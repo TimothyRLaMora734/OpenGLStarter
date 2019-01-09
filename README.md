@@ -533,7 +533,7 @@ This project is divided in categories of shaders as follow:
 
 * Detail
 	* ShaderBumpMapping
-	![](https://github.com/A-Ribeiro/OpenGLStarter/raw/master/doc/images/shaders/01BumpMapping.png =300)
+	![](https://github.com/A-Ribeiro/OpenGLStarter/raw/master/doc/images/shaders/01BumpMapping.png | width=300)
 	* ShaderConeStepMappingOriginal
 	![](https://github.com/A-Ribeiro/OpenGLStarter/raw/master/doc/images/shaders/02ConeStepMapping.png)
 * Radiometric
