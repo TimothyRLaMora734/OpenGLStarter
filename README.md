@@ -497,21 +497,21 @@ vec2 vec = Random::getVec2();
 quat rot = Random::getQuat();
 ```
 
-## Example Projects
+# Example Projects
 
-### Easing Equations Test
+## Easing Equations Test
 
 This project is used to render in OpenGL all the easing equations the framework has.
 
 ![](https://github.com/A-Ribeiro/OpenGLStarter/raw/master/doc/images/robert-penner-easing-eq.png)
 
-### Game Invader
+## Game Invader
 
 This project has an interactive application structure. It handles the user input to be able to run the game. It does work with XBox 360 Joystick and PC Keyboard.
 
 ![](https://github.com/A-Ribeiro/OpenGLStarter/raw/master/doc/images/game-invader.png)
 
-### Game Tetris
+## Game Tetris
 
 This project has an interactive application structure. It handles the user input to be able to run the game. It does work with a PC Keyboard.
 
@@ -521,7 +521,7 @@ It uses the TransformStack class and it has a basic render state manager to draw
 
 ![](https://github.com/A-Ribeiro/OpenGLStarter/raw/master/doc/images/game-tetris.png)
 
-### Shader Examples
+## Shader Examples
 
 This project has an interactive application structure. It handles the user mouse input.
 
@@ -533,7 +533,7 @@ This project is divided in categories of shaders as follow:
 
 * Detail
 	* ShaderBumpMapping
-	![](https://github.com/A-Ribeiro/OpenGLStarter/raw/master/doc/images/shaders/01BumpMapping.png | width=300)
+	![](https://github.com/A-Ribeiro/OpenGLStarter/raw/master/doc/images/shaders/01BumpMapping.png)
 	* ShaderConeStepMappingOriginal
 	![](https://github.com/A-Ribeiro/OpenGLStarter/raw/master/doc/images/shaders/02ConeStepMapping.png)
 * Radiometric
@@ -562,7 +562,7 @@ This project is divided in categories of shaders as follow:
 	![](https://github.com/A-Ribeiro/OpenGLStarter/raw/master/doc/images/shaders/12ProceduralTexture.png)
 
 
-## Alessandro Ribeiro's Content
+# Alessandro Ribeiro's Content
 
 I have an instrumental music album I recorded playing electric guitar.
 
@@ -572,7 +572,7 @@ The album is distributes by CDBaby, and they will take care of the Digital Right
 
 I'm telling you that because if you use the audio in any youtube video, for example, you will not be able to turn on the video monetization.
 
-## 3rdparty Libraries
+# 3rdparty Libraries
 
 This framework uses the following 3rdparty libraries:
 
