@@ -51,7 +51,7 @@ When you click in the _configure_ for the first time, you need to select the IDE
 ![CMake build system selection](https://github.com/A-Ribeiro/OpenGLStarter/raw/master/doc/images/cmake-ide-select.png)
 
 4. __Click in configure until all the red parameters gone__
-CMake you analyse your system for the compiler and build system you selected. You need to click several times in the _configure_ button until all red parameters are gone.
+CMake analyses your system for the compiler and build system you selected. You need to click several times in the _configure_ button until all red parameters gone.
 ![CMake red parameters](https://github.com/A-Ribeiro/OpenGLStarter/raw/master/doc/images/cmake-red-parameters.png)
 
 5. __Click in generate__
@@ -60,7 +60,7 @@ After these steps, you can open in the IDE you created the project located in th
 
 ## How to Create a new Project
 
-The structure of the CMake uses a file called CMakeLists.txt in the base folder of each library or binary project you want.
+The structure of the CMake configuration uses a file called CMakeLists.txt in the base folder of each library or binary project you want.
 
 To create a new project, you need to create a folder with the same pattern that is in the framework.
 
@@ -162,7 +162,7 @@ Look at the example below:
 }
 ```
 
-The project __aribeiro-text-easing-eq__ has a renderer from all functions. You can see the print screen below:
+The project __aribeiro-text-easing-eq__ render all equations. You can see the print screen below:
 
 ![Robert Penner's equations](https://github.com/A-Ribeiro/OpenGLStarter/raw/master/doc/images/robert-penner-easing-eq.png)
 
@@ -216,7 +216,7 @@ int main(int argc, char* argv[]) {
 
 ### OpenGL Font
 
-Use fonts in any graphics API is not an easy task, because fonts are created using several techniques. You need a lot of work to undestand the several types of font files formats that exist.
+To use fonts in any graphics API is not an easy task, because fonts are created using several techniques. You need a lot of work to undestand the several types of font files formats that exist.
 
 I created an image based font format that comes with the glyph information and the image in the same binary file.
 
@@ -271,7 +271,7 @@ int main(int argc, char* argv[]) {
 
 To create the BASOF file you need to build the font2bitmap tool.
 
-It receives as parameter the font file (could be ttf, otf or other freetype2 compatible format) and generate the .basof file.
+It receives as parameter the font file (could be ttf, otf or other freetype2 compatible format) and generates the .basof file.
 
 Example of use:
 
@@ -381,7 +381,7 @@ printf("time.unscaledDeltaTime (2 secs): %f\n", time.unscaledDeltaTime);
 
 ### Platform Path
 
-I created this class to manage the binary working directory. You can change the work direcory on the fly.
+I created this class to manage the binary working directory. You can change the work directory on the fly.
 
 The common use is to set the work directory to the binary directory. This make easy to load relative path files.
 
@@ -533,35 +533,33 @@ This project is divided in categories of shaders as follow:
 
 * Detail
 	* ShaderBumpMapping
-	![](https://github.com/A-Ribeiro/OpenGLStarter/raw/master/doc/images/shaders/01BumpMapping.png)
+	![](https://github.com/A-Ribeiro/OpenGLStarter/raw/master/doc/images/shaders/01BumpMapping.png =300)
 	* ShaderConeStepMappingOriginal
 	![](https://github.com/A-Ribeiro/OpenGLStarter/raw/master/doc/images/shaders/02ConeStepMapping.png)
 * Radiometric
 	* ShaderBrightnessContrast
 	![](https://github.com/A-Ribeiro/OpenGLStarter/raw/master/doc/images/shaders/03BrightnessContrast.png)
 	* ShaderGrayScaleInternet
-	![](https://github.com/A-Ribeiro/OpenGLStarter/raw/master/doc/images/shaders/03BrightnessContrast.png)
+	![](https://github.com/A-Ribeiro/OpenGLStarter/raw/master/doc/images/shaders/04GrayScaleInternet.png)
 	* ShaderGrayScaleHumanVisualSystem
-	![](https://github.com/A-Ribeiro/OpenGLStarter/raw/master/doc/images/shaders/03BrightnessContrast.png)
+	![](https://github.com/A-Ribeiro/OpenGLStarter/raw/master/doc/images/shaders/05GrayScaleHumanVisualSystem.png)
 	* ShaderGrayScaleHueSaturationValue
-	![](https://github.com/A-Ribeiro/OpenGLStarter/raw/master/doc/images/shaders/03BrightnessContrast.png)
-	* ShaderBlinPhongPixel
-	![](https://github.com/A-Ribeiro/OpenGLStarter/raw/master/doc/images/shaders/03BrightnessContrast.png)
+	![](https://github.com/A-Ribeiro/OpenGLStarter/raw/master/doc/images/shaders/06GrayScaleHueSaturationValue.png)
 * Filter
 	* ShaderLaplace
-	![](https://github.com/A-Ribeiro/OpenGLStarter/raw/master/doc/images/shaders/03BrightnessContrast.png)
+	![](https://github.com/A-Ribeiro/OpenGLStarter/raw/master/doc/images/shaders/07Laplace.png)
 	* ShaderBlur
-	![](https://github.com/A-Ribeiro/OpenGLStarter/raw/master/doc/images/shaders/03BrightnessContrast.png)
+	![](https://github.com/A-Ribeiro/OpenGLStarter/raw/master/doc/images/shaders/08Blur.png)
 * Ilumination
 	* ShaderBlinPhongVertex
-	![](https://github.com/A-Ribeiro/OpenGLStarter/raw/master/doc/images/shaders/03BrightnessContrast.png)
+	![](https://github.com/A-Ribeiro/OpenGLStarter/raw/master/doc/images/shaders/09BlinPhongVertex.png)
 	* ShaderBlinPhongPixel
-	![](https://github.com/A-Ribeiro/OpenGLStarter/raw/master/doc/images/shaders/03BrightnessContrast.png)
+	![](https://github.com/A-Ribeiro/OpenGLStarter/raw/master/doc/images/shaders/10BlinPhongPixel.png)
 * Texture
 	* ShaderTwoTextures
-	![](https://github.com/A-Ribeiro/OpenGLStarter/raw/master/doc/images/shaders/03BrightnessContrast.png)
+	![](https://github.com/A-Ribeiro/OpenGLStarter/raw/master/doc/images/shaders/11TwoTextures.png)
 	* ShaderProceduralTexture
-	![](https://github.com/A-Ribeiro/OpenGLStarter/raw/master/doc/images/shaders/03BrightnessContrast.png)
+	![](https://github.com/A-Ribeiro/OpenGLStarter/raw/master/doc/images/shaders/12ProceduralTexture.png)
 
 
 ## Alessandro Ribeiro's Content
