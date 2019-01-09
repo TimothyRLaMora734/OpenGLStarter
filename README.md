@@ -531,34 +531,30 @@ It has a ShaderManager class to handle the loading and setup of all shaders this
 
 This project is divided in categories of shaders as follow:
 
-* Detail
-	* ShaderBumpMapping
+### Detail - ShaderBumpMapping
 	![](https://github.com/A-Ribeiro/OpenGLStarter/raw/master/doc/images/shaders/01BumpMapping.png)
-	* ShaderConeStepMappingOriginal
+### Detail - ShaderConeStepMappingOriginal
 	![](https://github.com/A-Ribeiro/OpenGLStarter/raw/master/doc/images/shaders/02ConeStepMapping.png)
-* Radiometric
-	* ShaderBrightnessContrast
+
+### Radiometric - ShaderBrightnessContrast
 	![](https://github.com/A-Ribeiro/OpenGLStarter/raw/master/doc/images/shaders/03BrightnessContrast.png)
-	* ShaderGrayScaleInternet
+### Radiometric - ShaderGrayScaleInternet
 	![](https://github.com/A-Ribeiro/OpenGLStarter/raw/master/doc/images/shaders/04GrayScaleInternet.png)
-	* ShaderGrayScaleHumanVisualSystem
+### Radiometric - ShaderGrayScaleHumanVisualSystem
 	![](https://github.com/A-Ribeiro/OpenGLStarter/raw/master/doc/images/shaders/05GrayScaleHumanVisualSystem.png)
-	* ShaderGrayScaleHueSaturationValue
+### Radiometric - ShaderGrayScaleHueSaturationValue
 	![](https://github.com/A-Ribeiro/OpenGLStarter/raw/master/doc/images/shaders/06GrayScaleHueSaturationValue.png)
-* Filter
-	* ShaderLaplace
+### Filter - ShaderLaplace
 	![](https://github.com/A-Ribeiro/OpenGLStarter/raw/master/doc/images/shaders/07Laplace.png)
-	* ShaderBlur
+### Filter - ShaderBlur
 	![](https://github.com/A-Ribeiro/OpenGLStarter/raw/master/doc/images/shaders/08Blur.png)
-* Ilumination
-	* ShaderBlinPhongVertex
+### Ilumination - ShaderBlinPhongVertex
 	![](https://github.com/A-Ribeiro/OpenGLStarter/raw/master/doc/images/shaders/09BlinPhongVertex.png)
-	* ShaderBlinPhongPixel
+### Ilumination - ShaderBlinPhongPixel
 	![](https://github.com/A-Ribeiro/OpenGLStarter/raw/master/doc/images/shaders/10BlinPhongPixel.png)
-* Texture
-	* ShaderTwoTextures
+### Texture - ShaderTwoTextures
 	![](https://github.com/A-Ribeiro/OpenGLStarter/raw/master/doc/images/shaders/11TwoTextures.png)
-	* ShaderProceduralTexture
+### Texture - ShaderProceduralTexture
 	![](https://github.com/A-Ribeiro/OpenGLStarter/raw/master/doc/images/shaders/12ProceduralTexture.png)
 
 
