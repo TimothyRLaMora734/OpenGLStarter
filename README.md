@@ -532,30 +532,52 @@ It has a ShaderManager class to handle the loading and setup of all shaders this
 This project is divided in categories of shaders as follow:
 
 ### Detail - ShaderBumpMapping
-	![](https://github.com/A-Ribeiro/OpenGLStarter/raw/master/doc/images/shaders/01BumpMapping.png)
+
+![](https://github.com/A-Ribeiro/OpenGLStarter/raw/master/doc/images/shaders/01BumpMapping.png)
+
 ### Detail - ShaderConeStepMappingOriginal
-	![](https://github.com/A-Ribeiro/OpenGLStarter/raw/master/doc/images/shaders/02ConeStepMapping.png)
+
+![](https://github.com/A-Ribeiro/OpenGLStarter/raw/master/doc/images/shaders/02ConeStepMapping.png)
 
 ### Radiometric - ShaderBrightnessContrast
-	![](https://github.com/A-Ribeiro/OpenGLStarter/raw/master/doc/images/shaders/03BrightnessContrast.png)
+
+![](https://github.com/A-Ribeiro/OpenGLStarter/raw/master/doc/images/shaders/03BrightnessContrast.png)
+
 ### Radiometric - ShaderGrayScaleInternet
-	![](https://github.com/A-Ribeiro/OpenGLStarter/raw/master/doc/images/shaders/04GrayScaleInternet.png)
+
+![](https://github.com/A-Ribeiro/OpenGLStarter/raw/master/doc/images/shaders/04GrayScaleInternet.png)
+
 ### Radiometric - ShaderGrayScaleHumanVisualSystem
-	![](https://github.com/A-Ribeiro/OpenGLStarter/raw/master/doc/images/shaders/05GrayScaleHumanVisualSystem.png)
+
+![](https://github.com/A-Ribeiro/OpenGLStarter/raw/master/doc/images/shaders/05GrayScaleHumanVisualSystem.png)
+
 ### Radiometric - ShaderGrayScaleHueSaturationValue
-	![](https://github.com/A-Ribeiro/OpenGLStarter/raw/master/doc/images/shaders/06GrayScaleHueSaturationValue.png)
+
+![](https://github.com/A-Ribeiro/OpenGLStarter/raw/master/doc/images/shaders/06GrayScaleHueSaturationValue.png)
+
 ### Filter - ShaderLaplace
-	![](https://github.com/A-Ribeiro/OpenGLStarter/raw/master/doc/images/shaders/07Laplace.png)
+
+![](https://github.com/A-Ribeiro/OpenGLStarter/raw/master/doc/images/shaders/07Laplace.png)
+
 ### Filter - ShaderBlur
-	![](https://github.com/A-Ribeiro/OpenGLStarter/raw/master/doc/images/shaders/08Blur.png)
+
+![](https://github.com/A-Ribeiro/OpenGLStarter/raw/master/doc/images/shaders/08Blur.png)
+
 ### Ilumination - ShaderBlinPhongVertex
-	![](https://github.com/A-Ribeiro/OpenGLStarter/raw/master/doc/images/shaders/09BlinPhongVertex.png)
+
+![](https://github.com/A-Ribeiro/OpenGLStarter/raw/master/doc/images/shaders/09BlinPhongVertex.png)
+
 ### Ilumination - ShaderBlinPhongPixel
-	![](https://github.com/A-Ribeiro/OpenGLStarter/raw/master/doc/images/shaders/10BlinPhongPixel.png)
+
+![](https://github.com/A-Ribeiro/OpenGLStarter/raw/master/doc/images/shaders/10BlinPhongPixel.png)
+
 ### Texture - ShaderTwoTextures
-	![](https://github.com/A-Ribeiro/OpenGLStarter/raw/master/doc/images/shaders/11TwoTextures.png)
+
+![](https://github.com/A-Ribeiro/OpenGLStarter/raw/master/doc/images/shaders/11TwoTextures.png)
+
 ### Texture - ShaderProceduralTexture
-	![](https://github.com/A-Ribeiro/OpenGLStarter/raw/master/doc/images/shaders/12ProceduralTexture.png)
+
+![](https://github.com/A-Ribeiro/OpenGLStarter/raw/master/doc/images/shaders/12ProceduralTexture.png)
 
 
 # Alessandro Ribeiro's Content
