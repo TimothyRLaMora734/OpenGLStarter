@@ -3,9 +3,9 @@
 
 # OpenGLStarter
 
-> For this is how God loved the world:
-> he gave his only Son, so that everyone
-> who believes in him may not perish
+> For this is how God loved the world:<br/>
+> he gave his only Son, so that everyone<br/>
+> who believes in him may not perish<br/>
 > but may have eternal life.
 > 
 > John 3:16
@@ -36,26 +36,26 @@ It makes the cross-platform compilation very easy.
 
 ### Step-by-Step
 
-1. __Install CMake__
+1. __Install CMake__<br/>
 Download and install the CMake from their website [here](https://cmake.org/download/).
 
-2. __Setup the source folder and the build folder__
-Open CMake. You will see two input boxes. 
-The first you will put the OpenGLStarter folder. 
-The Second you will put the location you want to build the project. 
-Look at the example:
+2. __Setup the source folder and the build folder__ <br/>
+Open CMake. You will see two input boxes. <br/>
+The first you will put the OpenGLStarter folder. <br/>
+The Second you will put the location you want to build the project. <br/>
+Look at the example: <br/>
 ![CMake folder setup](https://github.com/A-Ribeiro/OpenGLStarter/raw/master/doc/images/cmake-folder-setup.png)
 
-3. __Select the platform specific project you want to create__
-When you click in the _configure_ for the first time, you need to select the IDE or the build system you want CMake to generate for you.
+3. __Select the platform specific project you want to create__ <br/>
+When you click in the _configure_ for the first time, you need to select the IDE or the build system you want CMake to generate for you. <br/>
 ![CMake build system selection](https://github.com/A-Ribeiro/OpenGLStarter/raw/master/doc/images/cmake-ide-select.png)
 
-4. __Click in configure until all the red parameters gone__
-CMake analyses your system for the compiler and build system you selected. You need to click several times in the _configure_ button until all red parameters gone.
+4. __Click in configure until all the red parameters gone__ <br/>
+CMake analyses your system for the compiler and build system you selected. You need to click several times in the _configure_ button until all red parameters gone. <br/>
 ![CMake red parameters](https://github.com/A-Ribeiro/OpenGLStarter/raw/master/doc/images/cmake-red-parameters.png)
 
-5. __Click in generate__
-After these steps, you can open in the IDE you created the project located in the build folder.
+5. __Click in generate__ <br/>
+After these steps, you can open in the IDE you created the project located in the build folder. <br/>
 ![CMake generated](https://github.com/A-Ribeiro/OpenGLStarter/raw/master/doc/images/cmake-generate.png)
 
 ## How to Create a new Project
@@ -405,11 +405,11 @@ void main(int argc, char* argv[]) {
 
 ### General Utilities
 
-* __C++ Method and Function Delegation__
-Yes you can use method delegation with this framework.
-Method delegation is a way to pass a method from a class as parameter to another.
-It can be used to implement events.
-See the example below:
+* __C++ Method and Function Delegation__ <br/>
+Yes you can use method delegation with this framework. <br/>
+Method delegation is a way to pass a method from a class as parameter to another. <br/>
+It can be used to implement events. <br/>
+See the example below: <br/>
 ```cpp
 // first you need to declare the delegate type
 BEGIN_DECLARE_DELEGATE(DelegateWithIntParameter, int v) CALL_PATTERN (v) END_DECLARE_DELEGATE;
@@ -448,18 +448,17 @@ void main(int argc, char* argv[]) {
 }
 ```
 
-* __Get Machine Mac Address__
-Returns the first mac address that are installed in the computer.
-Example:
-
+* __Get Machine Mac Address__ <br/>
+Returns the first mac address that are installed in the computer. <br/>
+Example: <br/>
 ```cpp
 std::vector<unsigned char> macaddr;
 macaddr = getFirstMacAddress();
 ```
 
-* __Read and Write PNG files__
-You can load and write .png files.
-example:
+* __Read and Write PNG files__ <br/>
+You can load and write .png files. <br/>
+example: <br/>
 ```cpp
 //
 // Writing image to PNG file
@@ -480,8 +479,8 @@ if (buffer == NULL){
 }
 ```
 
-* __Handle the Transformation Stack__
-To make easy to do hierarchy operations with any type.
+* __Handle the Transformation Stack__ <br/>
+To make easy to do hierarchy operations with any type. <br/>
 ```cpp
 TransformStack<mat4> projection;
 projection.push();
@@ -490,8 +489,8 @@ projection.top = mat4::IdentityMatrix;
 projection.pop();
 ```
 
-* __Random Generator__
-To generate random numbers with all types from the framework.
+* __Random Generator__ <br/>
+To generate random numbers with all types from the framework. <br/>
 ```cpp
 vec2 vec = Random::getVec2();
 quat rot = Random::getQuat();
