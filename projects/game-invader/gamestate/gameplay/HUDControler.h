@@ -15,7 +15,7 @@ private:
 	int score;
 	int level;
 	//PixelFont *font;
-	int w, h;
+	//int w, h;
 
 	SpaceInvader * spaceInvader;
 public:

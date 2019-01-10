@@ -27,7 +27,7 @@ const char* menuStateToStr(MENU_STATES state) {
 }
 //------------------------------------------------------------------------------
 void Menu::parser(MENU_TOKENS token) {
-	const int intervalLerpMenu = 100;
+	//const int intervalLerpMenu = 100;
 	switch (menuState) {
 		//MS_NEW_GAME
 	case  MS_NEW_GAME:

@@ -190,6 +190,8 @@
 #include <sys/types.h>
 #include <pwd.h>
 
+#include <errno.h>
+
 std::string unixHomeDirectory() {
 	size_t bufsize = sysconf(_SC_GETPW_R_SIZE_MAX);
 	if (bufsize == -1)

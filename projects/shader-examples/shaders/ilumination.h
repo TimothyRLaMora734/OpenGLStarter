@@ -76,9 +76,9 @@ public:
 				"vec3 light = normalize( uVec3LightPosition - pos );"
 				"vec3 normal = normalize( ( uMat4ModelViewInverseTranspose * vec4(aVec3Normal,1.0) ).xyz);"
 				"vec3 eyeVec = vec3(0,0,1);"
-				"vec3 half = normalize(eyeVec + light);"
-				"float kd = saturate(dot(normal, light));"
-				"float ke = saturate(dot(normal, half));"
+				"vec3 halfV = normalize(eyeVec + light);"
+				"float kd = clamp(dot(normal, light), 0.0, 1.0);"
+				"float ke = clamp(dot(normal, halfV), 0.0, 1.0);"
 				"vVec3ColorMultiply = uVec3ObjectColor * ( uVec3LightAmbient + kd * uVec3LightDiffuse );"
 				"vVec3ColorSum = uVec3LightSpecular * pow(ke, uFloatLightShine);"
 				"vVec2UV = aVec2UV;"
@@ -252,8 +252,8 @@ public:
 				"vec4 color = texture2D(uSampler2DDiffuse, vVec2UV);"
 
 				"vec3 normal = normalize(vVec3Normal);"
-				"float kd = saturate(dot(normal, normalize(vVec3Light)));"
-				"float ke = saturate(dot(normal, normalize(vVec3Half)));"
+				"float kd = clamp(dot(normal, normalize(vVec3Light)), 0.0, 1.0);"
+				"float ke = clamp(dot(normal, normalize(vVec3Half)), 0.0, 1.0);"
 
 				"color.rgb = color.rgb * (uVec3LightAmbient + kd * uVec3LightDiffuse) + uVec3LightSpecular * pow(ke,uFloatLightShine);"
 

@@ -1,4 +1,4 @@
-﻿#ifndef detail__h
+#ifndef detail__h
 #define detail__h
 
 /*
@@ -123,19 +123,19 @@ public:
 
 				// normal map
 				"vec3 normal = texture2D(uSampler2DBumpMap, uv).rgb;"
-				"normal.xy = 2 * normal.xy - 1;"
+				"normal.xy = 2.0 * normal.xy - 1.0;"
 
 				"normal.z = sqrt(1.0 - dot(normal.xy,normal.xy));"
 
-				"normal = normalize( lerp(vec3(0,0,1), normal, uFloatStrength) );"
+				"normal = normalize( mix(vec3(0,0,1), normal, uFloatStrength) );"
 
 				// light and view in tangent space
 				"vec3 l = normalize(vVec3Light);"
 				"vec3 v = normalize(vVec3Eye);"
 
 				// compute diffuse and specular terms
-				"float diff = saturate(dot(l,normal));"
-				"float spec = saturate(dot(normalize(l - v),normal));"
+				"float diff = clamp(dot(l,normal), 0.0, 1.0);"
+				"float spec = clamp(dot(normalize(l - v),normal), 0.0, 1.0);"
 
 				// attenuation factor
 				//float att = 1.0 - max(0,l.z); 
@@ -148,7 +148,7 @@ public:
 						"(color.xyz * uVec3LightDiffuse * diff +"
 						"uVec3LightSpecular * pow(spec, uFloatLightShine));"
 
-				"finalcolor.w = 1.0f;"
+				"finalcolor.w = 1.0;"
 				"return finalcolor;"
 			"}"
 
@@ -342,19 +342,19 @@ public:
 
 				// normal map
 				"vec3 normal = texture2D(uSampler2DBumpMap, uv).rgb;"
-				"normal.xy = 2 * normal.xy - 1;"
+				"normal.xy = 2.0 * normal.xy - 1.0;"
 
 				"normal.z = sqrt(1.0 - dot(normal.xy,normal.xy));"
 
-				"normal = normalize( lerp(vec3(0,0,1), normal, uFloatConeDepth) );"
+				"normal = normalize( mix(vec3(0,0,1), normal, uFloatConeDepth) );"
 
 				// light and view in tangent space
 				"vec3 l = normalize(vVec3Light);"
 				"vec3 v = normalize(vVec3Eye);"
 
 				// compute diffuse and specular terms
-				"float diff = saturate(dot(l,normal));"
-				"float spec = saturate(dot(normalize(l - v),normal));"
+				"float diff = clamp(dot(l,normal), 0.0, 1.0);"
+				"float spec = clamp(dot(normalize(l - v),normal), 0.0, 1.0);"
 
 				// attenuation factor
 				//float att = 1.0 - max(0,l.z); 
@@ -367,7 +367,7 @@ public:
 				"(color.xyz * uVec3LightDiffuse * diff +"
 				"uVec3LightSpecular * pow(spec, uFloatLightShine));"
 
-				"finalcolor.w = 1.0f;"
+				"finalcolor.w = 1.0;"
 				"return finalcolor;"
 			"}"
 
@@ -388,8 +388,8 @@ public:
 						"break;"
 					"O += v * w*scale * vec3(1,-1,1);"//a texture foi gerada com a coordenada Y invertida...
 				"}"
-				"if (O.x > 1 || O.x < 0 ||"
-				    "O.y > 1 || O.y < 0) discard;"
+				"if (O.x > 1.0 || O.x < 0.0 ||"
+				    "O.y > 1.0 || O.y < 0.0) discard;"
 				"vec4 result = normal_mapping(O.xy);"
 				"gl_FragColor = result;"
 			"}"

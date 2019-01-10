@@ -52,9 +52,9 @@ const char* gamestateToStr(GAMESTATE_STATES_ENUM state) {
 //------------------------------------------------------------------------------
 GameState::GameState(SpaceInvader *si) :
 	cgReproducer(si),
-	pauseState(si),
-	playState(si),
-	menu(si)
+    playState(si),
+	menu(si),
+    pauseState(si)
 {
 	globalGamestate = GS_MENU;
 	this->spaceInvader = si;

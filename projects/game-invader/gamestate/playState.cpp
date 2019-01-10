@@ -13,8 +13,8 @@
 
 //------------------------------------------------------------------------------
 PlayState::PlayState(SpaceInvader *si) :
+    HUD(si),
 	starsDraw(si),
-	HUD(si),
 	scene(si)
 	// ,postEffectRender(w,h)
 {

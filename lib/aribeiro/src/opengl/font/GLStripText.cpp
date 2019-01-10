@@ -26,8 +26,8 @@ namespace aRibeiro {
 		mStripInfo = new StripInfoVertexAttrib[buffSize];
 		mSize = buffSize;
 
-		texture = texture;
-		shader = shader;
+		this->texture = texture;
+		this->shader = shader;
 
 		//mTextureID = textureID;
 		//TextureManager::getSingleton()->incrementTextureUse(textureID);

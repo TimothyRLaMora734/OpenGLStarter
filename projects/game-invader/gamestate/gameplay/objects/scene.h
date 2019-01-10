@@ -172,7 +172,7 @@ private:
 			}
 			else {
 				object->position = object->position + object->velocity * invaderref->time.deltaTime * 30.0f;
-				if ((object->type == OT_Enemy)) {
+				if (object->type == OT_Enemy) {
 					if (object->aabb.min_box.y < scene->aabb.min_box.y) {
 						scene->killAllSpaceShip();
 					}

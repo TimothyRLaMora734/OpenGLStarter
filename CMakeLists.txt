@@ -109,6 +109,21 @@ add_definitions(-DGLEW_STATIC)
 add_definitions(-DOS_TARGET_${OS_TARGET})
 add_definitions(-DARCH_TARGET_${ARCH_TARGET})
 
+if (${OS_TARGET} STREQUAL "mac")
+
+	#set(ARIBEIRO_LIBRARIES ${ARIBEIRO_LIBRARIES} pthread )
+	#add_definitions( -all_load )
+
+	#SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -all_load")
+	#SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -all_load")
+
+	SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -ObjC")
+
+	#flag to fix static linking on macOS
+	#add_definitions(-ObjC)
+
+endif()
+
 #
 # PostBuildCopy DLL on windows
 #

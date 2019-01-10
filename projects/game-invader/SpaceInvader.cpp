@@ -113,8 +113,8 @@ void SpaceInvader::draw() {
 
 
 const int
-XBOX_LB = 4,
-XBOX_RB = 5,
+//XBOX_LB = 4,
+//XBOX_RB = 5,
 XBOX_START = 7,
 XBOX_A = 0;
 

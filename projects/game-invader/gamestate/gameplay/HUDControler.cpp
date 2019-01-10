@@ -16,8 +16,8 @@
 //------------------------------------------------------------------------------
 HUDcontroler::HUDcontroler(SpaceInvader * si) {
 	this->spaceInvader = si;
-	this->w = w;
-	this->h = h;
+    //this->w = si->render->dimension.x;// w;
+	//this->h = h;
 	numberOfLifes = initialNumberOfLife;
 	score = 0;
 }

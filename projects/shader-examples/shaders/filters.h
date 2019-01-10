@@ -76,6 +76,7 @@ public:
 				//    -1
 				//  -1 4-1
 				//    -1
+            
 				"vec3 texel = abs("
 					"centerTexelColor * 4.0"
 					"-texture2D(uSampler2DFramebuffer, vVec2UV + uVec2FramebufferTexelNeighbor * vec2(-1, 0)).rgb"
@@ -84,8 +85,8 @@ public:
 					"-texture2D(uSampler2DFramebuffer, vVec2UV + uVec2FramebufferTexelNeighbor * vec2( 0,-1)).rgb"
 				") * ( uFloatIntensity * 1.1 );"
 
-				"texel = (1 - saturate(texel.r + texel.g + texel.b));"
-				"texel = lerp(centerTexelColor, texel, uFloatBlend);"
+				"texel = vec3(1.0 - clamp(texel.r + texel.g + texel.b, 0.0, 1.0));"
+				"texel = mix(centerTexelColor, texel, uFloatBlend);"
 				"vec4 result = vec4(texel, 1.0);"
 				"gl_FragColor = result;"
 			"}"
@@ -179,20 +180,36 @@ public:
 			//varying
 			"varying vec2 vVec2UV;"
 
-			"const float coef[] = {0.015625,0.093750, 0.234375, 0.312500,0.234375, 0.093750, 0.015625};"
+            "uniform float coef[7];"
+            /*
+			"const float coef[7] = float[7](0.015625,0.093750, 0.234375, 0.312500,0.234375, 0.093750, 0.015625);"
+             */
 
 			"void main() {"
+            
 				"vec3 centerTexelColor = texture2D(uSampler2DFramebuffer, vVec2UV ).rgb;"
-				"vec3 texel = 0;"
+				"vec3 texel = vec3(0.0);"
+            
 				"for (int i = -3; i <= 3; i++) {"
+                    "float iF = float (i);"
+                    "vec2 uv = vVec2UV + uVec2FramebufferTexelNeighbor * uVec2HorizontalVertical * iF;"
+            
+                    "texel += texture2D(uSampler2DFramebuffer, uv ).rgb * coef[i + 3];"
+            /*
 					"texel += texture2D(uSampler2DFramebuffer, vVec2UV + uVec2FramebufferTexelNeighbor * uVec2HorizontalVertical * (float)i ).rgb * coef[i + 3];"
+             */
 				"}"
+             
 				"vec4 result = vec4(texel, 1.0);"
 				"gl_FragColor = result;"
 			"}"
 		};
 
 		LoadShaderProgram(vertexShaderCode, fragmentShaderCode);
+        
+        enable();
+        float coef[] = {0.015625f, 0.093750f, 0.234375f, 0.312500f, 0.234375f, 0.093750f, 0.015625f};
+        glUniform1fv(getUniformLocation("coef"),7,coef);
 
 		aVec3Position = getAttribLocation("aVec3Position");
 		aVec2UV = getAttribLocation("aVec2UV");

@@ -58,7 +58,7 @@ public:
 			"void main() {"
 				"vec4 textelA = texture2D(uSampler2DTextureA, vVec2UV);"
 				"vec4 textelB = texture2D(uSampler2DTextureB, vVec2UV);"
-				"gl_FragColor = lerp(textelA, textelB, uFloatBlend);"
+				"gl_FragColor = mix(textelA, textelB, uFloatBlend);"
 			"}"
 		};
 
@@ -140,9 +140,9 @@ public:
 
 			"vec3 proceduralChecker(vec2 coord) {"
 				"float freq = uFloatFrequency;"
-				"vec3 retorno = 1;"
-				"if (freq > 0)"
-					"retorno = lerp( vec3(0.5,0.5,0.5), vec3(1.0,1.0,1.0), saturate(sign(fmod(coord.x,freq) - freq * 0.5)) );"
+				"vec3 retorno = vec3(1.0);"
+				"if (freq > 0.0)"
+					"retorno = mix( vec3(0.5,0.5,0.5), vec3(1.0,1.0,1.0), clamp(sign(mod(coord.x,freq) - freq * 0.5), 0.0, 1.0) );"
 				"return retorno;"
 			"}"
 
