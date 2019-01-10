@@ -329,34 +329,45 @@ if(SFML_OS_WINDOWS)
 
 elseif(SFML_OS_MACOSX)
 
+    message(STATUS "[sfml] Framework Source Dir:" )
+
     # install extlibs dependencies only when used
     if("${FLAC_LIBRARY}" STREQUAL "${SFML_SOURCE_DIR}/extlibs/libs-osx/Frameworks/FLAC.framework")
         install(DIRECTORY extlibs/libs-osx/Frameworks/FLAC.framework DESTINATION ${CMAKE_INSTALL_FRAMEWORK_PREFIX})
+        message(STATUS "${FLAC_LIBRARY}" )
     endif()
 
     if("${FREETYPE_LIBRARY}" STREQUAL "${SFML_SOURCE_DIR}/extlibs/libs-osx/Frameworks/freetype.framework")
         install(DIRECTORY extlibs/libs-osx/Frameworks/freetype.framework DESTINATION ${CMAKE_INSTALL_FRAMEWORK_PREFIX})
+        message(STATUS "${FREETYPE_LIBRARY}" )
     endif()
 
     if("${OGG_LIBRARY}" STREQUAL "${SFML_SOURCE_DIR}/extlibs/libs-osx/Frameworks/ogg.framework")
         install(DIRECTORY extlibs/libs-osx/Frameworks/ogg.framework DESTINATION ${CMAKE_INSTALL_FRAMEWORK_PREFIX})
+        message(STATUS "${OGG_LIBRARY}" )
     endif()
 
     if("${VORBIS_LIBRARY}" STREQUAL "${SFML_SOURCE_DIR}/extlibs/libs-osx/Frameworks/vorbis.framework")
         install(DIRECTORY extlibs/libs-osx/Frameworks/vorbis.framework DESTINATION ${CMAKE_INSTALL_FRAMEWORK_PREFIX})
+        message(STATUS "${VORBIS_LIBRARY}" )
     endif()
 
     if("${VORBISENC_LIBRARY}" STREQUAL "${SFML_SOURCE_DIR}/extlibs/libs-osx/Frameworks/vorbisenc.framework")
         install(DIRECTORY extlibs/libs-osx/Frameworks/vorbisenc.framework DESTINATION ${CMAKE_INSTALL_FRAMEWORK_PREFIX})
+        message(STATUS "${VORBISENC_LIBRARY}" )
     endif()
 
     if("${VORBISFILE_LIBRARY}" STREQUAL "${SFML_SOURCE_DIR}/extlibs/libs-osx/Frameworks/vorbisfile.framework")
         install(DIRECTORY extlibs/libs-osx/Frameworks/vorbisfile.framework DESTINATION ${CMAKE_INSTALL_FRAMEWORK_PREFIX})
+        message(STATUS "${VORBISFILE_LIBRARY}" )
     endif()
 
     if("${OPENAL_LIBRARY}" STREQUAL "${SFML_SOURCE_DIR}/extlibs/libs-osx/Frameworks/OpenAL.framework")
         install(DIRECTORY "${OPENAL_LIBRARY}" DESTINATION ${CMAKE_INSTALL_FRAMEWORK_PREFIX})
+        message(STATUS "${OPENAL_LIBRARY}" )
     endif()
+
+    message(STATUS "" )
 
     # install the Xcode templates if requested
     if(SFML_INSTALL_XCODE_TEMPLATES)
