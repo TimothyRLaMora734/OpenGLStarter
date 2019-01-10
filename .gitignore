@@ -3,8 +3,8 @@
 # CMake folders #
 #################
 
-build/
-include/
+/build/
+/include/
 
 ######################
 # OS generated files #
