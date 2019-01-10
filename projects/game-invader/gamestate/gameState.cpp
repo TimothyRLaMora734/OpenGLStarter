@@ -51,9 +51,9 @@ const char* gamestateToStr(GAMESTATE_STATES_ENUM state) {
 }
 //------------------------------------------------------------------------------
 GameState::GameState(SpaceInvader *si) :
-	cgReproducer(si),
-    playState(si),
 	menu(si),
+    cgReproducer(si),
+    playState(si),
     pauseState(si)
 {
 	globalGamestate = GS_MENU;
