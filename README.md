@@ -601,6 +601,10 @@ The album is distributes by CDBaby, and they will take care of the Digital Right
 
 I'm telling you that because if you use the audio in any youtube video, for example, you will not be able to turn on the video monetization.
 
+# 3rdparty's Content
+
+I used the Jesus image from [Reji Joseph website](http://www.rejijoseph.com/search/label/Heavenly).
+
 # 3rdparty Libraries
 
 This framework uses the following 3rdparty libraries:
