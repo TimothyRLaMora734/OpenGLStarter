@@ -536,6 +536,18 @@ This project is divided in categories of shaders as follow:
 
 ### Detail - ShaderConeStepMappingOriginal
 
+The framework has a tool called __conestep-generator__ to compute the conemap texture from a depth map texture.
+
+You can use the tool as the example below:
+
+```
+conestep-generator <filepath>/<filename>.png
+```
+
+The tool will generate the normal map texture and the cone map texture.
+
+You can see the example of the cone step mapping below:
+
 ![](https://github.com/A-Ribeiro/OpenGLStarter/raw/master/doc/images/shaders/02ConeStepMapping.png)
 
 ### Radiometric - ShaderBrightnessContrast
