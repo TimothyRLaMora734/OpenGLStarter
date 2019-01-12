@@ -377,7 +377,7 @@ public:
 			"void main() {"
 				//configurando a posicao
 				"vec3 O = vec3(vVec2UV,0);"
-				"vec3 v = vec3((vVec3Eye * (-(uFloatConeDepth * 0.1) / vVec3Eye.z)).xy, 1.0);"
+				"vec3 v = vec3((vVec3Eye * (-(uFloatConeDepth * 0.2) / vVec3Eye.z)).xy, 1.0);"
 				"float iz = max(abs(v.x),abs(v.y));"
 				"const float w = 1.2;"
 				"vec4 info;"

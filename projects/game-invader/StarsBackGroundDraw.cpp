@@ -65,11 +65,11 @@ void StarsBackGroundDraw::draw(float deltaTime){
 
 }
 
-  //intensidade = abs( ( fmod(deslocamento * 10.0f,1.0f) ) * 2.0f - 1.0f );//-1 a 1
+  //intensidade = absv( ( fmod(deslocamento * 10.0f,1.0f) ) * 2.0f - 1.0f );//-1 a 1
   //intensidade = intensidade*0.5+0.5;
 
   intensidade += deltaTime;
-  float intensity = abs( fmod(intensidade, 2.0f) - 1.0f);
+  float intensity = absv( fmod(intensidade, 2.0f) - 1.0f);
   intensidade = fmod(intensidade, 2.0f);
 
   intensity = intensity * 0.5 + 0.5;

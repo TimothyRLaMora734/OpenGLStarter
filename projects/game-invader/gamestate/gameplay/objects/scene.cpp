@@ -49,7 +49,7 @@ void Scene::renderCongratulations(const vec2& screenCenter, float deltatime){
   invaderref->render->shader->setColor(vec4(1.0f));
 
   for (int i=-5;i<=5;i++){
-    if (abs(i)<2) continue;
+    if (absv(i)<2) continue;
 
 	invaderref->render->model.push();
 

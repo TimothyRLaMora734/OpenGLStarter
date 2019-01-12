@@ -154,8 +154,8 @@ private:
 			}
 			else {
 				object->velocity = vec2(0);
-				if (abs(newPos.x - scene->aabb.min_box.x) <
-					abs(newPos.x - scene->aabb.max_box.x)) {
+				if (absv(newPos.x - scene->aabb.min_box.x) <
+					absv(newPos.x - scene->aabb.max_box.x)) {
 					newPos.x = scene->aabb.min_box.x;
 				}
 				else {
@@ -204,7 +204,7 @@ private:
 			float xToAlignA = scene->aabb.max_box.x - object->aabb.min_box.x;
 			float xToAlignB = scene->aabb.min_box.x - object->aabb.max_box.x;
 			
-			if (abs(xToAlignA) < abs(xToAlignB))
+			if (absv(xToAlignA) < absv(xToAlignB))
 				scene->velocityFixWhenInverted = xToAlignA;
 			else
 				scene->velocityFixWhenInverted = xToAlignB;
@@ -242,9 +242,9 @@ private:
 	void CreateEnemy(int Nlinhas, int NColunas, double Vspace, double Hspace) {
 		int OoS = 0;
 		vec2 initHoriz = vec2(0),
-			endHoriz = vec2(abs(Hspace*Nlinhas), 0),
+			endHoriz = vec2(absv(Hspace*Nlinhas), 0),
 			initVert = vec2(0),
-			endVert = vec2(0, -abs(Vspace*NColunas)),
+			endVert = vec2(0, -absv(Vspace*NColunas)),
 			pos;
 		float aux = 0;
 		for (int i = 0; i < Nlinhas; i++) {
@@ -334,8 +334,8 @@ public:
 	//----------------------------------------------------------------------------
 	void createEnemy(double enemy_Velocity, double down_Velocity,
 		int Nl, int Nc, double vspc, double hspc) {
-		this->enemy_velocity = vec2(abs(enemy_Velocity), 0);
-		this->down_velocity = vec2(0, -abs(down_Velocity));
+		this->enemy_velocity = vec2(absv(enemy_Velocity), 0);
+		this->down_velocity = vec2(0, -absv(down_Velocity));
 
 		CreateEnemy(Nl, Nc, vspc, hspc);
 	}
@@ -494,7 +494,7 @@ public:
 				AABB(position - dimension / 2,position + dimension / 2),//aabb;//Axis-Aligned Bound Box
 				true,//active;
 				dimension,//dimension;
-				vec2(0,-abs(shootSpeed)),//velocity
+				vec2(0,-absv(shootSpeed)),//velocity
 				0//int counter
 		};
 		enemyShootList.insert(aux);
@@ -513,7 +513,7 @@ public:
 				AABB(position - dimension / 2,position + dimension / 2),//aabb;//Axis-Aligned Bound Box
 				true,//active;
 				dimension,//dimension;
-				vec2(0,abs(shootSpeed)),//velocity
+				vec2(0,absv(shootSpeed)),//velocity
 				0//int counter
 		};
 		spaceShipShootList.insert(aux);

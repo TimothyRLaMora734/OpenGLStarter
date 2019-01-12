@@ -227,6 +227,7 @@ add_subdirectory( projects/shader-examples )
 # Tools
 #
 add_subdirectory( tools/font2bitmap )
+add_subdirectory( tools/conestep-generator )
 
 #add_subdirectory( projects/crazytwirl )
 

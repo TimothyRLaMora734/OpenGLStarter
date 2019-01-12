@@ -36,7 +36,11 @@ class ShaderManager {
 
 	void draw_GLShaderTextureColor(GLShader *baseshader, GLint ogl_primitive, const VertexAttrib *vertexBuffer, int vertexCount);
 	void draw_ShaderBumpMapping(GLShader *baseshader, GLint ogl_primitive, const VertexAttrib *vertexBuffer, int vertexCount);
+	void draw_ShaderBumpMappingWood(GLShader *baseshader, GLint ogl_primitive, const VertexAttrib *vertexBuffer, int vertexCount);
+
 	void draw_ShaderConeStepMappingOriginal(GLShader *baseshader, GLint ogl_primitive, const VertexAttrib *vertexBuffer, int vertexCount);
+	void draw_ShaderConeStepMappingOriginalWood(GLShader *baseshader, GLint ogl_primitive, const VertexAttrib *vertexBuffer, int vertexCount);
+
 	void draw_ShaderLaplace(GLShader *baseshader, GLint ogl_primitive, const VertexAttrib *vertexBuffer, int vertexCount);
 	void draw_ShaderBlur(GLShader *baseshader, GLint ogl_primitive, const VertexAttrib *vertexBuffer, int vertexCount);
 	void draw_ShaderBlinPhongVertex(GLShader *baseshader, GLint ogl_primitive, const VertexAttrib *vertexBuffer, int vertexCount);
@@ -51,6 +55,13 @@ class ShaderManager {
 public:
 	std::string activeShaderName;
 	GLShader *activeShader;
+
+	//
+	//aux textures
+	//
+	GLTexture *wood;
+	GLTexture *woodBumpAndCone;
+
 
 	//
 	// shader parameters

@@ -163,7 +163,7 @@ void GenericSimulation::setSimulationInterval_ms(const unsigned int time) {
 
 
 	  double lrp = (1.0-(double)time/(double)simulationInterval_ms)*(double)lastDiffTimeSimulation_ms;
-	  int aux = (int)(abs(lrp)+0.5);
+	  int aux = (int)(absv(lrp)+0.5);
 	  lastTimeSimulation_ms += aux;
 
 	  simulationInterval_ms = time;

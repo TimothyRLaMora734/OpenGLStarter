@@ -11,8 +11,11 @@ ShaderManager::ShaderManager(RenderSystem *renderSystem) {
 	groups.push_back("radiometric");
 	groups.push_back("texture");
 
-	insideGroup["detail"].push_back("BumpMapping");
-	insideGroup["detail"].push_back("ConeStepMapping");
+	insideGroup["detail"].push_back("BumpMappingRock");
+	insideGroup["detail"].push_back("ConeStepMappingRock");
+	insideGroup["detail"].push_back("BumpMappingWood");
+	insideGroup["detail"].push_back("ConeStepMappingWood");
+
 	insideGroup["filters"].push_back("Laplace");
 	insideGroup["filters"].push_back("Blur");
 	
@@ -35,13 +38,21 @@ ShaderManager::ShaderManager(RenderSystem *renderSystem) {
 	shaders_is_post_processing["GLShaderTextureColor"] = false;
 
 	//detail
-	shaders["BumpMapping"] = new ShaderBumpMapping();
-	shaders_draw_map["BumpMapping"] = &ShaderManager::draw_ShaderBumpMapping;
-	shaders_is_post_processing["BumpMapping"] = false;
+	shaders["BumpMappingRock"] = new ShaderBumpMapping();
+	shaders_draw_map["BumpMappingRock"] = &ShaderManager::draw_ShaderBumpMapping;
+	shaders_is_post_processing["BumpMappingRock"] = false;
 
-	shaders["ConeStepMapping"] = new ShaderConeStepMappingOriginal();
-	shaders_draw_map["ConeStepMapping"] = &ShaderManager::draw_ShaderConeStepMappingOriginal;
-	shaders_is_post_processing["ConeStepMapping"] = false;
+	shaders["BumpMappingWood"] = new ShaderBumpMapping();
+	shaders_draw_map["BumpMappingWood"] = &ShaderManager::draw_ShaderBumpMappingWood;
+	shaders_is_post_processing["BumpMappingWood"] = false;
+
+	shaders["ConeStepMappingRock"] = new ShaderConeStepMappingOriginal();
+	shaders_draw_map["ConeStepMappingRock"] = &ShaderManager::draw_ShaderConeStepMappingOriginal;
+	shaders_is_post_processing["ConeStepMappingRock"] = false;
+
+	shaders["ConeStepMappingWood"] = new ShaderConeStepMappingOriginal();
+	shaders_draw_map["ConeStepMappingWood"] = &ShaderManager::draw_ShaderConeStepMappingOriginalWood;
+	shaders_is_post_processing["ConeStepMappingWood"] = false;
 
 	//filter
 	shaders["Laplace"] = new ShaderLaplace();
@@ -90,6 +101,10 @@ ShaderManager::ShaderManager(RenderSystem *renderSystem) {
 	//
 	// Initialize Parameters
 	//
+
+	wood = GLTexture::loadFromPNG("resources/images/wood.png");
+	woodBumpAndCone = GLTexture::loadFromPNG("resources/images/wood+bump+cone.png");
+
 	defaultTexture = GLTexture::loadFromPNG("resources/images/jesus1.png");
 
 	diffuse = GLTexture::loadFromPNG("resources/images/rock.png");
@@ -136,6 +151,9 @@ ShaderManager::~ShaderManager() {
 	setNullAndDelete(bumpmap);
 	setNullAndDelete(conemap);
 	setNullAndDelete(diffuseB);
+
+	setNullAndDelete(wood);
+	setNullAndDelete(woodBumpAndCone);
 
 }
 
@@ -232,6 +250,114 @@ void ShaderManager::draw_ShaderBumpMapping(GLShader *baseshader, GLint ogl_primi
 
 	bumpmap->deactive(1);
 	diffuse->deactive(0);
+}
+
+
+
+void ShaderManager::draw_ShaderBumpMappingWood(GLShader *baseshader, GLint ogl_primitive, const VertexAttrib *vertexBuffer, int vertexCount) {
+	ShaderBumpMapping *shader = (ShaderBumpMapping*)baseshader;
+
+	shader->enable();
+
+	wood->active(0);
+	shader->setDiffuse(0);
+
+	woodBumpAndCone->active(1);
+	shader->setBumpMap(1);
+
+	shader->setModelViewProjection(render->getMVP());
+	shader->setModelView(render->model.top);
+	shader->setModelViewInverseTranspose(render->getModelIT());
+
+	shader->setLightPosition(lightPosition);
+	shader->setLightAmbient(lightAmbient);
+	shader->setLightDiffuse(lightDiffuse);
+	shader->setLightSpecular(lightSpecular);
+	shader->setLightShine(lightShine);
+	shader->setStrength(normalStrength);
+
+
+	OPENGL_CMD(glEnableVertexAttribArray(shader->aVec3Position));
+	OPENGL_CMD(glVertexAttribPointer(shader->aVec3Position, 3, GL_FLOAT, false, sizeof(VertexAttrib), &vertexBuffer[0].position));
+
+	OPENGL_CMD(glEnableVertexAttribArray(shader->aVec2UV));
+	OPENGL_CMD(glVertexAttribPointer(shader->aVec2UV, 2, GL_FLOAT, false, sizeof(VertexAttrib), &vertexBuffer[0].uv));
+
+	OPENGL_CMD(glEnableVertexAttribArray(shader->aVec3Normal));
+	OPENGL_CMD(glVertexAttribPointer(shader->aVec3Normal, 3, GL_FLOAT, false, sizeof(VertexAttrib), &vertexBuffer[0].normal));
+
+	OPENGL_CMD(glEnableVertexAttribArray(shader->aVec3Tangent));
+	OPENGL_CMD(glVertexAttribPointer(shader->aVec3Tangent, 3, GL_FLOAT, false, sizeof(VertexAttrib), &vertexBuffer[0].tangent));
+
+	OPENGL_CMD(glEnableVertexAttribArray(shader->aVec3Binormal));
+	OPENGL_CMD(glVertexAttribPointer(shader->aVec3Binormal, 3, GL_FLOAT, false, sizeof(VertexAttrib), &vertexBuffer[0].binormal));
+
+	OPENGL_CMD(glDrawArrays(ogl_primitive, 0, vertexCount));
+
+	OPENGL_CMD(glDisableVertexAttribArray(shader->aVec3Position));
+	OPENGL_CMD(glDisableVertexAttribArray(shader->aVec2UV));
+	OPENGL_CMD(glDisableVertexAttribArray(shader->aVec3Normal));
+	OPENGL_CMD(glDisableVertexAttribArray(shader->aVec3Tangent));
+	OPENGL_CMD(glDisableVertexAttribArray(shader->aVec3Binormal));
+
+	woodBumpAndCone->deactive(1);
+	wood->deactive(0);
+}
+
+void ShaderManager::draw_ShaderConeStepMappingOriginalWood(GLShader *baseshader, GLint ogl_primitive, const VertexAttrib *vertexBuffer, int vertexCount) {
+	ShaderConeStepMappingOriginal *shader = (ShaderConeStepMappingOriginal*)baseshader;
+
+	shader->enable();
+
+	wood->active(0);
+	shader->setDiffuse(0);
+
+	woodBumpAndCone->active(1);
+	shader->setBumpMap(1);
+
+	woodBumpAndCone->active(2);
+	shader->setConeMap(2);
+
+	shader->setConeDepth(conedepth);
+
+	shader->setModelViewProjection(render->getMVP());
+	shader->setModelView(render->model.top);
+	shader->setModelViewInverseTranspose(render->getModelIT());
+
+	shader->setLightPosition(lightPosition);
+	shader->setLightAmbient(lightAmbient);
+	shader->setLightDiffuse(lightDiffuse);
+	shader->setLightSpecular(lightSpecular);
+	shader->setLightShine(lightShine);
+
+
+	OPENGL_CMD(glEnableVertexAttribArray(shader->aVec3Position));
+	OPENGL_CMD(glVertexAttribPointer(shader->aVec3Position, 3, GL_FLOAT, false, sizeof(VertexAttrib), &vertexBuffer[0].position));
+
+	OPENGL_CMD(glEnableVertexAttribArray(shader->aVec2UV));
+	OPENGL_CMD(glVertexAttribPointer(shader->aVec2UV, 2, GL_FLOAT, false, sizeof(VertexAttrib), &vertexBuffer[0].uv));
+
+	OPENGL_CMD(glEnableVertexAttribArray(shader->aVec3Normal));
+	OPENGL_CMD(glVertexAttribPointer(shader->aVec3Normal, 3, GL_FLOAT, false, sizeof(VertexAttrib), &vertexBuffer[0].normal));
+
+	OPENGL_CMD(glEnableVertexAttribArray(shader->aVec3Tangent));
+	OPENGL_CMD(glVertexAttribPointer(shader->aVec3Tangent, 3, GL_FLOAT, false, sizeof(VertexAttrib), &vertexBuffer[0].tangent));
+
+	OPENGL_CMD(glEnableVertexAttribArray(shader->aVec3Binormal));
+	OPENGL_CMD(glVertexAttribPointer(shader->aVec3Binormal, 3, GL_FLOAT, false, sizeof(VertexAttrib), &vertexBuffer[0].binormal));
+
+	OPENGL_CMD(glDrawArrays(ogl_primitive, 0, vertexCount));
+
+	OPENGL_CMD(glDisableVertexAttribArray(shader->aVec3Position));
+	OPENGL_CMD(glDisableVertexAttribArray(shader->aVec2UV));
+	OPENGL_CMD(glDisableVertexAttribArray(shader->aVec3Normal));
+	OPENGL_CMD(glDisableVertexAttribArray(shader->aVec3Tangent));
+	OPENGL_CMD(glDisableVertexAttribArray(shader->aVec3Binormal));
+
+	woodBumpAndCone->deactive(2);
+	woodBumpAndCone->deactive(1);
+	wood->deactive(0);
+
 }
 
 void ShaderManager::draw_ShaderConeStepMappingOriginal(GLShader *baseshader, GLint ogl_primitive, const VertexAttrib *vertexBuffer, int vertexCount) {
