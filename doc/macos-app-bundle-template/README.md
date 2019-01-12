@@ -1,11 +1,11 @@
 
 ## MacOS App
 
-Before create and app in mac OS, you need to build the executable binary.
+Before create an app in mac OS, you need to build the executable binary.
 
 After that you need to setup a folder with a specific structure.
 
-I'll show how to build it using the shader-examples project  
+I'll show how to build it using the __shader-examples__ project  
 
 ### 1) Copy the template folder
 
