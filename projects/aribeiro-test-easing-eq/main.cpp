@@ -42,11 +42,33 @@ int main(int argc, char* argv[]) {
 	// OpenGL 2.0 context
 	contextSettings.majorVersion = 2;
 	contextSettings.majorVersion = 0;
-	
+
+	//
+	// get fullscreen modes and look the near desktop mode resolution
+	//
+	sf::VideoMode desktopMode = sf::VideoMode(1920, 1080);//sf::VideoMode::getDesktopMode();
+	sf::VideoMode nearDesktopMode;
+	const std::vector<sf::VideoMode> &modes = sf::VideoMode::getFullscreenModes();
+	nearDesktopMode = modes[0];
+	int distance = (desktopMode.width - modes[0].width)*(desktopMode.width - modes[0].width) +
+                   (desktopMode.height - modes[0].height)*(desktopMode.height - modes[0].height);
+
+	for(int i=1;i<modes.size();i++) {
+        int dstToTest = (desktopMode.width - modes[i].width)*(desktopMode.width - modes[i].width) +
+                        (desktopMode.height - modes[i].height)*(desktopMode.height - modes[i].height);
+        if ( dstToTest <= distance ){
+            distance = dstToTest;
+            nearDesktopMode = modes[i];
+        }
+	}
+
+	printf(" Best Fullscreen Mode Found: %ix%i\n", nearDesktopMode.width, nearDesktopMode.height);
+
 #if NDEBUG
 	// Fullscreen window
 	sf::RenderWindow window(
-		sf::VideoMode::getDesktopMode(),
+        nearDesktopMode,
+		//sf::VideoMode::getDesktopMode(),
 		"Template",
 		sf::Style::Fullscreen,
 		contextSettings);
@@ -62,7 +84,7 @@ int main(int argc, char* argv[]) {
 	window.setVerticalSyncEnabled(true);
 	window.setFramerateLimit(0);
 
-	
+
 	//
 	// Check hardware capabilities
 	//
@@ -111,7 +133,7 @@ int main(int argc, char* argv[]) {
 		font = font_raw->createGLFont();
 		setNullAndDelete(font_raw);
 	}
-	
+
 	EasingEqDrawer eqDrawer;
 
 	//
@@ -131,14 +153,14 @@ int main(int argc, char* argv[]) {
 		glClear(GL_COLOR_BUFFER_BIT);
 
 		shaderColor->enable();
-		
+
 		eqDrawer.drawAllFunctions(mvp, shaderColor, font, &time);
 
 		//
 		// Swap Buffers
 		//
 		window.display();
-		
+
 		//
 		//avoid linux 100% CPU usage
 		//
@@ -156,7 +178,7 @@ int main(int argc, char* argv[]) {
 		}
 	}
 
-	
+
 
 	return 0;
 }
