@@ -19,12 +19,14 @@ using namespace aRibeiro;
 
 #include "Simulation.h"
 
+/*
+
 #include <SFML/Audio.hpp>
 
 class AlMultiSource {
 
 	sf::SoundBuffer *audioBuffer;
-	sf::Sound *audioSource[10]; 
+	sf::Sound *audioSource[10];
 	int count;
 
 public:
@@ -94,7 +96,7 @@ public:
 	bool isPlaying() {
 		return music->getStatus() == sf::SoundStream::Playing;
 	}
-	
+
 
 	void stop() {
 		music->stop();
@@ -120,6 +122,6 @@ public:
 
 };
 
-
+*/
 
 #endif
