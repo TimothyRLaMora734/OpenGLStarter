@@ -1208,11 +1208,13 @@ ARIBEIRO_API mat4 transpose(const mat4& m);
 ARIBEIRO_API mat4 inv(const mat4& m);
 /// \brief Computes the inverse of a matrix
 ///
+/// ** This inv_faster function in a certain angle returns the wrong matrix...
+///
 /// \author Alessandro Ribeiro
 /// \param m Origin mat4
 /// \return The inverse matrix
 ///
-ARIBEIRO_API mat4 inv_faster(const mat4& m);
+//ARIBEIRO_API mat4 inv_faster(const mat4& m);
 /// \brief Reads the modelview matrix from the Opengl and return it as a mat4
 ///
 /// \author Alessandro Ribeiro

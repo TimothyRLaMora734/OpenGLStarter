@@ -128,7 +128,8 @@ mat4 &RenderSystem::getMVP() {
 		lastprojection = projection.top;
 		lastmodel = model.top;
 
-		modelIT = transpose(inv_faster(model.top));
+		//modelIT = transpose(inv_faster(model.top));
+		modelIT = transpose(inv(model.top));
 		//modelIT = inv_faster(transpose(model.top));
 	}
 

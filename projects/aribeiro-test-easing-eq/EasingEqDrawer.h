@@ -77,7 +77,8 @@ class EasingEqDrawer {
 
 	void drawAllFunctions(const mat4 &baseMatrix, GLShaderColor * shader, GLFont *font, PlatformTime *time) {
 		
-		mat4 base_inv = inv_faster(baseMatrix);
+		//mat4 base_inv = inv_faster(baseMatrix);
+		mat4 base_inv = inv(baseMatrix);
 
 		lrp += time->deltaTime;
 		lrp = fmod(lrp, 1.0f);
