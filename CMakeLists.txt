@@ -57,6 +57,14 @@ else()
 	  set( OS_TARGET mac )
 	else()
 	  set( OS_TARGET linux )
+
+      if( NOT CMAKE_BUILD_TYPE )
+        set( CMAKE_BUILD_TYPE Debug CACHE STRING
+             "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel."
+             FORCE )
+        set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS None Debug Release RelWithDebInfo MinSizeRel)
+      endif()
+
 	endif()
 endif()
 #
@@ -97,7 +105,7 @@ if (${OS_TARGET} STREQUAL "android")
 		add_definitions(-ftree-vectorize)
 	endif()
 elseif(CMAKE_COMPILER_IS_GNUCXX)
-	add_definitions(-O2)
+	#add_definitions(-O2)
 elseif(MSVC)
 endif()
 # Unicode Font issues
