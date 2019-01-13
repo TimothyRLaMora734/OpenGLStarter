@@ -126,7 +126,7 @@ ShaderManager::ShaderManager(RenderSystem *renderSystem) {
 	objectColor = vec3(1.0f);
 	brightness = 0.5f;
 	contrast = 0.5f;
-	diffuseB = GLTexture::loadFromPNG("resources/images/grass.png");
+	diffuseB = GLTexture::loadFromPNG("resources/images/jesus2.png");
 	blend = 0.5f;
 
 	frequency = 0.5f;
