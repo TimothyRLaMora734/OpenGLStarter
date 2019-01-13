@@ -37,6 +37,8 @@ public:
 	PlatformTime time;
 	float simulationtick_interval;
 
+	PressReleaseDetector btnLeft, btnRight, btnShoot, btnStart;
+
 	SpaceInvader(int w, int h);
 
 	virtual ~SpaceInvader();

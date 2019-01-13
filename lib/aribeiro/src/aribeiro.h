@@ -80,6 +80,8 @@
 
 #include <aribeiro/Random.h>
 
+#include <aribeiro/PressReleaseDetector.h>
+
 
 #ifdef _WIN32
 

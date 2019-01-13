@@ -120,6 +120,60 @@ XBOX_A = 0;
 
 void SpaceInvader::processInput() {
 
+	bool composedLeft = sf::Keyboard::isKeyPressed(sf::Keyboard::Left);
+	bool composedRight = sf::Keyboard::isKeyPressed(sf::Keyboard::Right);
+	bool composedShoot = sf::Keyboard::isKeyPressed(sf::Keyboard::Space);
+	bool composedStart = sf::Keyboard::isKeyPressed(sf::Keyboard::Return);
+
+	if (sf::Joystick::isConnected(0)) {
+		float x = sf::Joystick::getAxisPosition(0, sf::Joystick::X);
+		float povx = sf::Joystick::getAxisPosition(0, sf::Joystick::PovX);
+
+		composedLeft = composedLeft || (x < -50.0f) || (povx < -50.0f);
+		composedRight = composedRight || (x > 50.0f) || (povx > 50.0f);
+		composedShoot = composedShoot || sf::Joystick::isButtonPressed(0, XBOX_A);
+		composedStart = composedStart || sf::Joystick::isButtonPressed(0, XBOX_START);
+	}
+
+	btnLeft.setState(composedLeft);
+	btnRight.setState(composedRight);
+	btnShoot.setState(composedShoot);
+	btnStart.setState(composedStart);
+
+	if (btnLeft.down)
+		gameState->setMenuInput(MT_PREV_OPTION);
+	
+	if (btnRight.down)
+		gameState->setMenuInput(MT_NEXT_OPTION);
+	
+	if (btnShoot.down)
+		gameState->shoot();
+
+	if (btnStart.down) {
+		//esta verificação deve vir antes para evitar que
+		//  um enter faça efeito nos dois elementos em estados diferentes
+		//        cgReproducer e menu
+		if (!gameState->cgReproducerIsTerminatedCheck()) {
+			//se não consumiu o evento
+			if (gameState->setMenuInput(MT_OK)) {
+				canExitApplication = true;
+				return;
+			}
+		}
+		gameState->enterPress();
+	}
+
+	float speed = 0;
+	if (btnLeft.pressed)
+		speed = -0.05f;
+	if (btnRight.pressed)
+		speed = +0.05f;
+	gameState->moveSpaceShip(speed);
+
+
+	/*
+
+
 	bool keyL = false;
 	bool keyLrelease = false;
 
@@ -295,6 +349,6 @@ void SpaceInvader::processInput() {
 	gameState->moveSpaceShip(speed);
 
 
-
+	*/
 }
 
