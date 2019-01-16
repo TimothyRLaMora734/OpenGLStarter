@@ -61,8 +61,8 @@ namespace aRibeiro {
 			"}"
 
 			"\n#define SIZE 15\n"
-			"\n#define THRESHOULD (30.0/255.0)\n"
-			"\n#define THRESHOULD_SQR (THRESHOULD*THRESHOULD)\n"
+			"\n#define THRESHOLD (30.0/255.0)\n"
+			"\n#define THRESHOLD_SQR (THRESHOLD*THRESHOLD)\n"
 
 			"vec3 RGB(vec2 uv) { "
 			"  vec3 yuv;"
@@ -115,10 +115,10 @@ namespace aRibeiro {
 			"    cmp3 = tex3 - texColor.rgb;"
 			"    cmp4 = tex4 - texColor.rgb;"
 
-			"    walk_1 *= step( dot(cmp1,cmp1), THRESHOULD_SQR );"
-			"    walk_2 *= step( dot(cmp2,cmp2), THRESHOULD_SQR );"
-			"    walk_3 *= step( dot(cmp3,cmp3), THRESHOULD_SQR );"
-			"    walk_4 *= step( dot(cmp4,cmp4), THRESHOULD_SQR );"
+			"    walk_1 *= step( dot(cmp1,cmp1), THRESHOLD_SQR );"
+			"    walk_2 *= step( dot(cmp2,cmp2), THRESHOLD_SQR );"
+			"    walk_3 *= step( dot(cmp3,cmp3), THRESHOLD_SQR );"
+			"    walk_4 *= step( dot(cmp4,cmp4), THRESHOLD_SQR );"
 
 			"    count += walk_1;"
 			"    count += walk_2;"

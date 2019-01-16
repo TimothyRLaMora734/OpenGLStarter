@@ -1,18 +1,18 @@
-#ifndef BloomThreshouldShader__h
-#define BloomThreshouldShader__h
+#ifndef BloomThresholdShader__h
+#define BloomThresholdShader__h
 
 #include <aribeiro/GLPostProcessingShader.h>
 
 namespace aRibeiro {
     
-    class BloomThreshouldShader : public GLPostProcessingShader {
+    class BloomThresholdShader : public GLPostProcessingShader {
         
         int uSampler2DTexture;
-        int uFloatThreshould;
+        int uFloatThreshold;
         
     public:
         
-        BloomThreshouldShader() {
+        BloomThresholdShader() {
             const char vertexShaderCode[] = {
                 //attributes
                 "attribute vec2 aVec2Position;"
@@ -32,18 +32,18 @@ namespace aRibeiro {
                 //"precision mediump float;"
                 //uniforms
                 "uniform sampler2D uSampler2DTexture;"
-                "uniform float uFloatThreshould;"
+                "uniform float uFloatThreshold;"
                 
                 //varying
                 "varying vec2 vVec2UV;"
                 
                 "void main() {"
                     "vec3 texel = texture2D(uSampler2DTexture, vVec2UV ).rgb;"
-                    //"texel = step(vec3(uFloatThreshould), texel);"//faz cor ir de 0 a 1
-                    "texel = texel * step(vec3(uFloatThreshould), texel);"
-                    /*"texel.r = texel.r * step(uFloatThreshould, texel.r);"
-                    "texel.g = texel.g * step(uFloatThreshould, texel.g);"
-                    "texel.b = texel.b * step(uFloatThreshould, texel.b);"*/
+                    //"texel = step(vec3(uFloatThreshold), texel);"//faz cor ir de 0 a 1
+                    "texel = texel * step(vec3(uFloatThreshold), texel);"
+                    /*"texel.r = texel.r * step(uFloatThreshold, texel.r);"
+                    "texel.g = texel.g * step(uFloatThreshold, texel.g);"
+                    "texel.b = texel.b * step(uFloatThreshold, texel.b);"*/
                     "vec4 result = vec4(texel, 1.0);"
                     "gl_FragColor = result;"
                 "}"
@@ -55,15 +55,15 @@ namespace aRibeiro {
             aVec2UV = getAttribLocation("aVec2UV");
             
             uSampler2DTexture = getUniformLocation("uSampler2DTexture");
-            uFloatThreshould = getUniformLocation("uFloatThreshould");
+            uFloatThreshold = getUniformLocation("uFloatThreshold");
             
         }
         
         void setTexture(int texUnit){
             setUniform(uSampler2DTexture, texUnit);
         }
-        void setThreshould(float v){
-            setUniform(uFloatThreshould, v);
+        void setThreshold(float v){
+            setUniform(uFloatThreshold, v);
         }
     };
     

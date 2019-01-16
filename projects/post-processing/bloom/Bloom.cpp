@@ -28,11 +28,11 @@ namespace aRibeiro {
         fbo1->attachTextures();
         fbo2->attachTextures();
        
-        threshouldShader = new BloomThreshouldShader();
+        thresholdShader = new BloomThresholdShader();
         blurShader = new BloomBlurShader();
         compositeShader = new BloomCompositeShader();
         
-        threshould = 0.5f;
+        threshold = 0.5f;
         intensity = 0.5f;
     }
     
@@ -42,7 +42,7 @@ namespace aRibeiro {
         setNullAndDelete(fbo2->color[0]);
         setNullAndDelete(fbo2);
         
-        setNullAndDelete(threshouldShader);
+        setNullAndDelete(thresholdShader);
         setNullAndDelete(blurShader);
         setNullAndDelete(compositeShader);
     }
@@ -52,17 +52,17 @@ namespace aRibeiro {
         
         
         //
-        // 1st pass -- threshould
+        // 1st pass -- threshold
         //
         fbo1->enable();
         glViewport(0,0,fbo1->width,fbo1->height);
         
-        threshouldShader->enable();
+        thresholdShader->enable();
         colorSrc->active(0);
-        threshouldShader->setTexture(0);
-        threshouldShader->setThreshould(threshould);
+        thresholdShader->setTexture(0);
+        thresholdShader->setThreshold(threshold);
         
-        GLPostProcess::drawQuad(threshouldShader);
+        GLPostProcess::drawQuad(thresholdShader);
         
         
         //

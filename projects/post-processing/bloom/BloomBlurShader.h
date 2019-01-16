@@ -67,7 +67,7 @@ namespace aRibeiro {
             LoadShaderProgram(vertexShaderCode, fragmentShaderCode);
 #if BloomBlurShader_USE_GAUSSIAN == 1
             // load blur coefs
-            float gaussCoefs_15[] = {0.0229490642, 0.0344506279, 0.0485831723, 0.06436224, 0.0801001, 0.09364651, 0.102850571, 0.1061154, 0.102850571, 0.09364651, 0.0801001, 0.06436224, 0.0485831723, 0.0344506279, 0.0229490642};
+			float gaussCoefs_15[] = { 0.0229490642f, 0.0344506279f, 0.0485831723f, 0.06436224f, 0.0801001f, 0.09364651f, 0.102850571f, 0.1061154f, 0.102850571f, 0.09364651f, 0.0801001f, 0.06436224f, 0.0485831723f, 0.0344506279f, 0.0229490642f };
             enable();
             glUniform1fv(getUniformLocation("gaussCoefs_15"),15,gaussCoefs_15);
 #else

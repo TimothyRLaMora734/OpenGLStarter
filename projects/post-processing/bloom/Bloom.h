@@ -5,14 +5,14 @@
 #include <aribeiro/GLTexture.h>
 #include <aribeiro/GLPostProcess.h>
 
-#include "BloomThreshouldShader.h"
+#include "BloomThresholdShader.h"
 #include "BloomBlurShader.h"
 #include "BloomCompositeShader.h"
 
 namespace aRibeiro {
     
     class Bloom: public iPostProcess {
-        BloomThreshouldShader *threshouldShader;
+        BloomThresholdShader *thresholdShader;
         BloomBlurShader *blurShader;
         BloomCompositeShader *compositeShader;
         
@@ -26,7 +26,7 @@ namespace aRibeiro {
         void setSize(int w, int h);
         
     public:
-        float threshould;
+        float threshold;
         float intensity;
         
         Bloom();

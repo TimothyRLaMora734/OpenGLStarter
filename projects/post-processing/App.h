@@ -31,7 +31,7 @@ class BloomInterface: public GUIGroup {
     GLFont *font;
     
     int
-    idSliderThreshould,
+    idSliderThreshold,
     idSliderIntensity;
 public:
     BloomInterface() {
@@ -79,15 +79,15 @@ public:
         
         clearAll();
         
-        idSliderThreshould = addSlider(vec2(w-40-100,h-40), vec2(w-40,h-40), 20.0f, bolinha);
+        idSliderThreshold = addSlider(vec2(w-40-100,h-40), vec2(w-40,h-40), 20.0f, bolinha);
         idSliderIntensity = addSlider(vec2(w-40-100,h-40-40), vec2(w-40,h-40-40), 20.0f, bolinha);
         
-        ((Slider*)getInterface(idSliderThreshould))->setLerp(bloom->threshould);
+        ((Slider*)getInterface(idSliderThreshold))->setLerp(bloom->threshold);
         ((Slider*)getInterface(idSliderIntensity))->setLerp(bloom->intensity);
         
         //labels
-        AABB aabb = font->computeBoundsJustBox("Threshould:");
-        addLabel(font, "Threshould:", vec2(w-40-100 - 5 - (aabb.max_box.x - aabb.min_box.x) * 0.25f ,h-40-4), false, false, 0.25f);
+        AABB aabb = font->computeBoundsJustBox("Threshold:");
+        addLabel(font, "Threshold:", vec2(w-40-100 - 5 - (aabb.max_box.x - aabb.min_box.x) * 0.25f ,h-40-4), false, false, 0.25f);
         
         aabb = font->computeBoundsJustBox("Intensity:");
         addLabel(font, "Intensity:", vec2(w-40-100 - 5 - (aabb.max_box.x - aabb.min_box.x) * 0.25f ,h-40-40-4-3), false, false, 0.25f);
@@ -102,8 +102,8 @@ public:
     }
     
     virtual bool performAction(const int ID, Event &e) {
-        if (ID ==idSliderThreshould )
-            bloom->threshould = e.lerpChanged.newLerp;
+        if (ID ==idSliderThreshold )
+            bloom->threshold = e.lerpChanged.newLerp;
         else if (ID == idSliderIntensity)
             bloom->intensity = e.lerpChanged.newLerp;
         return true;
@@ -154,7 +154,7 @@ public:
     virtual void setMousePos(const vec2 &pos) {
         
         GUIGroup::setMousePos(pos);
-        //bloom->threshould = (float)pos.x / (float)(postProcess->width-1);
+        //bloom->threshold = (float)pos.x / (float)(postProcess->width-1);
         
         if (track) {
             if (mouseTracker.x < 0 || mouseTracker.y < 0)
