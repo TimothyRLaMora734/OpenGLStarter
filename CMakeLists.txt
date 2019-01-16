@@ -230,6 +230,7 @@ add_subdirectory( projects/template )
 add_subdirectory( projects/game-invader )
 add_subdirectory( projects/game-tetris )
 add_subdirectory( projects/shader-examples )
+add_subdirectory( projects/post-processing )
 
 #
 # Tools

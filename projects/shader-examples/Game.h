@@ -111,7 +111,7 @@ public:
 		shaderManager->laplaceIntensity = v;
 		//shaderManager->laplaceBlend = v;
 
-		shaderManager->blurSteps = (int)(v * 20.0f + 0.5f);
+		shaderManager->blurSteps = (int)(v * 5.0f + 0.5f);
 
 		shaderManager->brightness = v;
 		//shaderManager->contrast = v;
@@ -151,6 +151,7 @@ public:
 		ShaderManager *shaderManager = render->shaderManager;
 
 		shaderManager->framebuffer->setSize(w, h);
+        shaderManager->framebufferBlur->setSize(w, h);
 		shaderManager->framebufferNeighbor = vec2( 1.0f / (float)w, 1.0f / (float)h);
 
 		/*
@@ -324,7 +325,7 @@ public:
 		RenderSystem *render = RenderSystem::getSingleton();
 		ShaderManager *shaderManager = render->shaderManager;
 
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		
 		glEnable(GL_DEPTH_TEST);
 
 		render->projection.top = projection_perspective( 45.0f, (float)w / (float)h, 0.01f, 100);
@@ -338,6 +339,11 @@ public:
 		//shaderManager->setupShaderParametersAndDraw();
 
 		if (postProcessingMode) {
+            
+            shaderManager->framebuffer->enable();
+            
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            
 			shaderManager->setActiveShader("GLShaderTextureColor");
 			switch (drawObject) {
 				case 0:
@@ -351,7 +357,10 @@ public:
 					break;//planexy_div
 			}
 
-			shaderManager->framebuffer->copyFrameBuffer();
+			//shaderManager->framebuffer->copyFrameBuffer();
+            
+            GLFramebufferObject::disable();
+            
 			shaderManager->setActiveShader(shaderName);
 
 			glDisable(GL_DEPTH_TEST);
@@ -363,6 +372,9 @@ public:
 
 		}
 		else {
+            
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            
 			shaderManager->setActiveShader(shaderName);
 
 			switch (drawObject) {
@@ -413,6 +425,7 @@ public:
 		else if (k == sf::Keyboard::Subtract || k == sf::Keyboard::Dash)
 			distance -= 1;
 
+        /*
         if (k == sf::Keyboard::P){
             RenderSystem *render = RenderSystem::getSingleton();
             ShaderManager *shaderManager = render->shaderManager;
@@ -421,6 +434,7 @@ public:
             name.erase(std::remove(name.begin(), name.end(), '\n'), name.end());
             shaderManager->framebuffer->writeToPNG(( name + std::string(".png")).c_str());
         }
+         */
 
 		return true;
 	}

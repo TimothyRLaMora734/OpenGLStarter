@@ -1,0 +1,40 @@
+#ifndef Bloom__h
+#define Bloom__h
+
+#include <aribeiro/all_math.h>
+#include <aribeiro/GLTexture.h>
+#include <aribeiro/GLPostProcess.h>
+
+#include "BloomThreshouldShader.h"
+#include "BloomBlurShader.h"
+#include "BloomCompositeShader.h"
+
+namespace aRibeiro {
+    
+    class Bloom: public iPostProcess {
+        BloomThreshouldShader *threshouldShader;
+        BloomBlurShader *blurShader;
+        BloomCompositeShader *compositeShader;
+        
+        //private copy constructores, to avoid copy...
+        Bloom(const Bloom& v);
+        void operator=(const Bloom& v);
+        
+        GLFramebufferObject *fbo1, *fbo2;
+        vec2 neighborhood;
+        
+        void setSize(int w, int h);
+        
+    public:
+        float threshould;
+        float intensity;
+        
+        Bloom();
+        virtual ~Bloom();
+        
+        virtual void render(GLPostProcess *postProcess, GLTexture *colorSrc, GLTexture *depthSrc, GLFramebufferObject *dst);
+    };
+
+}
+
+#endif

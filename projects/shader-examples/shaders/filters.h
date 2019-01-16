@@ -15,6 +15,7 @@ technique _blur5 {
 #include <aribeiro/aribeiro.h>
 using namespace aRibeiro;
 
+#define ShaderBlur_USE_15_SAMPLES 1
 
 class ShaderLaplace : public GLShader {
 
@@ -180,25 +181,30 @@ public:
 			//varying
 			"varying vec2 vVec2UV;"
 
+#if ShaderBlur_USE_15_SAMPLES == 1
+            "uniform float coef[15];"
+#else
             "uniform float coef[7];"
-            /*
-			"const float coef[7] = float[7](0.015625,0.093750, 0.234375, 0.312500,0.234375, 0.093750, 0.015625);"
-             */
-
+#endif
 			"void main() {"
             
 				"vec3 centerTexelColor = texture2D(uSampler2DFramebuffer, vVec2UV ).rgb;"
 				"vec3 texel = vec3(0.0);"
-            
-				"for (int i = -3; i <= 3; i++) {"
+#if ShaderBlur_USE_15_SAMPLES == 1
+                "for (int i = -7; i <= 7; i++) {"
                     "float iF = float (i);"
                     "vec2 uv = vVec2UV + uVec2FramebufferTexelNeighbor * uVec2HorizontalVertical * iF;"
-            
+                    "texel += texture2D(uSampler2DFramebuffer, uv ).rgb * coef[i + 7];"
+                "}"
+				
+#else
+                "for (int i = -3; i <= 3; i++) {"
+                    "float iF = float (i);"
+                    "vec2 uv = vVec2UV + uVec2FramebufferTexelNeighbor * uVec2HorizontalVertical * iF;"
                     "texel += texture2D(uSampler2DFramebuffer, uv ).rgb * coef[i + 3];"
-            /*
-					"texel += texture2D(uSampler2DFramebuffer, vVec2UV + uVec2FramebufferTexelNeighbor * uVec2HorizontalVertical * (float)i ).rgb * coef[i + 3];"
-             */
-				"}"
+                "}"
+            
+#endif
              
 				"vec4 result = vec4(texel, 1.0);"
 				"gl_FragColor = result;"
@@ -207,9 +213,15 @@ public:
 
 		LoadShaderProgram(vertexShaderCode, fragmentShaderCode);
         
+#if ShaderBlur_USE_15_SAMPLES == 1
+        enable();
+        float gaussCoefs_15[] = {0.0229490642, 0.0344506279, 0.0485831723, 0.06436224, 0.0801001, 0.09364651, 0.102850571, 0.1061154, 0.102850571, 0.09364651, 0.0801001, 0.06436224, 0.0485831723, 0.0344506279, 0.0229490642};
+        glUniform1fv(getUniformLocation("coef"),15,gaussCoefs_15);
+#else
         enable();
         float coef[] = {0.015625f, 0.093750f, 0.234375f, 0.312500f, 0.234375f, 0.093750f, 0.015625f};
         glUniform1fv(getUniformLocation("coef"),7,coef);
+#endif
 
 		aVec3Position = getAttribLocation("aVec3Position");
 		aVec2UV = getAttribLocation("aVec2UV");

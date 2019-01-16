@@ -91,12 +91,15 @@ set( PUBLIC_HEADERS
 
 		src/opengl/GLTexture.h
 		src/opengl/GLShader.h
+        src/opengl/GLFramebufferObject.h
+        src/opengl/GLPostProcess.h
 
 		src/opengl/shaders/GLShaderColor.h
 		src/opengl/shaders/GLShaderTextureColor.h
 		src/opengl/shaders/GLShaderFont.h
 		src/opengl/shaders/GLShaderYUV2RGB.h
 		src/opengl/shaders/GLShaderVertexColor.h
+        src/opengl/shaders/GLPostProcessingShader.h
 
 		src/opengl/draw/GLSquare.h
 
@@ -153,6 +156,8 @@ set( SRC
 
 		src/opengl/GLTexture.cpp
 		src/opengl/GLShader.cpp
+        src/opengl/GLFramebufferObject.cpp
+        src/opengl/GLPostProcess.cpp
 		
 		src/opengl/shaders/GLShaderColor.cpp
 		src/opengl/shaders/GLShaderTextureColor.cpp
@@ -246,6 +251,10 @@ set( SRC
 		src/opengl/GLTexture.cpp
 		src/opengl/GLShader.h
 		src/opengl/GLShader.cpp
+        src/opengl/GLFramebufferObject.h
+        src/opengl/GLFramebufferObject.cpp
+        src/opengl/GLPostProcess.h
+        src/opengl/GLPostProcess.cpp
 	)
 
 	source_group("opengl\\shaders" FILES
@@ -262,6 +271,8 @@ set( SRC
 
 		src/opengl/shaders/GLShaderVertexColor.h
 		src/opengl/shaders/GLShaderVertexColor.cpp
+
+        src/opengl/shaders/GLPostProcessingShader.h
 
 	)
 

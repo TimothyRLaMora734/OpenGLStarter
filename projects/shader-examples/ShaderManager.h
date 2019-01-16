@@ -93,7 +93,9 @@ public:
 	//float lightShine;
 
 	//ShaderLaplace
-	GLTexture *framebuffer;
+	//GLTexture *framebuffer;
+    GLFramebufferObject *framebuffer;
+    GLFramebufferObject *framebufferBlur;
 	vec2 framebufferNeighbor;
 	float laplaceIntensity;
 	float laplaceBlend;

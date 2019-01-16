@@ -51,36 +51,29 @@
 #include <aribeiro/PlatformSleep.h>
 #include <aribeiro/PlatformPath.h>
 #include <aribeiro/PlatformGL.h>
-
 #include <aribeiro/Delegate.h>
 #include <aribeiro/GetFirstMacAddress.h>
 #include <aribeiro/SetNullAndDelete.h>
-
 #include <aribeiro/NetworkConstants.h>
-
 #include <aribeiro/GLTexture.h>
 #include <aribeiro/GLShader.h>
-
-
 #include <aribeiro/GLShaderColor.h>
 #include <aribeiro/GLShaderTextureColor.h>
 #include <aribeiro/GLShaderFont.h>
 #include <aribeiro/GLShaderYUV2RGB.h>
 #include <aribeiro/GLShaderVertexColor.h>
-
 #include <aribeiro/GLSquare.h>
-
 #include <aribeiro/Font.h>
 #include <aribeiro/GLFont.h>
 #include <aribeiro/GLStripText.h>
-
 #include <aribeiro/PNGHelper.h>
-
 #include <aribeiro/TransformStack.h>
-
 #include <aribeiro/Random.h>
-
 #include <aribeiro/PressReleaseDetector.h>
+#include <aribeiro/GLPostProcessingShader.h>
+#include <aribeiro/GLFramebufferObject.h>
+#include <aribeiro/GLPostProcess.h>
+
 
 
 #ifdef _WIN32
