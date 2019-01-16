@@ -520,6 +520,14 @@ It uses the TransformStack class and it has a basic render state manager to draw
 
 ![](https://github.com/A-Ribeiro/OpenGLStarter/raw/master/doc/images/game-tetris.png)
 
+## Post Processing Example
+
+Demo project to test the GLFramebufferObject and GLPostProcess classes.
+
+Look at the image below:
+
+![](https://github.com/A-Ribeiro/OpenGLStarter/raw/master/doc/images/post-processing.png)
+
 ## Shader Examples
 
 This project has an interactive application structure. It handles the user mouse input.
