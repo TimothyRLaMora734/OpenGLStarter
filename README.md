@@ -477,6 +477,8 @@ if (buffer == NULL){
   fprintf(stderr, "error to load image from file: %s\n", filename);
   exit(-1);
 }
+// use the texture content
+PNGHelper::closePNG(buffer);//release the allocated buffer
 ```
 
 * __Handle the Transformation Stack__ <br/>
