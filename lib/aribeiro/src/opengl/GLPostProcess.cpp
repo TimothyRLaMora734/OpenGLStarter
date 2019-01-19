@@ -66,7 +66,8 @@ namespace aRibeiro {
         glDisable(GL_DEPTH_TEST);
         
         GLFramebufferObject* src = firstRender;
-        GLFramebufferObject* dst = fbo[current++];
+        GLFramebufferObject* dst = fbo[current];
+        current = (current + 1) % 2;
         
         for (int i=0; i<pipeline.size(); i++) {
             if (i == pipeline.size() - 1){
@@ -74,7 +75,8 @@ namespace aRibeiro {
             } else {
                 pipeline[i]->render( this, src->color[0], firstRender->depth, dst);
                 src = dst;
-                dst = fbo[current++];
+                dst = fbo[current];
+                current = (current + 1) % 2;
             }
         }
         
