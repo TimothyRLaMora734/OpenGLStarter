@@ -3,7 +3,7 @@
 
 #include <aribeiro/aribeiro.h>
 
-#include "bloom/Bloom.h"
+#include "bloom/BloomPowerOfTwo.h"
 
 using namespace aRibeiro;
 
@@ -24,8 +24,8 @@ class BloomInterface: public GUIGroup {
     bool track;
     vec2 cameraRotationAngle;
     
-    GLPostProcess *postProcess;
-    Bloom *bloom;
+    GLPostProcessPowerOfTwo *postProcess;
+    BloomPowerOfTwo *bloom;
     
     GLTexture *bolinha;
     GLFont *font;
@@ -51,8 +51,8 @@ public:
         track = false;
         cameraRotationAngle = vec2(0, 0);
         
-        postProcess = new GLPostProcess();
-        bloom = new Bloom();
+        postProcess = new GLPostProcessPowerOfTwo();
+        bloom = new BloomPowerOfTwo();
         
         postProcess->pipeline.push_back(bloom);
         

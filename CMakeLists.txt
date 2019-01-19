@@ -231,6 +231,7 @@ add_subdirectory( projects/game-invader )
 add_subdirectory( projects/game-tetris )
 add_subdirectory( projects/shader-examples )
 add_subdirectory( projects/post-processing )
+add_subdirectory( projects/post-processing-power-of-two )
 
 #
 # Tools

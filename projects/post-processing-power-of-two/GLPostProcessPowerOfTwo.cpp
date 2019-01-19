@@ -1,4 +1,4 @@
-#include "GLPostProcess.h"
+#include "GLPostProcessPowerOfTwo.h"
 #include <aribeiro/common.h>
 #include <aribeiro/SetNullAndDelete.h>
 #include <aribeiro/PlatformGL.h>
@@ -6,12 +6,15 @@
 namespace aRibeiro {
 
     //private copy constructores, to avoid copy...
-    GLPostProcess::GLPostProcess(const GLPostProcess& v) {}
-    void GLPostProcess::operator=(const GLPostProcess& v) {}
+    GLPostProcessPowerOfTwo::GLPostProcessPowerOfTwo(const GLPostProcessPowerOfTwo& v) {}
+    void GLPostProcessPowerOfTwo::operator=(const GLPostProcessPowerOfTwo& v) {}
     
-    GLPostProcess::GLPostProcess() {
+    GLPostProcessPowerOfTwo::GLPostProcessPowerOfTwo() {
         width = -1;
         height = -1;
+        
+        potWidth = -1;
+        potHeight = -1;
         
         firstRender = new GLFramebufferObject();
         firstRender->depth = new GLTexture();
@@ -22,17 +25,16 @@ namespace aRibeiro {
             fbo[i]->color.push_back(new GLTexture());
         }
         
-        resize(32, 32);
+        resize(32,32);
         
         firstRender->attachTextures();
-        for (int i=0;i<2;i++){
+        for (int i=0;i<2;i++)
             fbo[i]->attachTextures();
-        }
         
         current = 0;
     }
     
-    GLPostProcess::~GLPostProcess() {
+    GLPostProcessPowerOfTwo::~GLPostProcessPowerOfTwo() {
         
         setNullAndDelete( firstRender->depth );
         setNullAndDelete( firstRender->color[0] );
@@ -44,29 +46,46 @@ namespace aRibeiro {
         
     }
     
-    void GLPostProcess::resize(int w, int h) {
+    void GLPostProcessPowerOfTwo::resize(int w, int h) {
         
-        if (w == width && h == height)
+        if (width == w && height == h)
             return;
         
         width = w;
         height = h;
         
-        firstRender->setSize(w, h);
+        //find the POT width and height
+        
+        potWidth = 1;
+        potHeight = 1;
+        
+        while ( potWidth < width )
+            potWidth = potWidth << 1;
+        while ( potHeight < height )
+            potHeight = potHeight << 1;
+        
+        printf("[%s:%i]\n", __FILE__, __LINE__);
+        printf("Resize potsize: %i %i, using resolution: %i %i\n",potWidth, potHeight, width, height);
+        
+        texelNeighbor = vec2(1.0f/potWidth,1.0f/potHeight);
+        drawQuadMaxUV = vec2((float)width/(float)potWidth, (float)height/(float)potHeight);
+        texelMaxUVAccess = drawQuadMaxUV - texelNeighbor * 0.5f;
+        
+        firstRender->setSize(potWidth, potHeight);
         for (int i=0;i<2;i++){
-            fbo[i]->setSize(w, h);
+            fbo[i]->setSize(potWidth, potHeight);
         }
     }
     
-    void GLPostProcess::beginDraw() {
+    void GLPostProcessPowerOfTwo::beginDraw() {
         if (pipeline.size() == 0)
             return;
         
         firstRender->enable();
-        glViewport(0,0,firstRender->width,firstRender->height);
+        glViewport(0,0,width,height);
     }
     
-    void GLPostProcess::endDraw() {
+    void GLPostProcessPowerOfTwo::endDraw() {
         if (pipeline.size() == 0)
             return;
         
@@ -92,19 +111,25 @@ namespace aRibeiro {
     }
     
     
-    void GLPostProcess::drawQuad(GLPostProcessingShader *shader) {
+    void GLPostProcessPowerOfTwo::drawQuad(GLPostProcessingPowerOfTwoShader *shader,
+                                           vec2 texelNeighbor,
+                                           vec2 texelMaxUVAccess,
+                                           vec2 drawQuadMaxUV) {
         const vec2 vpos[] = {
             vec2(-1, -1),
             vec2(1, -1),
             vec2(1,  1),
             vec2(-1,  1)
         };
-        const vec2 vuv[] = {
+        vec2 vuv[] = {
             vec2(0, 0),
-            vec2(1, 0),
-            vec2(1, 1),
-            vec2(0, 1)
+            vec2(drawQuadMaxUV.x, 0),
+            vec2(drawQuadMaxUV.x, drawQuadMaxUV.y),
+            vec2(0, drawQuadMaxUV.y)
         };
+        
+        shader->setTexelNeighbor(texelNeighbor);
+        shader->setTexelMaxUVAccess(texelMaxUVAccess);
         
         OPENGL_CMD(glEnableVertexAttribArray(shader->aVec2Position));
         OPENGL_CMD(glVertexAttribPointer(shader->aVec2Position, 2, GL_FLOAT, false, sizeof(vec2), &vpos[0]));
