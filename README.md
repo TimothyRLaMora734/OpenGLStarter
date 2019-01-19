@@ -524,6 +524,14 @@ It uses the TransformStack class and it has a basic render state manager to draw
 
 Demo project to test the GLFramebufferObject and GLPostProcess classes.
 
+I implemented two versions of the post processing. One version has the forward implementation, using non-power-of-two textures with the screen resolution as input.
+
+The second I implemented the FBOs to be in power-of-two textures, but I setup the viewport to use just the rendered area. For example: if the screen is: 640x480, then the FBO will be 1024x512, but the viewport will be setup to be bound to 640x480 inside this texture.
+
+I tested in my mac (early 2011) with Intel HD3000. The power-of-two implementation runs with a frame drop from 2 to 4. I used the same effect to render several times in one frame (24 times). While the non-power-of-two is running at 16 FPS the power-of-two runs 12 FPS. I expected the power-of-two could be faster, but in my case it doesn't.
+
+I uploaded the project I used to test. You might test in your card if you want. I read that the mobile version of OpenGL reads the power-of-two textures 10 to 20 times faster, maybe this implementation is better in the mobile platform.
+
 Look at the image below:
 
 ![](https://github.com/A-Ribeiro/OpenGLStarter/raw/master/doc/images/post-processing.png)
