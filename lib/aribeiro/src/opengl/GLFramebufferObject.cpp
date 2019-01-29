@@ -1,12 +1,15 @@
 #include "GLFramebufferObject.h"
 #include <aribeiro/PlatformGL.h>
 
+#include <stdio.h>
+#include <stdlib.h>
+
 namespace aRibeiro {
 
 	//uses the following extensions:
-	//   GLEW_ARB_framebuffer_object, 
-	//   GLEW_ARB_draw_buffers, 
-	//   GLEW_ARB_framebuffer_no_attachments, 
+	//   GLEW_ARB_framebuffer_object,
+	//   GLEW_ARB_draw_buffers,
+	//   GLEW_ARB_framebuffer_no_attachments,
 	//   GLEW_ARB_depth_texture
 	//   GLEW_ARB_texture_non_power_of_two
 
@@ -28,7 +31,7 @@ namespace aRibeiro {
 		GL_COLOR_ATTACHMENT14_EXT,
 		GL_COLOR_ATTACHMENT15_EXT
 	};
-    
+
     GLFramebufferObject::GLFramebufferObject(const GLFramebufferObject& v) {}
     void GLFramebufferObject::operator=(const GLFramebufferObject& v) {}
 
@@ -50,7 +53,7 @@ namespace aRibeiro {
 	}
 
 	//
-	// attach the textures set and depth 
+	// attach the textures set and depth
 	//
 	void GLFramebufferObject::attachTextures() {
 		if (initialized)
@@ -59,7 +62,7 @@ namespace aRibeiro {
 		initialized = true;
 
 		if (color.size() > maxDrawBuffers()) {
-			fprintf(stderr, 
+			fprintf(stderr,
 				"[GLFramebufferObject] Trying to use more draw buffers than the current hardware support. \n"
 				"                      (color buffer size: %lu, max draw buffers: %i)\n", color.size(), maxDrawBuffers());
 			exit(-1);
@@ -82,7 +85,7 @@ namespace aRibeiro {
 
 		for (int i = 0; i < color.size(); i++)
 			OPENGL_CMD(glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, DrawBuffersUnit[i], GL_TEXTURE_2D, color[i]->mTexture, 0));
-		
+
 		if (depth != NULL) {
 			OPENGL_CMD(glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_TEXTURE_2D, depth->mTexture, 0));
 		}
