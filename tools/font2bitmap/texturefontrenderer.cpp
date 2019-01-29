@@ -300,7 +300,7 @@ void TextureFontRenderer::exportSFont(const char* file_meta, const char* file_pn
                space_width ,//<Space_size_x>
                glyph_h,//<new_line_size_y>
                1,//<pixel_format=1(8888)>
-               glyphs.size()//<GlyphsCount>
+               (unsigned int)glyphs.size()//<GlyphsCount>
                );
         //iterate over all glyphs
         std::map<UTF32, TextureFontRenderer::GlyphInfo>::iterator it;

@@ -20,15 +20,21 @@ int main(int argc, char* argv[]){
 		return 0;
 	}
 #endif
-	
+
 	std::string filepath;
-	
+
 #if DEBUG == 0
 		filepath = std::string(argv[1]);
 #endif
 
 #if DEBUG == 1
+
+#ifdef linux
+    filepath = std::string("/home/alessandro/Desktop/OpenGLStarter/lib/assimp/test/models/FBX/spider.fbx");
+#else
     filepath = std::string("/Users/alessandro/Desktop/GIT/OpenGLStarter/lib/assimp/test/models/FBX/spider.fbx");
+#endif
+
 #endif
 
     std::string folder, filename, filename_wo_ext, fileext;
@@ -42,12 +48,12 @@ int main(int argc, char* argv[]){
 	std::string outputFile = (folder + PlatformPath::SEPARATOR + filename_wo_ext + std::string(".bams"));
 
 	ModelContainer *container = ImportFromAssimp(inputFile.c_str());
-    
+
     //save the container
-    
-    
+
+
     delete container;
-    
+
 
 	return 0;
 }
