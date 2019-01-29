@@ -10,9 +10,13 @@ namespace aRibeiro {
     void Bloom::operator=(const Bloom& v) {}
     
     void Bloom::setSize(int w, int h) {
-        if (fbo1->width != w || fbo1->height != h){
-            fbo1->setSize(w/2,h/2);
-            fbo2->setSize(w/2,h/2);
+
+		w = w / 2;
+		h = h / 2;
+
+        if (fbo1->width != w || fbo1->height != h ){
+            fbo1->setSize(w,h);
+            fbo2->setSize(w,h);
             
             neighborhood = vec2(1.0f/(float)fbo1->width, 1.0f/(float)fbo1->height);
         }
