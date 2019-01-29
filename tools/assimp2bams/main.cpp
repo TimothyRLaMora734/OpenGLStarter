@@ -31,6 +31,8 @@ int main(int argc, char* argv[]){
 
 #ifdef linux
     filepath = std::string("/home/alessandro/Desktop/OpenGLStarter/lib/assimp/test/models/FBX/spider.fbx");
+#elif WIN32
+	filepath = std::string("E:\\projetos\\GIT\\OpenGLStarter\\lib\\assimp\\test\\models\\FBX\\spider.fbx");
 #else
     filepath = std::string("/Users/alessandro/Desktop/GIT/OpenGLStarter/lib/assimp/test/models/FBX/spider.fbx");
 #endif

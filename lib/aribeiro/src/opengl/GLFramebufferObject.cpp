@@ -61,7 +61,7 @@ namespace aRibeiro {
 
 		initialized = true;
 
-		if (color.size() > maxDrawBuffers()) {
+		if ((int)color.size() > maxDrawBuffers()) {
 			fprintf(stderr,
 				"[GLFramebufferObject] Trying to use more draw buffers than the current hardware support. \n"
 				"                      (color buffer size: %lu, max draw buffers: %i)\n", color.size(), maxDrawBuffers());
@@ -83,7 +83,7 @@ namespace aRibeiro {
 
 		OPENGL_CMD(glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, mFbo));
 
-		for (int i = 0; i < color.size(); i++)
+		for (int i = 0; i < (int)color.size(); i++)
 			OPENGL_CMD(glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, DrawBuffersUnit[i], GL_TEXTURE_2D, color[i]->mTexture, 0));
 
 		if (depth != NULL) {
@@ -150,7 +150,7 @@ namespace aRibeiro {
 			depth->setSize(w, h, depthFormat);
 		if (stencil != NULL)
 			stencil->setSize(w, h, stencilFormat);
-		for (int i = 0; i < color.size(); i++)
+		for (int i = 0; i < (int)color.size(); i++)
 			color[i]->setSize(w, h, colorFormat);
 	}
 

@@ -416,8 +416,8 @@ ModelContainer *ImportFromAssimp(const char* filename) {
         camera.forward = vec3( aicamera->mLookAt.x, aicamera->mLookAt.y, aicamera->mLookAt.z );
         
         camera.horizontalFOVrad = aicamera->mHorizontalFOV;
-        camera.near = aicamera->mClipPlaneNear;
-        camera.far = aicamera->mClipPlaneFar;
+        camera.nearPlane = aicamera->mClipPlaneNear;
+        camera.farPlane = aicamera->mClipPlaneFar;
         camera.aspect = aicamera->mAspect;
         
         if (camera.aspect == 0.0f) {
@@ -429,8 +429,8 @@ ModelContainer *ImportFromAssimp(const char* filename) {
         fprintf(stderr, "         pos: %f, %f, %f\n", camera.pos.x, camera.pos.y, camera.pos.z);
         fprintf(stderr, "         up: %f, %f, %f\n", camera.up.x, camera.up.y, camera.up.z);
         fprintf(stderr, "         forward: %f, %f, %f\n", camera.forward.x, camera.forward.y, camera.forward.z);
-        fprintf(stderr, "         near: %f\n", camera.near);
-        fprintf(stderr, "         far: %f\n", camera.far);
+        fprintf(stderr, "         nearPlane: %f\n", camera.nearPlane);
+        fprintf(stderr, "         farPlane: %f\n", camera.farPlane);
         fprintf(stderr, "         aspect: %f\n", camera.aspect);
         fprintf(stderr, "         horizontalFOV: %f\n", RAD2DEG(camera.horizontalFOVrad));
         fprintf(stderr, "         verticalFOV: %f\n", RAD2DEG(camera.verticalFOVrad));

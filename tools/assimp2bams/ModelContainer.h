@@ -218,9 +218,9 @@ public:
     vec3 up;
     vec3 forward;
     
-    float horizontalFOVrad;
-    float near;
-    float far;
+	float horizontalFOVrad;
+	float nearPlane;
+	float farPlane;
     float aspect;
     
     float verticalFOVrad;
@@ -238,8 +238,8 @@ public:
         forward = vec3(0,0,1);
         
         horizontalFOVrad = DEG2RAD(60.0f);
-        near = 0.1f;
-        far = 100.0f;
+		nearPlane = 0.1f;
+		farPlane = 100.0f;
         aspect = 1.0f;
         
         verticalFOVrad = DEG2RAD(60.0f);
@@ -255,8 +255,8 @@ public:
         up = v.up;
         forward = v.forward;
         horizontalFOVrad = v.horizontalFOVrad;
-        near = v.near;
-        far = v.far;
+		nearPlane = v.nearPlane;
+		farPlane = v.farPlane;
         aspect = v.aspect;
         verticalFOVrad = v.verticalFOVrad;
     }
