@@ -17,15 +17,16 @@ mat4::mat4(const float value){
     _11=_12=_13=_14=_21=_22=_23=_24=
     _31=_32=_33=_34=_41=_42=_43=_44= value;
 }
-mat4::mat4(const float __11,const float __12,const float __13,const float __14,
-           const float __21,const float __22,const float __23,const float __24,
-           const float __31,const float __32,const float __33,const float __34,
-           const float __41,const float __42,const float __43,const float __44){
-    _11=__11;_12=__12;_13=__13;_14=__14;
-    _21=__21;_22=__22;_23=__23;_24=__24;
-    _31=__31;_32=__32;_33=__33;_34=__34;
-    _41=__41;_42=__42;_43=__43;_44=__44;
+mat4::mat4(const float a1,const float b1,const float c1,const float d1,
+           const float a2,const float b2,const float c2,const float d2,
+           const float a3,const float b3,const float c3,const float d3,
+           const float a4,const float b4,const float c4,const float d4){
+    _11=a1;_12=b1;_13=c1;_14=d1;
+    _21=a2;_22=b2;_23=c2;_24=d2;
+    _31=a3;_32=b3;_33=c3;_34=d3;
+    _41=a4;_42=b4;_43=c4;_44=d4;
 }
+
 mat4::mat4(const mat4 &m){
     memcpy(array,m.array,sizeof(float)*4*4);
 }

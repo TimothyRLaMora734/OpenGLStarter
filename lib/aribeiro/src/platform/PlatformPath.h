@@ -93,6 +93,19 @@ namespace aRibeiro {
 		/// \return true if it is a file
 		///
 		static bool isFile(const std::string &path);
+        
+        
+        /// \brief Split the path+file string into path file extension
+        ///
+        /// Make easy work with path input from main argument
+        ///
+        /// \author Alessandro Ribeiro
+        /// \param the arg string from main parameter
+        /// \param returns folder path
+        /// \param returns filename with extension
+        /// \param returns filename without extension
+        /// \param returns extension from filename
+        static void splitPathString(std::string input, std::string *outFolder, std::string *outFilename, std::string *outFileWOExt, std::string *outFileExt);
 
 
 		//static bool createDir(const std::string &path);

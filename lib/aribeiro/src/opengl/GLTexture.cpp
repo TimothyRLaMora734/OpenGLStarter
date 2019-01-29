@@ -121,16 +121,43 @@ namespace aRibeiro {
 	void GLTexture::setSize(int w, int h, GLuint format) {
 		OPENGL_CMD(glBindTexture(GL_TEXTURE_2D, mTexture));
         
-        if (format == GL_DEPTH_COMPONENT16 ||
-            format == GL_DEPTH_COMPONENT24 ||
-            format == GL_DEPTH_COMPONENT32 )
-            OPENGL_CMD(glTexImage2D(GL_TEXTURE_2D, 0, format, w, h, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0));
-        else if (format == GL_RGBA16F ||
-                 format == GL_RGB16F ||
-                 format == GL_RGBA32F ||
-                 format == GL_RGB32F )
-            OPENGL_CMD(glTexImage2D(GL_TEXTURE_2D, 0, format, w, h, 0, GL_RGBA, GL_FLOAT, 0));
-        else
+		if (format == GL_DEPTH_COMPONENT16 ||
+			format == GL_DEPTH_COMPONENT24 ||
+			format == GL_DEPTH_COMPONENT32) {
+
+			OPENGL_CMD(glTexImage2D(GL_TEXTURE_2D, 0, format, w, h, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0));
+
+			//depth buffer force to nearest filtering...
+			OPENGL_CMD(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST));
+			OPENGL_CMD(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
+
+		}
+		else if (format == GL_STENCIL_INDEX8) {
+			
+			OPENGL_CMD(glTexImage2D(GL_TEXTURE_2D, 0, format, w, h, 0, GL_STENCIL_INDEX, GL_UNSIGNED_BYTE, 0));
+
+			//depth buffer force to nearest filtering...
+			OPENGL_CMD(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST));
+			OPENGL_CMD(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
+
+		}
+		else if (format == GL_DEPTH24_STENCIL8 ) {
+			//
+			// requires extension: GLEW_EXT_packed_depth_stencil or GLEW_NV_packed_depth_stencil
+			//
+			OPENGL_CMD(glTexImage2D(GL_TEXTURE_2D, 0, format, w, h, 0, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, 0));
+
+			//depth buffer force to nearest filtering...
+			OPENGL_CMD(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST));
+			OPENGL_CMD(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
+		}
+		else if (format == GL_RGBA16F ||
+			format == GL_RGB16F ||
+			format == GL_RGBA32F ||
+			format == GL_RGB32F) {
+			OPENGL_CMD(glTexImage2D(GL_TEXTURE_2D, 0, format, w, h, 0, GL_RGBA, GL_FLOAT, 0));
+		}
+		else
             OPENGL_CMD(glTexImage2D(GL_TEXTURE_2D, 0, format, w, h, 0, format, GL_UNSIGNED_BYTE, 0));
         
         

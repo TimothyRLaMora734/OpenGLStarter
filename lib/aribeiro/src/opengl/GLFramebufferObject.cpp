@@ -35,6 +35,7 @@ namespace aRibeiro {
 	GLFramebufferObject::GLFramebufferObject() {
 		initialized = false;
 		depth = NULL;
+		stencil = NULL;
 		mFbo = 0;
 		width = 0;
 		height = 0;
@@ -82,8 +83,13 @@ namespace aRibeiro {
 		for (int i = 0; i < color.size(); i++)
 			OPENGL_CMD(glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, DrawBuffersUnit[i], GL_TEXTURE_2D, color[i]->mTexture, 0));
 		
-		if (depth != NULL)
+		if (depth != NULL) {
 			OPENGL_CMD(glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_TEXTURE_2D, depth->mTexture, 0));
+		}
+
+		if (stencil != NULL) {
+			OPENGL_CMD(glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_STENCIL_ATTACHMENT, GL_TEXTURE_2D, stencil->mTexture, 0));
+		}
 
 		//check the fbo attachment status...
 		GLenum status = (GLenum)glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
@@ -132,13 +138,15 @@ namespace aRibeiro {
 	// GL_RGBA, etc...
 	// GL_RGBA32F_ARB, GL_RGB32F_ARB, GL_RGBA16F_ARB, GL_RGB16F_ARB
 	//
-	void GLFramebufferObject::setSize(int w, int h, GLuint colorFormat, GLuint depthFormat) {
+	void GLFramebufferObject::setSize(int w, int h, GLuint colorFormat, GLuint depthFormat, GLuint stencilFormat) {
         if (this->width == w && this->height == h)
             return;
 		this->width = w;
 		this->height = h;
 		if (depth != NULL)
 			depth->setSize(w, h, depthFormat);
+		if (stencil != NULL)
+			stencil->setSize(w, h, stencilFormat);
 		for (int i = 0; i < color.size(); i++)
 			color[i]->setSize(w, h, colorFormat);
 	}

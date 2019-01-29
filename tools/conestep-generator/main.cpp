@@ -87,6 +87,7 @@ int main(int argc, char *argv[]) {
 
 	std::string filepath = std::string(argv[1]);
 
+    /*
 	//
 	// normalize path separator
 	//
@@ -112,8 +113,10 @@ int main(int argc, char *argv[]) {
 	else {
 		filename_wo_ext = filename.substr(0, path_directory_index);
 	}
-
-
+     */
+    
+    std::string folder, filename, filename_wo_ext, fileext;
+    PlatformPath::splitPathString(filepath, &folder, &filename, &filename_wo_ext, &fileext);
 
 	fprintf(stdout, "Folder: %s\n", folder.c_str());
 	fprintf(stdout, "Filename: %s\n", filename.c_str());

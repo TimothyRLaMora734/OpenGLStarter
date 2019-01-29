@@ -23,6 +23,12 @@ class ARIBEIRO_API mat4{
                   _13,_23,_33,_43,
                   _14,_24,_34,_44;
         };
+		struct {
+			float a1, a2, a3, a4,
+				  b1, b2, b3, b4,
+				  c1, c2, c3, c4,
+				  d1, d2, d3, d4;
+		};
         float array[16];
         // column-major (OpenGL like matrix byte order)
         //  x  y  z  w
@@ -54,10 +60,10 @@ class ARIBEIRO_API mat4{
     ///
     /// \author Alessandro Ribeiro
     ///
-    mat4(const float __11,const float __12,const float __13,const float __14,
-         const float __21,const float __22,const float __23,const float __24,
-         const float __31,const float __32,const float __33,const float __34,
-         const float __41,const float __42,const float __43,const float __44);
+    mat4(const float a1,const float b1,const float c1,const float d1,
+         const float a2,const float b2,const float c2,const float d2,
+         const float a3,const float b3,const float c3,const float d3,
+         const float a4,const float b4,const float c4,const float d4);
     //---------------------------------------------------------------------------
     /// \brief Constructs a 4x4 matrix
     ///

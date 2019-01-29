@@ -206,7 +206,7 @@ endmacro()
 #
 # 3rdParty libraries
 #
-#add_subdirectory( lib/assimp )
+add_subdirectory( lib/assimp )
 add_subdirectory( lib/convertutf )
 add_subdirectory( lib/freetype )
 add_subdirectory( lib/glew )
@@ -238,6 +238,7 @@ add_subdirectory( projects/post-processing-power-of-two )
 #
 add_subdirectory( tools/font2bitmap )
 add_subdirectory( tools/conestep-generator )
+add_subdirectory( tools/assimp2bams )
 
 #add_subdirectory( projects/crazytwirl )
 

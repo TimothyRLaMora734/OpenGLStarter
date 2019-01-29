@@ -26,6 +26,7 @@ namespace aRibeiro {
 
 		std::vector<GLTexture *> color;
 		GLTexture *depth;
+		GLTexture *stencil;
 
 		int width, height;
 
@@ -40,7 +41,10 @@ namespace aRibeiro {
 		// GL_RGBA, etc...
 		// GL_RGBA32F_ARB, GL_RGB32F_ARB, GL_RGBA16F_ARB, GL_RGB16F_ARB
 		//
-		void setSize(int w, int h, GLuint colorFormat = GL_RGBA, GLuint depthFormat = GL_DEPTH_COMPONENT24);
+		void setSize(int w, int h, GLuint colorFormat = GL_RGBA, 
+			GLuint depthFormat = GL_DEPTH_COMPONENT24,
+			GLuint stencilFormat = GL_STENCIL_INDEX8
+			);
 
 		void enable();
 

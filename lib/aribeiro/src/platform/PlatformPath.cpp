@@ -383,5 +383,45 @@ namespace aRibeiro {
 		return unixIsFile(path.c_str());
 #endif
 	}
+    
+    
+    void PlatformPath::splitPathString(std::string input, std::string *outFolder, std::string *outFilename, std::string *outFileWOExt, std::string *outFileExt) {
+        //
+        // normalize path separator
+        //
+        std::replace(input.begin(), input.end(), '\\', PlatformPath::SEPARATOR[0]);
+        std::replace(input.begin(), input.end(), '/', PlatformPath::SEPARATOR[0]);
+        
+        
+        std::string folder, filename, filename_wo_ext, ext;
+        size_t path_directory_index = input.find_last_of(PlatformPath::SEPARATOR[0]);
+        if (path_directory_index == -1) {
+            folder = ".";
+            filename = input;
+        }
+        else {
+            folder = input.substr(0, path_directory_index);
+            filename = input.substr(path_directory_index + 1, input.size() - 1 - path_directory_index);
+        }
+        
+        
+        path_directory_index = filename.find_last_of('.');
+        if (path_directory_index == -1) {
+            filename_wo_ext = filename;
+            ext = "";
+        }
+        else {
+            filename_wo_ext = filename.substr(0, path_directory_index);
+            ext = filename.substr(path_directory_index + 1, filename.size() - 1 - path_directory_index);
+        }
+        
+        
+        
+        *outFolder = folder;
+        *outFilename = filename;
+        *outFileWOExt = filename_wo_ext;
+        *outFileExt = ext;
+        
+    }
 
 }
