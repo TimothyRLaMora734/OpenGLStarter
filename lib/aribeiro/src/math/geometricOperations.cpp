@@ -1375,14 +1375,10 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 		);
 
 		/*
-		return mul( 
-			mul(
-				quatFromAxisAngle( vec3(0.0, 0.0, 1.0), yaw),
-				quatFromAxisAngle(vec3(0.0, 1.0, 0.0), pitch)
-			)
-			,quatFromAxisAngle(vec3(1.0, 0.0, 0.0), roll)
-		);
-
+		return 
+			quatFromAxisAngle(vec3(0.0, 0.0, 1.0), yaw) * 
+			quatFromAxisAngle(vec3(0.0, 1.0, 0.0), pitch) * 
+			quatFromAxisAngle(vec3(1.0, 0.0, 0.0), roll);
 		*/
 		
 	}
