@@ -78,32 +78,44 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 
 
 
+	ARIBEIRO_API quat operator^(const quat &a, const quat &b) {
+
+		return quat(
+					a.w * b.x + a.x * b.w + a.y * b.z - a.z * b.y,
+					a.w * b.y + a.y * b.w + a.z * b.x - a.x * b.z,
+					a.w * b.z + a.z * b.w + a.x * b.y - a.y * b.x,
+					a.w * b.w - a.x * b.x - a.y * b.y - a.z * b.z
+				) ;
+	}
 
 	ARIBEIRO_API quat operator*(const quat &a, const quat &b) {
 
-		return 
-			//normalize(
+		return normalize(
 		quat(
 			a.w * b.x + a.x * b.w + a.y * b.z - a.z * b.y,
 			a.w * b.y + a.y * b.w + a.z * b.x - a.x * b.z,
 			a.w * b.z + a.z * b.w + a.x * b.y - a.y * b.x,
 			a.w * b.w - a.x * b.x - a.y * b.y - a.z * b.z
 		)
-		//)
-		;
-
-		//return mul(a,b);
+		);
 	}
 
 	ARIBEIRO_API vec3 operator*(const quat &a, const vec3 &v) {
 		//quat result = mul(a, mul(quat(v.x, v.y, v.z, 0.0f), conjugate(a)));
-		quat result = a * quat(v.x, v.y, v.z, 0.0f) * conjugate(a);
+		//
+		// non normalized multiplication of the quaternion
+		//
+		quat result = a ^ quat(v.x, v.y, v.z, 0.0f) ^ conjugate(a);
 		return vec3(result.x, result.y, result.z);
 	}
 
 	ARIBEIRO_API vec4 operator*(const quat &a, const vec4 &v) {
 		//quat result = mul(a, mul(quat(v.x, v.y, v.z, 0.0f), conjugate(a)));
-		quat result = a * quat(v.x, v.y, v.z, 0.0f) * conjugate(a);
+		//quat result = a * quat(v.x, v.y, v.z, 0.0f) * conjugate(a);
+		//
+		// non normalized multiplication of the quaternion
+		//
+		quat result = a ^ quat(v.x, v.y, v.z, 0.0f) ^ conjugate(a);
 		return vec4(result.x, result.y, result.z, v.w);
 	}
 
@@ -1211,9 +1223,11 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 	//namespace quaternionOperations{
 
 		//------------------------------------------------------------------------------
-	quat toQuat(const vec3& v) {
+	quat toQuat(const vec3& vp) {
+		vec3 v = normalize(vp);
 		const float t = 1.0f - (v.x*v.x) - (v.y*v.y) - (v.z*v.z);
-		if (t < 0.0f)
+		const float EPSILON = 1e-6f;
+		if (t < EPSILON)
 			return quat(v.x, v.y, v.z, 0.0f);
 		else
 			return quat(v.x, v.y, v.z, sqrt(t));
@@ -1334,14 +1348,14 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 			k1 = sin((0.0f + lerp) * fAngle) * fOneOverSin;
 		}
 
-		return //normalize( 
+		return normalize( 
 			quat(
 			k0 * a.x + k1 * y2.x,
 			k0 * a.y + k1 * y2.y,
 			k0 * a.z + k1 * y2.z,
 			k0 * a.w + k1 * y2.w
 		)
-		//)
+		)
 		;
 	}
 	//------------------------------------------------------------------------------

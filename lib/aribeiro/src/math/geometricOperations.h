@@ -68,8 +68,20 @@ ARIBEIRO_API vec4 operator*(const mat4 &mat, const vec4 &vec);
 ///
 ARIBEIRO_API vec4 operator*(const vec4 &vec, const mat4 &mat);
 
+/// \brief Rotate quaternion a according quaternion b. 
+///
+/// The result is not normalized
+///
+/// \author Alessandro Ribeiro
+/// \param a source quaternion
+/// \param b source quaternion
+/// \return a rotated according b
+///
+ARIBEIRO_API quat operator^(const quat &a, const quat &b);
 
-/// \brief Rotate quaternion a according quaternion b
+/// \brief Rotate quaternion a according quaternion b. 
+///
+/// The result will be normalized
 ///
 /// \author Alessandro Ribeiro
 /// \param a source quaternion

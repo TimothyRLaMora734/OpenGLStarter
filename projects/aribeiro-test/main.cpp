@@ -77,7 +77,7 @@ void test_Quaternions() {
 				}
 
 				//convert back the quaternion to a transformation matrix, and multiply...
-				resultQuat = toVec3( toMat4(quatRotation) * toVec4(p));
+				resultQuat = toVec3( toMat4( quatRotation ) * toVec4(p));
 				if (distance(result, resultQuat) > 0.02f) {
 					printf("  ERROR!!!\n ");
 					printf("  r (%f, %f, %f) ", result.x, result.y, result.z);
@@ -468,6 +468,7 @@ void test_Util() {
 
 
 int main(int argc, char* argv[]) {
+
 
 	printf("  press any key to do move functions test...\n");fgetc(stdin);
 	test_MoveFunctions();
