@@ -67,6 +67,10 @@ float& mat4::operator()(const int x,const int y){
 vec4& mat4::operator[](const int x){
     return *((vec4*)&array[x*4]);
 }
+vec4 mat4::operator[](const int v)const {
+	return *((vec4*)&array[v * 4]);
+}
+
 tensor4& mat4::asTensor4()const{
     return *((tensor4*)this);
 }

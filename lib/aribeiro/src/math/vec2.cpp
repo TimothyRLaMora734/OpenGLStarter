@@ -81,4 +81,8 @@ float& vec2::operator[](const int v){
     return array[v];
 }
 
+float vec2::operator[](const int v)const {
+	return array[v];
+}
+
 }

@@ -191,6 +191,7 @@ class ARIBEIRO_API vec4{
     /// \return A reference to the element at the index v
     ///
     float& operator[](const int v);
+	float operator[](const int v)const;
 };
 
 }

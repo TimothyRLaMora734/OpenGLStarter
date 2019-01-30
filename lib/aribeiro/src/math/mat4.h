@@ -112,6 +112,7 @@ class ARIBEIRO_API mat4{
     /// \return A reference to the matrix row as vec4
     ///
     vec4& operator[](const int x);
+	vec4 operator[](const int v)const;
     //---------------------------------------------------------------------------
     /// \brief Use the current byte raw data as tensor4 type
     ///

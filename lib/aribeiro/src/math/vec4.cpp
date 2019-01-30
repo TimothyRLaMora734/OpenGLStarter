@@ -103,4 +103,8 @@ float& vec4::operator[](const int v){
     return array[v];
 }
 
+float vec4::operator[](const int v)const {
+	return array[v];
+}
+
 }

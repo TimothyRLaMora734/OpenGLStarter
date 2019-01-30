@@ -167,6 +167,7 @@ class ARIBEIRO_API vec2{
     /// \return A reference to the element at the index v
     ///
     float& operator[](const int v);
+	float operator[](const int v)const;
 };
 
 }
