@@ -1753,6 +1753,68 @@ ARIBEIRO_API bool GL_project(const vec3 &worldPtn,
 	///
 	ARIBEIRO_API float angleBetween(const quat& a, const quat& b);
 
+
+
+
+
+	//
+	// Move functions
+	//
+	/// \brief Move from current to target, considering the max variation
+	///
+	///
+	/// \author Alessandro Ribeiro
+	/// \sa move(float current, float target, float maxDistanceVariation)
+	/// \param current The current state
+	/// \param target The target state
+	/// \return the lerp from current to target according max variation
+	///
+	float move(float current, float target, float maxDistanceVariation);
+
+	/// \brief Move from current to target, considering the max variation
+	///
+	///
+	/// \author Alessandro Ribeiro
+	/// \sa move(float current, float target, float maxDistanceVariation)
+	/// \param current The current state
+	/// \param target The target state
+	/// \return the lerp from current to target according max variation
+	///
+	vec2 move(const vec2 &current, const vec2 &target, float maxDistanceVariation);
+
+	/// \brief Move from current to target, considering the max variation
+	///
+	///
+	/// \author Alessandro Ribeiro
+	/// \sa move(float current, float target, float maxDistanceVariation)
+	/// \param current The current state
+	/// \param target The target state
+	/// \return the lerp from current to target according max variation
+	///
+	vec3 move(const vec3 &current, const vec3 &target, float maxDistanceVariation);
+
+	/// \brief Move from current to target, considering the max variation
+	///
+	///
+	/// \author Alessandro Ribeiro
+	/// \sa moveSlerp(const vec3 &current, const vec3 &target, float maxAngleVariation)
+	/// \param current The current state
+	/// \param target The target state
+	/// \return the lerp from current to target according max variation
+	///
+	vec3 moveSlerp(const vec3 &current, const vec3 &target, float maxAngleVariation);
+
+	/// \brief Move from current to target, considering the max variation
+	///
+	///
+	/// \author Alessandro Ribeiro
+	/// \sa moveSlerp(const quat &current, const quat &target, float maxAngleVariation)
+	/// \param current The current state
+	/// \param target The target state
+	/// \return the lerp from current to target according max variation
+	///
+	quat moveSlerp(const quat &current, const quat &target, float maxAngleVariation);
+
 }
 
 

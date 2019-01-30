@@ -81,11 +81,16 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 
 	ARIBEIRO_API quat operator*(const quat &a, const quat &b) {
 
-		return quat(
+		return 
+			//normalize(
+		quat(
 			a.w * b.x + a.x * b.w + a.y * b.z - a.z * b.y,
 			a.w * b.y + a.y * b.w + a.z * b.x - a.x * b.z,
 			a.w * b.z + a.z * b.w + a.x * b.y - a.y * b.x,
-			a.w * b.w - a.x * b.x - a.y * b.y - a.z * b.z);
+			a.w * b.w - a.x * b.x - a.y * b.y - a.z * b.z
+		)
+		//)
+		;
 
 		//return mul(a,b);
 	}
@@ -109,7 +114,7 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 		// https://github.com/g-truc/glm
 		//
 		// get cosine of angle between vectors (-1 -> 1)
-		float CosAlpha = dot(a, b);
+		float CosAlpha = dot( normalize(a), normalize(b) );
 		// get angle (0 -> pi)
 		float Alpha = acos(CosAlpha);
 		// get sine of angle between vectors (0 -> 1)
@@ -328,7 +333,8 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 	*/
 	float distance(const float a, const float b) {
 		float ab = b - a;
-		return sqrtf(ab*ab);
+		//return sqrtf(ab*ab);
+		return absv(ab);
 	}
 	float distance(const vec2 &a, const vec2 &b) {
 		vec2 ab = b - a;
@@ -1215,16 +1221,35 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 	//------------------------------------------------------------------------------
 	quat normalize(const quat& q) {
 		quat result = q;
-		const float TOLERANCE = 0.001f;
+		const float TOLERANCE = 1e-6f;
 		// Don't normalize if we don't have to
+
 		float mag2 = q.w * q.w + q.x * q.x + q.y * q.y + q.z * q.z;
 		if (fabs(mag2) > TOLERANCE && fabs(mag2 - 1.0f) > TOLERANCE) {
-			float mag = sqrt(mag2);
-			result.w = q.w / mag;
-			result.x = q.x / mag;
-			result.y = q.y / mag;
-			result.z = q.z / mag;
+			float magInv = 1.0f / sqrt(mag2);
+			result.w = q.w * magInv;
+			result.x = q.x * magInv;
+			result.y = q.y * magInv;
+			result.z = q.z * magInv;
 		}
+
+		/*
+		float qmagsq = q.w * q.w + q.x * q.x + q.y * q.y + q.z * q.z;
+		if (std::abs(1.0f - qmagsq) < TOLERANCE) {
+			float invMag = 2.0f / (1.0f + qmagsq);
+			result.w = q.w * invMag;
+			result.x = q.x * invMag;
+			result.y = q.y * invMag;
+			result.z = q.z * invMag;
+		} else {
+			float invMag = 1.0f / sqrt(qmagsq);
+			result.w = q.w * invMag;
+			result.x = q.x * invMag;
+			result.y = q.y * invMag;
+			result.z = q.z * invMag;
+		}
+		*/
+
 		return result;
 	}
 	//------------------------------------------------------------------------------
@@ -1309,11 +1334,15 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 			k1 = sin((0.0f + lerp) * fAngle) * fOneOverSin;
 		}
 
-		return quat(
+		return //normalize( 
+			quat(
 			k0 * a.x + k1 * y2.x,
 			k0 * a.y + k1 * y2.y,
 			k0 * a.z + k1 * y2.z,
-			k0 * a.w + k1 * y2.w);
+			k0 * a.w + k1 * y2.w
+		)
+		//)
+		;
 	}
 	//------------------------------------------------------------------------------
 	/*
@@ -1766,4 +1795,51 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 		return acos(dot(normalize(a), normalize(b))) * 2.0f;
 		//return acos( dot(normalize(vec3(a.x, a.y, a.z)), normalize(vec3(b.x, b.y, b.z))) );
 	}
+
+
+
+
+	//------------------------------------------------------------------------------
+
+	float move(float current, float target, float maxDistanceVariation) {
+		const float EPSILON = 1e-6f;
+		float deltaDistance = distance(current, target);
+		if (deltaDistance < maxDistanceVariation + EPSILON)
+			return target;
+		return lerp(current, target, maxDistanceVariation / deltaDistance);
+	}
+
+	vec2 move(const vec2 &current, const vec2 &target, float maxDistanceVariation) {
+		const float EPSILON = 1e-6f;
+		float deltaDistance = distance(current, target);
+		if (deltaDistance < maxDistanceVariation + EPSILON)
+			return target;
+		return lerp(current, target, maxDistanceVariation / deltaDistance);
+	}
+
+	vec3 move(const vec3 &current, const vec3 &target, float maxDistanceVariation) {
+		const float EPSILON = 1e-6f;
+		float deltaDistance = distance(current, target);
+		if (deltaDistance < maxDistanceVariation + EPSILON)
+			return target;
+		return lerp(current, target, maxDistanceVariation / deltaDistance);
+	}
+
+
+	vec3 moveSlerp(const vec3 &current, const vec3 &target, float maxAngleVariation) {
+		const float EPSILON = 1e-6f;
+		float deltaAngle = angleBetween(current, target);
+		if (deltaAngle < maxAngleVariation + EPSILON)
+			return target;
+		return slerp(current, target, maxAngleVariation / deltaAngle);
+	}
+
+	quat moveSlerp(const quat &current, const quat &target, float maxAngleVariation) {
+		const float EPSILON = 1e-6f;
+		float deltaAngle = angleBetween(current, target);
+		if (deltaAngle < maxAngleVariation + EPSILON)
+			return target;
+		return slerp(current, target, maxAngleVariation / deltaAngle);
+	}
+
 }

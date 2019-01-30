@@ -6,6 +6,41 @@ using namespace aRibeiro;
 
 #include <stdio.h>
 
+void test_MoveFunctions() {
+
+	printf("---------------------------------------\n");
+	printf("  test_MoveFunctions\n");
+	printf("---------------------------------------\n\n");
+
+	vec3 p(100,0,0), b(0,100,0);
+
+	printf("move\n");
+	printf(" p(%f, %f, %f) \n", p.x, p.y, p.z);
+	p = move(p,b,60);
+	printf(" p(%f, %f, %f) \n", p.x, p.y, p.z);
+	p = move(p, b, 60);
+	printf(" p(%f, %f, %f) \n", p.x, p.y, p.z);
+	p = move(p, b, 60);
+	printf(" p(%f, %f, %f) \n", p.x, p.y, p.z);
+	p = move(p, b, 60);
+	printf(" p(%f, %f, %f) \n\n", p.x, p.y, p.z);
+
+
+	printf("moveSlerp\n");
+	p = vec3(1, 0, 0);
+	b = vec3(0, 1, 0);
+	printf(" p(%f, %f, %f) \n", p.x, p.y, p.z);
+	p = moveSlerp(p, b, DEG2RAD(90.0f/4.0f));
+	printf(" p(%f, %f, %f) \n", p.x, p.y, p.z);
+	p = moveSlerp(p, b, DEG2RAD(90.0f / 4.0f));
+	printf(" p(%f, %f, %f) \n", p.x, p.y, p.z);
+	p = moveSlerp(p, b, DEG2RAD(90.0f / 4.0f));
+	printf(" p(%f, %f, %f) \n", p.x, p.y, p.z);
+	p = moveSlerp(p, b, DEG2RAD(90.0f / 4.0f));
+	printf(" p(%f, %f, %f) \n", p.x, p.y, p.z);
+
+}
+
 //
 // Test: Quaternions Operations
 //
@@ -434,16 +469,18 @@ void test_Util() {
 
 int main(int argc, char* argv[]) {
 
-
+	printf("  press any key to do move functions test...\n");fgetc(stdin);
+	test_MoveFunctions();
+	printf("  press any key to do quaternion test...\n"); fgetc(stdin);
 	test_Quaternions();
-	
-
+	printf("  press any key to do path test...\n"); fgetc(stdin);
 	test_PlatformPath(argv[0]);
+	printf("  press any key to do time and sleep test...\n"); fgetc(stdin);
 	test_PlatformTime_and_PlatformSleep();
+	printf("  press any key to do thread and mutex test...\n"); fgetc(stdin);
 	test_PlatformThread_and_PlatformMutex();
+	printf("  press any key to do util test...\n"); fgetc(stdin);
 	test_Util();
-
-
 
 
 	printf("  press any key to exit...\n");
