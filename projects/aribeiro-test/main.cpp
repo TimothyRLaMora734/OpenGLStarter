@@ -6,8 +6,6 @@ using namespace aRibeiro;
 
 #include <stdio.h>
 
-
-
 //
 // Test: Quaternions Operations
 //
@@ -43,17 +41,48 @@ void test_Quaternions() {
 					printf(" dst: %f\n", distance(result, resultQuat));
 				}
 
-				/*
-				// none of the algorithms tested with euler extract from quaternion works when applied the same point to the angles calculated...
-				vec3 euler;
-				extractEuler(quatRotation, &euler.x, &euler.y, &euler.z);
+				//convert back the quaternion to a transformation matrix, and multiply...
+				resultQuat = toVec3( toMat4(quatRotation) * toVec4(p));
+				if (distance(result, resultQuat) > 0.02f) {
+					printf("  ERROR!!!\n ");
+					printf("  r (%f, %f, %f) ", result.x, result.y, result.z);
+					printf(" q (%f, %f, %f) -> ", resultQuat.x, resultQuat.y, resultQuat.z);
+					printf(" dst: %f\n", distance(result, resultQuat));
+				}
 
-				if (euler.x < 0)
-					euler.x += DEG2RAD(360.0f);
-				if (euler.y < 0)
-					euler.y += DEG2RAD(360.0f);
-				if (euler.z < 0)
-					euler.z += DEG2RAD(360.0f);
+				//convert the matrix4 to quaternion and multiply
+				resultQuat = extractQuat(matRotation) * p;
+				if (distance(result, resultQuat) > 0.02f) {
+					printf("  ERROR!!!\n ");
+					printf("  r (%f, %f, %f) ", result.x, result.y, result.z);
+					printf(" q (%f, %f, %f) -> ", resultQuat.x, resultQuat.y, resultQuat.z);
+					printf(" dst: %f\n", distance(result, resultQuat));
+				}
+
+
+				// none of the algorithms tested with euler extract from quaternion works when applied the same point to the angles calculated...
+				vec3 euler = vec3(0);
+				extractEuler(quatRotation, &euler.x, &euler.y, &euler.z);
+				//
+				// test transform using the extracted euler angles from quaternion
+				//
+				resultQuat = quatFromEuler(euler.x, euler.y, euler.z) * p;
+				if (distance(result, resultQuat) > 0.02f) {
+					printf("  error on extracting euler angles!!!\n ");
+					printf("    matrix rotation (%f, %f, %f) \n", result.x, result.y, result.z);
+					printf("    quaternion rotation (%f, %f, %f) -> \n", resultQuat.x, resultQuat.y, resultQuat.z);
+					printf("      dst: %f\n\n", distance(result, resultQuat));
+
+					printf("    Angles: %f %f %f\n", anglex, angley, anglez);
+					printf("    ExtractedAngles: %f %f %f\n", RAD2DEG(euler.x), RAD2DEG(euler.y), RAD2DEG(euler.z));
+					//fgetc(stdin);
+				}
+
+				//
+				// test transform using the extracted euler angles from mat4
+				//
+				euler = vec3(0);
+				extractEuler(matRotation, &euler.x, &euler.y, &euler.z);
 
 				//test transform using the extracted euler angles
 				resultQuat = quatFromEuler(euler.x, euler.y, euler.z) * p;
@@ -65,24 +94,13 @@ void test_Quaternions() {
 
 					printf("    Angles: %f %f %f\n", anglex, angley, anglez);
 					printf("    ExtractedAngles: %f %f %f\n", RAD2DEG(euler.x), RAD2DEG(euler.y), RAD2DEG(euler.z));
-					fgetc(stdin);
+					//fgetc(stdin);
 				}
-				*/
-
-
-
-
-
 			}
-
-
-
 		}
-
-
-
 	}
-
+	
+	printf("Done.\n\n");
 	
 
 }
@@ -371,11 +389,12 @@ int main(int argc, char* argv[]) {
 
 	test_Quaternions();
 	
+
 	test_PlatformPath(argv[0]);
 	test_PlatformTime_and_PlatformSleep();
 	test_PlatformThread_and_PlatformMutex();
 	test_Util();
-	
+
 
 
 

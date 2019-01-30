@@ -889,6 +889,33 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 		return zRotate(yaw) * yRotate(pitch) * xRotate(roll);
 	}
 	//------------------------------------------------------------------------------
+	void extractEuler(mat4 m, float *roll, float *pitch, float *yaw) {
+		//
+		// https://www.learnopencv.com/rotation-matrix-to-euler-angles/
+		//
+		float sy = sqrt(m._11 * m._11 + m._21 * m._21);
+
+		bool singular = sy < 1e-6; // If
+
+		float x, y, z;
+		if (!singular)
+		{
+			x = atan2(m._32, m._33);
+			y = atan2(-m._31, sy);
+			z = atan2(m._21, m._11);
+		}
+		else
+		{
+			x = atan2(-m._23, m._22);
+			y = atan2(-m._31, sy);
+			z = 0;
+		}
+
+		*roll = x;
+		*pitch = y;
+		*yaw = z;
+	}
+	//------------------------------------------------------------------------------
 	/*
 	openglRotation
 	c = cosseno
@@ -1351,9 +1378,9 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 	}
 	//------------------------------------------------------------------------------
 
-
+	/*
 	//
-	// http://bediyap.com/programming/convert-quaternion-to-euler-rotations/
+	// http://bediyap.com/programming/convert-quaternion-to-euler-rotations/ - Doesn't work
 	//
 	enum RotSeq { zyx, zyz, zxy, zxz, yxz, yxy, yzx, yzy, xyz, xyx, xzy, xzx };
 
@@ -1370,13 +1397,13 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 	}
 
 	// note: 
-// return values of res[] depends on rotSeq.
-// i.e.
-// for rotSeq zyx, 
-// x = res[0], y = res[1], z = res[2]
-// for rotSeq xyz
-// z = res[0], y = res[1], x = res[2]
-// ...
+	// return values of res[] depends on rotSeq.
+	// i.e.
+	// for rotSeq zyx, 
+	// x = res[0], y = res[1], z = res[2]
+	// for rotSeq xyz
+	// z = res[0], y = res[1], x = res[2]
+	// ...
 	static inline void quaternion2Euler(const quat& q, float res[], RotSeq rotSeq)
 	{
 		switch (rotSeq) {
@@ -1494,13 +1521,67 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 		}
 	}
 
+	//*/
 
 	//all algorithms failed to extract the euler angles...
 
 	void extractEuler(quat q, float *roll, float *pitch, float *yaw) {
 
 		/*
-		
+		float x2 = q.x * q.x;
+		float y2 = q.y * q.y;
+		float z2 = q.z * q.z;
+		float xy = q.x * q.y;
+		float xz = q.x * q.z;
+		float yz = q.y * q.z;
+		float wx = q.w * q.x;
+		float wy = q.w * q.y;
+		float wz = q.w * q.z;
+
+		float m_11 = 1.0f - 2.0f * (y2 + z2);
+		//float m_12 = 2.0f * (xy - wz);
+		//float m_13 = 2.0f * (xz + wy);
+
+		float m_21 = 2.0f * (xy + wz);
+		float m_22 = 1.0f - 2.0f * (x2 + z2);
+		float m_23 = 2.0f * (yz - wx);
+
+		float m_31 = 2.0f * (xz - wy);
+		float m_32 = 2.0f * (yz + wx);
+		float m_33 = 1.0f - 2.0f * (x2 + y2);
+
+		//
+		// https://www.learnopencv.com/rotation-matrix-to-euler-angles/
+		//
+		float sy = sqrt(m_11 * m_11 + m_21 * m_21);
+
+		bool singular = sy < 1e-6; // If
+
+		float x, y, z;
+		if (!singular)
+		{
+			x = atan2(m_32, m_33);
+			y = atan2(-m_31, sy);
+			z = atan2(m_21, m_11);
+		}
+		else
+		{
+			x = atan2(-m_23, m_22);
+			y = atan2(-m_31, sy);
+			z = 0;
+		}
+
+		*roll = x;
+		*pitch = y;
+		*yaw = z;
+		*/
+
+
+		// can't find an algorithm that works... so use the mat4 to get the euler angles...
+		extractEuler(toMat4(q), roll, pitch, yaw);
+
+		/*
+		// http://bediyap.com/programming/convert-quaternion-to-euler-rotations/ - Doesn't work
 		float res[3];
 		quaternion2Euler(q, res, zxy);
 		
@@ -1511,7 +1592,7 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 		*/
 		
 		/*
-		//https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles
+		//https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles -- Doesn't work
 
 		// roll (x-axis rotation)
 		float sinr_cosp = +2.0f * (q.w * q.x + q.y * q.z);
@@ -1534,7 +1615,7 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 
 		
 		/*
-		//https://www.gamedev.net/forums/topic/166424-quaternion-to-euler/
+		//https://www.gamedev.net/forums/topic/166424-quaternion-to-euler/ -- Doesn't work
 		float sqw;
 		float sqx;
 		float sqy;
@@ -1553,7 +1634,7 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 
 		/*
 
-		// http://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToEuler/index.htm
+		// http://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToEuler/index.htm -- Doesn't work
 
 		double sqw = q.w*q.w;
 		double sqx = q.x*q.x;
@@ -1581,12 +1662,6 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 		*roll = atan2(2.0 * q.x*q.w - 2.0 * q.y*q.z, -sqx + sqy - sqz + sqw);
 
 		//*/
-
-
-
-
-
-
 
 	}
 	//------------------------------------------------------------------------------

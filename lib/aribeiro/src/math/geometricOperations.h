@@ -1350,6 +1350,19 @@ ARIBEIRO_API mat4 zRotate(const float _psi_);
 /// \return A 4x4 matrix
 ///
 ARIBEIRO_API mat4 eulerRotate(float roll, float pitch, float yaw);
+
+//------------------------------------------------------------------------------
+/// \brief Extract euler angles from matrix
+///
+/// \author Alessandro Ribeiro
+/// \param Matrix
+/// \param Angle in radians
+/// \param Angle in radians
+/// \param Angle in radians
+/// \return A 4x4 matrix
+///
+ARIBEIRO_API void extractEuler(mat4 m, float *roll, float *pitch, float *yaw);
+
 //------------------------------------------------------------------------------
 /// \brief Creates a rotation 4x4 matrix over an arbitrari axis
 ///
@@ -1544,7 +1557,7 @@ ARIBEIRO_API bool project(vec3 worldPtn,
 ARIBEIRO_API bool GL_project(const vec3 &worldPtn,
                 vec3 *pointInWindow);
     //
-    // All quaternion operations are based on http://assimp.sourceforge.net/,
+    // quaternion operations based on http://assimp.sourceforge.net/,
     //  http://www.gpwiki.org/index.php/OpenGL:Tutorials:Using_Quaternions_to_represent_rotation
     //  and http://www.gamedev.net/page/resources/_/reference/programming/math-and-physics/quaternions/quaternion-powers-r1095
     //
@@ -1685,7 +1698,7 @@ ARIBEIRO_API bool GL_project(const vec3 &worldPtn,
 	/// \param pitch radians
 	/// \param yaw radians
     ///
-    //ARIBEIRO_API void extractEuler(quat q, float *roll,float *pitch,float *yaw );
+    ARIBEIRO_API void extractEuler(quat q, float *roll,float *pitch,float *yaw );
 
 	//------------------------------------------------------------------------------
     /// \brief Computes the inverse of a quaternion. Notice
