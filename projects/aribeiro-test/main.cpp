@@ -18,16 +18,16 @@ void test_Quaternions() {
 	printf(" p vec3(%f, %f, %f) \n", p.x, p.y, p.z);
 
 	printf("quatFromEuler and extractEuler test...\n"
-		  "   If you don't see any error message, so the implementation is OK.\n");
+		  "   If you don't see any error message, so the implementation is OK.\n\n");
 
 	float anglex = 0.0f;
-	for (anglex = 0; anglex < 360.0f; anglex += 360.0f / 20.0f ) {
+	for (anglex = 0; anglex <= 360.1f; anglex += 360.0f / 20.0f ) {
 
 		float angley = 0.0f;
-		for (angley = 0; angley < 360.0f; angley += 360.0f / 20.0f ) {
+		for (angley = 0; angley <= 360.1f; angley += 360.0f / 20.0f ) {
 
 			float anglez = 0.0f;
-			for (anglez = 0; anglez < 360.0f; anglez += 360.0f / 20.0f) {
+			for (anglez = 0; anglez <= 360.1f; anglez += 360.0f / 20.0f) {
 
 				quat quatRotation = quatFromEuler(DEG2RAD(anglex), DEG2RAD(angley), DEG2RAD(anglez));
 				mat4 matRotation = eulerRotate(DEG2RAD(anglex), DEG2RAD(angley), DEG2RAD(anglez));
@@ -99,6 +99,54 @@ void test_Quaternions() {
 			}
 		}
 	}
+
+	printf(" Slerp test.\n\n");
+
+	//slerp test
+	for (anglex = 0; anglex <= 170.1f; anglex += 170.0f / 5.0f) {
+		float lrp = anglex / 170.0f;
+		quat result = slerp( quat() ,quatFromEuler(DEG2RAD(170.0f), 0.0f, 0.0f), lrp);
+
+		vec3 euler = vec3(0);
+		extractEuler(result, &euler.x, &euler.y, &euler.z);
+		euler *= RAD2DEG(1);
+
+		if (euler.x < -0)
+			euler.x += 360.0f;
+		if (euler.y < -0)
+			euler.y += 360.0f;
+		if (euler.z < -0)
+			euler.z += 360.0f;
+
+		printf("    lrp: %f\n", lrp);
+		printf("    anglex: %f\n", anglex);
+		printf("    AnglesFromQuaternion: %f %f %f\n", euler.x, euler.y, euler.z);
+		printf("\n");
+	}
+
+	printf(" Slerp test On Vec3.\n\n");
+
+	for (anglex = 0; anglex <= 170.1f; anglex += 170.0f / 5.0f) {
+		float lrp = anglex / 170.0f;
+		vec3 src = quat() * vec3(1.0f, 0.0f, 0.0f);
+		vec3 target = quatFromEuler(0.0f, DEG2RAD(170.0f), 0.0f) * vec3(1.0f,0.0f,0.0f);
+
+		vec3 computed = slerp(src, target, lrp);
+
+		float angledeg = RAD2DEG( angleBetween(src, computed) );
+		float angledegTotal = RAD2DEG(angleBetween(src, target));
+
+		float angleBetweenQuat = RAD2DEG(angleBetween(quat(), quatFromEuler(0.0f, DEG2RAD(anglex), 0.0f)));
+
+		printf("    lrp: %f\n", lrp);
+		printf("    anglex: %f\n", anglex);
+		printf("    angleBetween: %f\n", angledeg);
+		printf("    angleBetween(quat): %f\n", angleBetweenQuat);
+		printf("    angleBetween(total): %f\n", angledegTotal);
+		printf("\n");
+	}
+
+
 	
 	printf("Done.\n\n");
 	

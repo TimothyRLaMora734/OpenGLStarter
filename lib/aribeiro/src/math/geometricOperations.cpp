@@ -80,17 +80,51 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 
 
 	ARIBEIRO_API quat operator*(const quat &a, const quat &b) {
-		return mul(a,b);
+
+		return quat(
+			a.w * b.x + a.x * b.w + a.y * b.z - a.z * b.y,
+			a.w * b.y + a.y * b.w + a.z * b.x - a.x * b.z,
+			a.w * b.z + a.z * b.w + a.x * b.y - a.y * b.x,
+			a.w * b.w - a.x * b.x - a.y * b.y - a.z * b.z);
+
+		//return mul(a,b);
 	}
 
 	ARIBEIRO_API vec3 operator*(const quat &a, const vec3 &v) {
-		quat result = mul(a, mul(quat(v.x, v.y, v.z, 0.0f), conjugate(a)));
+		//quat result = mul(a, mul(quat(v.x, v.y, v.z, 0.0f), conjugate(a)));
+		quat result = a * quat(v.x, v.y, v.z, 0.0f) * conjugate(a);
 		return vec3(result.x, result.y, result.z);
 	}
 
 	ARIBEIRO_API vec4 operator*(const quat &a, const vec4 &v) {
-		quat result = mul(a, mul(quat(v.x, v.y, v.z, 0.0f), conjugate(a)));
+		//quat result = mul(a, mul(quat(v.x, v.y, v.z, 0.0f), conjugate(a)));
+		quat result = a * quat(v.x, v.y, v.z, 0.0f) * conjugate(a);
 		return vec4(result.x, result.y, result.z, v.w);
+	}
+
+
+	vec3 slerp(const vec3& a, const vec3& b, const float lerp) {
+
+		//
+		// https://github.com/g-truc/glm
+		//
+		// get cosine of angle between vectors (-1 -> 1)
+		float CosAlpha = dot(a, b);
+		// get angle (0 -> pi)
+		float Alpha = acos(CosAlpha);
+		// get sine of angle between vectors (0 -> 1)
+		float SinAlpha = sin(Alpha);
+		// this breaks down when SinAlpha = 0, i.e. Alpha = 0 or pi
+		float t1 = sin( (1.0f - lerp) * Alpha ) / SinAlpha;
+		float t2 = sin(lerp * Alpha) / SinAlpha;
+
+		// interpolate src vectors
+		return a * t1 + b * t2;
+	}
+
+	float angleBetween(const vec3& a, const vec3& b) {
+		float cosA = dot(normalize(a), normalize(b));
+		return acos(cosA);
 	}
 
 
@@ -895,7 +929,7 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 		//
 		float sy = sqrt(m._11 * m._11 + m._21 * m._21);
 
-		bool singular = sy < 1e-6; // If
+		bool singular = sy < 1e-6f; // If
 
 		float x, y, z;
 		if (!singular)
@@ -1203,9 +1237,12 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 	}
 	//------------------------------------------------------------------------------
 	// Performs a spherical interpolation between two quaternions
-	// Implementation adopted from the gmtl project. All others I found on the net fail in some cases.
-	// Congrats, gmtl!
+	// Implementation adopted from the gmtl project.
 	quat slerp(const quat& a, const quat& b, const float lerp) {
+		/*
+		if (lerp <= 0.0f) return a;
+		if (lerp >= 1.0f) return b;
+
 		// calc cosine theta
 		float cosom = a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w;
 
@@ -1238,16 +1275,58 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 			sclp * a.y + sclq * end.y,
 			sclp * a.z + sclq * end.z,
 			sclp * a.w + sclq * end.w);
+		*/
+		//
+		// https://github.com/g-truc/glm
+		//
+		if (lerp <= 0.0f) return a;
+		if (lerp >= 1.0f) return b;
+
+		//float fCos = dot(a, b);
+		float fCos = a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w;
+		quat y2(b); //BUG!!! qua<T> y2;
+		if (fCos < 0.0f)
+		{
+			//y2 = -y;
+			y2 = quat(-b.x, -b.y, -b.z, -b.w);
+			fCos = -fCos;
+		}
+
+		//if(fCos > 1.0f) // problem
+		float k0, k1;
+		const float EPSILON = 1e-6f;
+		if (fCos > (1.0f - EPSILON))
+		{
+			k0 = 1.0f - lerp;
+			k1 = 0.0f + lerp; //BUG!!! 1.0f + lerp;
+		}
+		else
+		{
+			float fSin = sqrt( 1.0f - fCos * fCos );
+			float fAngle = atan2(fSin, fCos);
+			float fOneOverSin = 1.0f / fSin;
+			k0 = sin((1.0f - lerp) * fAngle) * fOneOverSin;
+			k1 = sin((0.0f + lerp) * fAngle) * fOneOverSin;
+		}
+
+		return quat(
+			k0 * a.x + k1 * y2.x,
+			k0 * a.y + k1 * y2.y,
+			k0 * a.z + k1 * y2.z,
+			k0 * a.w + k1 * y2.w);
 	}
 	//------------------------------------------------------------------------------
+	/*
 	// Multiplying q1 with q2 applies the rotation q2 to q1
 	quat mul(const quat& a, const quat& b) {
 		// the constructor takes its arguments as (x, y, z, w)
-		return quat(a.w * b.x + a.x * b.w + a.y * b.z - a.z * b.y,
+		return quat(
+			a.w * b.x + a.x * b.w + a.y * b.z - a.z * b.y,
 			a.w * b.y + a.y * b.w + a.z * b.x - a.x * b.z,
 			a.w * b.z + a.z * b.w + a.x * b.y - a.y * b.x,
 			a.w * b.w - a.x * b.x - a.y * b.y - a.z * b.z);
 	}
+	*/
 	//------------------------------------------------------------------------------
 	/*
 	vec3 rotateVec(const quat& a, const vec3& v) {
@@ -1683,6 +1762,12 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 		*/
 	}
 	//------------------------------------------------------------------------------
+	float dot(const quat& a, const quat& b) {
+		return a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w;
+	}
 
-
+	float angleBetween(const quat& a, const quat& b) {
+		return acos(dot(normalize(a), normalize(b))) * 2.0f;
+		//return acos( dot(normalize(vec3(a.x, a.y, a.z)), normalize(vec3(b.x, b.y, b.z))) );
+	}
 }

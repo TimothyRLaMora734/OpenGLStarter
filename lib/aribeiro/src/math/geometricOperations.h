@@ -97,6 +97,25 @@ ARIBEIRO_API vec3 operator*(const quat &r, const vec3 &vec);
 ARIBEIRO_API vec4 operator*(const quat &r, const vec4 &vec);
 
 
+/// \brief Compute the spherical linear interpolation between 2 vec3
+///
+/// \author Alessandro Ribeiro
+/// \param a The source vector
+/// \param a The target vector
+/// \return The quaternion
+///
+ARIBEIRO_API vec3 slerp(const vec3& a, const vec3& b, const float lerp);
+
+/// \brief Compute the angle between two vectors
+///
+/// \author Alessandro Ribeiro
+/// \param a The source vector
+/// \param a The target vector
+/// \return The quaternion
+///
+ARIBEIRO_API float angleBetween(const vec3& a, const vec3& b);
+
+
 /// \brief Converts a vec4 to a vec3 by discarding the w component of v
 ///
 /// Considering that the parameter is a point (i.e. with w=0) or a vector (i.e. with w=1), it can be converted to a vec3 without the w component.
@@ -1594,7 +1613,7 @@ ARIBEIRO_API bool GL_project(const vec3 &worldPtn,
     ///
     ARIBEIRO_API float length(const quat& q);
     //------------------------------------------------------------------------------
-    /// \brief Compute the spherical linear interpolation between 2 quaternions. Notice: not tested
+    /// \brief Compute the spherical linear interpolation between 2 quaternions.
     ///
     /// \author Alessandro Ribeiro
     /// \param q The quaternion
@@ -1602,14 +1621,16 @@ ARIBEIRO_API bool GL_project(const vec3 &worldPtn,
     ///
     ARIBEIRO_API quat slerp(const quat& a,const quat& b,const float lerp);
     //------------------------------------------------------------------------------
-    /// \brief Multiply two quaternions in a right handed fashion (like mat4 multiplication)
+    
+	/// \brief Multiply two quaternions in a right handed fashion (like mat4 multiplication)
     ///
     /// \author Alessandro Ribeiro
     /// \param a The quaternion
     /// \param b The quaternion
     /// \return The quaternion
     ///
-    ARIBEIRO_API quat mul(const quat& a,const quat& b);
+    //ARIBEIRO_API quat mul(const quat& a,const quat& b);
+
     //------------------------------------------------------------------------------
     
 	/// \brief Apply the quaternion multiplication directly over a point
@@ -1708,6 +1729,30 @@ ARIBEIRO_API bool GL_project(const vec3 &worldPtn,
     /// \return The inverse of the quaternion
     ///
     ARIBEIRO_API quat inv( const quat &q );
+
+	/// \brief Computes the dot product between two quaternions
+	///
+	/// For a more detailed description, see dot( const vec2& a, const vec2& b )
+	///
+	/// \author Alessandro Ribeiro
+	/// \sa dot(const quat& a, const quat& b)
+	/// \param a The first quat
+	/// \param b The second quat
+	/// \return The dot product between the two quaternions
+	///
+	ARIBEIRO_API float dot(const quat& a, const quat& b);
+
+	/// \brief Computes the angle between two quaternions
+	///
+	///
+	/// \author Alessandro Ribeiro
+	/// \sa angleBetween(const quat& a, const quat& b)
+	/// \param a The first quat
+	/// \param b The second quat
+	/// \return The dot product between the two quaternions
+	///
+	ARIBEIRO_API float angleBetween(const quat& a, const quat& b);
+
 }
 
 
