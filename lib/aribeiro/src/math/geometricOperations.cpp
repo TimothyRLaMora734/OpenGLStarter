@@ -78,7 +78,7 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 
 
 
-	ARIBEIRO_API quat operator^(const quat &a, const quat &b) {
+	quat operator^(const quat &a, const quat &b) {
 
 		return quat(
 					a.w * b.x + a.x * b.w + a.y * b.z - a.z * b.y,
@@ -88,7 +88,7 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 				) ;
 	}
 
-	ARIBEIRO_API quat operator*(const quat &a, const quat &b) {
+	quat operator*(const quat &a, const quat &b) {
 
 		return normalize(
 		quat(
@@ -100,7 +100,7 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 		);
 	}
 
-	ARIBEIRO_API vec3 operator*(const quat &a, const vec3 &v) {
+	vec3 operator*(const quat &a, const vec3 &v) {
 		//quat result = mul(a, mul(quat(v.x, v.y, v.z, 0.0f), conjugate(a)));
 		//
 		// non normalized multiplication of the quaternion
@@ -109,7 +109,7 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 		return vec3(result.x, result.y, result.z);
 	}
 
-	ARIBEIRO_API vec4 operator*(const quat &a, const vec4 &v) {
+	vec4 operator*(const quat &a, const vec4 &v) {
 		//quat result = mul(a, mul(quat(v.x, v.y, v.z, 0.0f), conjugate(a)));
 		//quat result = a * quat(v.x, v.y, v.z, 0.0f) * conjugate(a);
 		//
@@ -1832,6 +1832,14 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 	}
 
 	vec3 move(const vec3 &current, const vec3 &target, float maxDistanceVariation) {
+		const float EPSILON = 1e-6f;
+		float deltaDistance = distance(current, target);
+		if (deltaDistance < maxDistanceVariation + EPSILON)
+			return target;
+		return lerp(current, target, maxDistanceVariation / deltaDistance);
+	}
+
+	vec4 move(const vec4 &current, const vec4 &target, float maxDistanceVariation) {
 		const float EPSILON = 1e-6f;
 		float deltaDistance = distance(current, target);
 		if (deltaDistance < maxDistanceVariation + EPSILON)

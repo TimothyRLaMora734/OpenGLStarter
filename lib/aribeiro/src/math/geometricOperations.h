@@ -1781,7 +1781,7 @@ ARIBEIRO_API bool GL_project(const vec3 &worldPtn,
 	/// \param target The target state
 	/// \return the lerp from current to target according max variation
 	///
-	float move(float current, float target, float maxDistanceVariation);
+	ARIBEIRO_API float move(float current, float target, float maxDistanceVariation);
 
 	/// \brief Move from current to target, considering the max variation
 	///
@@ -1792,7 +1792,7 @@ ARIBEIRO_API bool GL_project(const vec3 &worldPtn,
 	/// \param target The target state
 	/// \return the lerp from current to target according max variation
 	///
-	vec2 move(const vec2 &current, const vec2 &target, float maxDistanceVariation);
+	ARIBEIRO_API vec2 move(const vec2 &current, const vec2 &target, float maxDistanceVariation);
 
 	/// \brief Move from current to target, considering the max variation
 	///
@@ -1803,7 +1803,18 @@ ARIBEIRO_API bool GL_project(const vec3 &worldPtn,
 	/// \param target The target state
 	/// \return the lerp from current to target according max variation
 	///
-	vec3 move(const vec3 &current, const vec3 &target, float maxDistanceVariation);
+	ARIBEIRO_API vec3 move(const vec3 &current, const vec3 &target, float maxDistanceVariation);
+
+	/// \brief Move from current to target, considering the max variation
+	///
+	///
+	/// \author Alessandro Ribeiro
+	/// \sa move(float current, float target, float maxDistanceVariation)
+	/// \param current The current state
+	/// \param target The target state
+	/// \return the lerp from current to target according max variation
+	///
+	ARIBEIRO_API vec4 move(const vec4 &current, const vec4 &target, float maxDistanceVariation);
 
 	/// \brief Move from current to target, considering the max variation
 	///
@@ -1814,7 +1825,7 @@ ARIBEIRO_API bool GL_project(const vec3 &worldPtn,
 	/// \param target The target state
 	/// \return the lerp from current to target according max variation
 	///
-	vec3 moveSlerp(const vec3 &current, const vec3 &target, float maxAngleVariation);
+	ARIBEIRO_API vec3 moveSlerp(const vec3 &current, const vec3 &target, float maxAngleVariation);
 
 	/// \brief Move from current to target, considering the max variation
 	///
@@ -1825,7 +1836,7 @@ ARIBEIRO_API bool GL_project(const vec3 &worldPtn,
 	/// \param target The target state
 	/// \return the lerp from current to target according max variation
 	///
-	quat moveSlerp(const quat &current, const quat &target, float maxAngleVariation);
+	ARIBEIRO_API quat moveSlerp(const quat &current, const quat &target, float maxAngleVariation);
 
 }
 
