@@ -69,6 +69,34 @@ ARIBEIRO_API vec4 operator*(const mat4 &mat, const vec4 &vec);
 ARIBEIRO_API vec4 operator*(const vec4 &vec, const mat4 &mat);
 
 
+/// \brief Rotate quaternion a according quaternion b
+///
+/// \author Alessandro Ribeiro
+/// \param a source quaternion
+/// \param b source quaternion
+/// \return a rotated according b
+///
+ARIBEIRO_API quat operator*(const quat &a, const quat &b);
+
+/// \brief Rotate vector according a quaternion
+///
+/// \author Alessandro Ribeiro
+/// \param r source quaternion
+/// \param vec source vector
+/// \return vec rotated according r
+///
+ARIBEIRO_API vec3 operator*(const quat &r, const vec3 &vec);
+
+/// \brief Rotate vector according a quaternion
+///
+/// \author Alessandro Ribeiro
+/// \param r source quaternion
+/// \param vec source vector
+/// \return vec rotated according r
+///
+ARIBEIRO_API vec4 operator*(const quat &r, const vec4 &vec);
+
+
 /// \brief Converts a vec4 to a vec3 by discarding the w component of v
 ///
 /// Considering that the parameter is a point (i.e. with w=0) or a vector (i.e. with w=1), it can be converted to a vec3 without the w component.
@@ -1206,6 +1234,7 @@ ARIBEIRO_API mat4 transpose(const mat4& m);
 /// \return The inverse matrix
 ///
 ARIBEIRO_API mat4 inv(const mat4& m);
+
 /// \brief Computes the inverse of a matrix
 ///
 /// ** This inv_faster function in a certain angle returns the wrong matrix...
@@ -1215,6 +1244,7 @@ ARIBEIRO_API mat4 inv(const mat4& m);
 /// \return The inverse matrix
 ///
 //ARIBEIRO_API mat4 inv_faster(const mat4& m);
+
 /// \brief Reads the modelview matrix from the Opengl and return it as a mat4
 ///
 /// \author Alessandro Ribeiro
@@ -1310,6 +1340,16 @@ ARIBEIRO_API mat4 yRotate(const float _theta_);
 /// \return A 4x4 matrix
 ///
 ARIBEIRO_API mat4 zRotate(const float _psi_);
+//------------------------------------------------------------------------------
+/// \brief Creates a rotation 4x4 matrix over the Euler angles
+///
+/// \author Alessandro Ribeiro
+/// \param Angle in radians
+/// \param Angle in radians
+/// \param Angle in radians
+/// \return A 4x4 matrix
+///
+ARIBEIRO_API mat4 eulerRotate(float roll, float pitch, float yaw);
 //------------------------------------------------------------------------------
 /// \brief Creates a rotation 4x4 matrix over an arbitrari axis
 ///
@@ -1431,16 +1471,20 @@ ARIBEIRO_API mat4 projection_ortho(const float Left,const float Right,const floa
 ///
 ARIBEIRO_API mat4 lookAt(const vec3 &front, const vec3 &up, const vec3 &position);
 //------------------------------------------------------------------------------
+
 /// \brief Computes the inverse of a 4x4 matrix
 ///
 /// This method is the same as presented by Shan Hao Bo, April 2006.
+///
+/// NOTICE: Does not compute inverse for all cases...removed from library
 ///
 /// \author Alessandro Ribeiro
 /// \param src The source matrix
 /// \param inverse The return parameter
 /// \return True if it is possible to compute the inverse, false if src is a singular matrix
 ///
-ARIBEIRO_API bool inverse_alternative(const mat4 &src, mat4 *inverse);
+//ARIBEIRO_API bool inverse_alternative(const mat4 &src, mat4 *inverse);
+
 //------------------------------------------------------------------------------
 /// \brief Computes the result of the reverse projection of a point in the projection plane
 ///
@@ -1554,16 +1598,19 @@ ARIBEIRO_API bool GL_project(const vec3 &worldPtn,
     ///
     ARIBEIRO_API quat mul(const quat& a,const quat& b);
     //------------------------------------------------------------------------------
-    /// \brief Apply the quaternion multiplication directly over a point
+    
+	/// \brief Apply the quaternion multiplication directly over a point
     ///
     /// \author Alessandro Ribeiro
     /// \param a The quaternion
     /// \param v The point
     /// \return The point transformed
     ///
-    ARIBEIRO_API vec3 rotateVec(const quat& a,const vec3& v);
+    //ARIBEIRO_API vec3 rotateVec(const quat& a,const vec3& v);
+
     //------------------------------------------------------------------------------
-    /// \brief Apply the quaternion multiplication directly over a vec4
+    
+	/// \brief Apply the quaternion multiplication directly over a vec4
     ///
     /// The vec4 will be rotated according the x,y,z coords. The w component will be copied from the parameter to the result.
     ///
@@ -1572,7 +1619,8 @@ ARIBEIRO_API bool GL_project(const vec3 &worldPtn,
     /// \param v The vec4
     /// \return The vec4 transformed with the same w as the parameter
     ///
-    ARIBEIRO_API vec4 rotateVec(const quat& a,const vec4& v);
+    //ARIBEIRO_API vec4 rotateVec(const quat& a,const vec4& v);
+
     //------------------------------------------------------------------------------
     /// \brief Constructs a quaternion from an axis and an angle in radians.
     ///
@@ -1583,15 +1631,15 @@ ARIBEIRO_API bool GL_project(const vec3 &worldPtn,
     ///
     ARIBEIRO_API quat quatFromAxisAngle(const vec3& axis,const float angle_rad);
     //------------------------------------------------------------------------------
-    /// \brief Constructs a quaternion from euler angles in radians. Notice: Not tested
+    /// \brief Constructs a quaternion from euler angles in radians.
     ///
     /// \author Alessandro Ribeiro
-    /// \param _phi_rad - pitch
-    /// \param _theta_rad - yaw
-    /// \param _psi_rad - roll
+    /// \param pitch radians
+    /// \param yaw radians
+    /// \param roll radians
     /// \return The quat
     ///
-    ARIBEIRO_API quat quatFromEuler(const float _phi_rad,const float _theta_rad,const float _psi_rad);
+    ARIBEIRO_API quat quatFromEuler(float roll, float pitch, float yaw);
     //------------------------------------------------------------------------------
     /// \brief Constructs a conjugate quaternion
     ///
@@ -1628,17 +1676,19 @@ ARIBEIRO_API bool GL_project(const vec3 &worldPtn,
     ///
     ARIBEIRO_API void extractAxisAngle(const quat& q, vec3 *axis, float *angle);
 	//------------------------------------------------------------------------------
-    /// \brief Convert the quaternion to Euler representation. Notice: Not tested
+    
+	/// \brief Convert the quaternion to Euler representation. Notice: Not found an algorithm that works...
     ///
     /// \author Alessandro Ribeiro
     /// \param q The rotation quaternion
-    /// \param _phi_rad Output - The Pitch angle
-	/// \param _theta_rad Output - The Yaw angle
-	/// \param _psi_rad Output - The Roll angle
+    /// \param roll radians
+	/// \param pitch radians
+	/// \param yaw radians
     ///
-    ARIBEIRO_API void extractEuler(quat q, float *_phi_rad,float *_theta_rad,float *_psi_rad );
+    //ARIBEIRO_API void extractEuler(quat q, float *roll,float *pitch,float *yaw );
+
 	//------------------------------------------------------------------------------
-    /// \brief Computes the inverse of a quaternion. Notice: Not tested
+    /// \brief Computes the inverse of a quaternion. Notice
     ///
     /// \author Alessandro Ribeiro
     /// \param q The rotation quaternion

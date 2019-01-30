@@ -49,12 +49,11 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 		OPERATION_IMPLEMENTATION(tensor4)
 
 
-		//[ 11 12 13 14 ]  [ x ]      [ x11+y12+z13+w14 ]
-		//[ 21 22 23 24 ]  [ y ]   =  [ x21+y22+z23+w24 ]
-		//[ 31 32 33 34 ]  [ z ]      [ x31+y32+z33+w34 ]
-		//[ 41 42 43 44 ]  [ w ]      [ x41+y42+z43+w44 ]
-
-		vec4 operator*(const mat4 &mat, const vec4 &vec) {
+	//[ 11 12 13 14 ]  [ x ]      [ x11+y12+z13+w14 ]
+	//[ 21 22 23 24 ]  [ y ]   =  [ x21+y22+z23+w24 ]
+	//[ 31 32 33 34 ]  [ z ]      [ x31+y32+z33+w34 ]
+	//[ 41 42 43 44 ]  [ w ]      [ x41+y42+z43+w44 ]
+	vec4 operator*(const mat4 &mat, const vec4 &vec) {
 		vec4 result;
 		result.x = mat._11*vec.x + mat._12*vec.y + mat._13*vec.z + mat._14*vec.w;
 		result.y = mat._21*vec.x + mat._22*vec.y + mat._23*vec.z + mat._24*vec.w;
@@ -67,7 +66,6 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 	//(x y z w)   [ 21 22 23 24 ]   =  (11x+21y+31z+41w  12x+22y+32z+42w  13x+23y+33z+43w  14x+24y+34z+44w)
 	//            [ 31 32 33 34 ]
 	//            [ 41 42 43 44 ]
-
 	vec4 operator*(const vec4 &vec, const mat4 &mat) {
 		vec4 result;
 		result.x = mat._11*vec.x + mat._21*vec.y + mat._31*vec.z + mat._41*vec.w;
@@ -77,6 +75,23 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 		return result;
 	}
 
+
+
+
+
+	ARIBEIRO_API quat operator*(const quat &a, const quat &b) {
+		return mul(a,b);
+	}
+
+	ARIBEIRO_API vec3 operator*(const quat &a, const vec3 &v) {
+		quat result = mul(a, mul(quat(v.x, v.y, v.z, 0.0f), conjugate(a)));
+		return vec3(result.x, result.y, result.z);
+	}
+
+	ARIBEIRO_API vec4 operator*(const quat &a, const vec4 &v) {
+		quat result = mul(a, mul(quat(v.x, v.y, v.z, 0.0f), conjugate(a)));
+		return vec4(result.x, result.y, result.z, v.w);
+	}
 
 
 	//typedef vec2 float2;
@@ -740,11 +755,13 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 		return retorno;
 	}
 
+	/*
 	mat4 inv_faster(const mat4& m) {
 		mat4 result;
 		inverse_alternative(m, &result);
 		return result;
 	}
+	*/
 
 
 	mat4 getModelviewFromOpenGL() {
@@ -841,7 +858,8 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 	mat4 xRotate(const float _phi_) {
 		float c = cos(_phi_);
 		float s = sin(_phi_);
-		return mat4(1, 0, 0, 0,
+		return mat4(
+			1, 0, 0, 0,
 			0, c, -s, 0,
 			0, s, c, 0,
 			0, 0, 0, 1);
@@ -850,7 +868,8 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 	mat4 yRotate(const float _theta_) {
 		float c = cos(_theta_);
 		float s = sin(_theta_);
-		return mat4(c, 0, s, 0,
+		return mat4(
+			c, 0, s, 0,
 			0, 1, 0, 0,
 			-s, 0, c, 0,
 			0, 0, 0, 1);
@@ -859,10 +878,15 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 	mat4 zRotate(const float _psi_) {
 		float c = cos(_psi_);
 		float s = sin(_psi_);
-		return mat4(c, -s, 0, 0,
+		return mat4(
+			c, -s, 0, 0,
 			s, c, 0, 0,
 			0, 0, 1, 0,
 			0, 0, 0, 1);
+	}
+	//------------------------------------------------------------------------------
+	mat4 eulerRotate(float roll, float pitch, float yaw) {
+		return zRotate(yaw) * yRotate(pitch) * xRotate(roll);
 	}
 	//------------------------------------------------------------------------------
 	/*
@@ -978,6 +1002,7 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 	** inverse = invert(src)
 	** New, faster implementation by Shan Hao Bo, April 2006.
 	*/
+	/*
 	bool inverse_alternative(const mat4 &src, mat4 *inverse) {
 		int i, j, k;
 		float t;
@@ -1023,6 +1048,7 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 		}
 		return true;
 	}
+	*/
 	//------------------------------------------------------------------------------
 	// retorna false se a matriz final é singular e n pode ser invertida
 	bool unproject(vec3 pointInWindow,
@@ -1031,8 +1057,17 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 		int viewportX, int viewportY, int viewportW, int viewportH,
 		vec3 *worldPtn) {
 		mat4 modelViewProjection_inverse = projectionMatrix * modelViewMatrix;//pre_multiplyed ogl Like
+
+		modelViewProjection_inverse = inv(modelViewProjection_inverse);
+
+		if ( modelViewProjection_inverse.array[0] == std::numeric_limits<float>::quiet_NaN()) {
+			return false;
+		}
+
+		/*
 		if (!inverse_alternative(modelViewProjection_inverse, &modelViewProjection_inverse))
 			return false;
+		*/
 		/* Map x and y from window coordinates */
 		pointInWindow.x = (pointInWindow.x - float(viewportX)) / float(viewportW);
 		pointInWindow.y = (pointInWindow.y - float(viewportY)) / float(viewportH);
@@ -1187,6 +1222,7 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 			a.w * b.w - a.x * b.x - a.y * b.y - a.z * b.z);
 	}
 	//------------------------------------------------------------------------------
+	/*
 	vec3 rotateVec(const quat& a, const vec3& v) {
 		quat result = mul(a, mul(quat(v.x, v.y, v.z, 0.0f), conjugate(a)));
 		return vec3(result.x, result.y, result.z);
@@ -1196,6 +1232,7 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 		quat result = mul(a, mul(quat(v.x, v.y, v.z, 0.0f), conjugate(a)));
 		return vec4(result.x, result.y, result.z, v.w);
 	}
+	*/
 	//------------------------------------------------------------------------------
 	quat quatFromAxisAngle(const vec3& axis, const float angle_rad) {
 		float sinAngle;
@@ -1208,29 +1245,40 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 			cos(angle));
 	}
 	//------------------------------------------------------------------------------
-	quat quatFromEuler(const float _phi_rad, const float _theta_rad, const float _psi_rad) {
+	quat quatFromEuler(float roll, float pitch, float yaw) {
 
-		// Basically we create 3 Quaternions, one for pitch, one for yaw, one for roll
-		// and multiply those together.
-		// the calculation below does the same, just shorter
+		pitch *= 0.5f;
+		yaw *= 0.5f;
+		roll *= 0.5f;
 
-		float p = _phi_rad * _PI_180 / 2.0f; //pitch
-		float y = _theta_rad * _PI_180 / 2.0f; //yaw
-		float r = _psi_rad * _PI_180 / 2.0f; //roll
+		float sinPitch = sin(pitch);
+		float cosPitch = cos(pitch);
+		float sinYaw = sin(yaw);
+		float cosYaw = cos(yaw);
+		float sinRoll = sin(roll);
+		float cosRoll = cos(roll);
 
-		float sinp = sin(p);
-		float siny = sin(y);
-		float sinr = sin(r);
-		float cosp = cos(p);
-		float cosy = cos(y);
-		float cosr = cos(r);
+		float cosPitchCosYaw = cosPitch * cosYaw;
+		float sinPitchSinYaw = sinPitch * sinYaw;
 
-		quat result(sinr * cosp * cosy - cosr * sinp * siny,
-			cosr * sinp * cosy + sinr * cosp * siny,
-			cosr * cosp * siny - sinr * sinp * cosy,
-			cosr * cosp * cosy + sinr * sinp * siny);
-		return normalize(result);
+		return quat(
+			sinRoll * cosPitchCosYaw - cosRoll * sinPitchSinYaw,
+			cosRoll * sinPitch * cosYaw + sinRoll * cosPitch * sinYaw,
+			cosRoll * cosPitch * sinYaw - sinRoll * sinPitch * cosYaw,
+			cosRoll * cosPitchCosYaw + sinRoll * sinPitchSinYaw
+		);
 
+		/*
+		return mul( 
+			mul(
+				quatFromAxisAngle( vec3(0.0, 0.0, 1.0), yaw),
+				quatFromAxisAngle(vec3(0.0, 1.0, 0.0), pitch)
+			)
+			,quatFromAxisAngle(vec3(1.0, 0.0, 0.0), roll)
+		);
+
+		*/
+		
 	}
 	//------------------------------------------------------------------------------
 	quat conjugate(const quat& a) {
@@ -1302,31 +1350,249 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 		*angle = acos(q.w) * 2.0f;
 	}
 	//------------------------------------------------------------------------------
-	void extractEuler(quat q, float *_phi_rad, float *_theta_rad, float *_psi_rad) {
-		float fTx = 2.0f*q.x;
-		float fTy = 2.0f*q.y;
-		float fTz = 2.0f*q.z;
 
-		float fTxx = fTx * q.x;
-		float fTxy = fTy * q.x;
-		float fTxz = fTz * q.x;
 
-		float fTyy = fTy * q.y;
-		float fTyz = fTz * q.y;
-		float fTzz = fTz * q.z;
+	//
+	// http://bediyap.com/programming/convert-quaternion-to-euler-rotations/
+	//
+	enum RotSeq { zyx, zyz, zxy, zxz, yxz, yxy, yzx, yzy, xyz, xyx, xzy, xzx };
 
-		float fTwx = fTx * q.w;
-		float fTwy = fTy * q.w;
-		float fTwz = fTz * q.w;
-		//PITCH
-		*_phi_rad = atan2(fTyz + fTwx, 1.0f - (fTxx + fTzz));
-		//YAW
-		*_theta_rad = atan2(fTxz + fTwy, 1.0f - (fTxx + fTyy));
-		//ROLL
-		*_psi_rad = atan2(fTxy + fTwz, 1.0f - (fTyy + fTzz));
+	static inline void twoaxisrot(float r11, float r12, float r21, float r31, float r32, float res[]) {
+		res[0] = atan2(r11, r12);
+		res[1] = acos(r21);
+		res[2] = atan2(r31, r32);
+	}
+
+	static inline void threeaxisrot(float r11, float r12, float r21, float r31, float r32, float res[]) {
+		res[0] = atan2(r31, r32);
+		res[1] = asin(r21);
+		res[2] = atan2(r11, r12);
+	}
+
+	// note: 
+// return values of res[] depends on rotSeq.
+// i.e.
+// for rotSeq zyx, 
+// x = res[0], y = res[1], z = res[2]
+// for rotSeq xyz
+// z = res[0], y = res[1], x = res[2]
+// ...
+	static inline void quaternion2Euler(const quat& q, float res[], RotSeq rotSeq)
+	{
+		switch (rotSeq) {
+		case zyx:
+			threeaxisrot(2 * (q.x*q.y + q.w*q.z),
+				q.w*q.w + q.x*q.x - q.y*q.y - q.z*q.z,
+				-2 * (q.x*q.z - q.w*q.y),
+				2 * (q.y*q.z + q.w*q.x),
+				q.w*q.w - q.x*q.x - q.y*q.y + q.z*q.z,
+				res);
+			break;
+
+		case zyz:
+			twoaxisrot(2 * (q.y*q.z - q.w*q.x),
+				2 * (q.x*q.z + q.w*q.y),
+				q.w*q.w - q.x*q.x - q.y*q.y + q.z*q.z,
+				2 * (q.y*q.z + q.w*q.x),
+				-2 * (q.x*q.z - q.w*q.y),
+				res);
+			break;
+
+		case zxy:
+			threeaxisrot(-2 * (q.x*q.y - q.w*q.z),
+				q.w*q.w - q.x*q.x + q.y*q.y - q.z*q.z,
+				2 * (q.y*q.z + q.w*q.x),
+				-2 * (q.x*q.z - q.w*q.y),
+				q.w*q.w - q.x*q.x - q.y*q.y + q.z*q.z,
+				res);
+			break;
+
+		case zxz:
+			twoaxisrot(2 * (q.x*q.z + q.w*q.y),
+				-2 * (q.y*q.z - q.w*q.x),
+				q.w*q.w - q.x*q.x - q.y*q.y + q.z*q.z,
+				2 * (q.x*q.z - q.w*q.y),
+				2 * (q.y*q.z + q.w*q.x),
+				res);
+			break;
+
+		case yxz:
+			threeaxisrot(2 * (q.x*q.z + q.w*q.y),
+				q.w*q.w - q.x*q.x - q.y*q.y + q.z*q.z,
+				-2 * (q.y*q.z - q.w*q.x),
+				2 * (q.x*q.y + q.w*q.z),
+				q.w*q.w - q.x*q.x + q.y*q.y - q.z*q.z,
+				res);
+			break;
+
+		case yxy:
+			twoaxisrot(2 * (q.x*q.y - q.w*q.z),
+				2 * (q.y*q.z + q.w*q.x),
+				q.w*q.w - q.x*q.x + q.y*q.y - q.z*q.z,
+				2 * (q.x*q.y + q.w*q.z),
+				-2 * (q.y*q.z - q.w*q.x),
+				res);
+			break;
+
+		case yzx:
+			threeaxisrot(-2 * (q.x*q.z - q.w*q.y),
+				q.w*q.w + q.x*q.x - q.y*q.y - q.z*q.z,
+				2 * (q.x*q.y + q.w*q.z),
+				-2 * (q.y*q.z - q.w*q.x),
+				q.w*q.w - q.x*q.x + q.y*q.y - q.z*q.z,
+				res);
+			break;
+
+		case yzy:
+			twoaxisrot(2 * (q.y*q.z + q.w*q.x),
+				-2 * (q.x*q.y - q.w*q.z),
+				q.w*q.w - q.x*q.x + q.y*q.y - q.z*q.z,
+				2 * (q.y*q.z - q.w*q.x),
+				2 * (q.x*q.y + q.w*q.z),
+				res);
+			break;
+
+		case xyz:
+			threeaxisrot(-2 * (q.y*q.z - q.w*q.x),
+				q.w*q.w - q.x*q.x - q.y*q.y + q.z*q.z,
+				2 * (q.x*q.z + q.w*q.y),
+				-2 * (q.x*q.y - q.w*q.z),
+				q.w*q.w + q.x*q.x - q.y*q.y - q.z*q.z,
+				res);
+			break;
+
+		case xyx:
+			twoaxisrot(2 * (q.x*q.y + q.w*q.z),
+				-2 * (q.x*q.z - q.w*q.y),
+				q.w*q.w + q.x*q.x - q.y*q.y - q.z*q.z,
+				2 * (q.x*q.y - q.w*q.z),
+				2 * (q.x*q.z + q.w*q.y),
+				res);
+			break;
+
+		case xzy:
+			threeaxisrot(2 * (q.y*q.z + q.w*q.x),
+				q.w*q.w - q.x*q.x + q.y*q.y - q.z*q.z,
+				-2 * (q.x*q.y - q.w*q.z),
+				2 * (q.x*q.z + q.w*q.y),
+				q.w*q.w + q.x*q.x - q.y*q.y - q.z*q.z,
+				res);
+			break;
+
+		case xzx:
+			twoaxisrot(2 * (q.x*q.z - q.w*q.y),
+				2 * (q.x*q.y + q.w*q.z),
+				q.w*q.w + q.x*q.x - q.y*q.y - q.z*q.z,
+				2 * (q.x*q.z + q.w*q.y),
+				-2 * (q.x*q.y - q.w*q.z),
+				res);
+			break;
+		default:
+
+			//std::cout << "Unknown rotation sequence" << std::endl;
+			break;
+		}
+	}
+
+
+	//all algorithms failed to extract the euler angles...
+
+	void extractEuler(quat q, float *roll, float *pitch, float *yaw) {
+
+		/*
+		
+		float res[3];
+		quaternion2Euler(q, res, zxy);
+		
+		*roll = res[1];
+		*pitch = res[0];
+		*yaw = res[2];
+
+		*/
+		
+		/*
+		//https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles
+
+		// roll (x-axis rotation)
+		float sinr_cosp = +2.0f * (q.w * q.x + q.y * q.z);
+		float cosr_cosp = +1.0f - 2.0f * (q.x * q.x + q.y * q.y);
+		*roll = atan2(sinr_cosp, cosr_cosp);
+
+		// pitch (y-axis rotation)
+		float sinp = +2.0 * (q.w * q.y - q.z * q.x);
+		if (fabs(sinp) >= 1)
+			*pitch = copysign( PI / 2.0f, sinp); // use 90 degrees if out of range
+		else
+			*pitch = asin(sinp);
+
+		// yaw (z-axis rotation)
+		float siny_cosp = +2.0f * (q.w * q.z + q.x * q.y);
+		float cosy_cosp = +1.0f - 2.0f * (q.y * q.y + q.z * q.z);
+		*yaw = atan2(siny_cosp, cosy_cosp);
+
+		//*/
+
+		
+		/*
+		//https://www.gamedev.net/forums/topic/166424-quaternion-to-euler/
+		float sqw;
+		float sqx;
+		float sqy;
+		float sqz;
+
+		sqw = q.w * q.w;
+		sqx = q.x * q.x;
+		sqy = q.y * q.y;
+		sqz = q.z * q.z;
+
+		*roll = (float)atan2l(2.0f * (q.y * q.z + q.x * q.w), (-sqx - sqy + sqz + sqw));
+		*pitch = (float)asinl(-2.0f * (q.x * q.z - q.y * q.w));
+		*yaw = (float)atan2l(2.0f * (q.x * q.y + q.z * q.w), (sqx - sqy - sqz + sqw));
+
+		//*/
+
+		/*
+
+		// http://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToEuler/index.htm
+
+		double sqw = q.w*q.w;
+		double sqx = q.x*q.x;
+		double sqy = q.y*q.y;
+		double sqz = q.z*q.z;
+		double unit = sqx + sqy + sqz + sqw; // if normalised is one, otherwise is correction factor
+		double test = q.x*q.y + q.z*q.w;
+
+		
+		if (test > 0.499*unit) { // singularity at north pole
+			*pitch = 2.0 * atan2(q.x, q.w);
+			*yaw = PI / 2.0;
+			*roll = 0;
+			return;
+		}
+		if (test < -0.499*unit) { // singularity at south pole
+			*pitch = -2.0 * atan2(q.x, q.w);
+			*yaw = -PI / 2.0;
+			*roll = 0;
+			return;
+		}
+
+		*pitch = atan2(2.0 * q.y*q.w - 2.0 * q.x*q.z, sqx - sqy - sqz + sqw);
+		*yaw = asin(2.0 * test / unit);
+		*roll = atan2(2.0 * q.x*q.w - 2.0 * q.y*q.z, -sqx + sqy - sqz + sqw);
+
+		//*/
+
+
+
+
+
+
+
 	}
 	//------------------------------------------------------------------------------
 	quat inv(const quat &q) {
+		return conjugate(q);
+		/*
 		quat result;
 		const float TOLERANCE = 0.001f;
 		// Don't normalize if we don't have to
@@ -1339,6 +1605,7 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 			result = quat(-q.x, -q.y, -q.z, -q.w);
 		}
 		return result;
+		*/
 	}
 	//------------------------------------------------------------------------------
 
