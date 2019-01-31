@@ -13,7 +13,6 @@
 #include <aribeiro/common.h>
 
 //#include "all_math.h"
-#include <aribeiro/AABB.h>
 #include <aribeiro/BresenhamIterator.h>
 #include <aribeiro/constants.h>
 //#include "defs.h"
@@ -25,6 +24,15 @@
 #include <aribeiro/vec2.h>
 #include <aribeiro/vec3.h>
 #include <aribeiro/vec4.h>
+
+#include <aribeiro/AABB.h>
+#include <aribeiro/Plane.h>
+#include <aribeiro/LineSegment.h>
+#include <aribeiro/Sphere.h>
+#include <aribeiro/Triangle.h>
+#include <aribeiro/Ray.h>
+#include <aribeiro/Frustum.h>
+
 
 /*
 #include <aribeiro/MulticastUdpSocket.h>

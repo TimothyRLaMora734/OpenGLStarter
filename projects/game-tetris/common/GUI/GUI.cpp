@@ -49,7 +49,7 @@ int AABBitem::getID()const {
 }
 bool AABBitem::colide(const vec2 &point)const {
 	AABB aabb = AABB(position, position + img_dim);
-	return AABB::pointInAABB(point, aabb);
+	return AABB::pointInsideAABB(point, aabb);
 }
 void AABBitem::render()const {
 	RenderSystem *render = RenderSystem::getSingleton();

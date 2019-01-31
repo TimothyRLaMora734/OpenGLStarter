@@ -13,7 +13,7 @@ void UnitMounter2D::setUnit(const int index, const vec2 &pos) {
 }
 bool UnitMounter2D::colide(const vec2& ptn) {
 	for (int i = 0; i < 4; i++) {
-		if (AABB::pointInAABB(ptn, AABB(positions[i] + vec2(posx, posy) - vec2(0.5), positions[i] + vec2(posx, posy) + vec2(0.5))))
+		if (AABB::pointInsideAABB(ptn, AABB(positions[i] + vec2(posx, posy) - vec2(0.5), positions[i] + vec2(posx, posy) + vec2(0.5))))
 			return true;
 	}
 	return false;
@@ -21,14 +21,14 @@ bool UnitMounter2D::colide(const vec2& ptn) {
 void UnitMounter2D::rotate() {};
 bool UnitMounter2D::colide(const AABB &aabb) {
 	for (int i = 0; i < 4; i++) {
-		if (AABB::isAABBoverlaped(aabb, AABB(positions[i] + vec2(posx, posy) - vec2(0.5), positions[i] + vec2(posx, posy) + vec2(0.5))))
+		if (AABB::aabbOverlapsAABB(aabb, AABB(positions[i] + vec2(posx, posy) - vec2(0.5), positions[i] + vec2(posx, posy) + vec2(0.5))))
 			return true;
 	}
 	return false;
 }
 bool UnitMounter2D::someBlockDontColide(const AABB &aabb) {
 	for (int i = 0; i < 4; i++) {
-		if (!AABB::isAABBoverlaped(aabb, AABB(positions[i] + vec2(posx, posy) - vec2(0.5), positions[i] + vec2(posx, posy) + vec2(0.5)))) {
+		if (!AABB::aabbOverlapsAABB(aabb, AABB(positions[i] + vec2(posx, posy) - vec2(0.5), positions[i] + vec2(posx, posy) + vec2(0.5)))) {
 			return true;
 		}
 	}
@@ -37,13 +37,13 @@ bool UnitMounter2D::someBlockDontColide(const AABB &aabb) {
 void UnitMounter2D::turnOffDontCollided(const AABB &aabb) {
 	vec2 p = positions[0];
 	for (int i = 0; i < 4; i++) {
-		if (AABB::isAABBoverlaped(aabb, AABB(positions[i] + vec2(posx, posy) - vec2(0.5), positions[i] + vec2(posx, posy) + vec2(0.5)))) {
+		if (AABB::aabbOverlapsAABB(aabb, AABB(positions[i] + vec2(posx, posy) - vec2(0.5), positions[i] + vec2(posx, posy) + vec2(0.5)))) {
 			p = positions[i];
 		}
 	}
 	blocks = 4;
 	for (int i = 0; i < 4; i++) {
-		if (!AABB::isAABBoverlaped(aabb, AABB(positions[i] + vec2(posx, posy) - vec2(0.5), positions[i] + vec2(posx, posy) + vec2(0.5)))) {
+		if (!AABB::aabbOverlapsAABB(aabb, AABB(positions[i] + vec2(posx, posy) - vec2(0.5), positions[i] + vec2(posx, posy) + vec2(0.5)))) {
 			positions[i] = p;
 			blocks--;
 		}

@@ -634,11 +634,3 @@ This framework uses the following 3rdparty libraries:
 * __sfml__ (to open OpenGL window, play sounds and handle Input events from keyboard, mouse and joystick)
 * __glew__ (to manage OpenGL extensions)
 
-
-# Release Notes
-
-### Release v1.00
-* general math
-* tool (font2bitmap)
-* tests
-* template

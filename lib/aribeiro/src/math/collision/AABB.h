@@ -3,11 +3,16 @@
 
 #include <aribeiro/common.h>
 
-#include "vec3.h"//I need a complete definition to instantiate a vec3 as class field
+//I need a complete definition to instantiate a vec3 as class field
+#include <aribeiro/vec3.h>
 
 namespace aRibeiro {
 
 class vec2;
+class Sphere;
+class LineSegment;
+class Plane;
+class Ray;
 
 /// \brief Axis Aligned Bounding Box (AABB)
 ///
@@ -76,16 +81,20 @@ class ARIBEIRO_API AABB{
     //--------------------------------------------------------------------------
     // Static methods
     //--------------------------------------------------------------------------
-    /// \brief OpenGL calls to draw the GL_LINES of the AABB in 3D <br/>
+    
+	
+	/// \brief OpenGL calls to draw the GL_LINES of the AABB in 3D <br/>
     /// If the application doesn't use the gl headers, this method won draw anything
     /// \author Alessandro Ribeiro
     ///
-    static void glDrawLines(const AABB &aabb);
+    //static void glDrawLines(const AABB &aabb);
     /// \brief OpenGL calls to draw the GL_QUADS of the AABB in 3D <br/>
     /// If the application doesn't use the gl headers, this method won draw anything
     /// \author Alessandro Ribeiro
     ///
-    static void glDrawQuads(const AABB &aabb);
+    //static void glDrawQuads(const AABB &aabb);
+
+
     /// \brief Test if a point is inside an AABB
     /// \author Alessandro Ribeiro
     /// \param ptn 2D point to test against the AABB
@@ -93,28 +102,54 @@ class ARIBEIRO_API AABB{
     /// \return true if the point is inside the AABB, otherwise false
     /// \warning The z is not used in the test
     ///
-    static bool pointInAABB(const vec2& ptn,const AABB& b);
+    static bool pointInsideAABB(const vec2& ptn,const AABB& b);
     /// \brief Test if a point is inside an AABB
     /// \author Alessandro Ribeiro
     /// \param ptn 3D point to test against the AABB
     /// \param b The AABB
     /// \return true if the point is inside the AABB, otherwise false
     ///
-    static bool pointInAABB(const vec3& ptn,const AABB& b);
-    /// \brief Test if there is some overlaped area between two AABBs
+    static bool pointInsideAABB(const vec3& ptn,const AABB& b);
+    
+	/// \brief Test if there is some overlaped area between two AABBs
     /// \author Alessandro Ribeiro
     /// \param a The first AABB to test
     /// \param b The second AABB to test against
     /// \return true if there are some overlaped area between the two AABBs, otherwise false
     ///
-    static bool isAABBoverlaped(const AABB& a,const AABB& b);
+    static bool aabbOverlapsAABB(const AABB& a,const AABB& b);
+
     /// \brief Create an AABB that is the union result between the two AABBs
     /// \author Alessandro Ribeiro
     /// \param a The first AABB to consider in the union
     /// \param b The second AABB to consider in the union
     /// \return AABB of the union of the parameters
     ///
-    static AABB AABBjoin(const AABB& a,const AABB& b);
+    static AABB joinAABB(const AABB& a,const AABB& b);
+
+
+
+	static AABB fromTriangle(const vec3& a, const vec3& b, const vec3& c);
+	static AABB fromSphere(const vec3& pos, float radius);
+	static AABB fromLineSegment(const vec3& a, const vec3& b);
+
+	// Intersect ray R(t) = p + t*d against AABB a. When intersecting,
+	// return intersection distance tmin and point q of intersection
+	static bool raycastAABB(const Ray &r, const AABB& a, float *outTmin);
+
+	// Test if segment specified by points p0 and p1 intersects AABB b
+	static bool segmentIntersectsAABB(const vec3& p0, const vec3& p1, const AABB &b);
+	static bool segmentIntersectsAABB(const LineSegment& ls, const AABB &b);
+
+	// Given point p, return the point q on or in AABB b that is closest to p
+	static vec3 closestPointToAABB(const vec3 &p, const AABB &b);
+
+	static bool sphereOverlapsAABB(const Sphere &sphere, const AABB& aabb, vec3 *penetration);
+	static bool planeIntersectsAABB(const Plane &plane, const AABB &b);
+	static bool triangleIntersectsAABB(const vec3 &v0, const vec3 &v1, const vec3 &v2, const AABB &box);
+
+
+
 };
 
 }

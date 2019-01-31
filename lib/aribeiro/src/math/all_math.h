@@ -15,12 +15,19 @@
 #include "geometricOperations.h"
 
 //composed types
-#include "AABB.h"
 #include "BresenhamIterator.h"
 
 //Interpolation based on Easing Equations 
 #include "EasingEquations.h"
 
+
+#include <aribeiro/AABB.h>
+#include <aribeiro/Plane.h>
+#include <aribeiro/LineSegment.h>
+#include <aribeiro/Sphere.h>
+#include <aribeiro/Triangle.h>
+#include <aribeiro/Ray.h>
+#include <aribeiro/Frustum.h>
 
 
 #endif

@@ -72,7 +72,7 @@ bool ObjectList::hasColision(Object* obj, vec2 *colisionPoint){
   ObjectListIterator_list iterator;
   for( iterator = objects.begin(); iterator != objects.end(); iterator++ ){
     if (!(*iterator)->active) continue;
-    if (AABB::isAABBoverlaped((*iterator)->aabb, obj->aabb)) {
+    if (AABB::aabbOverlapsAABB((*iterator)->aabb, obj->aabb)) {
       *colisionPoint = (*iterator)->position;
       remove(*iterator);
       return true;

@@ -27,6 +27,9 @@ endif()
 set(ARIBEIRO_INCLUDE_DIR ${ARIBEIRO_INCLUDE_DIR} PARENT_SCOPE)
 set(ARIBEIRO_LIBRARIES ${ARIBEIRO_LIBRARIES} PARENT_SCOPE)
 
+FILE( GLOB math_collision_src src/math/collision/*.cpp)
+FILE( GLOB math_collision_h src/math/collision/*.h )
+
 set( PUBLIC_HEADERS
 
 		src/aribeiro.h
@@ -40,7 +43,6 @@ set( PUBLIC_HEADERS
 		#src/gl/font/Font.h
 		
 		src/math/all_math.h
-		src/math/AABB.h
 		src/math/BresenhamIterator.h
 		src/math/constants.h
 		#src/math/defs.h
@@ -52,6 +54,10 @@ set( PUBLIC_HEADERS
 		src/math/vec2.h
 		src/math/vec3.h
 		src/math/vec4.h
+		
+		
+		${math_collision_h}
+		
 		
 		#src/network/MulticastUdpSocket.h
 		#src/network/NetworkConstants.h
@@ -116,7 +122,6 @@ set( SRC
 		#src/gl/font/ConvertUTF.c
 		#src/gl/font/Font.cpp
 		
-		src/math/AABB.cpp
 		src/math/BresenhamIterator.cpp
 		src/math/geometricOperations.cpp
 		src/math/mat4.cpp
@@ -125,6 +130,9 @@ set( SRC
 		src/math/vec2.cpp
 		src/math/vec3.cpp
 		src/math/vec4.cpp
+		
+		${math_collision_src}
+		
 		
 		#src/network/MulticastUdpSocket.cpp
 		#src/network/NetworkHelper.cpp
@@ -205,6 +213,11 @@ set( SRC
 		src/math/vec2.cpp
 		src/math/vec3.cpp
 		src/math/vec4.cpp
+	)
+	
+	source_group("math\\collision" FILES
+		${math_collision_h}
+		${math_collision_src}
 	)
 	
 	source_group("platform" FILES

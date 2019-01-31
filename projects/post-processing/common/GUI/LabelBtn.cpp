@@ -110,7 +110,7 @@ void LabelBtn::setAlign(const bool Vcentered, const bool Hcentered) {
 	ajustPosBtn();
 }
 void LabelBtn::setMousePos(const int ID, const vec2 &pos) {
-	if (AABB::pointInAABB(pos, AABB(p, (p + quadDim)))) {
+	if (AABB::pointInsideAABB(pos, AABB(p, (p + quadDim)))) {
 		if (!selected)
 			selected = true;
 	}
@@ -120,7 +120,7 @@ void LabelBtn::setMousePos(const int ID, const vec2 &pos) {
 	}
 }
 bool LabelBtn::mouseDown(const int ID, const int btn, const vec2 &pos) {
-	if (AABB::pointInAABB(pos, AABB(p, (p + quadDim)))) {
+	if (AABB::pointInsideAABB(pos, AABB(p, (p + quadDim)))) {
 		Event e;
 		e.type = MOUSE_PRESS;
 		e.mousePress.x = pos.x;

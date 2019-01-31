@@ -98,7 +98,7 @@ private:
 	static bool verifyLimitAndRemoveIfPasses(void* param, Object *object) {
 		Scene *scene = (Scene*)param;
 
-		if (!AABB::isAABBoverlaped(object->aabb, scene->aabb)) {
+		if (!AABB::aabbOverlapsAABB(object->aabb, scene->aabb)) {
 			scene->listOfObject->remove(object);
 		}
 		return true;
@@ -149,7 +149,7 @@ private:
 
 		if (object->type == OT_SpaceShip) {
 			vec2 newPos = object->position + object->velocity * invaderref->time.deltaTime * 30.0f;
-			if (AABB::pointInAABB(newPos, scene->aabb)) {
+			if (AABB::pointInsideAABB(newPos, scene->aabb)) {
 				object->position = newPos;
 			}
 			else {
@@ -199,7 +199,7 @@ private:
 	static bool verifyLimitToSetVelocity(void* param, Object *object) {
 		if (!object->active) return true;
 		Scene *scene = (Scene*)param;
-		if (!AABB::isAABBoverlaped(scene->aabb, object->aabb)) {
+		if (!AABB::aabbOverlapsAABB(scene->aabb, object->aabb)) {
 
 			float xToAlignA = scene->aabb.max_box.x - object->aabb.min_box.x;
 			float xToAlignB = scene->aabb.min_box.x - object->aabb.max_box.x;
