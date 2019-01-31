@@ -25,7 +25,7 @@ class EasingEqDrawer {
 	
 	public:
 
-	EasingEqDrawer():lineSquare(4), lineGraphic(256), points(40) {
+	EasingEqDrawer():points(40), lineSquare(4), lineGraphic(256) {
 		
 		lineSquare.data[0] = vec3(0,0,0);
 		lineSquare.data[1] = vec3(1,0,0);

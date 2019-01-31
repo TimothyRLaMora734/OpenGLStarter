@@ -43,6 +43,14 @@ namespace aRibeiro {
 		back.normalize();
 	}
 
+    Plane& Frustum::operator[](int idx){
+        return ((&right)[idx]);
+    }
+    
+    const Plane& Frustum::operator[](int idx)const {
+        return ((&right)[idx]);
+    }
+    
 	Frustum::Frustum(const mat4& projection) {
 		computePlanes(projection);
 	}
@@ -54,7 +62,7 @@ namespace aRibeiro {
 
 	bool Frustum::pointInsideFrustum(const vec3 &p, const Frustum &frustum) {
 		for (int i = 0; i < 6; i++) {
-			if (Plane::pointDistanceToPlane(p, frustum.planes[i]) < 0)
+			if (Plane::pointDistanceToPlane(p, frustum[i]) < 0)
 				return false;
 		}
 		return true;
@@ -62,7 +70,7 @@ namespace aRibeiro {
 
 	bool Frustum::sphereOverlapsFrustum(const Sphere &s, const Frustum &frustum) {
 		for (int i = 0; i < 6; i++) {
-			if (Plane::pointDistanceToPlane(s.center, frustum.planes[i]) < -s.radius)
+			if (Plane::pointDistanceToPlane(s.center, frustum[i]) < -s.radius)
 				return false;
 		}
 		return true;
@@ -74,14 +82,14 @@ namespace aRibeiro {
 
 		for (int i = 0; i < 6; i++) {
 			
-			if (Plane::pointDistanceToPlane(center + halfbounds * vec3(1, 1, 1), frustum.planes[i]) >= 0.0f) continue; // 000
-			if (Plane::pointDistanceToPlane(center + halfbounds * vec3(1, 1, -1), frustum.planes[i]) >= 0.0f) continue; // 001
-			if (Plane::pointDistanceToPlane(center + halfbounds * vec3(1, -1, 1), frustum.planes[i]) >= 0.0f) continue; // 010
-			if (Plane::pointDistanceToPlane(center + halfbounds * vec3(1, -1, -1), frustum.planes[i]) >= 0.0f) continue; // 011
-			if (Plane::pointDistanceToPlane(center + halfbounds * vec3(-1, 1, 1), frustum.planes[i]) >= 0.0f) continue; // 100
-			if (Plane::pointDistanceToPlane(center + halfbounds * vec3(-1, 1, -1), frustum.planes[i]) >= 0.0f) continue; // 101
-			if (Plane::pointDistanceToPlane(center + halfbounds * vec3(-1, -1, 1), frustum.planes[i]) >= 0.0f) continue; // 110
-			if (Plane::pointDistanceToPlane(center + halfbounds * vec3(-1, -1, -1), frustum.planes[i]) >= 0.0f) continue; // 111
+			if (Plane::pointDistanceToPlane(center + halfbounds * vec3(1, 1, 1), frustum[i]) >= 0.0f) continue; // 000
+			if (Plane::pointDistanceToPlane(center + halfbounds * vec3(1, 1, -1), frustum[i]) >= 0.0f) continue; // 001
+			if (Plane::pointDistanceToPlane(center + halfbounds * vec3(1, -1, 1), frustum[i]) >= 0.0f) continue; // 010
+			if (Plane::pointDistanceToPlane(center + halfbounds * vec3(1, -1, -1), frustum[i]) >= 0.0f) continue; // 011
+			if (Plane::pointDistanceToPlane(center + halfbounds * vec3(-1, 1, 1), frustum[i]) >= 0.0f) continue; // 100
+			if (Plane::pointDistanceToPlane(center + halfbounds * vec3(-1, 1, -1), frustum[i]) >= 0.0f) continue; // 101
+			if (Plane::pointDistanceToPlane(center + halfbounds * vec3(-1, -1, 1), frustum[i]) >= 0.0f) continue; // 110
+			if (Plane::pointDistanceToPlane(center + halfbounds * vec3(-1, -1, -1), frustum[i]) >= 0.0f) continue; // 111
 
 			return false;
 		}

@@ -11,7 +11,7 @@ void computeConeStepMappingInBuffer(vec4 *depthMapBuffer, int w, int h, float ti
 	const float max_ratio = 2.0;
 
 	// And for the cone version, how tolerant am I?(and should it be a ratio, tolerance*r^2, or flat?)
-	const float cone_tol2 = 4.0f / (255.0f * 255.0f);
+	//const float cone_tol2 = 4.0f / (255.0f * 255.0f);
 
 	// Do I want the textures to be computed as tileable? 
 	bool x_tileable = tile;
@@ -34,7 +34,7 @@ void computeConeStepMappingInBuffer(vec4 *depthMapBuffer, int w, int h, float ti
 	int chans = 4;
 	// forced for now (by corona)
 	int ScanWidth = chans * width;
-	int TheSize = ScanWidth * height;
+	//int TheSize = ScanWidth * height;
 
 	// invert this (used to convert depth-map to height-map) 
 	for (int px = 0; px < width*height; ++px)

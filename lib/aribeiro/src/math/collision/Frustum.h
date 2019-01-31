@@ -16,10 +16,11 @@ namespace aRibeiro {
 	class Frustum {
 		void computePlanes(const mat4& clipMatrix);
 	public:
-		union {
-			Plane right, left, bottom, top, back, front;
-			Plane planes[6];
-		};
+        
+        Plane right, left, bottom, top, back, front;
+        
+        Plane& operator[](int idx);
+        const Plane& operator[](int idx)const;
 
 		Frustum(const mat4& projection);
 		Frustum(const mat4& projection, const mat4& camera);
