@@ -9,6 +9,7 @@ namespace aRibeiro {
 	class Ray;
 	class Triangle;
 	class LineSegment;
+	class AABB;
 
 	class Plane {
 	public:
@@ -36,8 +37,8 @@ namespace aRibeiro {
 
 		static bool raycastPlane(const Ray &r, const Plane &plane, float *outT);
 		
-		static bool segmentIntersectsPlane(const vec3 &a, const vec3 &b, const Plane &plane, float *outT);
-		static bool segmentIntersectsPlane(const LineSegment &ls, const Plane &plane, float *outT);
+		static bool segmentIntersectsPlane(const vec3 &a, const vec3 &b, const Plane &plane);
+		static bool segmentIntersectsPlane(const LineSegment &ls, const Plane &plane);
 
 
 		// Given planes p1 and p2, compute line L = p+t*d of their intersection.
@@ -46,6 +47,10 @@ namespace aRibeiro {
 		// Compute the point p at which the three planes p1, p2 and p3 intersect (if at all)
 		static bool intersectPlanes(const Plane &p1, const Plane &p2, const Plane &p3, vec3 *outP);
 
+		//
+		// Cloned methods from other collision classes
+		//
+		static bool aabbIntersectsPlane(const AABB &b, const Plane &plane);
 
 	};
 

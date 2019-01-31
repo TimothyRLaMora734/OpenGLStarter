@@ -195,4 +195,8 @@ namespace aRibeiro {
 		return sphereIntersectsTriangle(sphere,t.a, t.b, t.c,penetration);
 	}
 
+	bool Triangle::aabbIntersectsTriangle(const AABB &box, const vec3 &v0, const vec3 &v1, const vec3 &v2) {
+		return AABB::triangleIntersectsAABB(v0, v1, v2, box);
+	}
+
 }

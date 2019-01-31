@@ -93,4 +93,31 @@ namespace aRibeiro {
 		float sqrDst = dot(p_sc, p_sc);
 		return sqrDst <= (sphere.radius * sphere.radius);
 	}
+
+
+	bool Sphere::aabbOverlapsSphere(const AABB& aabb, const Sphere &sphere, vec3 *penetration) {
+		bool result = AABB::sphereOverlapsAABB(sphere, aabb, penetration);
+		if (result)
+			*penetration = -(*penetration);
+		return result;
+	}
+
+	bool Sphere::frustumOverlapsSphere(const Frustum &f, const Sphere &s) {
+		return Frustum::sphereOverlapsFrustum(s, f);
+	}
+
+	bool Sphere::triangleIntersectsSphere(const vec3& a, const vec3& b, const vec3& c, const Sphere& sphere, vec3 *penetration) {
+		bool result = Triangle::sphereIntersectsTriangle(sphere, a, b, c, penetration);
+		if (result)
+			*penetration = -(*penetration);
+		return result;
+	}
+
+	bool Sphere::triangleIntersectsSphere(const Triangle& t, const Sphere& sphere, vec3 *penetration) {
+		bool result = Triangle::sphereIntersectsTriangle(sphere, t, penetration);
+		if (result)
+			*penetration = -(*penetration);
+		return result;
+	}
+
 }

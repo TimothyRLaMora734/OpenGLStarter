@@ -8,6 +8,9 @@ namespace aRibeiro {
 	
 	class Ray;
 	class LineSegment;
+	class AABB;
+	class Frustum;
+	class Triangle;
 
 	class Sphere {
 	public:
@@ -26,6 +29,15 @@ namespace aRibeiro {
 		static bool segmentIntersectsSphere(const vec3& p, const vec3& q, const Sphere &sphere);
 		static bool segmentIntersectsSphere(const LineSegment& ls, const Sphere &sphere);
 		static bool pointInsideSphere(const vec3& p, const Sphere &sphere);
+
+		//
+		// Cloned methods from other collision classes
+		//
+		static bool aabbOverlapsSphere(const AABB& aabb, const Sphere &sphere, vec3 *penetration);
+		static bool frustumOverlapsSphere(const Frustum &f, const Sphere &s);
+		static bool triangleIntersectsSphere(const vec3& a, const vec3& b, const vec3& c, const Sphere& sphere, vec3 *penetration);
+		static bool triangleIntersectsSphere(const Triangle& t, const Sphere& sphere, vec3 *penetration);
+
 
 	};
 }

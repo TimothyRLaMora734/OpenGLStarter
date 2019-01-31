@@ -13,6 +13,8 @@ class Sphere;
 class LineSegment;
 class Plane;
 class Ray;
+class Triangle;
+class Frustum;
 
 /// \brief Axis Aligned Bounding Box (AABB)
 ///
@@ -132,6 +134,7 @@ class ARIBEIRO_API AABB{
 	static AABB fromTriangle(const vec3& a, const vec3& b, const vec3& c);
 	static AABB fromSphere(const vec3& pos, float radius);
 	static AABB fromLineSegment(const vec3& a, const vec3& b);
+	static AABB fromLineSegment(const LineSegment& ls);
 
 	// Intersect ray R(t) = p + t*d against AABB a. When intersecting,
 	// return intersection distance tmin and point q of intersection
@@ -147,8 +150,12 @@ class ARIBEIRO_API AABB{
 	static bool sphereOverlapsAABB(const Sphere &sphere, const AABB& aabb, vec3 *penetration);
 	static bool planeIntersectsAABB(const Plane &plane, const AABB &b);
 	static bool triangleIntersectsAABB(const vec3 &v0, const vec3 &v1, const vec3 &v2, const AABB &box);
+	static bool triangleIntersectsAABB(const Triangle &t, const AABB &box);
 
-
+	//
+	// Cloned methods from other collision classes
+	//
+	static bool frustumOverlapsAABB(const Frustum &f, const AABB &aabb);
 
 };
 

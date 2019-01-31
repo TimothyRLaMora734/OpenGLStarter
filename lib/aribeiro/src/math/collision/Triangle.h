@@ -9,6 +9,7 @@ namespace aRibeiro {
 	class Ray;
 	class Sphere;
 	class LineSegment;
+	class AABB;
 
 	// this class dont hold the triangle positions, because it is thought to be used within vertex lists...
 	class Triangle {
@@ -48,9 +49,12 @@ namespace aRibeiro {
 		//  If you are using a movable sphere, you can check the max step it can do based in its radius... 
 		//     and consider the max step to look the minor triangle in the collision scene
 		static bool sphereIntersectsTriangle(const Sphere& sphere, const vec3& a, const vec3& b, const vec3& c, vec3 *penetration);
-
 		static bool sphereIntersectsTriangle(const Sphere& sphere, const Triangle& t, vec3 *penetration);
 
+		//
+		// Cloned methods from other collision classes
+		//
+		static bool aabbIntersectsTriangle(const AABB &box, const vec3 &v0, const vec3 &v1, const vec3 &v2);
 
 
 

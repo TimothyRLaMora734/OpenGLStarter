@@ -153,6 +153,10 @@ namespace aRibeiro {
 		return AABB(a, b);
 	}
 
+	AABB AABB::fromLineSegment(const LineSegment& ls) {
+		return AABB(ls.a, ls.b);
+	}
+
 
 	// Intersect ray R(t) = p + t*d against AABB a. When intersecting,
 	// return intersection distance tmin and point q of intersection
@@ -385,6 +389,14 @@ namespace aRibeiro {
 
 		// No separating axis found.
 		return true;
+	}
+
+	bool AABB::triangleIntersectsAABB(const Triangle &t, const AABB &box) {
+		return triangleIntersectsAABB(t.a, t.b, t.c, box);
+	}
+
+	bool AABB::frustumOverlapsAABB(const Frustum &f, const AABB &aabb) {
+		return Frustum::aabbOverlapsFrustum(aabb, f);
 	}
 
 

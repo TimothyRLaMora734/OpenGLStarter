@@ -77,14 +77,14 @@ namespace aRibeiro {
 		return true;
 	}
 
-	bool Plane::segmentIntersectsPlane(const vec3 &a, const vec3 &b, const Plane &plane, float *outT)
+	bool Plane::segmentIntersectsPlane(const vec3 &a, const vec3 &b, const Plane &plane)
 	{
 		// Compute the t value for the directed line ab intersecting the plane
 		vec3 ab = b - a;
 		float t = (plane.distance - dot(plane.normal, a)) / dot(plane.normal, ab);
 		// If t in [0..1] compute and return intersection point
 		if (t >= 0.0f && t <= 1.0f) {
-			*outT = t;
+			//*outT = t;
 			//q = a + t * ab;
 			return true;
 		}
@@ -92,8 +92,8 @@ namespace aRibeiro {
 		return false;
 	}
 
-	bool Plane::segmentIntersectsPlane(const LineSegment &ls, const Plane &plane, float *outT) {
-		return segmentIntersectsPlane(ls.a, ls.b, plane, outT);
+	bool Plane::segmentIntersectsPlane(const LineSegment &ls, const Plane &plane) {
+		return segmentIntersectsPlane(ls.a, ls.b, plane);
 	}
 
 	// Given planes p1 and p2, compute line L = p+t*d of their intersection.
@@ -122,6 +122,10 @@ namespace aRibeiro {
 			return false; // Planes do not intersect in a point
 		*outP = (p1.distance*u + cross(p1.normal, p3.distance * p2.normal - p2.distance * p3.normal)) / denom;
 		return true;
+	}
+
+	bool Plane::aabbIntersectsPlane(const AABB &b, const Plane &plane) {
+		return AABB::planeIntersectsAABB(plane, b);
 	}
 
 }
