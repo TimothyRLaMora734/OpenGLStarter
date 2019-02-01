@@ -1,6 +1,8 @@
 #ifndef SIZE__H
 #define SIZE__H
 
+#include "string.h"//memcmp
+
 class iSize {
 public:
 	int x, y;

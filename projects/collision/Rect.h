@@ -1,6 +1,7 @@
 #ifndef RECT__H
 #define RECT__H
 
+#include "string.h"//memcmp
 
 class iRect {
 public:
