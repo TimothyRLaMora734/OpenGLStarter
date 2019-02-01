@@ -13,9 +13,9 @@ namespace aRibeiro {
 		up = pressed && !v;
 		pressed = v;
 		if (down)
-			OnDown.call();
+			OnDown();
 		if (up)
-			OnUp.call();
+			OnUp();
 	}
 
 }

@@ -406,7 +406,7 @@ public:
 		OnInt.add(this, &DelegateTest::int2);
 		OnInt.add(&DelegateFunctionOutside);
 
-		OnInt.call(10);
+		OnInt(10);
 	}
 
 	void int1(int v) {

@@ -67,7 +67,7 @@ namespace aRibeiro {
                 ) {
                 oldValue = value;
                 value = v;
-                OnChange.call(this);
+                OnChange(this);
             }
         }
 

@@ -95,7 +95,7 @@ namespace aRibeiro {
 		void removeAll(){ \
 			mDelegateEntry.clear(); \
 		} \
-		void call(__VA_ARGS__){ 
+		void operator()(__VA_ARGS__){ 
 
 #define CALL_PATTERN( ... ) \
 			for (size_t i=0;i<mDelegateEntry.size();i++) \

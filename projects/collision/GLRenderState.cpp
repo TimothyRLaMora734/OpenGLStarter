@@ -219,22 +219,22 @@ void GLRenderState::initialize(int w, int h) {
 	//
 	// Call all listener to do first setup with the default values
 	//
-	ClearColor.OnChange.call(&ClearColor);
-	CullFace.OnChange.call(&CullFace);
-	FrontFace.OnChange.call(&FrontFace);
-	DepthTest.OnChange.call(&DepthTest);
-	ClearDepth.OnChange.call(&ClearDepth);
-	DepthWrite.OnChange.call(&DepthWrite);
-	BlendMode.OnChange.call(&BlendMode);
-	AlphaTest.OnChange.call(&AlphaTest);
-	AlphaRef.OnChange.call(&AlphaRef);
-	LineSmoothHint.OnChange.call(&LineSmoothHint);
-	LineWidth.OnChange.call(&LineWidth);
-	PointSize.OnChange.call(&PointSize);
-	Wireframe.OnChange.call(&Wireframe);
-	CurrentShader.OnChange.call(&CurrentShader);
-	Viewport.OnChange.call(&Viewport);
-	CurrentFramebufferObject.OnChange.call(&CurrentFramebufferObject);
+	ClearColor.OnChange(&ClearColor);
+	CullFace.OnChange(&CullFace);
+	FrontFace.OnChange(&FrontFace);
+	DepthTest.OnChange(&DepthTest);
+	ClearDepth.OnChange(&ClearDepth);
+	DepthWrite.OnChange(&DepthWrite);
+	BlendMode.OnChange(&BlendMode);
+	AlphaTest.OnChange(&AlphaTest);
+	AlphaRef.OnChange(&AlphaRef);
+	LineSmoothHint.OnChange(&LineSmoothHint);
+	LineWidth.OnChange(&LineWidth);
+	PointSize.OnChange(&PointSize);
+	Wireframe.OnChange(&Wireframe);
+	CurrentShader.OnChange(&CurrentShader);
+	Viewport.OnChange(&Viewport);
+	CurrentFramebufferObject.OnChange(&CurrentFramebufferObject);
 
 	//
 	// Not using fixed pipeline lighting

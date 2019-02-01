@@ -444,8 +444,32 @@ void main(int argc, char* argv[]) {
   OnInt.add(&DelegateFunctionOutside);
   
   //call the event with parameter 10
-  OnInt.call(10);
+  OnInt(10);
 }
+```
+
+* __C++ Properties__ <br/>
+Yes you can use properties with this framework. <br/>
+A Property is a value that can have listeners attached to it when it is modified. <br/>
+It can be used to implement events related to value modification. <br/>
+See the example below: <br/>
+```cpp
+// first you need to declare the property
+Property<vec2> Size;
+
+//functions you want to call
+void OnSizeChange(Property<vec2> *prop) {
+  ... use the prop->value
+}
+
+//set the listener
+Size.onChange.add(&OnSizeChange);
+
+// to change the property value
+Size = vec2( 1.0f );
+
+// to get the property value
+vec2 result = Size;
 ```
 
 * __Get Machine Mac Address__ <br/>

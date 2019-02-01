@@ -189,12 +189,12 @@ void processSingleEvent(sf::RenderWindow &window, sf::Event &event) {
 
 	if (event.type == sf::Event::KeyPressed) {
 		printf("key pressed: %d \n", event.key.code);
-		app->OnKeyDown.call(event.key.code);
+		app->OnKeyDown(event.key.code);
 	}
 
 	if (event.type == sf::Event::KeyReleased) {
 		printf("key released: %d \n", event.key.code);
-		app->OnKeyUp.call(event.key.code);
+		app->OnKeyUp(event.key.code);
 	}
 
 	// Adjust the viewport when the window is resized
@@ -208,12 +208,12 @@ void processSingleEvent(sf::RenderWindow &window, sf::Event &event) {
 
 	if (event.type == sf::Event::MouseButtonPressed) {
 		printf(" press: %d %d \n", event.mouseButton.x, event.mouseButton.y);
-		app->OnMouseDown.call(event.mouseButton.button, vec2(event.mouseButton.x, window.getSize().y - 1 - event.mouseButton.y));
+		app->OnMouseDown(event.mouseButton.button, vec2(event.mouseButton.x, window.getSize().y - 1 - event.mouseButton.y));
 	}
 
 	if (event.type == sf::Event::MouseButtonReleased) {
 		printf(" release: %d %d \n", event.mouseButton.x, event.mouseButton.y);
-		app->OnMouseUp.call(event.mouseButton.button, vec2(event.mouseButton.x, window.getSize().y - 1 - event.mouseButton.y));
+		app->OnMouseUp(event.mouseButton.button, vec2(event.mouseButton.x, window.getSize().y - 1 - event.mouseButton.y));
 	}
 
 	if (event.type == sf::Event::MouseMoved) {
@@ -228,9 +228,9 @@ void processSingleEvent(sf::RenderWindow &window, sf::Event &event) {
 	if (event.type == sf::Event::MouseWheelScrolled) {
 		printf(" wheel: %f \n", event.mouseWheelScroll.delta);
 		if (event.mouseWheelScroll.delta > 0.9)
-			app->OnMouseWheelUp.call();
+			app->OnMouseWheelUp();
 		else if (event.mouseWheelScroll.delta < -0.9)
-			app->OnMouseWheelDown.call();
+			app->OnMouseWheelDown();
 	}
 
 }
