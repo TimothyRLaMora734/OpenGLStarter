@@ -120,6 +120,10 @@ class ARIBEIRO_API mat4{
     /// \return A reference to a tensor4
     ///
     tensor4& asTensor4()const;
+
+	bool operator==(const mat4&v) const;
+	bool operator!=(const mat4&v) const;
+
     static const mat4 IdentityMatrix;///<An static Identity matrix
 };
 

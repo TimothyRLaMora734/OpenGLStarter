@@ -38,7 +38,11 @@ vec3::vec3( const vec3 &a, const vec3 &b ){
 }
 
 bool vec3::operator==(const vec3&v) const {
-    return memcmp(array, v.array, sizeof(float)*3)==0;
+	return memcmp(array, v.array, sizeof(float) * 3) == 0;
+}
+
+bool vec3::operator!=(const vec3&v) const {
+	return memcmp(array, v.array, sizeof(float) * 3) != 0;
 }
 
 vec3& vec3::operator+=(const vec3& v){

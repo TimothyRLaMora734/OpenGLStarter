@@ -158,6 +158,9 @@ class ARIBEIRO_API tensor4{
     /// \return A reference to a mat4
     ///
     mat4& asMat4()const;
+
+	bool operator==(const tensor4&v) const;
+	bool operator!=(const tensor4&v) const;
 };
 //------------------------------------------------------------------------------
 

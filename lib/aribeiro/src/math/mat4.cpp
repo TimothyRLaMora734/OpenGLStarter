@@ -75,6 +75,14 @@ tensor4& mat4::asTensor4()const{
     return *((tensor4*)this);
 }
 
+bool mat4::operator==(const mat4&v) const {
+	return memcmp(array, v.array, sizeof(float) * 16) == 0;
+}
+
+bool mat4::operator!=(const mat4&v) const {
+	return memcmp(array, v.array, sizeof(float) * 16) != 0;
+}
+
 
 const mat4 mat4::IdentityMatrix(1,0,0,0,
                                 0,1,0,0,

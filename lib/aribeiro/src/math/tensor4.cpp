@@ -92,4 +92,12 @@ mat4& tensor4::asMat4()const{
     return *((mat4*)this);
 }
 
+bool tensor4::operator==(const tensor4&v) const {
+	return memcmp(array, v.array, sizeof(float) * 16) == 0;
+}
+
+bool tensor4::operator!=(const tensor4&v) const {
+	return memcmp(array, v.array, sizeof(float) * 16) != 0;
+}
+
 }

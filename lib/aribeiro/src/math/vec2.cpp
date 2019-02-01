@@ -22,7 +22,10 @@ vec2::vec2( const vec2 &a, const vec2 &b ){
     y = b.y - a.y;
 }
 bool vec2::operator==(const vec2&v) const {
-    return memcmp(array, v.array, sizeof(float)*2)==0;
+	return memcmp(array, v.array, sizeof(float) * 2) == 0;
+}
+bool vec2::operator!=(const vec2&v) const {
+	return memcmp(array, v.array, sizeof(float) * 2) != 0;
 }
 
 vec2& vec2::operator+=(const vec2& v){

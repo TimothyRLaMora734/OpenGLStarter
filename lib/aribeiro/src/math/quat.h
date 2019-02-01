@@ -53,6 +53,7 @@ class ARIBEIRO_API quat{
     /// \return true if the bits of this is the same of v, otherwise false.
     ///
     bool operator==(const quat&v) const ;
+	bool operator!=(const quat&v) const;
     /// \brief Index the components of the quat as a C array
     ///
     /// \author Alessandro Ribeiro

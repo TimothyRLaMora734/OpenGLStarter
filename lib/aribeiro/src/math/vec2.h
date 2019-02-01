@@ -70,6 +70,7 @@ class ARIBEIRO_API vec2{
     /// \return true if the bits of this is the same of v, otherwise false.
     ///
     bool operator==(const vec2&v) const ;
+	bool operator!=(const vec2&v) const;
 
     /// \brief Component-wise increment operator overload
     ///

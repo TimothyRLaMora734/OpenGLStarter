@@ -98,6 +98,7 @@ class ARIBEIRO_API vec3{
     /// \return true if the bits of this is the same of v, otherwise false.
     ///
     bool operator==(const vec3&v) const ;
+	bool operator!=(const vec3&v) const;
     /// \brief Component-wise increment operator overload
     ///
     /// Increment the vector by the components of another vector

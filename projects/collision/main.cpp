@@ -113,10 +113,10 @@ int main(int argc, char* argv[]) {
 	//
 	// Data structures
 	//
-	app = new App();
+	app = new App(window.getSize().x, window.getSize().y);
 
-	app->OnSetSize.call(window.getSize().x, window.getSize().y);
-
+	//app->WindowSize = iSize(window.getSize().x, window.getSize().y);
+	//app->OnSetSize.call(window.getSize().x, window.getSize().y);
 	//SpaceInvaderGlobal->setupViewport(window.getSize().x, window.getSize().y);
 
 	//
@@ -199,7 +199,7 @@ void processSingleEvent(sf::RenderWindow &window, sf::Event &event) {
 
 	// Adjust the viewport when the window is resized
 	if (event.type == sf::Event::Resized) {
-		app->OnSetSize.call(event.size.width, event.size.height);
+		app->WindowSize = iSize(event.size.width, event.size.height);
 	}
 
 	if (event.type == sf::Event::JoystickButtonPressed) {

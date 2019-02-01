@@ -134,6 +134,9 @@ namespace aRibeiro {
 			exit(-1);
 			break;
 		}
+		
+		//set the draw buffers to this FBO
+		OPENGL_CMD(glDrawBuffers(color.size(), DrawBuffersUnit));
 
 		OPENGL_CMD(glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0));
 	}
@@ -158,11 +161,13 @@ namespace aRibeiro {
 		if (!initialized)
 			return;
 		OPENGL_CMD(glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, mFbo));
-		OPENGL_CMD(glDrawBuffers(color.size(), DrawBuffersUnit));
+		//OPENGL_CMD(glDrawBuffers(color.size(), DrawBuffersUnit));
 	}
 
 	void GLFramebufferObject::disable() {
-		OPENGL_CMD(glDrawBuffers(1, DrawBuffersUnit));
+		// error to setup glDrawBuffers without any fbo in the current state set
+		//OPENGL_CMD(glDrawBuffers(1, DrawBuffersUnit));
+		//
 		OPENGL_CMD(glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0));
 	}
 
