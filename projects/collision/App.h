@@ -4,9 +4,7 @@
 #include <aribeiro/aribeiro.h>
 using namespace aRibeiro;
 
-#include "Property.h"
 #include "Size.h"
-
 
 #include <SFML/Window.hpp>
 

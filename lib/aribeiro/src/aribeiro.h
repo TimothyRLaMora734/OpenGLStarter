@@ -59,6 +59,7 @@
 #include <aribeiro/PlatformSleep.h>
 #include <aribeiro/PlatformPath.h>
 #include <aribeiro/PlatformGL.h>
+#include <aribeiro/Property.h>
 #include <aribeiro/Delegate.h>
 #include <aribeiro/GetFirstMacAddress.h>
 #include <aribeiro/SetNullAndDelete.h>

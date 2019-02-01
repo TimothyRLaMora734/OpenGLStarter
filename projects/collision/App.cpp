@@ -3,7 +3,6 @@
 #include <aribeiro/aribeiro.h>
 using namespace aRibeiro;
 
-#include "Property.h"
 #include "Size.h"
 
 #include "GLRenderState.h"

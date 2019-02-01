@@ -86,6 +86,7 @@ set( PUBLIC_HEADERS
 
 
 		src/util/Delegate.h
+        src/util/Property.h
 		src/util/GetFirstMacAddress.h
 		src/util/SetNullAndDelete.h
 		src/util/NetworkConstants.h
@@ -241,6 +242,7 @@ set( SRC
 
 	source_group("util" FILES
 		src/util/Delegate.h
+        src/util/Property.h
 		src/util/GetFirstMacAddress.h
 		src/util/SetNullAndDelete.h
 		src/util/GetFirstMacAddress.cpp

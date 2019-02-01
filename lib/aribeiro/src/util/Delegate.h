@@ -26,19 +26,19 @@ OnViewport.call(viewport);
 
 namespace aRibeiro {
 
-	class DelegateFrindObject {};
+	class DelegateFriendObject {};
 
 #define BEGIN_DECLARE_DELEGATE(className, ... ) \
-	typedef void (DelegateFrindObject::*className##Method) (__VA_ARGS__); \
+	typedef void (DelegateFriendObject::*className##Method) (__VA_ARGS__); \
 	typedef void (*className##Function) (__VA_ARGS__); \
 	class className{ \
 		struct DelegateEntry{ \
-			DelegateFrindObject* mObjPtr; \
+			DelegateFriendObject* mObjPtr; \
 			className##Method mMethodPtr; \
 			className##Function mFunctionPtr; \
 			int functionID; \
 			DelegateEntry(){ mObjPtr = NULL; mMethodPtr = NULL; mFunctionPtr = NULL; functionID = 0;} \
-			DelegateEntry(DelegateFrindObject* objptr, className##Method methodPtr){ mObjPtr = objptr; mMethodPtr = methodPtr; mFunctionPtr = NULL;functionID = 1;} \
+			DelegateEntry(DelegateFriendObject* objptr, className##Method methodPtr){ mObjPtr = objptr; mMethodPtr = methodPtr; mFunctionPtr = NULL;functionID = 1;} \
 			DelegateEntry(className##Function functionPtr){ mObjPtr = NULL; mMethodPtr = NULL; mFunctionPtr = functionPtr;functionID = 2;} \
 			bool operator==(const DelegateEntry& v)const{ \
 				if ( (functionID == 1) && mObjPtr != NULL && v.mObjPtr != NULL) \
@@ -52,7 +52,7 @@ namespace aRibeiro {
 		std::vector<DelegateEntry> mDelegateEntry; \
         typedef typename std::vector<DelegateEntry>::iterator iteratorType; \
 	public: \
-		void add(DelegateFrindObject* objPtr, className##Method methodPtr){ \
+		void add(DelegateFriendObject* objPtr, className##Method methodPtr){ \
 			DelegateEntry entry (objPtr,methodPtr); \
 			for (size_t i=0;i<mDelegateEntry.size();i++) \
 				if (mDelegateEntry[i] == entry) \
@@ -61,7 +61,7 @@ namespace aRibeiro {
         } \
 		template <typename __T__> \
 		void add(void* objPtr, void (__T__::*methodPtr) (__VA_ARGS__) ){ \
-			add(static_cast<DelegateFrindObject*>(objPtr), (className##Method) methodPtr) ; \
+			add(static_cast<DelegateFriendObject*>(objPtr), (className##Method) methodPtr) ; \
         } \
 		void add(className##Function functionPtr){ \
 			DelegateEntry entry (functionPtr); \
@@ -70,7 +70,7 @@ namespace aRibeiro {
 					return; \
 		    mDelegateEntry.push_back(entry); \
         } \
-		void remove(DelegateFrindObject* objPtr, className##Method methodPtr){ \
+		void remove(DelegateFriendObject* objPtr, className##Method methodPtr){ \
 			DelegateEntry entry (objPtr,methodPtr ); \
 			iteratorType it = mDelegateEntry.begin(); \
 			for (; it != mDelegateEntry.end(); it++) \
@@ -81,7 +81,7 @@ namespace aRibeiro {
         } \
 		template <typename __T__> \
 		void remove(void* objPtr, void (__T__::*methodPtr) (__VA_ARGS__) ){ \
-			remove( static_cast<DelegateFrindObject*>(objPtr), (className##Method) methodPtr); \
+			remove( static_cast<DelegateFriendObject*>(objPtr), (className##Method) methodPtr); \
 		} \
 		void remove(className##Function functionPtr){ \
 			DelegateEntry entry (functionPtr ); \
