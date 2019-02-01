@@ -15,6 +15,10 @@ namespace aRibeiro {
 
 	class Frustum {
 		void computePlanes(const mat4& clipMatrix);
+        
+        float minProjections[6];
+        float maxProjections[6];
+        
 	public:
         
         Plane right, left, bottom, top, back, front;

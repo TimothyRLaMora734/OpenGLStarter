@@ -4,6 +4,25 @@
 
 namespace aRibeiro {
 
+    
+    static inline void projectOnAxis(const vec3 *points, int count, const vec3 &axis, float *outMin, float *outMax)
+    {
+        float min = FLT_MAX;// double.PositiveInfinity;
+        float max = -FLT_MAX;// double.NegativeInfinity;
+        for (int i = 0; i < count; i++)
+        {
+            const vec3 &p = points[i];
+            float val = dot(axis, p);
+            if (val < min)
+                min = val;
+            if (val > max)
+                max = val;
+        }
+        *outMin = min;
+        *outMax = max;
+    }
+    
+    
 	void Frustum::computePlanes(const mat4& matrix) {
 		mat4 clipMatrix = transpose(matrix);
 		/*
@@ -56,6 +75,12 @@ namespace aRibeiro {
         Plane::intersectPlanes(left, bottom, back, &vertices[6]);
         Plane::intersectPlanes(left, top, back, &vertices[7]);
         
+        
+        
+        //pre-calculate the vertex projections over the frustum plane
+        for (int i = 0; i < 6; i++)
+            projectOnAxis(vertices, 8, (*this)[i].normal , &minProjections[i], &maxProjections[i]);
+        
 	}
 
     Plane& Frustum::operator[](int idx){
@@ -91,23 +116,6 @@ namespace aRibeiro {
 		return true;
 	}
     
-    static inline void projectOnAxis(const vec3 *points, int count, const vec3 &axis, float *outMin, float *outMax)
-    {
-        float min = FLT_MAX;// double.PositiveInfinity;
-        float max = -FLT_MAX;// double.NegativeInfinity;
-        for (int i = 0; i < count; i++)
-        {
-            const vec3 &p = points[i];
-            float val = dot(axis, p);
-            if (val < min)
-                min = val;
-            if (val > max)
-                max = val;
-        }
-        *outMin = min;
-        *outMax = max;
-    }
-
 	bool Frustum::aabbOverlapsFrustum(const AABB &aabb, const Frustum &frustum) {
         
         
@@ -142,8 +150,8 @@ namespace aRibeiro {
         
         for (int i = 0; i < 6; i++) {
             projectOnAxis(box_Vertices, 8, frustum[i].normal , &boxMin, &boxMax);
-            //if (boxMax < frustum[i].distance - EPSILON || boxMin > frustum[i].distance + EPSILON)
-            if (boxMax < frustum[i].distance - EPSILON ) //|| boxMin > frustum[i].distance + EPSILON)
+            //projectOnAxis(frustum.vertices, 8, frustum[i].normal , &frustum.minProjections[i], &frustum.maxProjections[i]);
+            if (boxMax < frustum.minProjections[i] - EPSILON || boxMin > frustum.maxProjections[i] + EPSILON)
                 return false; // No intersection possible.
         }
         
