@@ -12,13 +12,14 @@ class Property {
 	void operator=(const Property&) {}
 
 public:
-
-	BEGIN_DECLARE_DELEGATE(PropertyBaseEvent, Property<T> *prop) CALL_PATTERN(prop) END_DECLARE_DELEGATE;
+    
+    BEGIN_DECLARE_DELEGATE(PropertyBaseEvent, Property<T> *prop) CALL_PATTERN(prop) END_DECLARE_DELEGATE;
 
 	T oldValue;
 	T value;
 
 	PropertyBaseEvent OnChange;
+
 
 	Property(const T &defaultValue) {
 		oldValue = defaultValue;
@@ -45,5 +46,6 @@ public:
 		return value;
 	}
 };
+
 
 #endif

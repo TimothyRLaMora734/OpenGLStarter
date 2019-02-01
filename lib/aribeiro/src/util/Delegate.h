@@ -50,6 +50,7 @@ namespace aRibeiro {
 			} \
 		}; \
 		std::vector<DelegateEntry> mDelegateEntry; \
+        typedef typename std::vector<DelegateEntry>::iterator iteratorType; \
 	public: \
 		void add(DelegateFrindObject* objPtr, className##Method methodPtr){ \
 			DelegateEntry entry (objPtr,methodPtr); \
@@ -71,7 +72,7 @@ namespace aRibeiro {
         } \
 		void remove(DelegateFrindObject* objPtr, className##Method methodPtr){ \
 			DelegateEntry entry (objPtr,methodPtr ); \
-			std::vector<DelegateEntry>::iterator it = mDelegateEntry.begin(); \
+			iteratorType it = mDelegateEntry.begin(); \
 			for (; it != mDelegateEntry.end(); it++) \
 				if ((*it) == entry){ \
 					mDelegateEntry.erase(it); \
@@ -84,7 +85,7 @@ namespace aRibeiro {
 		} \
 		void remove(className##Function functionPtr){ \
 			DelegateEntry entry (functionPtr ); \
-			std::vector<DelegateEntry>::iterator it = mDelegateEntry.begin(); \
+			iteratorType it = mDelegateEntry.begin(); \
 			for (; it != mDelegateEntry.end(); it++) \
 				if ((*it) == entry){ \
 					mDelegateEntry.erase(it); \

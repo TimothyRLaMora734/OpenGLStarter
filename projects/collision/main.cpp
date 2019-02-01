@@ -220,7 +220,9 @@ void processSingleEvent(sf::RenderWindow &window, sf::Event &event) {
 		//int y = (int)window.getSize().y -1 - event.mouseMove.y;
 		printf(" move: %d %d \n", event.mouseMove.x, event.mouseMove.y);
 		//app->mouseMove(event.mouseMove.x, event.mouseMove.y);
-		app->OnMouseMove.call(vec2(event.mouseMove.x, window.getSize().y - 1 - event.mouseMove.y));
+		//app->OnMouseMove.call(vec2(event.mouseMove.x, window.getSize().y - 1 - event.mouseMove.y));
+        
+        app->MousePos = vec2(event.mouseMove.x, window.getSize().y - 1 - event.mouseMove.y);
 	}
 
 	if (event.type == sf::Event::MouseWheelScrolled) {

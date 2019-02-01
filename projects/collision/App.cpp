@@ -22,7 +22,7 @@ App::App(int w,int h) {
 App::~App() {
 }
 
-void App::OnWindowSizeChanged(Property<::iSize> *prop) {
+void App::OnWindowSizeChanged(Property<iSize> *prop) {
 	GLRenderState *renderState = GLRenderState::getInstance();
 	renderState->Viewport = iRect(prop->value.x, prop->value.y);
 }
