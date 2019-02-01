@@ -343,7 +343,6 @@ namespace aRibeiro {
 
 		for (int i = 0; i < 3; i++)
 		{
-			vec3 n = boxNormals[i];
 			projectOnAxis(triangle_Vertices, 3, boxNormals[i], &triangleMin, &triangleMax);
 			if (triangleMax < box.min_box[i] - EPSILON || triangleMin > box.max_box[i] + EPSILON)
 				return false; // No intersection possible.

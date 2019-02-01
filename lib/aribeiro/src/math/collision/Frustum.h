@@ -18,6 +18,7 @@ namespace aRibeiro {
 	public:
         
         Plane right, left, bottom, top, back, front;
+        vec3 vertices[8];
         
         Plane& operator[](int idx);
         const Plane& operator[](int idx)const;
