@@ -66,10 +66,11 @@ namespace aRibeiro {
 		if (aux_vd >= -EPSILON)
 			return false; //paralelo na direção do raio ou na direção contrária do raio
 		// if ray nearly parallel to plane, no intersection
-		if (absv(aux_vd) < 1e-6f)
-			return false;
-		v0 = -(dot(plane.normal, ray.origin) + plane.distance);
-		if (abs(v0) < EPSILON) 
+		//if (absv(aux_vd) < 1e-6f)
+			//return false;
+		v0 = plane.distance - dot(plane.normal, ray.origin);
+		//if (absv(v0) < EPSILON)
+        if (v0 < EPSILON)
 			return false;// surface pointing wrong way
 		t = v0 / aux_vd;
 

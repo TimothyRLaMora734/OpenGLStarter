@@ -14,32 +14,32 @@ namespace aRibeiro {
 		*/
 		vec4 aux = clipMatrix[3] - clipMatrix[0];
 		right.normal = toVec3(aux);
-		right.distance = aux.w;
+		right.distance = -aux.w;
 		right.normalize();
 
 		aux = clipMatrix[3] + clipMatrix[0];
 		left.normal = toVec3(aux);
-		left.distance = aux.w;
+		left.distance = -aux.w;
 		left.normalize();
 
 		aux = clipMatrix[3] + clipMatrix[1];
 		bottom.normal = toVec3(aux);
-		bottom.distance = aux.w;
+		bottom.distance = -aux.w;
 		bottom.normalize();
 
 		aux = clipMatrix[3] - clipMatrix[1];
 		top.normal = toVec3(aux);
-		top.distance = aux.w;
+		top.distance = -aux.w;
 		top.normalize();
 
 		aux = clipMatrix[3] - clipMatrix[2];
 		front.normal = toVec3(aux);
-		front.distance = aux.w;
+		front.distance = -aux.w;
 		front.normalize();
 
 		aux = clipMatrix[3] + clipMatrix[2];
 		back.normal = toVec3(aux);
-		back.distance = aux.w;
+		back.distance = -aux.w;
 		back.normalize();
 	}
 
