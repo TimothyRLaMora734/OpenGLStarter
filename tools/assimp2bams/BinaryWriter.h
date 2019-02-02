@@ -132,7 +132,7 @@ public:
 		//if (out == NULL)
 			//return;
 		write<int>(v.size());
-		std::map<std::string, T>::const_iterator it;
+		typename std::map<std::string, T>::const_iterator it;
 		for (it = v.begin(); it != v.end(); it++) {
 			writeString(it->first);
 			write<T>(it->second);
