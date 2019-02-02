@@ -7,6 +7,23 @@ using namespace aRibeiro;
 #include <vector>
 #include <map>
 
+#include "BinaryReader.h"
+#include "BinaryWriter.h"
+
+#ifdef NDEBUG
+#define assert_static(expression, Word)
+#else
+#define assert_static(expression, Word) \
+		template<bool> struct _##Word##_; \
+		template<> struct _##Word##_<true> { }; \
+		template<> struct _##Word##_<(expression) == 0> { };
+#endif
+
+
+//assert_static(sizeof(int) == 4, Struct_Size_Serialization_Error)
+
+//#define MAX_CHAR_COUNT_STRING 32
+
 class Vec3Key{
 public:
     float time;
@@ -44,6 +61,24 @@ public:
     
     AnimBehaviour preState;
     AnimBehaviour postState;
+
+	void write(BinaryWriter* writer) {
+		writer->writeString(nodeName);
+		writer->write<unsigned char>(preState);
+		writer->write<unsigned char>(postState);
+		writer->writeVector<Vec3Key>(positionKeys);
+		writer->writeVector<QuatKey>(rotationKeys);
+		writer->writeVector<Vec3Key>(scalingKeys);
+	}
+
+	void read(BinaryReader* reader) {
+		nodeName = reader->readString();
+		preState = (AnimBehaviour)reader->read<unsigned char>();
+		postState = (AnimBehaviour)reader->read<unsigned char>();
+		reader->readVector<Vec3Key>(&positionKeys);
+		reader->readVector<QuatKey>(&rotationKeys);
+		reader->readVector<Vec3Key>(&scalingKeys);
+	}
     
     NodeAnimation() {
         preState = AnimBehaviour_DEFAULT;
@@ -72,6 +107,26 @@ public:
     float durationTicks;
     float ticksPerSecond;
     std::vector<NodeAnimation> channels;
+
+	void write(BinaryWriter* writer)
+	{
+		writer->writeString(name);
+		writer->write<float>(durationTicks);
+		writer->write<float>(ticksPerSecond);
+		writer->write<int>(channels.size());
+		for (int i = 0; i < channels.size(); i++)
+			channels[i].write(writer);
+	}
+
+	void read(BinaryReader* reader) 
+	{
+		name = reader->readString();
+		durationTicks = reader->read<float>();
+		ticksPerSecond = reader->read<float>();
+		channels.resize(reader->read<int>());
+		for (int i = 0; i < channels.size(); i++)
+			channels[i].read(reader);
+	}
     
     Animation() {
         durationTicks = 0;
@@ -176,6 +231,46 @@ public:
     vec3 colorDiffuse;
     vec3 colorSpecular;
     vec3 colorAmbient;
+
+	void write(BinaryWriter* writer) {
+		writer->writeString(name);
+		writer->write<unsigned char>(type);
+		writer->write<DirectionalLight>(directional);
+		writer->write<PointLight>(point);
+		writer->write<SpotLight>(spot);
+		writer->write<AmbientLight>(ambient);
+		writer->write<AreaLight>(area);
+
+		// d = distance
+		// Atten = 1/( att0 + att1 * d + att2 * d*d)
+		writer->write<float>(attenuationConstant);
+		writer->write<float>(attenuationLinear);
+		writer->write<float>(attenuationQuadratic);
+
+		writer->write<vec3>(colorDiffuse);
+		writer->write<vec3>(colorSpecular);
+		writer->write<vec3>(colorAmbient);
+	}
+
+	void read(BinaryReader* reader) {
+		name = reader->readString();
+		type = (LightType)reader->read<unsigned char>();
+		directional = reader->read<DirectionalLight>();
+		point = reader->read<PointLight>();
+		spot = reader->read<SpotLight>();
+		ambient = reader->read<AmbientLight>();
+		area = reader->read<AreaLight>();
+
+		// d = distance
+		// Atten = 1/( att0 + att1 * d + att2 * d*d)
+		attenuationConstant = reader->read<float>();
+		attenuationLinear = reader->read<float>();
+		attenuationQuadratic = reader->read<float>();
+
+		colorDiffuse = reader->read<vec3>();
+		colorSpecular = reader->read<vec3>();
+		colorAmbient = reader->read<vec3>();
+	}
     
     Light() {
         attenuationConstant = 0;
@@ -231,6 +326,37 @@ public:
     float computeWidth(float height){
         return height * aspect;
     }
+
+	void write(BinaryWriter* writer) {
+		
+		writer->writeString(name);
+
+		writer->write<vec3>(pos);
+		writer->write<vec3>(up);
+		writer->write<vec3>(forward);
+
+		writer->write<float>(horizontalFOVrad);
+		writer->write<float>(nearPlane);
+		writer->write<float>(farPlane);
+		writer->write<float>(aspect);
+
+		writer->write<float>(verticalFOVrad);
+	}
+
+	void read(BinaryReader* reader) {
+		name = reader->readString();
+
+		pos = reader->read<vec3>();
+		up = reader->read<vec3>();
+		forward = reader->read<vec3>();
+
+		horizontalFOVrad = reader->read<float>();
+		nearPlane = reader->read<float>();
+		farPlane = reader->read<float>();
+		aspect = reader->read<float>();
+
+		verticalFOVrad = reader->read<float>();
+	}
     
     Camera() {
         pos = vec3(0,0,0);
@@ -367,6 +493,25 @@ public:
     TextureMapMode mapMode;
     
     int uvIndex;
+
+	void write(BinaryWriter* writer) {
+		writer->writeString(filename);
+		writer->writeString(fileext);
+		writer->write<unsigned char>(type);
+		writer->write<unsigned char>(op);
+		writer->write<unsigned char>(mapMode);
+		writer->write<int>(uvIndex);
+	}
+
+	void read(BinaryReader* reader) {
+		filename = reader->readString();
+		fileext = reader->readString();
+		type = (TextureType)reader->read<unsigned char>();
+		op = (TextureOp)reader->read<unsigned char>();
+		mapMode = (TextureMapMode)reader->read<unsigned char>();
+		uvIndex = reader->read<int>();
+	}
+
     Texture() {
         type = TextureType_NONE;
         op = TextureOp_Multiply;
@@ -404,6 +549,30 @@ public:
 	//std::string textureDiffuse;
 	//std::string textureNormal;
 
+	void write(BinaryWriter* writer) {
+		writer->writeString(name);
+		writer->writeStringMap<float>(floatValue);
+		writer->writeStringMap<vec2>(vec2Value);
+		writer->writeStringMap<vec3>(vec3Value);
+		writer->writeStringMap<vec4>(vec4Value);
+		writer->writeStringMap<int>(intValue);
+		writer->write<int>(textures.size());
+		for (int i = 0; i < textures.size(); i++)
+			textures[i].write(writer);
+	}
+
+	void read(BinaryReader* reader) {
+		name = reader->readString();
+		reader->readStringMap<float>(&floatValue);
+		reader->readStringMap<vec2>(&vec2Value);
+		reader->readStringMap<vec3>(&vec3Value);
+		reader->readStringMap<vec4>(&vec4Value);
+		reader->readStringMap<int>(&intValue);
+		textures.resize(reader->read<int>());
+		for (int i = 0; i < textures.size(); i++)
+			textures[i].read(reader);
+	}
+
 	Material() {
 
 	}
@@ -436,6 +605,18 @@ public:
 	std::vector<VertexWeight> weights;
 
 	mat4 offset;
+
+	void write(BinaryWriter* writer) {
+		writer->writeString(name);
+		writer->write<mat4>(offset);
+		writer->writeVector<VertexWeight>(weights);
+	}
+
+	void read(BinaryReader* reader) {
+		name = reader->readString();
+		offset = reader->read<mat4>();
+		reader->readVector<VertexWeight>(&weights);
+	}
 
 	Bone() {
 
@@ -503,6 +684,55 @@ public:
 
 	std::vector<Bone> bones;
 
+	void write(BinaryWriter* writer) {
+		writer->writeString(name);
+
+		//VertexFormat: CONTAINS_POS | CONTAINS_NORMAL | ...
+		writer->write<unsigned int>(format);
+		writer->write<unsigned int>(vertexCount);
+		writer->write<unsigned int>(indiceCountPerFace);// 1 - points, 2 - lines, 3 - triangles, 4 - quads
+		writer->write<unsigned int>(materialIndex);
+		
+		writer->writeVector<vec3>(pos);
+		writer->writeVector<vec3>(normals);
+		writer->writeVector<vec3>(tangent);
+		writer->writeVector<vec3>(binormal);
+		for (int i = 0; i < 8; i++)
+			writer->writeVector<vec3>(uv[i]);
+		for (int i = 0; i < 8; i++)
+			writer->writeVector<unsigned int>(color[i]);//RGBA
+		writer->writeVector<unsigned int>(indice);
+
+		writer->write<int>(bones.size());
+		for (int i = 0; i < bones.size(); i++)
+			bones[i].write(writer);
+
+	}
+
+	void read(BinaryReader* reader) {
+		name = reader->readString();
+
+		//VertexFormat: CONTAINS_POS | CONTAINS_NORMAL | ...
+		format = reader->read<unsigned int>();
+		vertexCount = reader->read<unsigned int>();
+		indiceCountPerFace = reader->read<unsigned int>();// 1 - points, 2 - lines, 3 - triangles, 4 - quads
+		materialIndex = reader->read<unsigned int>();
+
+		reader->readVector<vec3>(&pos);
+		reader->readVector<vec3>(&normals);
+		reader->readVector<vec3>(&tangent);
+		reader->readVector<vec3>(&binormal);
+		for (int i = 0; i < 8; i++)
+			reader->readVector<vec3>(&uv[i]);
+		for (int i = 0; i < 8; i++)
+			reader->readVector<unsigned int>(&color[i]);//RGBA
+		reader->readVector<unsigned int>(&indice);
+
+		bones.resize(reader->read<int>());
+		for (int i = 0; i < bones.size(); i++)
+			bones[i].read(reader);
+	}
+
 	Geometry() {
 		format = 0; //CONTAINS_POS | CONTAINS_NORMAL | ...
 		vertexCount = 0;
@@ -548,6 +778,20 @@ public:
 	std::vector<unsigned int> children;
 	mat4 transform;
 
+	void write(BinaryWriter* writer) {
+		writer->writeString(name);
+		writer->write<mat4>(transform);
+		writer->writeVector<unsigned int>(geometries);
+		writer->writeVector<unsigned int>(children);
+	}
+
+	void read(BinaryReader* reader) {
+		name = reader->readString();
+		transform = reader->read<mat4>();
+		reader->readVector<unsigned int>(&geometries);
+		reader->readVector<unsigned int>(&children);
+	}
+
 	Node() {
 
 	}
@@ -573,11 +817,67 @@ public:
 	std::vector<Geometry> geometries;
 	std::vector<Node> nodes;//the node[0] is the root
     
-    void save(const char* filename) {
-        //
-        // To be implemented...
-        //
+    void write(const char* filename) {
+        
+		BinaryWriter writer(filename, true);
+
+		writer.write<int>(animations.size());
+		for (int i = 0; i < animations.size(); i++)
+			animations[i].write(&writer);
+
+		writer.write<int>(lights.size());
+		for (int i = 0; i < lights.size(); i++)
+			lights[i].write(&writer);
+
+		writer.write<int>(cameras.size());
+		for (int i = 0; i < cameras.size(); i++)
+			cameras[i].write(&writer);
+
+		writer.write<int>(materials.size());
+		for (int i = 0; i < materials.size(); i++)
+			materials[i].write(&writer);
+		
+		writer.write<int>(geometries.size());
+		for (int i = 0; i < geometries.size(); i++)
+			geometries[i].write(&writer);
+
+		writer.write<int>(nodes.size());
+		for (int i = 0; i < nodes.size(); i++)
+			nodes[i].write(&writer);
+
+		writer.close();
     }
+
+	void read(const char* filename) {
+		
+		BinaryReader reader(filename, true);
+
+		animations.resize(reader.read<int>());
+		for (int i = 0; i < animations.size(); i++)
+			animations[i].read(&reader);
+
+		lights.resize(reader.read<int>());
+		for (int i = 0; i < lights.size(); i++)
+			lights[i].read(&reader);
+
+		cameras.resize(reader.read<int>());
+		for (int i = 0; i < cameras.size(); i++)
+			cameras[i].read(&reader);
+
+		materials.resize(reader.read<int>());
+		for (int i = 0; i < materials.size(); i++)
+			materials[i].read(&reader);
+
+		geometries.resize(reader.read<int>());
+		for (int i = 0; i < geometries.size(); i++)
+			geometries[i].read(&reader);
+
+		nodes.resize(reader.read<int>());
+		for (int i = 0; i < nodes.size(); i++)
+			nodes[i].read(&reader);
+
+		reader.close();
+	}
 };
 
 #endif
