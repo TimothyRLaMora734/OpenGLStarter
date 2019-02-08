@@ -199,4 +199,8 @@ namespace aRibeiro {
 		return AABB::triangleIntersectsAABB(v0, v1, v2, box);
 	}
 
+	bool Triangle::aabbIntersectsTriangle(const AABB &box, const Triangle &triangle) {
+		return AABB::triangleIntersectsAABB(triangle.a, triangle.b, triangle.c, box);
+	}
+
 }
