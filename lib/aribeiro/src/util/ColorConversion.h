@@ -5,6 +5,10 @@
 #include <aribeiro/common.h>
 #if defined(ARIBEIRO_OS_WINDOWS)
 #include <inttypes.h>
+#include <sys/types.h>
+#include <stdint.h>
+
+
 #else
 #include <sys/types.h>
 #endif
@@ -21,12 +25,12 @@ namespace aRibeiro {
 
     class UByteColorConversion {
     public:
-        static void RGBtoCMY(u_int8_t r, u_int8_t g, u_int8_t b, u_int8_t *c, u_int8_t *m, u_int8_t *y);
-        static void CMYtoRGB(u_int8_t c, u_int8_t m, u_int8_t y, u_int8_t *r, u_int8_t *g, u_int8_t *b);
-        static void RGBtoCMYK(u_int8_t r, u_int8_t g, u_int8_t b, u_int8_t *c, u_int8_t *m, u_int8_t *y, u_int8_t *k);
-        static void CMYKtoRGB(u_int8_t c, u_int8_t m, u_int8_t y, u_int8_t k, u_int8_t *r, u_int8_t *g, u_int8_t *b);
-        static void YUVtoRGB(u_int8_t y,u_int8_t u,u_int8_t v,u_int8_t *r, u_int8_t *g, u_int8_t *b);
-        static void RGBtoYUV(u_int8_t r,u_int8_t g,u_int8_t b,u_int8_t *y, u_int8_t *u, u_int8_t *v);
+        static void RGBtoCMY(uint8_t r, uint8_t g, uint8_t b, uint8_t *c, uint8_t *m, uint8_t *y);
+        static void CMYtoRGB(uint8_t c, uint8_t m, uint8_t y, uint8_t *r, uint8_t *g, uint8_t *b);
+        static void RGBtoCMYK(uint8_t r, uint8_t g, uint8_t b, uint8_t *c, uint8_t *m, uint8_t *y, uint8_t *k);
+        static void CMYKtoRGB(uint8_t c, uint8_t m, uint8_t y, uint8_t k, uint8_t *r, uint8_t *g, uint8_t *b);
+        static void YUVtoRGB(uint8_t y,uint8_t u,uint8_t v,uint8_t *r, uint8_t *g, uint8_t *b);
+        static void RGBtoYUV(uint8_t r,uint8_t g,uint8_t b,uint8_t *y, uint8_t *u, uint8_t *v);
     };
         
 }

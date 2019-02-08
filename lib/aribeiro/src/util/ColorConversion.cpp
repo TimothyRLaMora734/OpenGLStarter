@@ -89,19 +89,19 @@ namespace aRibeiro {
         return result;
     }
 
-    void UByteColorConversion::RGBtoCMY(u_int8_t r, u_int8_t g, u_int8_t b, u_int8_t *c, u_int8_t *m, u_int8_t *y){
+    void UByteColorConversion::RGBtoCMY(uint8_t r, uint8_t g, uint8_t b, uint8_t *c, uint8_t *m, uint8_t *y){
         *c = 255 - r;
         *m = 255 - g;
         *y = 255 - b;
     }
     
-    void UByteColorConversion::CMYtoRGB(u_int8_t c, u_int8_t m, u_int8_t y, u_int8_t *r, u_int8_t *g, u_int8_t *b){
+    void UByteColorConversion::CMYtoRGB(uint8_t c, uint8_t m, uint8_t y, uint8_t *r, uint8_t *g, uint8_t *b){
         *r = 255 - c;
         *g = 255 - m;
         *b = 255 - y;
     }
     
-    void UByteColorConversion::RGBtoCMYK(u_int8_t r, u_int8_t g, u_int8_t b, u_int8_t *c, u_int8_t *m, u_int8_t *y, u_int8_t *k){
+    void UByteColorConversion::RGBtoCMYK(uint8_t r, uint8_t g, uint8_t b, uint8_t *c, uint8_t *m, uint8_t *y, uint8_t *k){
         int gray = maxInt(maxInt(r,g),b);
         int kaux = (255 - gray);
         
@@ -115,23 +115,23 @@ namespace aRibeiro {
             int cAux = ((255 -(int)r - kaux) * 255) / gray;
             int mAux = ((255 -(int)g - kaux) * 255) / gray;
             int yAux = ((255 -(int)b - kaux) * 255) / gray;
-            *c = (u_int8_t)cAux;
-            *m = (u_int8_t)mAux;
-            *y = (u_int8_t)yAux;
+            *c = (uint8_t)cAux;
+            *m = (uint8_t)mAux;
+            *y = (uint8_t)yAux;
         }
     }
     
-    void UByteColorConversion::CMYKtoRGB(u_int8_t c, u_int8_t m, u_int8_t y, u_int8_t k, u_int8_t *r, u_int8_t *g, u_int8_t *b){
+    void UByteColorConversion::CMYKtoRGB(uint8_t c, uint8_t m, uint8_t y, uint8_t k, uint8_t *r, uint8_t *g, uint8_t *b){
         int gray = 255 - k;
         int raux = ((255 - (int)c) * gray) / 255;
         int gaux = ((255 - (int)m) * gray) / 255;
         int baux = ((255 - (int)y) * gray) / 255;
-        *r = (u_int8_t)raux;
-        *g = (u_int8_t)gaux;
-        *b = (u_int8_t)baux;
+        *r = (uint8_t)raux;
+        *g = (uint8_t)gaux;
+        *b = (uint8_t)baux;
     }
     
-    void UByteColorConversion::YUVtoRGB(u_int8_t y,u_int8_t u,u_int8_t v,u_int8_t *r, u_int8_t *g, u_int8_t *b) {
+    void UByteColorConversion::YUVtoRGB(uint8_t y, uint8_t u, uint8_t v, uint8_t *r, uint8_t *g, uint8_t *b) {
         int c = y-16;
         int d = u-128;
         int e = v-128;
@@ -144,20 +144,20 @@ namespace aRibeiro {
         clampInt(gAux, 0, 255);
         clampInt(bAux, 0, 255);
         
-        *r = (u_int8_t)rAux;
-        *g = (u_int8_t)gAux;
-        *b = (u_int8_t)bAux;
+        *r = (uint8_t)rAux;
+        *g = (uint8_t)gAux;
+        *b = (uint8_t)bAux;
     }
     
-    void UByteColorConversion::RGBtoYUV(u_int8_t r,u_int8_t g,u_int8_t b,u_int8_t *y, u_int8_t *u, u_int8_t *v) {
+    void UByteColorConversion::RGBtoYUV(uint8_t r, uint8_t g, uint8_t b, uint8_t *y, uint8_t *u, uint8_t *v) {
         
         int ir = (int)r;
         int ig = (int)g;
         int ib = (int)b;
         
-        *y = (u_int8_t)(((66 * ir + 129 * ig +  25 * ib + 128) >> 8) +  16);
-        *u = (u_int8_t)(((-38 * ir - 74 * ig + 112 * ib + 128) >> 8) + 128);
-        *v = (u_int8_t)(((112 * ir - 94 * ig -  18 * ib + 128) >> 8) + 128);
+        *y = (uint8_t)(((66 * ir + 129 * ig +  25 * ib + 128) >> 8) +  16);
+        *u = (uint8_t)(((-38 * ir - 74 * ig + 112 * ib + 128) >> 8) + 128);
+        *v = (uint8_t)(((112 * ir - 94 * ig -  18 * ib + 128) >> 8) + 128);
         
     }
 }
