@@ -120,7 +120,7 @@ struct ImportSettings
      *  is true.
      *
      *  The naming scheme for the generated nodes is:
-     *    <OriginalName>_$AssimpFbx$_<TransformName>
+     *    <OriginalName>_$Fbx$_<TransformName>
      *
      *  where <TransformName> is one of
      *    RotationPivot

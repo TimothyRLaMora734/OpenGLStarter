@@ -233,7 +233,7 @@ ModelContainer *ImportFromAssimp(const char* filename) {
         
         for (int i = 0; i < 8; i++) {
             if (mesh->HasVertexColors(i)) {
-                fprintf(stdout, "         + vertec color %i\n", i);
+                fprintf(stdout, "         + vertex color %i\n", i);
                 geometry.format = geometry.format | (VertexFormat::CONTAINS_COLOR0 << i);
             }
         }

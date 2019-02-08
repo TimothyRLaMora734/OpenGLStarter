@@ -72,7 +72,7 @@ namespace Assimp {
 
         using namespace Util;
 
-#define MAGIC_NODE_TAG "_$AssimpFbx$"
+#define MAGIC_NODE_TAG "_$Fbx$"
 
 #define CONVERT_FBX_TIME(time) static_cast<double>(time) / 46186158000L
 
