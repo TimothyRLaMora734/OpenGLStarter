@@ -82,6 +82,7 @@
 #include <aribeiro/GLPostProcessingShader.h>
 #include <aribeiro/GLFramebufferObject.h>
 #include <aribeiro/GLPostProcess.h>
+#include <aribeiro/ColorConversion.h>
 
 
 

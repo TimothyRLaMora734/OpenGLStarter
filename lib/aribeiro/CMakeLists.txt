@@ -95,6 +95,7 @@ set( PUBLIC_HEADERS
 		src/util/Random.h
 		src/util/win32/drand48.h
 		src/util/PressReleaseDetector.h
+        src/util/ColorConversion.h
 
 		src/opengl/GLTexture.h
 		src/opengl/GLShader.h
@@ -162,6 +163,7 @@ set( SRC
 		src/util/Random.cpp
 		src/util/win32/drand48.cpp
 		src/util/PressReleaseDetector.cpp
+        src/util/ColorConversion.cpp
 
 		src/opengl/GLTexture.cpp
 		src/opengl/GLShader.cpp
@@ -254,6 +256,8 @@ set( SRC
 		src/util/Random.cpp
 		src/util/PressReleaseDetector.h
 		src/util/PressReleaseDetector.cpp
+        src/util/ColorConversion.h
+        src/util/ColorConversion.cpp
 	)
 	
 	source_group("util\\win32" FILES
