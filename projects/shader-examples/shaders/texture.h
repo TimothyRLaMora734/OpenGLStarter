@@ -142,7 +142,10 @@ public:
 				"float freq = uFloatFrequency;"
 				"vec3 retorno = vec3(1.0);"
 				"if (freq > 0.0)"
-					"retorno = mix( vec3(0.5,0.5,0.5), vec3(1.0,1.0,1.0), clamp(sign(mod(coord.x,freq) - freq * 0.5), 0.0, 1.0) );"
+					"retorno = mix( vec3(0.5,0.5,0.5), vec3(1.0,1.0,1.0), clamp("
+                    //"sign(mod(coord.x,freq) - freq * 0.5"
+                    "sign(mod(  length( coord - vec2(0.5,0.5) ) ,freq) - freq * 0.5"
+                     "), 0.0, 1.0) );"
 				"return retorno;"
 			"}"
 
