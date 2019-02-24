@@ -233,6 +233,7 @@ add_subdirectory( projects/shader-examples )
 add_subdirectory( projects/post-processing )
 add_subdirectory( projects/post-processing-power-of-two )
 add_subdirectory( projects/collision )
+add_subdirectory( projects/puc2019 )
 
 #
 # Tools
