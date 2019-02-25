@@ -34,6 +34,7 @@ class App : public AppBase {
     bool rotateCounterClockwise;
     float angle_rad;
     vec3 cameraPosition;
+    vec3 objectPosition;
     
     void processInput();
     

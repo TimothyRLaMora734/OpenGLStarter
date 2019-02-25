@@ -16,6 +16,7 @@ App::App(int w, int h):AppBase(w,h){
     cameraPosition = vec3(0.0f,0.4f,2.0f);
     angle_rad = 0;
     rotateCounterClockwise = true;
+    objectPosition = vec3(0,-1.5f,-1);
     
     //listen the resize window event
     WindowSize.OnChange.add(this, &App::OnWindowResize);
@@ -45,17 +46,16 @@ void App::draw() {
     
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
     
-
-    //compute the camera projection matrix
-    camera = inv(translate(cameraPosition));
-    mat4 viewProjection = (mat4)projection * (mat4)camera;
-    
     //update internal parameters
     if (rotateCounterClockwise)
         angle_rad += time.deltaTime * DEG2RAD(200.0f);
     else
         angle_rad -= time.deltaTime * DEG2RAD(200.0f) + 2.0*PI*10.0f;
     angle_rad = fmod(angle_rad, 2.0*PI*10.0f);
+
+    //compute the camera projection matrix
+    camera = inv(translate(cameraPosition));
+    mat4 viewProjection = (mat4)projection * (mat4)camera;
     
     //setup hierarchy models and draw
     modelHierarchy = mat4::IdentityMatrix;//reset transform
@@ -99,7 +99,10 @@ void App::draw() {
     };
     
     modelHierarchy.push();
-    modelHierarchy = (mat4)modelHierarchy * translate(0.0f,0.4f,0.0f) * eulerRotate(0.0f, angle_rad, angle_rad*0.1f) * scale(0.2f,0.2f,0.2f);
+    modelHierarchy = (mat4)modelHierarchy *
+                     translate(0.0f,0.4f,0.0f) *
+                     eulerRotate(0.0f, angle_rad, angle_rad*0.1f) *
+                     scale(0.2f,0.2f,0.2f);
     modelViewProjection = viewProjection * (mat4)modelHierarchy;
     drawPrimitive(GL_TRIANGLES,modelViewProjection,vertexBuffer, colorBuffer, 3 );
     
@@ -124,6 +127,18 @@ void App::draw() {
     modelHierarchy.pop();
     
     modelHierarchy.pop();
+    
+    
+    objectPosition = move(objectPosition,  vec3(0,1,-1), time.deltaTime * 0.25f);
+    
+    modelHierarchy.push();
+    modelHierarchy = (mat4)modelHierarchy * translate(objectPosition);
+    modelViewProjection = viewProjection * (mat4)modelHierarchy;
+    drawPrimitive(GL_TRIANGLES,modelViewProjection,vertexBuffer, colorBuffer, 3 );
+    modelHierarchy.pop();
+
+    if (sqrDistance(objectPosition,vec3(0,1,-1)) <= 1e-6f)
+        objectPosition = vec3(0,-1.5f,-1);
 }
 
 void App::processInput() {

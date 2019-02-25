@@ -75,14 +75,14 @@ int main(int argc, char* argv[]) {
     sf::RenderWindow window(
                             nearDesktopMode,
                             //sf::VideoMode::getDesktopMode(),
-                            "Shader Examples",
+                            "PUC-2019",
                             sf::Style::Fullscreen,
                             contextSettings);
 #else
     // 640x480 window
     sf::RenderWindow window(
                             sf::VideoMode(800, 600),
-                            "Shader Examples",
+                            "PUC-2019",
                             sf::Style::Default,
                             contextSettings);
 #endif
