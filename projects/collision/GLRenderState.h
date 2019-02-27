@@ -87,7 +87,7 @@ class GLRenderState {
 	void OnCurrentFramebufferObjectChange(Property<GLFramebufferObject*> *prop);
 
 	GLRenderState();
-	bool initialized = false;
+	bool initialized;
 public:
 
 	Property<vec4> ClearColor;

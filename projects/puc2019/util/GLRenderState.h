@@ -97,7 +97,7 @@ class GLRenderState {
     void OnColorWriteChange(Property<ColorWriteType> *prop);
 
 	GLRenderState();
-	bool initialized = false;
+	bool initialized;
 public:
 
 	Property<vec4> ClearColor;
