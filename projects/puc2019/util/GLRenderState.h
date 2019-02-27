@@ -56,6 +56,15 @@ enum WireframeType {
 	WireframeBack
 };
 
+enum ColorWriteType{
+    ColorWriteNone = 0,
+    ColorWriteRed = 1,
+    ColorWriteGreen = 2,
+    ColorWriteBlue = 4,
+    ColorWriteAlpha = 8,
+    ColorWriteAll = 0x0f
+};
+
 
 /*
 bool operator!=(const Rect& a, const Rect& b) {
@@ -85,6 +94,7 @@ class GLRenderState {
 	void OnCurrentShaderChange(Property<GLShader*> *prop);
 	void OnViewportChange(Property<iRect> *prop);
 	void OnCurrentFramebufferObjectChange(Property<GLFramebufferObject*> *prop);
+    void OnColorWriteChange(Property<ColorWriteType> *prop);
 
 	GLRenderState();
 	bool initialized = false;
@@ -106,6 +116,7 @@ public:
 	Property<GLShader*> CurrentShader;
 	Property<iRect> Viewport;
 	Property<GLFramebufferObject*> CurrentFramebufferObject;
+    Property<ColorWriteType> ColorWrite;
 
 	static GLRenderState *getInstance();
 

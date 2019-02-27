@@ -169,6 +169,14 @@ void GLRenderState::OnCurrentFramebufferObjectChange(Property<GLFramebufferObjec
 		prop->value->enable();
 }
 
+void GLRenderState::OnColorWriteChange(Property<ColorWriteType> *prop) {
+    ColorWriteType colw = prop->value;
+    glColorMask((colw & ColorWriteRed) != 0 ,
+                (colw & ColorWriteGreen) != 0 ,
+                (colw & ColorWriteBlue) != 0 ,
+                (colw & ColorWriteAlpha) != 0);
+}
+
 GLRenderState *GLRenderState::getInstance() {
 	static GLRenderState renderState;
 	return &renderState;
@@ -195,6 +203,7 @@ void GLRenderState::initialize(int w, int h) {
 	CurrentShader = NULL;
 	Viewport = iRect(w, h);
 	CurrentFramebufferObject = NULL;
+    ColorWrite = ColorWriteAll;
 
 	//
 	// assign change listeners
@@ -215,6 +224,7 @@ void GLRenderState::initialize(int w, int h) {
 	CurrentShader.OnChange.add(this, &GLRenderState::OnCurrentShaderChange);
 	Viewport.OnChange.add(this, &GLRenderState::OnViewportChange);
 	CurrentFramebufferObject.OnChange.add(this, &GLRenderState::OnCurrentFramebufferObjectChange);
+    ColorWrite.OnChange.add(this, &GLRenderState::OnColorWriteChange);
 
 	//
 	// Call all listener to do first setup with the default values
@@ -235,6 +245,7 @@ void GLRenderState::initialize(int w, int h) {
 	CurrentShader.OnChange(&CurrentShader);
 	Viewport.OnChange(&Viewport);
 	CurrentFramebufferObject.OnChange(&CurrentFramebufferObject);
+    ColorWrite.OnChange(&ColorWrite);
 
 	//
 	// Not using fixed pipeline lighting
