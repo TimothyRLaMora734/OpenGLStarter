@@ -11,8 +11,18 @@ RenderSystem *RenderSystem::getSingleton() {
 
 }
 
-RenderSystem::RenderSystem() {
+RenderSystem::RenderSystem(){
 
+    
+    
+    sphere = new SphereModel(32, 32, 1.0f);
+    sphereModelVBO = new SphereModelVBO(sphere);
+    sphereModelVAO = new SphereModelVAO(sphereModelVBO, GLShaderTextureColor::vPosition, GLShaderTextureColor::vUV);
+    
+    setNullAndDelete(sphere);
+    setNullAndDelete(sphereModelVBO);
+    
+    
 
 	glClearColor(0, 0, 0, 1);
 	glEnable(GL_CULL_FACE);
@@ -79,6 +89,10 @@ void RenderSystem::releaseGLResources() {
 
 	setNullAndDelete(shader);
 	setNullAndDelete(shaderVertexColor);
+    
+    setNullAndDelete(sphere);
+    setNullAndDelete(sphereModelVBO);
+    setNullAndDelete(sphereModelVAO);
 }
 
 /*
@@ -302,163 +316,6 @@ void RenderSystem::drawTexture(GLTexture *texture, vec4 color, GLuint oglPrimiti
 
 void RenderSystem::drawSphere(GLTexture *texture, int sectorCount, int stackCount, float radius) {
 
-    //std::vector<vec3> lines;
-    //std::vector<vec4> colors;
-    
-	std::vector<VertexAttrib> vertices;
-	std::vector<unsigned short> indices;
-
-	float x, y, z, xy;                              // vertex position
-	float nx, ny, nz, lengthInv = 1.0f / radius;    // vertex normal
-	float s, t;                                     // vertex texCoord
-
-	float sectorStep = 2 * PI / sectorCount;
-	float stackStep = PI / stackCount;
-	float sectorAngle, stackAngle;
-
-	for (int i = 0; i <= stackCount; ++i)
-	{
-		stackAngle = PI / 2 - i * stackStep;        // starting from pi/2 to -pi/2
-		xy = radius * cosf(stackAngle);             // r * cos(u)
-		z = radius * sinf(stackAngle);              // r * sin(u)
-
-		// add (sectorCount+1) vertices per stack
-		// the first and last vertices have same position and normal, but different tex coords
-		for (int j = 0; j <= sectorCount; ++j)
-		{
-			sectorAngle = j * sectorStep;           // starting from 0 to 2pi
-
-			// vertex position (x, y, z)
-			x = xy * cosf(sectorAngle);             // r * cos(u) * cos(v)
-			y = xy * sinf(sectorAngle);             // r * cos(u) * sin(v)
-			//vertices.push_back(x);
-			//vertices.push_back(y);
-			//vertices.push_back(z);
-
-			// normalized vertex normal (nx, ny, nz)
-			nx = x * lengthInv;
-			ny = y * lengthInv;
-			nz = z * lengthInv;
-			//normals.push_back(nx);
-			//normals.push_back(ny);
-			//normals.push_back(nz);
-
-			// vertex tex coord (s, t) range between [0, 1]
-			s = (float)j / sectorCount;
-			t = (float)i / stackCount;
-			//texCoords.push_back(s);
-			//texCoords.push_back(t);
-
-            vec3 p = vec3(x,z,-y);
-            vec3 normal = vec3(nx,nz,-ny);
-            
-            vec3 tangent = normalize( cross(vec3(0,1,0),normal) );
-            vec3 binormal = normalize( cross(normal, tangent) );
-            
-            /*
-            //draw normal
-            lines.push_back(p);
-            lines.push_back(p+normal);
-            colors.push_back(vec4(0.5,0.5,1.0,1.0));
-            colors.push_back(vec4(0.5,0.5,1.0,1.0));
-            //draw tangent
-            lines.push_back(p);
-            lines.push_back(p+tangent);
-            colors.push_back(vec4(0.5,1.0,0.5,1.0));
-            colors.push_back(vec4(0.5,1.0,0.5,1.0));
-            */
-            
-            
-			VertexAttrib va = {
-				p,// position;
-				vec2(s,t),// uv;
-				normal,// normal;
-				tangent,// tangent;
-				binormal//vec3(0),// binormal;
-			};
-
-			vertices.push_back(va);
-		}
-	}
-    
-    int k1, k2;
-    int i = 0;
-    
-    //
-    // Fix tangent and binormal from poles
-    //
-    k1 = i * (sectorCount + 1);     // beginning of current stack
-    k2 = k1 + sectorCount + 1;      // beginning of next stack
-    
-    for (int j = 0; j < sectorCount; ++j, ++k1, ++k2)
-    {
-        // k1+1 => k2 => k2+1
-        int index1 = k1 + 1;
-        int index2 = k2;
-        int index3 = k2 + 1;
-        
-        vertices[index1].tangent = normalize( vertices[index2].tangent + vertices[index3].tangent );
-        vertices[index1].binormal = normalize( cross( vertices[index1].normal, vertices[index1].tangent ) );
-        /*
-        //draw tangent
-        lines.push_back(vertices[index1].position);
-        lines.push_back(vertices[index1].position+vertices[index1].tangent);
-        colors.push_back(vec4(1.0,0.5,0.5,1.0));
-        colors.push_back(vec4(1.0,0.5,0.5,1.0));
-        */
-        
-    }
-    
-    i = (stackCount - 1);
-    k1 = i * (sectorCount + 1);     // beginning of current stack
-    k2 = k1 + sectorCount + 1;      // beginning of next stack
-    
-    for (int j = 0; j < sectorCount; ++j, ++k1, ++k2)
-    {
-        // k1+1 => k2 => k2+1
-        int index1 = k1;
-        int index2 = k2;
-        int index3 = k1 + 1;
-        
-        vertices[index2].tangent = normalize( vertices[index1].tangent + vertices[index3].tangent );
-        vertices[index2].binormal = normalize( cross( vertices[index2].normal, vertices[index2].tangent ) );
-        
-        /*
-        //draw tangent
-        lines.push_back(vertices[index2].position);
-        lines.push_back(vertices[index2].position+vertices[index2].tangent);
-        colors.push_back(vec4(1.0,0.5,0.5,1.0));
-        colors.push_back(vec4(1.0,0.5,0.5,1.0));
-        */
-    }
-
-	
-	for (i = 0; i < stackCount; ++i)
-	{
-		k1 = i * (sectorCount + 1);     // beginning of current stack
-		k2 = k1 + sectorCount + 1;      // beginning of next stack
-
-		for (int j = 0; j < sectorCount; ++j, ++k1, ++k2)
-		{
-			// 2 triangles per sector excluding first and last stacks
-			// k1 => k2 => k1+1
-			if (i != 0)
-			{
-				indices.push_back(k1);
-				indices.push_back(k2);
-				indices.push_back(k1 + 1);
-			}
-
-			// k1+1 => k2 => k2+1
-			if (i != (stackCount - 1))
-			{
-				indices.push_back(k1 + 1);
-				indices.push_back(k2);
-				indices.push_back(k2 + 1);
-			}
-		}
-	}
-
 	//
 	// OpenGL Draw
 	//
@@ -468,25 +325,22 @@ void RenderSystem::drawSphere(GLTexture *texture, int sectorCount, int stackCoun
 	texture->active(0);
 	shader->setTexture(0);
 	shader->setColor(color);
-
-	OPENGL_CMD(glEnableVertexAttribArray(shader->vPosition));
-	OPENGL_CMD(glVertexAttribPointer(shader->vPosition, 3, GL_FLOAT, false, sizeof(VertexAttrib), &vertices[0].position));
-
-	OPENGL_CMD(glEnableVertexAttribArray(shader->vUV));
-	OPENGL_CMD(glVertexAttribPointer(shader->vUV, 2, GL_FLOAT, false, sizeof(VertexAttrib), &vertices[0].uv));
-
-	//GL_UNSIGNED_BYTE, GL_UNSIGNED_SHORT, or GL_UNSIGNED_INT
-	OPENGL_CMD(glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_SHORT, &indices[0]));
-
-	//OPENGL_CMD(glDrawArrays(GL_TRIANGLES, 0, vertices.size()));
-
-	OPENGL_CMD(glDisableVertexAttribArray(shader->vPosition));
-	OPENGL_CMD(glDisableVertexAttribArray(shader->vUV));
     
-    //draw lines
-    //drawColor(GL_LINES, &lines[0], &colors[0], lines.size());
-
-
+    sphereModelVAO->enable();
+    sphereModelVAO->draw();
+    sphereModelVAO->disable();
+    
+    /*
+    sphereModelVBO.setLayoutPointers(GLShaderTextureColor::vPosition, GLShaderTextureColor::vUV);
+    sphereModelVBO.draw();
+    sphereModelVBO.unsetLayoutPointers(GLShaderTextureColor::vPosition, GLShaderTextureColor::vUV);
+    */
+    /*
+    sphere.setLayoutPointers(GLShaderTextureColor::vPosition, GLShaderTextureColor::vUV);
+    sphere.draw();
+    sphere.unsetLayoutPointers(GLShaderTextureColor::vPosition, GLShaderTextureColor::vUV);
+    */
+    
 }
 
 void RenderSystem::drawTexture(GLTexture *texture, GLuint oglPrimitive, const vec3 *vertexBuffer, const vec2 *uvBuffer, int count) {

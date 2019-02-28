@@ -84,6 +84,9 @@
 #include <aribeiro/GLPostProcess.h>
 #include <aribeiro/ColorConversion.h>
 
+#include <aribeiro/GLVertexBufferObject.h>
+#include <aribeiro/GLVertexArrayObject.h>
+
 
 
 #ifdef _WIN32

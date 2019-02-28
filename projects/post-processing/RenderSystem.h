@@ -20,6 +20,8 @@ using namespace aRibeiro;
 #include <SFML/Audio.hpp>
 #include <stdio.h>
 
+#include "Sphere.h"
+
 //#include "../ShaderManager.h"
 
 //class ShaderManager;
@@ -40,6 +42,10 @@ private:
 	mat4 lastmodel, lastprojection, returnedMVP, modelIT;
 
 	RenderSystem();
+    
+    SphereModel *sphere;
+    SphereModelVBO *sphereModelVBO;
+    SphereModelVAO *sphereModelVAO;
 
 public:
 

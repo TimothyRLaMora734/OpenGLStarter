@@ -30,22 +30,17 @@ set(ARIBEIRO_LIBRARIES ${ARIBEIRO_LIBRARIES} PARENT_SCOPE)
 FILE( GLOB math_collision_src src/math/collision/*.cpp)
 FILE( GLOB math_collision_h src/math/collision/*.h )
 
+FILE( GLOB opengl_src src/opengl/*.cpp)
+FILE( GLOB opengl_h src/opengl/*.h )
+
 set( PUBLIC_HEADERS
 
 		src/aribeiro.h
 		src/common.h
 		
-		#src/gl/glUtil.h
-		#src/gl/GLTexture.h
-		#src/gl/GLSquare.h
-		#src/gl/GLShaderYUV2RGB.h
-		#src/gl/font/ConvertUTF.h
-		#src/gl/font/Font.h
-		
 		src/math/all_math.h
 		src/math/BresenhamIterator.h
 		src/math/constants.h
-		#src/math/defs.h
 		src/math/EasingEquations.h
 		src/math/geometricOperations.h
 		src/math/mat4.h
@@ -58,32 +53,13 @@ set( PUBLIC_HEADERS
 		
 		${math_collision_h}
 		
-		
-		#src/network/MulticastUdpSocket.h
-		#src/network/NetworkConstants.h
-		#src/network/NetworkHelper.h
-		#src/network/UDP_DataReceive.h
-		#src/network/UDP_DataSend.h
-		#src/network/BufferFragment.h
-		
-		#src/util/Delegate.h
-		#src/util/getDirectoryToSaveWin32.h
-		#src/util/Object.h
-		#src/util/PerformaneCounterWin32.h
-		#src/util/Platform.h
-		#src/util/Thread.h
-		#src/util/Time.h
-		
 		src/platform/PlatformMutex.h
 		src/platform/PlatformThread.h
 		src/platform/PlatformSleep.h
 		src/platform/PlatformPath.h
 		src/platform/PlatformThread.h
 		src/platform/PlatformTime.h
-
 		src/platform/PlatformGL.h
-
-
 
 		src/util/Delegate.h
         src/util/Property.h
@@ -97,10 +73,8 @@ set( PUBLIC_HEADERS
 		src/util/PressReleaseDetector.h
         src/util/ColorConversion.h
 
-		src/opengl/GLTexture.h
-		src/opengl/GLShader.h
-        src/opengl/GLFramebufferObject.h
-        src/opengl/GLPostProcess.h
+
+        ${opengl_h}
 
 		src/opengl/shaders/GLShaderColor.h
 		src/opengl/shaders/GLShaderTextureColor.h
@@ -121,9 +95,7 @@ set( PUBLIC_HEADERS
 set( PRIVATE_HEADERS )
 
 set( SRC
-		#src/gl/font/ConvertUTF.c
-		#src/gl/font/Font.cpp
-		
+
 		src/math/BresenhamIterator.cpp
 		src/math/geometricOperations.cpp
 		src/math/mat4.cpp
@@ -135,21 +107,6 @@ set( SRC
 		
 		${math_collision_src}
 		
-		
-		#src/network/MulticastUdpSocket.cpp
-		#src/network/NetworkHelper.cpp
-		#src/network/UDP_DataSend.cpp
-		
-		#src/util/getDirectoryToSaveWin32.cpp
-		#src/util/PlatformWin32.cpp
-		#src/util/PlatformLinux.cpp
-
-		#${PlatformFiles}
-
-		#src/util/Platform.h
-		#src/util/Thread.cpp
-		#src/util/Time.cpp
-
 		src/platform/PlatformMutex.cpp
 		src/platform/PlatformThread.cpp
 		src/platform/PlatformSleep.cpp
@@ -165,11 +122,8 @@ set( SRC
 		src/util/PressReleaseDetector.cpp
         src/util/ColorConversion.cpp
 
-		src/opengl/GLTexture.cpp
-		src/opengl/GLShader.cpp
-        src/opengl/GLFramebufferObject.cpp
-        src/opengl/GLPostProcess.cpp
-		
+        ${opengl_src}
+
 		src/opengl/shaders/GLShaderColor.cpp
 		src/opengl/shaders/GLShaderTextureColor.cpp
 		src/opengl/shaders/GLShaderFont.cpp
@@ -266,14 +220,8 @@ set( SRC
 	)
 
 	source_group("opengl" FILES
-		src/opengl/GLTexture.h
-		src/opengl/GLTexture.cpp
-		src/opengl/GLShader.h
-		src/opengl/GLShader.cpp
-        src/opengl/GLFramebufferObject.h
-        src/opengl/GLFramebufferObject.cpp
-        src/opengl/GLPostProcess.h
-        src/opengl/GLPostProcess.cpp
+        ${opengl_h}
+        ${opengl_src}
 	)
 
 	source_group("opengl\\shaders" FILES

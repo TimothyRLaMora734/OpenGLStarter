@@ -1,21 +1,36 @@
 #ifndef Sphere__H
 #define Sphere__H
 
-#include "RenderSystem.h"
+#include <aribeiro/aribeiro.h>
+using namespace aRibeiro;
 
-class VBO {
-public:
+#include <glew/glew.h>
+
+
+struct SphereVertexAttrib {
+    vec3 position;
+    vec2 uv;
+    vec3 normal;
+    vec3 tangent;
+    vec3 binormal;
 };
 
-class VAO {
-public:
-};
 
-class Sphere {
+class SphereModel {
 public:
-    Sphere(int sectorCount, int stackCount, float radius) {
-        std::vector<VertexAttrib> vertices;
-        std::vector<unsigned short> indices;
+    std::vector<SphereVertexAttrib> vertices;
+    std::vector<unsigned short> indices;
+    
+    int sectorCount;
+    int stackCount;
+    float radius;
+    
+    SphereModel(int sectorCount, int stackCount, float radius) {
+        
+        this->sectorCount = sectorCount;
+        this->stackCount = stackCount;
+        this->radius = radius;
+        
         
         float x, y, z, xy;                              // vertex position
         float nx, ny, nz, lengthInv = 1.0f / radius;    // vertex normal
@@ -54,7 +69,7 @@ public:
                 vec3 normal = vec3(nx,nz,-ny);
                 vec3 tangent = normalize( cross(vec3(0,1,0),normal) );
                 vec3 binormal = normalize( cross(normal, tangent) );
-                VertexAttrib va = {
+                SphereVertexAttrib va = {
                     p,// position;
                     vec2(s,t),// uv;
                     normal,// normal;
@@ -128,6 +143,122 @@ public:
             }
         }
     }
+    
+    void setLayoutPointers(GLint positionLayout, GLint uvLayout) {
+        OPENGL_CMD(glEnableVertexAttribArray(positionLayout));
+        OPENGL_CMD(glVertexAttribPointer(positionLayout, 3, GL_FLOAT, false, sizeof(SphereVertexAttrib), &vertices[0].position));
+        
+        OPENGL_CMD(glEnableVertexAttribArray(uvLayout));
+        OPENGL_CMD(glVertexAttribPointer(uvLayout, 2, GL_FLOAT, false, sizeof(SphereVertexAttrib), &vertices[0].uv));
+    }
+    
+    void draw() {
+        OPENGL_CMD(glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_SHORT, &indices[0]));
+    }
+    
+    void unsetLayoutPointers(GLint positionLayout, GLint uvLayout) {
+        OPENGL_CMD(glDisableVertexAttribArray(positionLayout));
+        OPENGL_CMD(glDisableVertexAttribArray(uvLayout));
+    }
 };
+
+
+class SphereModelVBO {
+    
+    //private copy constructores, to avoid copy...
+    SphereModelVBO(const SphereModelVBO& v){}
+    void operator=(const SphereModelVBO& v){}
+    
+public:
+    GLVertexBufferObject *data;
+    GLVertexBufferObject *index;
+    int vertexCount;
+    int indexCount;
+    
+    SphereModelVBO(const SphereModel * sphere) {
+        
+        vertexCount = sphere->vertices.size();
+        indexCount = sphere->indices.size();
+        
+        data = new GLVertexBufferObject();
+        index = new GLVertexBufferObject();
+        
+        data->uploadData((void*)&sphere->vertices[0].position, sizeof(SphereVertexAttrib)*sphere->vertices.size());
+        
+        index->uploadData((void*)&sphere->indices[0], sphere->indices.size()*sizeof(unsigned short));
+        
+    }
+    
+    void setLayoutPointers(GLint positionLayout, GLint uvLayout) {
+        data->setLayout(positionLayout, 3, GL_FLOAT, sizeof(SphereVertexAttrib), 0);
+        data->setLayout(uvLayout, 2, GL_FLOAT, sizeof(SphereVertexAttrib),
+                        sizeof(vec3)
+                        //offsetof(SphereVertexAttrib, uv)
+                        );
+        index->setIndex();
+    }
+    
+    void draw() {
+        index->drawIndex(GL_TRIANGLES, indexCount, GL_UNSIGNED_SHORT);
+    }
+    
+    void unsetLayoutPointers(GLint positionLayout, GLint uvLayout) {
+        data->unsetLayout(positionLayout);
+        data->unsetLayout(uvLayout);
+        index->unsetIndex();
+    }
+    
+    virtual ~SphereModelVBO() {
+        setNullAndDelete(data);
+        setNullAndDelete(index);
+    }
+    
+};
+
+class SphereModelVAO {
+    
+    //private copy constructores, to avoid copy...
+    SphereModelVAO(const SphereModelVAO& v){}
+    void operator=(const SphereModelVAO& v){}
+    
+    //SphereModelVBO *srcVBO;
+    
+    int indexCount;
+    
+public:
+    
+    GLVertexArrayObject *vao;
+    
+    SphereModelVAO(SphereModelVBO *vbo, GLint positionLayout, GLint uvLayout) {
+        //srcVBO = vbo;
+        
+        vao = new GLVertexArrayObject();
+        vao->enable();
+        vbo->setLayoutPointers(positionLayout, uvLayout);
+        vao->disable();
+        vbo->unsetLayoutPointers(positionLayout, uvLayout);
+        
+        indexCount = vbo->indexCount;
+        
+    }
+    
+    void enable() {
+        vao->enable();
+    }
+    
+    void draw() {
+        vao->drawIndex(GL_TRIANGLES, indexCount, GL_UNSIGNED_SHORT);
+    }
+    
+    void disable() {
+        vao->disable();
+    }
+    
+    virtual ~SphereModelVAO() {
+        setNullAndDelete(vao);
+    }
+    
+};
+
 
 #endif
