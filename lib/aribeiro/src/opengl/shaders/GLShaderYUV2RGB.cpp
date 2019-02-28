@@ -142,8 +142,8 @@ namespace aRibeiro {
 			LoadShaderProgram(vertexShaderCode, fragmentShaderCode);
 
 		//attrib
-		vPosition = getAttribLocation("vPosition");
-		vUV = getAttribLocation("vUV");
+		//vPosition = getAttribLocation("vPosition");
+		//vUV = getAttribLocation("vUV");
 		//uniform
 		scale = getUniformLocation("scale");
 		textureY = getUniformLocation("textureY");
@@ -170,5 +170,10 @@ namespace aRibeiro {
 	void GLShaderYUV2RGB::setFade(float v) {
 		setUniform(fade, v);
 	}
+    
+    void GLShaderYUV2RGB::setupAttribLocation() {
+        bindAttribLocation(GLShaderYUV2RGB::vPosition, "vPosition");
+        bindAttribLocation(GLShaderYUV2RGB::vUV, "vUV");
+    }
 
 }

@@ -26,8 +26,8 @@ namespace aRibeiro {
 		//
 		// Set the vertex position attrib array
 		//
-		OPENGL_CMD(glEnableVertexAttribArray(shader->vPosition));
-		OPENGL_CMD(glVertexAttribPointer(shader->vPosition, COORDS_PER_POS, GL_FLOAT, false, STRUCTURE_STRIDE_BYTES_POS, vertexBuffer));
+        OPENGL_CMD(glEnableVertexAttribArray(GLShaderColor::vPosition));
+		OPENGL_CMD(glVertexAttribPointer(GLShaderColor::vPosition, COORDS_PER_POS, GL_FLOAT, false, STRUCTURE_STRIDE_BYTES_POS, vertexBuffer));
 
 		//
 		// Draw quad
@@ -37,7 +37,7 @@ namespace aRibeiro {
 		//
 		// Disable arrays after draw
 		//
-		OPENGL_CMD(glDisableVertexAttribArray(shader->vPosition));
+		OPENGL_CMD(glDisableVertexAttribArray(GLShaderTextureColor::vPosition));
 	}
 
 
@@ -66,14 +66,14 @@ namespace aRibeiro {
 		//
 		// Set the vertex position attrib array
 		//
-		OPENGL_CMD(glEnableVertexAttribArray(shader->vPosition));
-		OPENGL_CMD(glVertexAttribPointer(shader->vPosition, COORDS_PER_POS, GL_FLOAT, false, STRUCTURE_STRIDE_BYTES_POS, vertexBuffer));
+        OPENGL_CMD(glEnableVertexAttribArray(GLShaderTextureColor::vPosition));
+		OPENGL_CMD(glVertexAttribPointer(GLShaderTextureColor::vPosition, COORDS_PER_POS, GL_FLOAT, false, STRUCTURE_STRIDE_BYTES_POS, vertexBuffer));
 
 		//
 		// Set the vertex uv attrib array
 		//
-		OPENGL_CMD(glEnableVertexAttribArray(shader->vUV));
-		OPENGL_CMD(glVertexAttribPointer(shader->vUV, COORDS_PER_UV, GL_FLOAT, false, STRUCTURE_STRIDE_BYTES_UV, uvBuffer));
+		OPENGL_CMD(glEnableVertexAttribArray(GLShaderTextureColor::vUV));
+		OPENGL_CMD(glVertexAttribPointer(GLShaderTextureColor::vUV, COORDS_PER_UV, GL_FLOAT, false, STRUCTURE_STRIDE_BYTES_UV, uvBuffer));
 
 		//
 		// Draw quad
@@ -83,8 +83,8 @@ namespace aRibeiro {
 		//
 		// Disable arrays after draw
 		//
-		OPENGL_CMD(glDisableVertexAttribArray(shader->vPosition));
-		OPENGL_CMD(glDisableVertexAttribArray(shader->vUV));
+		OPENGL_CMD(glDisableVertexAttribArray(GLShaderTextureColor::vPosition));
+		OPENGL_CMD(glDisableVertexAttribArray(GLShaderTextureColor::vUV));
 
 	}
 

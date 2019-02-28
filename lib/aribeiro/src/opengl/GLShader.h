@@ -14,7 +14,7 @@ namespace aRibeiro {
 	protected:
 
 		static GLint loadShader(int type, const char* shaderCode);
-		static GLint loadShaderStrings(const char* vertexShaderCode, const  char* fragmentShaderCode);
+		static GLint loadShaderStrings(GLShader *shaderObj, const char* vertexShaderCode, const  char* fragmentShaderCode);
 		static GLint getCurrentShader();
 
 		void LoadShaderProgram(const char* vertexShaderCode, const char* fragmentShaderCode);
@@ -35,6 +35,13 @@ namespace aRibeiro {
 		vec3 getUniformVec3(int location);
 		vec4 getUniformVec4(int location);
 		mat4 getUniformMat4(int location);
+        
+        void bindAttribLocation(int location, const char* attrib);
+        
+        //
+        // you need to specify the shader attrib layout to use the VBO or VAO
+        //
+        virtual void setupAttribLocation()=0;
 
 	public:
 

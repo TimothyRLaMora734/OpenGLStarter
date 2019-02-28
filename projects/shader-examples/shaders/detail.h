@@ -40,11 +40,11 @@ public:
 	//
 	// vertex attrib
 	//
-	int aVec3Position;
-	int aVec2UV;
-	int aVec3Normal;
-	int aVec3Tangent;
-	int aVec3Binormal;
+	static const int aVec3Position = 0;
+	static const int aVec2UV = 1;
+	static const int aVec3Normal = 2;
+	static const int aVec3Tangent = 3;
+	static const int aVec3Binormal = 4;
 	
 	ShaderBumpMapping():GLShader() {
 
@@ -161,11 +161,11 @@ public:
 
 		LoadShaderProgram(vertexShaderCode, fragmentShaderCode);
 
-		aVec3Position = getAttribLocation("aVec3Position");
-		aVec2UV = getAttribLocation("aVec2UV");
-		aVec3Normal = getAttribLocation("aVec3Normal");
-		aVec3Tangent = getAttribLocation("aVec3Tangent");
-		aVec3Binormal = getAttribLocation("aVec3Binormal");
+		//aVec3Position = getAttribLocation("aVec3Position");
+		//aVec2UV = getAttribLocation("aVec2UV");
+		//aVec3Normal = getAttribLocation("aVec3Normal");
+		//aVec3Tangent = getAttribLocation("aVec3Tangent");
+		//aVec3Binormal = getAttribLocation("aVec3Binormal");
 
 		uSampler2DDiffuse = getUniformLocation("uSampler2DDiffuse");
 		uSampler2DBumpMap = getUniformLocation("uSampler2DBumpMap");
@@ -229,6 +229,16 @@ public:
 	}
 
 
+protected:
+    
+    void setupAttribLocation() {
+        bindAttribLocation(ShaderBumpMapping::aVec3Position, "aVec3Position");
+        bindAttribLocation(ShaderBumpMapping::aVec2UV, "aVec2UV");
+        bindAttribLocation(ShaderBumpMapping::aVec3Normal, "aVec3Normal");
+        bindAttribLocation(ShaderBumpMapping::aVec3Tangent, "aVec3Tangent");
+        bindAttribLocation(ShaderBumpMapping::aVec3Binormal, "aVec3Binormal");
+    }
+    
 };
 
 
@@ -259,11 +269,11 @@ public:
 	//
 	// vertex attrib
 	//
-	int aVec3Position;
-	int aVec2UV;
-	int aVec3Normal;
-	int aVec3Tangent;
-	int aVec3Binormal;
+	static const int aVec3Position = 0;
+	static const int aVec2UV = 1;
+	static const int aVec3Normal = 2;
+	static const int aVec3Tangent = 3;
+	static const int aVec3Binormal = 4;
 
 	ShaderConeStepMappingOriginal() :GLShader() {
 
@@ -397,11 +407,11 @@ public:
 
 		LoadShaderProgram(vertexShaderCode, fragmentShaderCode);
 
-		aVec3Position = getAttribLocation("aVec3Position");
-		aVec2UV = getAttribLocation("aVec2UV");
-		aVec3Normal = getAttribLocation("aVec3Normal");
-		aVec3Tangent = getAttribLocation("aVec3Tangent");
-		aVec3Binormal = getAttribLocation("aVec3Binormal");
+		//aVec3Position = getAttribLocation("aVec3Position");
+		//aVec2UV = getAttribLocation("aVec2UV");
+		//aVec3Normal = getAttribLocation("aVec3Normal");
+		//aVec3Tangent = getAttribLocation("aVec3Tangent");
+		//aVec3Binormal = getAttribLocation("aVec3Binormal");
 
 		uSampler2DDiffuse = getUniformLocation("uSampler2DDiffuse");
 		uSampler2DConeMap = getUniformLocation("uSampler2DConeMap");
@@ -463,6 +473,18 @@ public:
 	void setLightShine(float v) {
 		setUniform(uFloatLightShine, v);
 	}
+    
+    
+protected:
+    
+    void setupAttribLocation() {
+        bindAttribLocation(ShaderConeStepMappingOriginal::aVec3Position, "aVec3Position");
+        bindAttribLocation(ShaderConeStepMappingOriginal::aVec2UV, "aVec2UV");
+        bindAttribLocation(ShaderConeStepMappingOriginal::aVec3Normal, "aVec3Normal");
+        bindAttribLocation(ShaderConeStepMappingOriginal::aVec3Tangent, "aVec3Tangent");
+        bindAttribLocation(ShaderConeStepMappingOriginal::aVec3Binormal, "aVec3Binormal");
+    }
+    
 };
 
 #endif

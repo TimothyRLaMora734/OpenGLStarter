@@ -23,8 +23,8 @@ public:
 	//
 	// vertex attrib
 	//
-	int aVec3Position;
-	int aVec2UV;
+	static const int aVec3Position = 0;
+	static const int aVec2UV = 1;
 
 	ShaderTwoTextures() :GLShader() {
 
@@ -64,8 +64,8 @@ public:
 
 		LoadShaderProgram(vertexShaderCode, fragmentShaderCode);
 
-		aVec3Position = getAttribLocation("aVec3Position");
-		aVec2UV = getAttribLocation("aVec2UV");
+		//aVec3Position = getAttribLocation("aVec3Position");
+		//aVec2UV = getAttribLocation("aVec2UV");
 
 		uSampler2DTextureA = getUniformLocation("uSampler2DTextureA");
 		uSampler2DTextureB = getUniformLocation("uSampler2DTextureB");
@@ -91,6 +91,14 @@ public:
 	void setModelViewProjection(const mat4 &matrix) {
 		setUniform(uMat4ModelViewProjection, matrix);
 	}
+    
+protected:
+    
+    void setupAttribLocation() {
+        
+        bindAttribLocation(ShaderTwoTextures::aVec3Position, "aVec3Position");
+        bindAttribLocation(ShaderTwoTextures::aVec2UV, "aVec2UV");
+    }
 
 };
 
@@ -108,8 +116,8 @@ public:
 	//
 	// vertex attrib
 	//
-	int aVec3Position;
-	int aVec2UV;
+	static const int aVec3Position = 0;
+	static const int aVec2UV = 1;
 
 	ShaderProceduralTexture() :GLShader() {
 
@@ -157,8 +165,8 @@ public:
 
 		LoadShaderProgram(vertexShaderCode, fragmentShaderCode);
 
-		aVec3Position = getAttribLocation("aVec3Position");
-		aVec2UV = getAttribLocation("aVec2UV");
+		//aVec3Position = getAttribLocation("aVec3Position");
+		//aVec2UV = getAttribLocation("aVec2UV");
 
 		uMat4ModelViewProjection = getUniformLocation("uMat4ModelViewProjection");
 
@@ -172,6 +180,16 @@ public:
 	void setModelViewProjection(const mat4 &matrix) {
 		setUniform(uMat4ModelViewProjection, matrix);
 	}
+    
+    
+protected:
+    
+    void setupAttribLocation() {
+        
+        bindAttribLocation(ShaderProceduralTexture::aVec3Position, "aVec3Position");
+        bindAttribLocation(ShaderProceduralTexture::aVec2UV, "aVec2UV");
+    }
+    
 };
 
 #endif

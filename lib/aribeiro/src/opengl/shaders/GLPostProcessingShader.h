@@ -7,8 +7,8 @@ namespace aRibeiro {
     
     class GLPostProcessingShader: public GLShader {
     public:
-        int aVec2Position;
-        int aVec2UV;
+        static const int aVec2Position = 0;
+        static const int aVec2UV = 1;
     };
     
 }

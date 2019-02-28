@@ -6,12 +6,17 @@
 namespace aRibeiro {
 
 	class GLShaderYUV2RGB : public GLShader {
+    
+    protected:
+        
+        void setupAttribLocation();
+        
 	public:
 		//
 		//attrib
 		//
-		int vPosition;
-		int vUV;
+		static const int vPosition = 0;
+		static const int vUV = 1;
 
 		//
 		//uniform

@@ -1,7 +1,7 @@
 #include "ModelContainer.h"
 #include "AssimpExporter.h"
 
-#define DEBUG 1
+#define DEBUG 0
 
 
 void printUsage() {

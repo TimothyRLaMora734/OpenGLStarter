@@ -153,6 +153,10 @@ void recursiveInsertNodes(ModelContainer *result, aiNode * ainode, std::string o
 ModelContainer *ImportFromAssimp(const char* filename) {
     const aiScene* scene;
     aiPropertyStore *store = aiCreatePropertyStore();
+    
+    // disable the extra FBX nodes generation...
+    //aiSetImportPropertyInteger(store, AI_CONFIG_IMPORT_FBX_PRESERVE_PIVOTS, AI_FALSE);
+    
     //aiSetImportPropertyInteger(store, AI_CONFIG_PP_SLM_VERTEX_LIMIT, AI_SLM_DEFAULT_MAX_VERTICES);
     scene = aiImportFileExWithProperties(filename, aiProcessPreset_TargetRealtime_MaxQuality, NULL, store);
     aiReleasePropertyStore(store);

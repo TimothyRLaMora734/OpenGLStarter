@@ -13,8 +13,8 @@ namespace aRibeiro {
     
     class GLPostProcessingPowerOfTwoShader : public GLShader {
     public:
-        int aVec2Position;
-        int aVec2UV;
+        static const int aVec2Position = 0;
+        static const int aVec2UV = 1;
         
         virtual void setTexelNeighbor(vec2 texelNeighbor) = 0;
         virtual void setTexelMaxUVAccess(vec2 texelMaxUVAccess) = 0;

@@ -55,8 +55,8 @@ namespace aRibeiro {
             
             LoadShaderProgram(vertexShaderCode, fragmentShaderCode);
             
-            aVec2Position = getAttribLocation("aVec2Position");
-            aVec2UV = getAttribLocation("aVec2UV");
+            //aVec2Position = getAttribLocation("aVec2Position");
+            //aVec2UV = getAttribLocation("aVec2UV");
             
             uSampler2DTexture = getUniformLocation("uSampler2DTexture");
             uFloatThreshold = getUniformLocation("uFloatThreshold");
@@ -79,6 +79,12 @@ namespace aRibeiro {
         void setTexelMaxUVAccess(vec2 texelMaxUVAccess){
             setUniform(uVec2TexelMaxUVAccess, texelMaxUVAccess);
         }
+        
+        void setupAttribLocation() {
+            bindAttribLocation(GLPostProcessingShader::aVec2Position, "aVec2Position");
+            bindAttribLocation(GLPostProcessingShader::aVec2UV, "aVec2UV");
+        }
+        
     };
     
 }

@@ -39,8 +39,8 @@ public:
 	//
 	// vertex attrib
 	//
-	int aVec3Position;
-	int aVec2UV;
+	static const int aVec3Position = 0;
+	static const int aVec2UV = 1;
 
 	ShaderLaplace() :GLShader() {
 
@@ -95,8 +95,8 @@ public:
 
 		LoadShaderProgram(vertexShaderCode, fragmentShaderCode);
 
-		aVec3Position = getAttribLocation("aVec3Position");
-		aVec2UV = getAttribLocation("aVec2UV");
+		//aVec3Position = getAttribLocation("aVec3Position");
+		//aVec2UV = getAttribLocation("aVec2UV");
 
 		uSampler2DFramebuffer = getUniformLocation("uSampler2DFramebuffer");
 		uVec2FramebufferTexelNeighbor = getUniformLocation("uVec2FramebufferTexelNeighbor");
@@ -126,6 +126,14 @@ public:
 		setUniform(uFloatBlend, v);
 	}
 
+    
+protected:
+    
+    void setupAttribLocation() {
+        bindAttribLocation(ShaderLaplace::aVec3Position, "aVec3Position");
+        bindAttribLocation(ShaderLaplace::aVec2UV, "aVec2UV");
+    }
+    
 };
 
 class ShaderBlur : public GLShader {
@@ -150,8 +158,8 @@ public:
 	//
 	// vertex attrib
 	//
-	int aVec3Position;
-	int aVec2UV;
+	static const int aVec3Position = 0;
+	static const int aVec2UV = 1;
 
 	ShaderBlur() :GLShader() {
 
@@ -223,8 +231,8 @@ public:
         glUniform1fv(getUniformLocation("coef"),7,coef);
 #endif
 
-		aVec3Position = getAttribLocation("aVec3Position");
-		aVec2UV = getAttribLocation("aVec2UV");
+		//aVec3Position = getAttribLocation("aVec3Position");
+		//aVec2UV = getAttribLocation("aVec2UV");
 
 		uSampler2DFramebuffer = getUniformLocation("uSampler2DFramebuffer");
 		uVec2FramebufferTexelNeighbor = getUniformLocation("uVec2FramebufferTexelNeighbor");
@@ -254,6 +262,14 @@ public:
 	void setVertical() {
 		setUniform(uVec2HorizontalVertical, vec2(0.0f, 1.0f));
 	}
+    
+protected:
+    
+    void setupAttribLocation() {
+        bindAttribLocation(ShaderBlur::aVec3Position, "aVec3Position");
+        bindAttribLocation(ShaderBlur::aVec2UV, "aVec2UV");
+    }
+    
 
 };
 

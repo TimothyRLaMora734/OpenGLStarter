@@ -16,7 +16,7 @@ namespace aRibeiro {
 		return shader;
 	}
 
-	GLint GLShader::loadShaderStrings(const char* vertexShaderCode, const  char* fragmentShaderCode) {
+	GLint GLShader::loadShaderStrings(GLShader *shaderObj, const char* vertexShaderCode, const  char* fragmentShaderCode) {
 		GLint vertexShader;
 		OPENGL_CMD(vertexShader = loadShader(GL_VERTEX_SHADER, vertexShaderCode));
 		PlatformGL::checkShaderStatus(vertexShader);
@@ -34,6 +34,9 @@ namespace aRibeiro {
 		OPENGL_CMD(glAttachShader(mProgram, vertexShader));
 		OPENGL_CMD(glAttachShader(mProgram, fragmentShader));
 
+        shaderObj->mProgram = mProgram;
+        shaderObj->setupAttribLocation();
+        
 		//
 		// Perform shader link
 		//
@@ -67,7 +70,7 @@ namespace aRibeiro {
 	// Non-Static
 	//
 	void GLShader::LoadShaderProgram(const char* vertexShaderCode, const char* fragmentShaderCode) {
-		mProgram = loadShaderStrings(vertexShaderCode, fragmentShaderCode);
+		mProgram = loadShaderStrings(this, vertexShaderCode, fragmentShaderCode);
 	}
 	GLint GLShader::getAttribLocation(const char* name) {
 		GLint result;
@@ -135,6 +138,10 @@ namespace aRibeiro {
 		OPENGL_CMD(glGetUniformfv(mProgram, location, v.array));
 		return v;
 	}
+    
+    void GLShader::bindAttribLocation(int location, const char* attribName) {
+        OPENGL_CMD(glBindAttribLocation(mProgram, location, attribName));
+    }
 
 	void GLShader::enable() {
 		if (GLShader::getCurrentShader() != mProgram)

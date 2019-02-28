@@ -27,8 +27,8 @@ namespace aRibeiro {
 
 		LoadShaderProgram(vertexShaderCode, fragmentShaderCode);
 
-		vPosition = getAttribLocation("vPosition");
-		vUV = getAttribLocation("vUV");
+		//vPosition = getAttribLocation("vPosition");
+		//vUV = getAttribLocation("vUV");
 		
 		color = getUniformLocation("color");
 		matrix = getUniformLocation("matrix");
@@ -47,6 +47,11 @@ namespace aRibeiro {
 	void GLShaderTextureColor::setTexture(int activeTextureUnit) {
 		setUniform(texture, activeTextureUnit);
 	}
+    
+    void GLShaderTextureColor::setupAttribLocation() {
+        bindAttribLocation(GLShaderTextureColor::vPosition, "vPosition");
+        bindAttribLocation(GLShaderTextureColor::vUV, "vUV");
+    }
 
 }
 

@@ -50,8 +50,8 @@ namespace aRibeiro {
             
             LoadShaderProgram(vertexShaderCode, fragmentShaderCode);
             
-            aVec2Position = getAttribLocation("aVec2Position");
-            aVec2UV = getAttribLocation("aVec2UV");
+            //aVec2Position = getAttribLocation("aVec2Position");
+            //aVec2UV = getAttribLocation("aVec2UV");
             
             uSampler2DSourceTexture = getUniformLocation("uSampler2DSourceTexture");
             uSampler2DBlurTexture = getUniformLocation("uSampler2DBlurTexture");
@@ -68,6 +68,12 @@ namespace aRibeiro {
         void setIntensity(float v){
             setUniform(uFloatIntensity, v);
         }
+        
+        void setupAttribLocation() {
+            bindAttribLocation(GLPostProcessingShader::aVec2Position, "aVec2Position");
+            bindAttribLocation(GLPostProcessingShader::aVec2UV, "aVec2UV");
+        }
+        
     };
 
 }

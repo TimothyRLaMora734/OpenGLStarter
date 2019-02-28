@@ -1,7 +1,8 @@
 #include "GLShaderVertexColor.h"
+#include <aribeiro/PlatformGL.h>
 
 namespace aRibeiro {
-
+    
 	GLShaderVertexColor::GLShaderVertexColor() :GLShader() {
 		const char vertexShaderCode[] = {
 			"attribute vec3 vPosition;"
@@ -24,8 +25,8 @@ namespace aRibeiro {
 
 		LoadShaderProgram(vertexShaderCode, fragmentShaderCode);
 
-		vPosition = getAttribLocation("vPosition");
-		vColor = getAttribLocation("vColor");
+		//vPosition = getAttribLocation("vPosition");
+		//vColor = getAttribLocation("vColor");
 
 		matrix = getUniformLocation("matrix");
 	}
@@ -34,6 +35,11 @@ namespace aRibeiro {
 	void GLShaderVertexColor::setMatrix(const mat4 & m) {
 		setUniform(matrix, m);
 	}
+    
+    void GLShaderVertexColor::setupAttribLocation() {
+        bindAttribLocation(GLShaderVertexColor::vPosition, "vPosition");
+        bindAttribLocation(GLShaderVertexColor::vColor, "vColor");
+    }
 
 }
 

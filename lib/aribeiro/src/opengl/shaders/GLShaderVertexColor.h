@@ -7,12 +7,16 @@ namespace aRibeiro {
 
 	class GLShaderVertexColor : public GLShader {
 
+    protected:
+        
+        void setupAttribLocation();
+        
 	public:
 		//
 		// attrib locations
 		//
-		int vPosition;
-		int vColor;
+		static const int vPosition = 0;
+		static const int vColor = 1;
 
 		//
 		// uniform locations

@@ -41,9 +41,9 @@ public:
 	//
 	// vertex attrib
 	//
-	int aVec3Position;
-	int aVec2UV;
-	int aVec3Normal;
+	static const int aVec3Position = 0;
+	static const int aVec2UV = 1;
+	static const int aVec3Normal = 2;
 
 	ShaderBlinPhongVertex() :GLShader() {
 
@@ -107,9 +107,9 @@ public:
 
 		LoadShaderProgram(vertexShaderCode, fragmentShaderCode);
 
-		aVec3Position = getAttribLocation("aVec3Position");
-		aVec2UV = getAttribLocation("aVec2UV");
-		aVec3Normal = getAttribLocation("aVec3Normal");
+		//aVec3Position = getAttribLocation("aVec3Position");
+		//aVec2UV = getAttribLocation("aVec2UV");
+		//aVec3Normal = getAttribLocation("aVec3Normal");
 
 		uSampler2DDiffuse = getUniformLocation("uSampler2DDiffuse");
 		uVec3ObjectColor = getUniformLocation("uVec3ObjectColor");
@@ -164,6 +164,16 @@ public:
 	void setLightShine(float v) {
 		setUniform(uFloatLightShine, v);
 	}
+    
+protected:
+    
+    void setupAttribLocation() {
+        
+        bindAttribLocation(ShaderBlinPhongVertex::aVec3Position, "aVec3Position");
+        bindAttribLocation(ShaderBlinPhongVertex::aVec2UV, "aVec2UV");
+        bindAttribLocation(ShaderBlinPhongVertex::aVec3Normal, "aVec3Normal");
+    }
+    
 };
 
 class ShaderBlinPhongPixel : public GLShader {
@@ -190,9 +200,9 @@ public:
 	//
 	// vertex attrib
 	//
-	int aVec3Position;
-	int aVec2UV;
-	int aVec3Normal;
+	static const int aVec3Position = 0;
+	static const int aVec2UV = 1;
+	static const int aVec3Normal = 2;
 
 	ShaderBlinPhongPixel() :GLShader() {
 
@@ -263,9 +273,9 @@ public:
 
 		LoadShaderProgram(vertexShaderCode, fragmentShaderCode);
 
-		aVec3Position = getAttribLocation("aVec3Position");
-		aVec2UV = getAttribLocation("aVec2UV");
-		aVec3Normal = getAttribLocation("aVec3Normal");
+		//aVec3Position = getAttribLocation("aVec3Position");
+		//aVec2UV = getAttribLocation("aVec2UV");
+		//aVec3Normal = getAttribLocation("aVec3Normal");
 
 		uSampler2DDiffuse = getUniformLocation("uSampler2DDiffuse");
 		uVec3ObjectColor = getUniformLocation("uVec3ObjectColor");
@@ -320,6 +330,16 @@ public:
 	void setLightShine(float v) {
 		setUniform(uFloatLightShine, v);
 	}
+    
+protected:
+    
+    void setupAttribLocation() {
+        
+        bindAttribLocation(ShaderBlinPhongPixel::aVec3Position, "aVec3Position");
+        bindAttribLocation(ShaderBlinPhongPixel::aVec2UV, "aVec2UV");
+        bindAttribLocation(ShaderBlinPhongPixel::aVec3Normal, "aVec3Normal");
+    }
+    
 };
 
 #endif

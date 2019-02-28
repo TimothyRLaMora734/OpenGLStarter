@@ -33,9 +33,9 @@ namespace aRibeiro {
 
 		LoadShaderProgram(vertexShaderCode, fragmentShaderCode);
 
-		vPosition = getAttribLocation("vPosition");
-		vColor = getAttribLocation("vColor");
-		vUV = getAttribLocation("vUV");
+		//vPosition = getAttribLocation("vPosition");
+		//vColor = getAttribLocation("vColor");
+		//vUV = getAttribLocation("vUV");
 
 		texture = getUniformLocation("texture");
 		matrix = getUniformLocation("matrix");
@@ -49,5 +49,11 @@ namespace aRibeiro {
 	void GLShaderFont::setMatrix(const mat4 & m) {
 		setUniform(matrix, m);
 	}
+    
+    void GLShaderFont::setupAttribLocation() {
+        bindAttribLocation(GLShaderFont::vPosition, "vPosition");
+        bindAttribLocation(GLShaderFont::vColor, "vColor");
+        bindAttribLocation(GLShaderFont::vUV, "vUV");
+    }
 
 }

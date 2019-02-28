@@ -259,15 +259,15 @@ void RenderSystem::drawTexture(GLTexture *texture, vec4 color, GLuint oglPrimiti
 	//
 	// Set the vertex position attrib array
 	//
-	OPENGL_CMD(glEnableVertexAttribArray(shader->vPosition));
+    OPENGL_CMD(glEnableVertexAttribArray(GLShaderTextureColor::vPosition));
 
-	OPENGL_CMD(glVertexAttribPointer(shader->vPosition, 3, GL_FLOAT, false, sizeof(vec3), &vertexBuffer[0]));
+	OPENGL_CMD(glVertexAttribPointer(GLShaderTextureColor::vPosition, 3, GL_FLOAT, false, sizeof(vec3), &vertexBuffer[0]));
 
 	//
 	// Set the vertex uv attrib array
 	//
-	OPENGL_CMD(glEnableVertexAttribArray(shader->vUV));
-	OPENGL_CMD(glVertexAttribPointer(shader->vUV, 2, GL_FLOAT, false, sizeof(vec2), &uvBuffer[0]));
+	OPENGL_CMD(glEnableVertexAttribArray(GLShaderTextureColor::vUV));
+	OPENGL_CMD(glVertexAttribPointer(GLShaderTextureColor::vUV, 2, GL_FLOAT, false, sizeof(vec2), &uvBuffer[0]));
 
 	//
 	// Draw quad
@@ -277,8 +277,8 @@ void RenderSystem::drawTexture(GLTexture *texture, vec4 color, GLuint oglPrimiti
 	//
 	// Disable arrays after draw
 	//
-	OPENGL_CMD(glDisableVertexAttribArray(shader->vPosition));
-	OPENGL_CMD(glDisableVertexAttribArray(shader->vUV));
+	OPENGL_CMD(glDisableVertexAttribArray(GLShaderTextureColor::vPosition));
+	OPENGL_CMD(glDisableVertexAttribArray(GLShaderTextureColor::vUV));
 }
 
 void RenderSystem::drawTexture(GLTexture *texture, GLuint oglPrimitive, const vec3 *vertexBuffer, const vec2 *uvBuffer, int count) {
@@ -293,15 +293,15 @@ void RenderSystem::drawTexture(GLTexture *texture, GLuint oglPrimitive, const ve
 	//
 	// Set the vertex position attrib array
 	//
-	OPENGL_CMD(glEnableVertexAttribArray(shader->vPosition));
+	OPENGL_CMD(glEnableVertexAttribArray(GLShaderTextureColor::vPosition));
 
-	OPENGL_CMD(glVertexAttribPointer(shader->vPosition, 3, GL_FLOAT, false, sizeof(vec3), &vertexBuffer[0]));
+	OPENGL_CMD(glVertexAttribPointer(GLShaderTextureColor::vPosition, 3, GL_FLOAT, false, sizeof(vec3), &vertexBuffer[0]));
 
 	//
 	// Set the vertex uv attrib array
 	//
-	OPENGL_CMD(glEnableVertexAttribArray(shader->vUV));
-	OPENGL_CMD(glVertexAttribPointer(shader->vUV, 2, GL_FLOAT, false, sizeof(vec2), &uvBuffer[0]));
+	OPENGL_CMD(glEnableVertexAttribArray(GLShaderTextureColor::vUV));
+	OPENGL_CMD(glVertexAttribPointer(GLShaderTextureColor::vUV, 2, GL_FLOAT, false, sizeof(vec2), &uvBuffer[0]));
 
 	//
 	// Draw quad
@@ -311,8 +311,8 @@ void RenderSystem::drawTexture(GLTexture *texture, GLuint oglPrimitive, const ve
 	//
 	// Disable arrays after draw
 	//
-	OPENGL_CMD(glDisableVertexAttribArray(shader->vPosition));
-	OPENGL_CMD(glDisableVertexAttribArray(shader->vUV));
+	OPENGL_CMD(glDisableVertexAttribArray(GLShaderTextureColor::vPosition));
+	OPENGL_CMD(glDisableVertexAttribArray(GLShaderTextureColor::vUV));
 
 
 }
@@ -328,14 +328,14 @@ void RenderSystem::drawColor(GLuint oglPrimitive, const vec3 *vertexBuffer, cons
 	//
 	// Set the vertex position attrib array
 	//
-	OPENGL_CMD(glEnableVertexAttribArray(shaderVertexColor->vPosition));
-	OPENGL_CMD(glVertexAttribPointer(shaderVertexColor->vPosition, 3, GL_FLOAT, false, sizeof(vec3), &vertexBuffer[0]));
+    OPENGL_CMD(glEnableVertexAttribArray(GLShaderVertexColor::vPosition));
+	OPENGL_CMD(glVertexAttribPointer(GLShaderVertexColor::vPosition, 3, GL_FLOAT, false, sizeof(vec3), &vertexBuffer[0]));
 
 	//
 	// Set the vertex color attrib array
 	//
-	OPENGL_CMD(glEnableVertexAttribArray(shaderVertexColor->vColor));
-	OPENGL_CMD(glVertexAttribPointer(shaderVertexColor->vColor, 4, GL_FLOAT, false, sizeof(vec4), &colorBuffer[0]));
+	OPENGL_CMD(glEnableVertexAttribArray(GLShaderVertexColor::vColor));
+	OPENGL_CMD(glVertexAttribPointer(GLShaderVertexColor::vColor, 4, GL_FLOAT, false, sizeof(vec4), &colorBuffer[0]));
 
 	//
 	// Draw quad
@@ -345,8 +345,8 @@ void RenderSystem::drawColor(GLuint oglPrimitive, const vec3 *vertexBuffer, cons
 	//
 	// Disable arrays after draw
 	//
-	OPENGL_CMD(glDisableVertexAttribArray(shaderVertexColor->vPosition));
-	OPENGL_CMD(glDisableVertexAttribArray(shaderVertexColor->vColor));
+	OPENGL_CMD(glDisableVertexAttribArray(GLShaderVertexColor::vPosition));
+	OPENGL_CMD(glDisableVertexAttribArray(GLShaderVertexColor::vColor));
 
 
 

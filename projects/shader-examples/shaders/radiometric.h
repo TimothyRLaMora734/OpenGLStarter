@@ -33,8 +33,8 @@ public:
 	//
 	// vertex attrib
 	//
-	int aVec3Position;
-	int aVec2UV;
+	static const int aVec3Position = 0;
+	static const int aVec2UV = 1;
 
 	ShaderBrightnessContrast() :GLShader() {
 
@@ -77,8 +77,8 @@ public:
 
 		LoadShaderProgram(vertexShaderCode, fragmentShaderCode);
 
-		aVec3Position = getAttribLocation("aVec3Position");
-		aVec2UV = getAttribLocation("aVec2UV");
+		//aVec3Position = getAttribLocation("aVec3Position");
+		//aVec2UV = getAttribLocation("aVec2UV");
 
 		uSampler2DTexture = getUniformLocation("uSampler2DTexture");
 		uMat4ModelViewProjection = getUniformLocation("uMat4ModelViewProjection");
@@ -102,6 +102,15 @@ public:
 	void setContrast(float v) {
 		setUniform(uFloatContrast, v);
 	}
+    
+protected:
+    
+    void setupAttribLocation() {
+        
+        bindAttribLocation(ShaderBrightnessContrast::aVec3Position, "aVec3Position");
+        bindAttribLocation(ShaderBrightnessContrast::aVec2UV, "aVec2UV");
+    }
+    
 };
 
 class ShaderGrayScaleInternet : public GLShader {
@@ -119,8 +128,8 @@ public:
 	//
 	// vertex attrib
 	//
-	int aVec3Position;
-	int aVec2UV;
+	static const int aVec3Position = 0;
+	static const int aVec2UV = 1;
 
 	ShaderGrayScaleInternet() :GLShader() {
 
@@ -159,8 +168,8 @@ public:
 
 		LoadShaderProgram(vertexShaderCode, fragmentShaderCode);
 
-		aVec3Position = getAttribLocation("aVec3Position");
-		aVec2UV = getAttribLocation("aVec2UV");
+		//aVec3Position = getAttribLocation("aVec3Position");
+		//aVec2UV = getAttribLocation("aVec2UV");
 
 		uSampler2DTexture = getUniformLocation("uSampler2DTexture");
 		uMat4ModelViewProjection = getUniformLocation("uMat4ModelViewProjection");
@@ -174,6 +183,14 @@ public:
 	void setModelViewProjection(const mat4 &matrix) {
 		setUniform(uMat4ModelViewProjection, matrix);
 	}
+    
+protected:
+    
+    void setupAttribLocation() {
+        
+        bindAttribLocation(ShaderGrayScaleInternet::aVec3Position, "aVec3Position");
+        bindAttribLocation(ShaderGrayScaleInternet::aVec2UV, "aVec2UV");
+    }
 };
 
 class ShaderGrayScaleHumanVisualSystem : public GLShader {
@@ -191,8 +208,8 @@ public:
 	//
 	// vertex attrib
 	//
-	int aVec3Position;
-	int aVec2UV;
+	static const int aVec3Position = 0;
+	static const int aVec2UV = 1;
 
 	ShaderGrayScaleHumanVisualSystem() :GLShader() {
 
@@ -232,8 +249,8 @@ public:
 
 		LoadShaderProgram(vertexShaderCode, fragmentShaderCode);
 
-		aVec3Position = getAttribLocation("aVec3Position");
-		aVec2UV = getAttribLocation("aVec2UV");
+		//aVec3Position = getAttribLocation("aVec3Position");
+		//aVec2UV = getAttribLocation("aVec2UV");
 
 		uSampler2DTexture = getUniformLocation("uSampler2DTexture");
 		uMat4ModelViewProjection = getUniformLocation("uMat4ModelViewProjection");
@@ -247,6 +264,15 @@ public:
 	void setModelViewProjection(const mat4 &matrix) {
 		setUniform(uMat4ModelViewProjection, matrix);
 	}
+    
+protected:
+    
+    void setupAttribLocation() {
+        
+        bindAttribLocation(ShaderGrayScaleHumanVisualSystem::aVec3Position, "aVec3Position");
+        bindAttribLocation(ShaderGrayScaleHumanVisualSystem::aVec2UV, "aVec2UV");
+    }
+    
 };
 
 class ShaderGrayScaleHueSaturationValue : public GLShader {
@@ -264,8 +290,8 @@ public:
 	//
 	// vertex attrib
 	//
-	int aVec3Position;
-	int aVec2UV;
+	static const int aVec3Position = 0;
+	static const int aVec2UV = 1;
 
 	ShaderGrayScaleHueSaturationValue() :GLShader() {
 
@@ -304,8 +330,8 @@ public:
 
 		LoadShaderProgram(vertexShaderCode, fragmentShaderCode);
 
-		aVec3Position = getAttribLocation("aVec3Position");
-		aVec2UV = getAttribLocation("aVec2UV");
+		//aVec3Position = getAttribLocation("aVec3Position");
+		//aVec2UV = getAttribLocation("aVec2UV");
 
 		uSampler2DTexture = getUniformLocation("uSampler2DTexture");
 		uMat4ModelViewProjection = getUniformLocation("uMat4ModelViewProjection");
@@ -319,6 +345,14 @@ public:
 	void setModelViewProjection(const mat4 &matrix) {
 		setUniform(uMat4ModelViewProjection, matrix);
 	}
+    
+protected:
+    
+    void setupAttribLocation() {
+        
+        bindAttribLocation(ShaderGrayScaleHumanVisualSystem::aVec3Position, "aVec3Position");
+        bindAttribLocation(ShaderGrayScaleHumanVisualSystem::aVec2UV, "aVec2UV");
+    }
 };
 
 #endif

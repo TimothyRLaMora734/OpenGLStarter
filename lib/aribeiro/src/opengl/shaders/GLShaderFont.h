@@ -7,13 +7,17 @@ namespace aRibeiro {
 
 	class GLShaderFont : public GLShader {
 
+    protected:
+        
+        void setupAttribLocation();
+        
 	public:
 		//
 		// attrib locations
 		//
-		int vPosition;
-		int vColor;
-		int vUV;
+		static const int vPosition = 0;
+		static const int vColor = 1;
+		static const int vUV = 2;
 
 		//
 		// uniform locations

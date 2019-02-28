@@ -170,11 +170,11 @@ void App::drawPrimitive( GLuint oglPrimitive, const mat4 &modelViewProjection, c
     renderState->CurrentShader = shaderVertexColor;
     
     shaderVertexColor->setMatrix(modelViewProjection);
-    OPENGL_CMD(glEnableVertexAttribArray(shaderVertexColor->vPosition));
-    OPENGL_CMD(glVertexAttribPointer(shaderVertexColor->vPosition, 3, GL_FLOAT, false, sizeof(vec3), &vertexBuffer[0]));
-    OPENGL_CMD(glEnableVertexAttribArray(shaderVertexColor->vColor));
-    OPENGL_CMD(glVertexAttribPointer(shaderVertexColor->vColor, 4, GL_FLOAT, false, sizeof(vec4), &colorBuffer[0]));
+    OPENGL_CMD(glEnableVertexAttribArray(GLShaderVertexColor::vPosition));
+    OPENGL_CMD(glVertexAttribPointer(GLShaderVertexColor::vPosition, 3, GL_FLOAT, false, sizeof(vec3), &vertexBuffer[0]));
+    OPENGL_CMD(glEnableVertexAttribArray(GLShaderVertexColor::vColor));
+    OPENGL_CMD(glVertexAttribPointer(GLShaderVertexColor::vColor, 4, GL_FLOAT, false, sizeof(vec4), &colorBuffer[0]));
     OPENGL_CMD(glDrawArrays(oglPrimitive, 0, count));
-    OPENGL_CMD(glDisableVertexAttribArray(shaderVertexColor->vPosition));
-    OPENGL_CMD(glDisableVertexAttribArray(shaderVertexColor->vColor));
+    OPENGL_CMD(glDisableVertexAttribArray(GLShaderVertexColor::vPosition));
+    OPENGL_CMD(glDisableVertexAttribArray(GLShaderVertexColor::vColor));
 }

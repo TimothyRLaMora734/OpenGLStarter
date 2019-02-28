@@ -124,20 +124,20 @@ namespace aRibeiro {
 		globalShader->enable();
 		globalShader->setTexture(0);
 
-		OPENGL_CMD(glEnableVertexAttribArray(globalShader->vPosition));
-		OPENGL_CMD(glVertexAttribPointer(globalShader->vPosition, 2, GL_FLOAT, false, sizeof(VertexAttrib), &mModelBuffer[0].pos));
+        OPENGL_CMD(glEnableVertexAttribArray(GLShaderFont::vPosition));
+		OPENGL_CMD(glVertexAttribPointer(GLShaderFont::vPosition, 2, GL_FLOAT, false, sizeof(VertexAttrib), &mModelBuffer[0].pos));
 
-		OPENGL_CMD(glEnableVertexAttribArray(globalShader->vUV));
-		OPENGL_CMD(glVertexAttribPointer(globalShader->vUV, 2, GL_FLOAT, false, sizeof(VertexAttrib), &mModelBuffer[0].uv));
+		OPENGL_CMD(glEnableVertexAttribArray(GLShaderFont::vUV));
+		OPENGL_CMD(glVertexAttribPointer(GLShaderFont::vUV, 2, GL_FLOAT, false, sizeof(VertexAttrib), &mModelBuffer[0].uv));
 
-		OPENGL_CMD(glEnableVertexAttribArray(globalShader->vColor));
-		OPENGL_CMD(glVertexAttribPointer(globalShader->vColor, 4, GL_FLOAT, false, sizeof(VertexAttrib), &mModelBuffer[0].color));
+		OPENGL_CMD(glEnableVertexAttribArray(GLShaderFont::vColor));
+		OPENGL_CMD(glVertexAttribPointer(GLShaderFont::vColor, 4, GL_FLOAT, false, sizeof(VertexAttrib), &mModelBuffer[0].color));
 
 		OPENGL_CMD(glDrawArrays(GL_TRIANGLES, 0, mModelBuffer.size()));
 
-		OPENGL_CMD(glDisableVertexAttribArray(globalShader->vPosition));
-		OPENGL_CMD(glDisableVertexAttribArray(globalShader->vUV));
-		OPENGL_CMD(glDisableVertexAttribArray(globalShader->vColor));
+		OPENGL_CMD(glDisableVertexAttribArray(GLShaderFont::vPosition));
+		OPENGL_CMD(glDisableVertexAttribArray(GLShaderFont::vUV));
+		OPENGL_CMD(glDisableVertexAttribArray(GLShaderFont::vColor));
 
 		texture.deactive(0);
 		//globalShader->disable();
