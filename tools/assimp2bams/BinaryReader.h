@@ -9,6 +9,7 @@
 
 #include <zlib/zlib.h>
 #include "MD5.h"
+#include "string.h" // memcmp
 
 class BinaryReader {
 
@@ -36,29 +37,29 @@ public:
 			fclose(in);
 
 			if (compressed) {
-                
+
                 if (buffer.size() < sizeof(unsigned char)*16 + sizeof(unsigned int) )
                 {
                     fprintf(stderr, "[%s:%i]\n", __FILE__, __LINE__);
                     fprintf(stderr,"Error to open file: %s\n", filename);
                     exit(-1);
                 }
-                
+
 				std::vector<char> zlibInputBuffer(buffer);
-                
+
                 unsigned char *md5_from_file = (unsigned char *)&zlibInputBuffer[0];
                 //
                 // Check the MD5 before create the uncompressed buffer
                 //
                 unsigned char md5[16];
                 MD5::get16bytesHashFromBytes(&zlibInputBuffer[sizeof(unsigned char)*16], zlibInputBuffer.size() - sizeof(unsigned char)*16 , md5);
-                
+
                 if (memcmp(md5_from_file, md5,sizeof(unsigned char)*16) != 0){
                     fprintf(stderr, "[%s:%i]\n", __FILE__, __LINE__);
                     fprintf(stderr,"File is corrupted: %s\n", filename);
                     exit(-1);
                 }
-				
+
 				uLongf zlibUncompressed_Length = (uLongf)(*((unsigned int*)&zlibInputBuffer[sizeof(unsigned char)*16]));
 
 				buffer.resize(zlibUncompressed_Length);
@@ -94,7 +95,7 @@ public:
 		if (eof())
 			return T();
 		T result;
-		
+
 		memcpy(&result, &buffer[readPos], sizeof(T));
 		readPos += sizeof(T);
 
