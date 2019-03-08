@@ -7,7 +7,7 @@
 #include <aribeiro/vec3.h>
 
 namespace aRibeiro {
-
+namespace collision {
 	class AABB;
 	class Plane;
 	class Sphere;
@@ -24,14 +24,15 @@ namespace aRibeiro {
 		//
 		// Cloned methods from other collision classes
 		//
-		static bool raycastAABB(const Ray &r, const AABB& a, float *outTmin);
-		static bool raycastPlane(const Ray &r, const Plane &plane, float *outT);
-		static bool raycastSphere(const Ray &r, const Sphere &sphere, float *outT);
-		static bool raycastTriangle(const Ray &ray, const vec3 &a, const vec3 &b, const vec3&c, float *outT);
-		static bool raycastTriangle(const Ray &ray, const Triangle &t, float *outT);
+		static bool raycastAABB(const Ray &r, const AABB& a, float *outTmin, vec3 *outNormal);
+		static bool raycastPlane(const Ray &r, const Plane &plane, float *outT, vec3 *outNormal);
+		static bool raycastSphere(const Ray &r, const Sphere &sphere, float *outT, vec3 *outNormal);
+		static bool raycastTriangle(const Ray &ray, const vec3 &a, const vec3 &b, const vec3&c, float *outT, vec3 *outNormal);
+		static bool raycastTriangle(const Ray &ray, const Triangle &t, float *outT, vec3 *outNormal);
 
 	};
 
+}
 }
 
 

@@ -6,6 +6,8 @@
 
 namespace aRibeiro {
 	
+namespace collision {
+        
 	class Ray;
 	class LineSegment;
 	class AABB;
@@ -20,12 +22,14 @@ namespace aRibeiro {
 
 		Sphere();
 		Sphere(const vec3 &center, float radius);
+        
+        static bool sphereOverlapsSphere(const Sphere& a,const Sphere& b);
 
 		static Sphere joinSpheres(const Sphere &s0, const Sphere &s1);
 
 		// Intersects ray r = p + td, |d| = 1, with sphere s and, if intersecting,
 		// returns t value of intersection and intersection point q
-		static bool raycastSphere(const Ray &r, const Sphere &sphere, float *outT);
+		static bool raycastSphere(const Ray &r, const Sphere &sphere, float *outT, vec3 *outNormal);
 		static bool segmentIntersectsSphere(const vec3& p, const vec3& q, const Sphere &sphere);
 		static bool segmentIntersectsSphere(const LineSegment& ls, const Sphere &sphere);
 		static bool pointInsideSphere(const vec3& p, const Sphere &sphere);
@@ -40,6 +44,8 @@ namespace aRibeiro {
 
 
 	};
+}
+    
 }
 
 #endif

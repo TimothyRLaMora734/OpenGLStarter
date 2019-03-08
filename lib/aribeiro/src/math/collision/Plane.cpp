@@ -4,7 +4,7 @@
 
 
 namespace aRibeiro {
-
+namespace collision {
 	Plane::Plane() {
 		normal = vec3(0, 1, 0);
 		distance = 0.0f;
@@ -60,7 +60,7 @@ namespace aRibeiro {
 		return q - t * plane.normal;
 	}
 
-	bool Plane::raycastPlane(const Ray &ray, const Plane &plane, float *outT) {
+	bool Plane::raycastPlane(const Ray &ray, const Plane &plane, float *outT, vec3 *outNormal) {
 		float aux_vd, v0, t;
 		aux_vd = dot(plane.normal, ray.dir);
 		if (aux_vd >= -EPSILON)
@@ -75,6 +75,7 @@ namespace aRibeiro {
 		t = v0 / aux_vd;
 
 		*outT = t;
+        *outNormal = plane.normal;
 		return true;
 	}
 
@@ -129,4 +130,5 @@ namespace aRibeiro {
 		return AABB::planeIntersectsAABB(plane, b);
 	}
 
+}
 }

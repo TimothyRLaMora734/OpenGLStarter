@@ -4,7 +4,7 @@
 
 namespace aRibeiro {
 
-
+namespace collision {
 	Sphere::Sphere() {
 		radius = 1.0f;
 	}
@@ -13,6 +13,11 @@ namespace aRibeiro {
 		this->center = center;
 		this->radius = radius;
 	}
+    
+    bool Sphere::sphereOverlapsSphere(const Sphere& a,const Sphere& b) {
+        float totalRadius = a.radius+b.radius;
+        return sqrLength(a.center - b.center) <= totalRadius * totalRadius;
+    }
 
 	Sphere Sphere::joinSpheres(const Sphere &s0, const Sphere &s1)
 	{
@@ -43,7 +48,7 @@ namespace aRibeiro {
 
 	// Intersects ray r = p + td, |d| = 1, with sphere s and, if intersecting,
 	// returns t value of intersection and intersection point q
-	bool Sphere::raycastSphere(const Ray &ray, const Sphere &sphere, float *outT)
+	bool Sphere::raycastSphere(const Ray &ray, const Sphere &sphere, float *outT, vec3 *outNormal)
 	{
 		vec3 m = ray.origin - sphere.center;
 		float b = dot(m, ray.dir);
@@ -62,6 +67,7 @@ namespace aRibeiro {
 			t = 0.0f;
 		//q = p + t * d;
 		*outT = t;
+        *outNormal = normalize((ray.origin + ray.dir * t) - sphere.center);
 		return true;
 	}
 
@@ -78,7 +84,8 @@ namespace aRibeiro {
 			return pointInsideSphere(p, sphere);
 		}
 
-		if (raycastSphere( Ray(p, pq), sphere, &t )) {
+        vec3 n;
+		if (raycastSphere( Ray(p, pq), sphere, &t, &n )) {
 			return (t < lengthPQ);
 		}
 		return false;
@@ -120,4 +127,5 @@ namespace aRibeiro {
 		return result;
 	}
 
+}
 }

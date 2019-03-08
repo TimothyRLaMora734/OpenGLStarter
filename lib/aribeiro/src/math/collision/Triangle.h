@@ -5,7 +5,7 @@
 #include <aribeiro/vec3.h>
 
 namespace aRibeiro {
-
+namespace collision {
 	class Ray;
 	class Sphere;
 	class LineSegment;
@@ -20,8 +20,8 @@ namespace aRibeiro {
 		Triangle();
 		Triangle(const vec3 &a, const vec3 &b, const vec3 &c);
 
-		static bool raycastTriangle(const Ray &ray, const vec3 &a, const vec3 &b, const vec3&c, float *outT);
-		static bool raycastTriangle(const Ray &ray, const Triangle &t, float *outT);
+		static bool raycastTriangle(const Ray &ray, const vec3 &a, const vec3 &b, const vec3&c, float *outT, vec3 *outNormal);
+		static bool raycastTriangle(const Ray &ray, const Triangle &t, float *outT, vec3 *outNormal);
 
 		//returns the closest point inside the triangle relative to the parameter p
 		static vec3 closestPointToTriangle(const vec3& p, const vec3& a, const vec3& b, const vec3& c);
@@ -61,6 +61,7 @@ namespace aRibeiro {
 
 	};
 
+}
 }
 
 #endif

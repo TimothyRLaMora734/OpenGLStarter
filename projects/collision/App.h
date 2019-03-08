@@ -4,40 +4,49 @@
 #include <aribeiro/aribeiro.h>
 using namespace aRibeiro;
 
-#include "Size.h"
+#include "util/AppBase.h"
+#include "util/GLRenderState.h"
+//#include "Models.h"
 
-#include <SFML/Window.hpp>
-
-BEGIN_DECLARE_DELEGATE(MouseEvent, sf::Mouse::Button button, vec2 pos) CALL_PATTERN(button, pos) END_DECLARE_DELEGATE;
-BEGIN_DECLARE_DELEGATE(KeyboardEvent, sf::Keyboard::Key code) CALL_PATTERN(code) END_DECLARE_DELEGATE;
-BEGIN_DECLARE_DELEGATE(CallEvent) CALL_PATTERN() END_DECLARE_DELEGATE;
-
-class App {
-
-	void OnWindowSizeChanged(Property<iSize> *prop);
+class App : public AppBase {
+    // render state
+    GLRenderState *renderState;
+    //
+    // time processor
+    //
+    PlatformTime time;
+    //
+    // default drawing shader
+    //
+    GLShaderColor *shaderColor;
+    //
+    // auxiliary matrix
+    //
+    mat4 projection;
+    mat4 camera;
+    TransformStack<mat4> modelHierarchy;
+    //
+    // input helper
+    //
+    PressReleaseDetector left,right,up,down;
+    //
+    // auxiliary variables
+    //
+    bool rotateCounterClockwise;
+    float angle_rad;
+    vec3 cameraPosition;
+    vec3 objectPosition;
+    
+    void processInput();
+    
+    void OnWindowResize(Property<iSize> *prop);
+    
+    void drawPrimitive(GLuint oglPrimitive, const mat4 &modelViewProjection, const vec3 vertexBuffer[], const vec4 &color, int count);
 
 public:
-	bool canExitApplication;
-
-	//
-	// Properties
-	//
-	Property<iSize> WindowSize;
-	Property<vec2> MousePos;
-
-	//
-	// Events
-	//
-	MouseEvent OnMouseDown;
-	MouseEvent OnMouseUp;
-	CallEvent OnMouseWheelUp;
-	CallEvent OnMouseWheelDown;
-	KeyboardEvent OnKeyDown;
-	KeyboardEvent OnKeyUp;
-	
-	App(int w, int h);
+    App(int w, int h);
 	virtual ~App();
-	void draw();
+	virtual void draw();
 };
 
 #endif

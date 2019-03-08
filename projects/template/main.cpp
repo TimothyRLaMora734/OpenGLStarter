@@ -148,7 +148,7 @@ int main(int argc, char* argv[]) {
 
 		swprintf(text, 1024, L"%.0f fps", 1.0f / time.unscaledDeltaTime);
 
-		AABB aabb = font->computeBounds(text);
+        collision::AABB aabb = font->computeBounds(text);
 		vec3 center = -aabb.max_box * 0.5f;
 
 		float fontSize = (1.0f / font->getLineHeight()) * 2.0f;

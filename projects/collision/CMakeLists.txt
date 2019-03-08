@@ -1,30 +1,23 @@
 PROJECT( collision )
 
 # Getting the source files
-FILE( GLOB sources *.cpp)
-FILE( GLOB headers *.h )
+FILE( GLOB src *.h *.cpp)
+FILE( GLOB src_util util/*.h util/*.cpp)
 
 add_executable(${PROJECT_NAME}
-		${sources}
-		${headers}
+${src}
+${src_util}
 )
 
-source_group("" FILES ${sources} ${headers})
+source_group("" FILES ${src})
+source_group("util" FILES ${src_util})
 
 # set the target's folder (for IDEs that support it, e.g. Visual Studio)
 set_target_properties(${PROJECT_NAME} PROPERTIES FOLDER "TESTS")
 
-# Setting dependencies
-# add_dependencies( ${PROJECT_NAME} aSilva assimp )
-
 # Linking libraries
-target_link_libraries(${PROJECT_NAME} 
-	aribeiro
-	${ARIBEIRO_LIBRARIES}
-	sfml-window sfml-graphics
-	
+target_link_libraries(${PROJECT_NAME}
+aribeiro
+${ARIBEIRO_LIBRARIES}
+sfml-window sfml-graphics
 )
-
-#PostBuildCopyFile( ${PROJECT_NAME} goudy_bookletter_1911.otf )
-
-

@@ -61,11 +61,11 @@ namespace aRibeiro {
 		void print(const vec4& color, const wchar_t* string);
 		void print(const vec3& color, const wchar_t* string);
 
-		AABB computeBounds(const wchar_t* string);
-		AABB computeBounds(const char* string);
+		collision::AABB computeBounds(const wchar_t* string);
+		collision::AABB computeBounds(const char* string);
 
-		AABB computeBoundsJustBox(const wchar_t* string);
-		AABB computeBoundsJustBox(const char* string);
+		collision::AABB computeBoundsJustBox(const wchar_t* string);
+		collision::AABB computeBoundsJustBox(const char* string);
 
 		GLStripText* createGLStripText(const wchar_t* string);
 

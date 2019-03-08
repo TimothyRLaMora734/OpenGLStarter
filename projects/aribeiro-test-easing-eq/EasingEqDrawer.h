@@ -62,7 +62,7 @@ class EasingEqDrawer {
 		//draw font
 		const mat4 fontTransform = translate(0.5f, 1.0f, 0) * scale(0.0025f, 0.0025f, 0.0025f);
 		
-		AABB aabb = font->computeBounds(text);
+		collision::AABB aabb = font->computeBounds(text);
 		vec3 center = -aabb.max_box * 0.5f;
 		center.y += font->getLineHeight();
 

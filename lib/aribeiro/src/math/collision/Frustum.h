@@ -9,7 +9,7 @@
 #include <aribeiro/Plane.h>
 
 namespace aRibeiro {
-	
+namespace collision {
 	class Sphere;
 	class AABB;
 
@@ -36,7 +36,7 @@ namespace aRibeiro {
 
 
 	};
-
+}
 }
 
 

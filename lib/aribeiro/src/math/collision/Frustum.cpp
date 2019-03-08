@@ -4,7 +4,7 @@
 
 namespace aRibeiro {
 
-    
+namespace collision {
     static inline void projectOnAxis(const vec3 *points, int count, const vec3 &axis, float *outMin, float *outMax)
     {
         float min = FLT_MAX;// double.PositiveInfinity;
@@ -178,5 +178,6 @@ namespace aRibeiro {
         */
 	}
 
+}
 
 }

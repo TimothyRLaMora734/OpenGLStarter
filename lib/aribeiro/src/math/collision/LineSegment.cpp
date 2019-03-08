@@ -3,7 +3,7 @@
 #include <aribeiro/all_math.h>
 
 namespace aRibeiro {
-
+namespace collision {
 	LineSegment::LineSegment() {
 
 	}
@@ -84,4 +84,5 @@ namespace aRibeiro {
 		return Triangle::segmentIntersectsTriangle(p, q, t, u, v, w);
 	}
 
+}
 }

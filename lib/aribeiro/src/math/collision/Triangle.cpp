@@ -3,7 +3,7 @@
 #include <aribeiro/all_math.h>
 
 namespace aRibeiro {
-
+namespace collision {
 	Triangle::Triangle() {
 
 	}
@@ -15,7 +15,7 @@ namespace aRibeiro {
 	}
 
 	//https://en.wikipedia.org/wiki/M%C3%B6ller%E2%80%93Trumbore_intersection_algorithm
-	bool Triangle::raycastTriangle(const Ray &ray, const vec3 &vertex0, const vec3 &vertex1, const vec3&vertex2, float *outT) {
+	bool Triangle::raycastTriangle(const Ray &ray, const vec3 &vertex0, const vec3 &vertex1, const vec3&vertex2, float *outT, vec3 *outNormal) {
 
 		const float EPSILON = 1e-6f;// 0.0000001;
 		vec3 edge1, edge2, h, s, q;
@@ -42,6 +42,7 @@ namespace aRibeiro {
 		if (t > EPSILON) // ray intersection
 		{
 			*outT = t;
+            *outNormal = normalize(cross(edge1,edge2));
 			//outIntersectionPoint = r_origin + r_dir * t;
 			return true;
 		}
@@ -49,8 +50,8 @@ namespace aRibeiro {
 			return false;
 	}
 
-	bool Triangle::raycastTriangle(const Ray &ray, const Triangle &t, float *outT) {
-		return raycastTriangle(ray, t.a, t.b, t.c, outT);
+	bool Triangle::raycastTriangle(const Ray &ray, const Triangle &t, float *outT, vec3 *outNormal) {
+		return raycastTriangle(ray, t.a, t.b, t.c, outT, outNormal);
 	}
 
 	vec3 Triangle::closestPointToTriangle(const vec3& p, const vec3& a, const vec3& b, const vec3& c) {
@@ -203,4 +204,5 @@ namespace aRibeiro {
 		return AABB::triangleIntersectsAABB(triangle.a, triangle.b, triangle.c, box);
 	}
 
+}
 }

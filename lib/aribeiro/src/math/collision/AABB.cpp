@@ -3,7 +3,7 @@
 
 namespace aRibeiro {
 
-
+namespace collision {
 	//--------------------------------------------------------------------------
 	AABB::AABB(const vec3 &a, const vec3 &b) {
 		if (a.x < b.x) {
@@ -160,10 +160,10 @@ namespace aRibeiro {
 
 	// Intersect ray R(t) = p + t*d against AABB a. When intersecting,
 	// return intersection distance tmin and point q of intersection
-	bool AABB::raycastAABB(const Ray &r, const AABB& a, float *outTmin) {
+	bool AABB::raycastAABB(const Ray &r, const AABB& a, float *outTmin, vec3 *outNormal) {
 
 		const float EPSILON = 0.002f;
-
+        int tminIndex = -1;
 		float tmin = 0.0f;// set to -FLT_MAX to get first hit on line
 		float tmax = FLT_MAX; // set to max distance ray can travel (for segment)
 		// For all three slabs
@@ -186,8 +186,10 @@ namespace aRibeiro {
 					t2 = taux;
 				}
 				// Compute the intersection of slab intersection intervals
-				if (t1 > tmin)
+                if (t1 > tmin){
 					tmin = t1;
+                    tminIndex = i;
+                }
 				if (t2 < tmax)
 					tmax = t2;
 				// Exit with no collision as soon as slab intersection becomes empty
@@ -197,6 +199,12 @@ namespace aRibeiro {
 		}
 		// Ray intersects all 3 slabs. Return point (q) and intersection t value (tmin)
 		*outTmin = tmin;
+        if (tminIndex == 0)
+            *outNormal = vec3(-sign(r.dir.x),0.0f,0.0f);
+        else if (tminIndex == 1)
+            *outNormal = vec3(0.0f,-sign(r.dir.y),0.0f);
+        else if (tminIndex == 2)
+            *outNormal = vec3(0.0f,0.0f,-sign(r.dir.z));
 		//*outQ = p + d * tmin;
 		return true;
 	}
@@ -398,6 +406,7 @@ namespace aRibeiro {
 		return Frustum::aabbOverlapsFrustum(aabb, f);
 	}
 
+}
 
 }
 

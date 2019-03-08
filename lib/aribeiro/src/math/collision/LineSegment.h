@@ -6,6 +6,8 @@
 
 namespace aRibeiro {
 
+namespace collision {
+        
 	class AABB;
 	class Plane;
 	class Sphere;
@@ -60,6 +62,7 @@ namespace aRibeiro {
 
 	};
 
+}
 }
 
 #endif

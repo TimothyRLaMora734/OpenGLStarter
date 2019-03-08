@@ -5,10 +5,14 @@
 
 //I need a complete definition to instantiate a vec3 as class field
 #include <aribeiro/vec3.h>
+#include <aribeiro/vec2.h>
 
 namespace aRibeiro {
 
-class vec2;
+//class vec2;
+    
+namespace collision {
+        
 class Sphere;
 class LineSegment;
 class Plane;
@@ -138,7 +142,7 @@ class ARIBEIRO_API AABB{
 
 	// Intersect ray R(t) = p + t*d against AABB a. When intersecting,
 	// return intersection distance tmin and point q of intersection
-	static bool raycastAABB(const Ray &r, const AABB& a, float *outTmin);
+	static bool raycastAABB(const Ray &r, const AABB& a, float *outTmin, vec3 *outNormal);
 
 	// Test if segment specified by points p0 and p1 intersects AABB b
 	static bool segmentIntersectsAABB(const vec3& p0, const vec3& p1, const AABB &b);
@@ -159,6 +163,8 @@ class ARIBEIRO_API AABB{
 
 };
 
+}
+    
 }
 
 #endif

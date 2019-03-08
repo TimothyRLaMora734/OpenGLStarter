@@ -13,6 +13,7 @@
 
 #include <aribeiro/aribeiro.h>
 using namespace aRibeiro;
+using namespace collision;
 
 #include <SFML/System.hpp>
 #include <SFML/Window.hpp>

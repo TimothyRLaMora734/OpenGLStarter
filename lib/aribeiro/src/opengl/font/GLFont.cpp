@@ -171,7 +171,7 @@ else { \
 }
 
 
-	AABB GLFont::computeBounds(const wchar_t* string) {
+	collision::AABB GLFont::computeBounds(const wchar_t* string) {
 		std::map<UTF32, GLFontGlyphInfo>::iterator it;
 
 		bool first = true;
@@ -225,17 +225,17 @@ else { \
 				checkMinMax(p)
 			}
 		}
-		return AABB(min, max);
+		return collision::AABB(min, max);
 	}
 
-	AABB GLFont::computeBounds(const char* string) {
+	collision::AABB GLFont::computeBounds(const char* string) {
 		std::string text(string);
 		std::wstring wText(text.begin(), text.end());
 
 		return computeBounds(wText.c_str());
 	}
 
-	AABB GLFont::computeBoundsJustBox(const wchar_t* string) {
+	collision::AABB GLFont::computeBoundsJustBox(const wchar_t* string) {
 		std::map<UTF32, GLFontGlyphInfo>::iterator it;
 
 		bool first = true;
@@ -271,10 +271,10 @@ else { \
 				checkMinMax(p)
 			}
 		}
-		return AABB(min, max);
+		return collision::AABB(min, max);
 	}
 
-	AABB GLFont::computeBoundsJustBox(const char* string) {
+	collision::AABB GLFont::computeBoundsJustBox(const char* string) {
 		std::string text(string);
 		std::wstring wText(text.begin(), text.end());
 
