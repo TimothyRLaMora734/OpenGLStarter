@@ -6,17 +6,22 @@ using namespace aRibeiro;
 
 #include "Size.h"
 
+#include <SFML/System.hpp>
 #include <SFML/Window.hpp>
+#include <SFML/Graphics.hpp>
 
 BEGIN_DECLARE_DELEGATE(MouseEvent, sf::Mouse::Button button, vec2 pos) CALL_PATTERN(button, pos) END_DECLARE_DELEGATE;
 BEGIN_DECLARE_DELEGATE(KeyboardEvent, sf::Keyboard::Key code) CALL_PATTERN(code) END_DECLARE_DELEGATE;
 BEGIN_DECLARE_DELEGATE(CallEvent) CALL_PATTERN() END_DECLARE_DELEGATE;
+BEGIN_DECLARE_DELEGATE(UpdateEvent, PlatformTime *time) CALL_PATTERN(time) END_DECLARE_DELEGATE;
 
 class AppBase {
 
 	void OnWindowSizeChanged(Property<iSize> *prop);
 
 public:
+	sf::RenderWindow *window;
+
 	bool canExitApplication;
 
 	//
@@ -34,8 +39,11 @@ public:
 	CallEvent OnMouseWheelDown;
 	KeyboardEvent OnKeyDown;
 	KeyboardEvent OnKeyUp;
+
+	UpdateEvent OnUpdate;
+	UpdateEvent OnLateUpdate;
 	
-	AppBase(int w, int h);
+	AppBase(sf::RenderWindow *window, int w, int h);
 	virtual ~AppBase();
 	virtual void draw();
 };

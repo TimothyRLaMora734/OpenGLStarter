@@ -2,18 +2,22 @@
 using namespace aRibeiro;
 #include "App.h"
 
-App::App(int w, int h):AppBase(w,h){
+App::App(sf::RenderWindow *window, int w, int h):
+	AppBase(window,w,h),
+	freeMoveCamera(this)
+{
     renderState = GLRenderState::getInstance();
     
     shaderColor = new GLShaderColor();
     
     //initialize all matrix
-    projection = mat4::IdentityMatrix;
-    camera = mat4::IdentityMatrix;
+    //projection = mat4::IdentityMatrix;
+    //camera = mat4::IdentityMatrix;
     modelHierarchy = mat4::IdentityMatrix;
     
     //initialize auxiliary variables
-    cameraPosition = vec3(0.0f,0.4f,2.0f);
+    //cameraPosition = vec3(0.0f,0.4f,2.0f);
+	freeMoveCamera.position = vec3(0.0f, 0.4f, 2.0f);
     angle_rad = 0;
     rotateCounterClockwise = true;
     objectPosition = vec3(0,-1.5f,-1);
@@ -37,11 +41,12 @@ App::~App(){
 void App::OnWindowResize(Property<iSize> *prop){
     iSize size = prop->value;
     // configure the projection
-    projection = projection_perspective(60.0f, (float)size.x/(float)size.y, 0.01f, 10.0f);
+    //projection = projection_perspective(60.0f, (float)size.x/(float)size.y, 0.01f, 10.0f);
 }
 
 void App::draw() {
     time.update();
+	OnUpdate(&time);
     processInput();
     
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
@@ -54,8 +59,8 @@ void App::draw() {
     angle_rad = fmod(angle_rad, 2.0*PI*10.0f);
 
     //compute the camera projection matrix
-    camera = inv(translate(cameraPosition));
-    mat4 viewProjection = (mat4)projection * (mat4)camera;
+    //camera = inv(translate(cameraPosition));
+	mat4 viewProjection = freeMoveCamera.computeViewProjectionMatrix();
     
     //setup hierarchy models and draw
     modelHierarchy = mat4::IdentityMatrix;//reset transform
@@ -127,6 +132,9 @@ void App::draw() {
 
     if (sqrDistance(objectPosition,vec3(0,1,-1)) <= 1e-6f)
         objectPosition = vec3(0,-1.5f,-1);
+
+
+	OnLateUpdate(&time);
 }
 
 void App::processInput() {
@@ -140,12 +148,13 @@ void App::processInput() {
     if (right.down)
         rotateCounterClockwise = false;
     
+	/*
     const float speed = 3.0f;
     if (up.pressed)
         cameraPosition.z -= time.deltaTime * speed;
     if (down.pressed)
         cameraPosition.z += time.deltaTime * speed;
-    /*
+    
      if (left.pressed)
      cameraPosition.x -= time.deltaTime * speed;
      if (right.pressed)

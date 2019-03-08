@@ -7,7 +7,8 @@ using namespace aRibeiro;
 
 #include "GLRenderState.h"
 
-AppBase::AppBase(int w,int h) {
+AppBase::AppBase(sf::RenderWindow *window, int w,int h) {
+	this->window = window;
 	GLRenderState *renderState = GLRenderState::getInstance();
 	renderState->initialize(w,h);
 

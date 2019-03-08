@@ -114,7 +114,7 @@ int main(int argc, char* argv[]) {
     //
     // Data structures
     //
-    app = new App(window.getSize().x, window.getSize().y);
+    app = new App(&window, window.getSize().x, window.getSize().y);
     
     //app->WindowSize = iSize(window.getSize().x, window.getSize().y);
     //app->OnSetSize.call(window.getSize().x, window.getSize().y);
@@ -189,12 +189,12 @@ void processSingleEvent(sf::RenderWindow &window, sf::Event &event) {
     }
     
     if (event.type == sf::Event::KeyPressed) {
-        printf("key pressed: %d \n", event.key.code);
+        //printf("key pressed: %d \n", event.key.code);
         app->OnKeyDown(event.key.code);
     }
     
     if (event.type == sf::Event::KeyReleased) {
-        printf("key released: %d \n", event.key.code);
+        //printf("key released: %d \n", event.key.code);
         app->OnKeyUp(event.key.code);
     }
     
@@ -204,22 +204,22 @@ void processSingleEvent(sf::RenderWindow &window, sf::Event &event) {
     }
     
     if (event.type == sf::Event::JoystickButtonPressed) {
-        printf("joy: %d btn: %d\n", event.joystickButton.joystickId, event.joystickButton.button);
+        //printf("joy: %d btn: %d\n", event.joystickButton.joystickId, event.joystickButton.button);
     }
     
     if (event.type == sf::Event::MouseButtonPressed) {
-        printf(" press: %d %d \n", event.mouseButton.x, event.mouseButton.y);
+        //printf(" press: %d %d \n", event.mouseButton.x, event.mouseButton.y);
         app->OnMouseDown(event.mouseButton.button, vec2(event.mouseButton.x, window.getSize().y - 1 - event.mouseButton.y));
     }
     
     if (event.type == sf::Event::MouseButtonReleased) {
-        printf(" release: %d %d \n", event.mouseButton.x, event.mouseButton.y);
+        //printf(" release: %d %d \n", event.mouseButton.x, event.mouseButton.y);
         app->OnMouseUp(event.mouseButton.button, vec2(event.mouseButton.x, window.getSize().y - 1 - event.mouseButton.y));
     }
     
     if (event.type == sf::Event::MouseMoved) {
         //int y = (int)window.getSize().y -1 - event.mouseMove.y;
-        printf(" move: %d %d \n", event.mouseMove.x, event.mouseMove.y);
+        //printf(" move: %d %d \n", event.mouseMove.x, event.mouseMove.y);
         //app->mouseMove(event.mouseMove.x, event.mouseMove.y);
         //app->OnMouseMove.call(vec2(event.mouseMove.x, window.getSize().y - 1 - event.mouseMove.y));
         
@@ -227,7 +227,7 @@ void processSingleEvent(sf::RenderWindow &window, sf::Event &event) {
     }
     
     if (event.type == sf::Event::MouseWheelScrolled) {
-        printf(" wheel: %f \n", event.mouseWheelScroll.delta);
+        //printf(" wheel: %f \n", event.mouseWheelScroll.delta);
         if (event.mouseWheelScroll.delta > 0.9)
             app->OnMouseWheelUp();
         else if (event.mouseWheelScroll.delta < -0.9)

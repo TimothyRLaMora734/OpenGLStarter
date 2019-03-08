@@ -6,9 +6,18 @@ using namespace aRibeiro;
 
 #include "util/AppBase.h"
 #include "util/GLRenderState.h"
-//#include "Models.h"
+#include "util/FreeMoveCamera.h"
+#include "Models.h"
+
+#include <SFML/System.hpp>
+#include <SFML/Window.hpp>
+#include <SFML/Graphics.hpp>
 
 class App : public AppBase {
+
+
+	FreeMoveCamera freeMoveCamera;
+
     // render state
     GLRenderState *renderState;
     //
@@ -22,8 +31,8 @@ class App : public AppBase {
     //
     // auxiliary matrix
     //
-    mat4 projection;
-    mat4 camera;
+    //mat4 projection;
+    //mat4 camera;
     TransformStack<mat4> modelHierarchy;
     //
     // input helper
@@ -34,7 +43,7 @@ class App : public AppBase {
     //
     bool rotateCounterClockwise;
     float angle_rad;
-    vec3 cameraPosition;
+    //vec3 cameraPosition;
     vec3 objectPosition;
     
     void processInput();
@@ -44,9 +53,13 @@ class App : public AppBase {
     void drawPrimitive(GLuint oglPrimitive, const mat4 &modelViewProjection, const vec3 vertexBuffer[], const vec4 &color, int count);
 
 public:
-    App(int w, int h);
+    App(sf::RenderWindow *window, int w, int h);
 	virtual ~App();
 	virtual void draw();
 };
+
+
+
+
 
 #endif
