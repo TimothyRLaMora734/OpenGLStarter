@@ -1,7 +1,15 @@
 #include "GLVertexBufferObject.h"
 
 #include <aribeiro/PlatformGL.h>
+#include <aribeiro/common.h>
 
+#if defined(ARIBEIRO_OS_WINDOWS)
+#include <inttypes.h>
+#include <sys/types.h>
+#include <stdint.h>
+#else
+#include <sys/types.h>
+#endif
 
 namespace aRibeiro {
     
