@@ -6,6 +6,7 @@ App::App(sf::RenderWindow *window, int w, int h):
 	AppBase(window,w,h),
 	freeMoveCamera(this)
 {
+
     renderState = GLRenderState::getInstance();
     
     shaderColor = new GLShaderColor();
@@ -29,13 +30,32 @@ App::App(sf::RenderWindow *window, int w, int h):
     //setup renderstate
     renderState->ClearColor = vec4(1.0f,1.0f,250.0f/255.0f,1.0f);
     renderState->Wireframe = WireframeBack;
-    renderState->CullFace = CullFaceNone;
+	renderState->CullFace = CullFaceNone;
+	//renderState->Wireframe = WireframeBoth;
+	//renderState->CullFace = CullFaceBack;
     
+
+	root = new Transform();
+	box = (Transform*)root->addChild(new Transform());
+	box->model = CreateBox(vec3(1.0f,1.0f,1.0f));
+	box->scale = vec3(0.2f,0.2f,0.2f);
+
+	Transform* sphere = (Transform*)box->addChild(new Transform());
+	sphere->model = CreateSphere(7, 7, 0.5f);
+	sphere->localPosition = vec3(1.0f,0.0f,0.0f);
+
+	sphere = (Transform*)box->addChild(new Transform());
+	sphere->model = CreateSphere(7, 7, 0.5f);
+	sphere->localPosition = vec3(-1.0f, 0.0f, 0.0f);
+
+
+
     time.update();
 }
 
 App::~App(){
     setNullAndDelete(shaderColor);
+	deleteTree(&root);
 }
 
 void App::OnWindowResize(Property<iSize> *prop){
@@ -50,6 +70,8 @@ void App::draw() {
     processInput();
     
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+
+
     
     //update internal parameters
     if (rotateCounterClockwise)
@@ -123,6 +145,8 @@ void App::draw() {
     
     
     objectPosition = move(objectPosition,  vec3(0,1,-1), time.deltaTime * 0.25f);
+	
+	box->localPosition = objectPosition;
     
     modelHierarchy.push();
     modelHierarchy = (mat4)modelHierarchy * translate(objectPosition);
@@ -133,6 +157,8 @@ void App::draw() {
     if (sqrDistance(objectPosition,vec3(0,1,-1)) <= 1e-6f)
         objectPosition = vec3(0,-1.5f,-1);
 
+
+	drawModelsFromTree();
 
 	OnLateUpdate(&time);
 }
@@ -173,4 +199,43 @@ void App::drawPrimitive(GLuint oglPrimitive, const mat4 &modelViewProjection, co
     OPENGL_CMD(glVertexAttribPointer(GLShaderColor::vPosition, 3, GL_FLOAT, false, sizeof(vec3), &vertexBuffer[0]));
     OPENGL_CMD(glDrawArrays(oglPrimitive, 0, count));
     OPENGL_CMD(glDisableVertexAttribArray(GLShaderColor::vPosition));
+}
+
+void App::drawTraverseTreeDepthFirst(Transform *element) {
+	if (element->model != NULL) {
+		mat4 &transform = element->computeMatrix();
+
+		shaderColor->setMatrix(viewProjection * transform);
+		shaderColor->setColor(vec4(0, 0, 0, 1));
+		element->model->setLayoutPointers(GLShaderColor::vPosition);
+
+		element->model->draw();
+	}
+
+	std::vector<Transform*> &children = element->getChildren();
+	for (int i = 0; i < children.size(); i++) {
+		drawTraverseTreeDepthFirst((Transform *)children[i]);
+	}
+}
+
+void App::drawModelsFromTree() {
+
+	viewProjection = freeMoveCamera.computeViewProjectionMatrix();
+
+	renderState->CurrentShader = shaderColor;
+	drawTraverseTreeDepthFirst(root);
+
+	TrianglesModel::unsetLayoutPointers(GLShaderColor::vPosition);
+
+}
+
+void App::deleteTree(Transform **element) {
+	std::vector<Transform*> &children = (*element)->getChildren();
+	for (int i = children.size()-1; i >=0 ; i--) {
+		Transform * t = (Transform *)(*element)->removeChild(i);
+		deleteTree(&t);
+	}
+	if ((*element)->model != NULL)
+		setNullAndDelete((*element)->model);
+	setNullAndDelete(*element);
 }

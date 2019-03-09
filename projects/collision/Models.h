@@ -1,6 +1,8 @@
 #ifndef Models__H__
 #define Models__H__
 
+#include "Transform.h"
+
 #include <aribeiro/aribeiro.h>
 using namespace aRibeiro;
 
@@ -42,11 +44,10 @@ public:
 		OPENGL_CMD(glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_SHORT, &indices[0]));
 	}
 
-	void unsetLayoutPointers(GLint positionLayout) {
+	static void unsetLayoutPointers(GLint positionLayout) {
 		OPENGL_CMD(glDisableVertexAttribArray(positionLayout));
 	}
 };
-
 
 static inline TrianglesModel *CreateBox(const vec3 &dimension) {
 	TrianglesModel *result = new TrianglesModel();

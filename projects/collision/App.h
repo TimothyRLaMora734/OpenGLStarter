@@ -18,6 +18,8 @@ class App : public AppBase {
 
 	FreeMoveCamera freeMoveCamera;
 
+	Transform *root;
+
     // render state
     GLRenderState *renderState;
     //
@@ -33,6 +35,7 @@ class App : public AppBase {
     //
     //mat4 projection;
     //mat4 camera;
+	mat4 viewProjection;
     TransformStack<mat4> modelHierarchy;
     //
     // input helper
@@ -45,12 +48,19 @@ class App : public AppBase {
     float angle_rad;
     //vec3 cameraPosition;
     vec3 objectPosition;
+	Transform* box;
     
     void processInput();
     
     void OnWindowResize(Property<iSize> *prop);
     
     void drawPrimitive(GLuint oglPrimitive, const mat4 &modelViewProjection, const vec3 vertexBuffer[], const vec4 &color, int count);
+
+	void drawTraverseTreeDepthFirst(Transform *element);
+
+	void drawModelsFromTree();
+
+	void deleteTree(Transform **element);
 
 public:
     App(sf::RenderWindow *window, int w, int h);
