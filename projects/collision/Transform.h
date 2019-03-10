@@ -7,6 +7,7 @@ using namespace aRibeiro;
 class TrianglesModel;
 class Transform;
 
+
 class Node {
 	std::vector<Transform*> children;
 	Transform* parent;
@@ -16,6 +17,9 @@ class Node {
 	void operator=(const Node& v);
 
 protected:
+
+	Transform* root;
+
 	Node();
 
 public:
@@ -28,6 +32,24 @@ public:
 	bool isRoot();
 
 	virtual ~Node();
+};
+
+class UpdateTag : public Node {
+	uint32_t ownTag;
+public:
+	UpdateTag() {
+		root = NULL;
+		ownTag = -1;
+	}
+
+	void tagModify() {
+		((UpdateTag*)root)->ownTag++;
+	}
+
+	bool isUpdated() {
+		return ((UpdateTag*)root)->ownTag == ownTag;
+	}
+
 };
 
 class Transform : public Node {
@@ -82,6 +104,8 @@ public:
 	mat4 &computeMatrixIT();
 	mat4 &computeMatrixInv();
 
+	mat4 &computeMatrixModelViewProjection();
+
 	void setPosition(const vec3 &pos);
 	vec3 getPosition();
 
@@ -89,7 +113,14 @@ public:
 	quat getRotation();
 
 	TrianglesModel *model;
+	mat4 projection, projectionCache;
+	mat4 view, viewCache;
+	mat4 viewProjection;
+	mat4 modelViewProjection;
+	bool modelViewProjectionDirty;
 };
+
+
 
 
 #endif

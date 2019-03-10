@@ -126,7 +126,16 @@ public:
 	}
 
 	mat4 computeViewMatrix() {
-		return inv(computeTransformMatrix());
+		//return toMat4(rotation) * translate(-position) ;// inv(computeTransformMatrix());
+		mat4 matrix = toMat4(inv(rotation));
+
+		vec3 t_inv = -position;
+
+		matrix.d1 = matrix.a1*t_inv.x + matrix.b1*t_inv.y + matrix.c1*t_inv.z;
+		matrix.d2 = matrix.a2*t_inv.x + matrix.b2*t_inv.y + matrix.c2*t_inv.z;
+		matrix.d3 = matrix.a3*t_inv.x + matrix.b3*t_inv.y + matrix.c3*t_inv.z;
+
+		return matrix;
 	}
 
 	mat4 computeViewProjectionMatrix() {

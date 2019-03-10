@@ -113,6 +113,75 @@ Transform::Transform():Node(){
 	needToRecomputeMatrixInv = true;
 
 	model = NULL;
+	projection = NULL;
+	view = NULL;
+	modelViewProjectionDirty = true;
+}
+
+mat4 &Transform::computeMatrixModelViewProjection() {
+	mat4 *transform = NULL;
+
+	if (dirty_matrix) {
+		//
+		// compute the matrix transform
+		//
+		updateBaseRotation();
+
+		matrix = matrixBaseRotation;
+
+		matrix.a1 *= scale.value.x;
+		matrix.a2 *= scale.value.x;
+		matrix.a3 *= scale.value.x;
+
+		matrix.b1 *= scale.value.y;
+		matrix.b2 *= scale.value.y;
+		matrix.b3 *= scale.value.y;
+
+		matrix.c1 *= scale.value.z;
+		matrix.c2 *= scale.value.z;
+		matrix.c3 *= scale.value.z;
+
+		matrix.d1 = localPosition.value.x;
+		matrix.d2 = localPosition.value.y;
+		matrix.d3 = localPosition.value.z;
+
+		dirty_matrix = false;
+		needToRecomputeMatrix = true;
+		modelViewProjectionDirty = true;
+	}
+	Transform* parent = ((Transform*)getParent());
+	if (parent != NULL// && !parent->isRoot()
+		) {
+		mat4 &aux = parent->computeMatrixModelViewProjection();
+		if (matrixParent != aux) {
+			matrixParent = aux;
+			needToRecomputeMatrix = true;
+		}
+		if (needToRecomputeMatrix) {
+			matrixResult = matrixParent * matrix;
+			needToRecomputeMatrix = false;
+		}
+		transform = &matrixResult;
+	}
+	else
+		transform = &matrix;
+
+
+	if (isRoot()) {
+		if ((projection) != projectionCache || (view) != viewCache) {
+			projectionCache = projection;
+			viewCache = view;
+			viewProjection = projectionCache * viewCache;
+			modelViewProjectionDirty = true;
+		}
+		if (modelViewProjectionDirty)
+		{
+			modelViewProjection = viewProjection;// *(*transform);
+			modelViewProjectionDirty = false;
+		}
+		return modelViewProjection;
+	}
+	return (*transform);
 }
 
 mat4 &Transform::computeMatrix() {
@@ -142,6 +211,7 @@ mat4 &Transform::computeMatrix() {
 
 		dirty_matrix = false;
 		needToRecomputeMatrix = true;
+		modelViewProjectionDirty = true;
 	}
 	Transform* parent = ((Transform*)getParent());
 	if (parent != NULL && !parent->isRoot()) {
@@ -281,6 +351,7 @@ void Node::operator=(const Node& v) {}
 
 Node::Node() {
 	parent = NULL;
+	root = (Transform*)this;
 }
 
 Node::~Node() {
@@ -291,6 +362,7 @@ Transform* Node::addChild(Transform * transform) {
 		transform->parent->removeChild(transform);
 	transform->parent = (Transform*)this;
 	children.push_back(transform);
+	transform->root = root;
 	return transform;
 }
 
@@ -310,6 +382,7 @@ Transform* Node::removeChild(Transform * transform) {
 		if (children[i] == transform) {
 			children.erase(children.begin() + i);
 			transform->parent = NULL;
+			transform->root = transform;
 			return transform;
 		}
 	fprintf(stderr,"Trying to remove a child that is not in the scene...\n");
@@ -340,3 +413,8 @@ void Node::setParent(Transform *prnt) {
 bool Node::isRoot() {
 	return parent == NULL;
 }
+
+
+//
+// UpdateTag
+//

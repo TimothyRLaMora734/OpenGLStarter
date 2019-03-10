@@ -35,7 +35,7 @@ class App : public AppBase {
     //
     //mat4 projection;
     //mat4 camera;
-	mat4 viewProjection;
+	//mat4 viewProjection;
     TransformStack<mat4> modelHierarchy;
     //
     // input helper

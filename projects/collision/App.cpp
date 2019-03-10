@@ -203,9 +203,9 @@ void App::drawPrimitive(GLuint oglPrimitive, const mat4 &modelViewProjection, co
 
 void App::drawTraverseTreeDepthFirst(Transform *element) {
 	if (element->model != NULL) {
-		mat4 &transform = element->computeMatrix();
+		mat4 &mvp = element->computeMatrixModelViewProjection();
 
-		shaderColor->setMatrix(viewProjection * transform);
+		shaderColor->setMatrix(mvp);
 		shaderColor->setColor(vec4(0, 0, 0, 1));
 		element->model->setLayoutPointers(GLShaderColor::vPosition);
 
@@ -220,7 +220,13 @@ void App::drawTraverseTreeDepthFirst(Transform *element) {
 
 void App::drawModelsFromTree() {
 
-	viewProjection = freeMoveCamera.computeViewProjectionMatrix();
+	//viewProjection = freeMoveCamera.computeViewProjectionMatrix();
+
+	//freeMoveCamera.computeViewProjectionMatrix
+
+	root->projection = freeMoveCamera.projection;
+	root->view = freeMoveCamera.computeViewMatrix();
+
 
 	renderState->CurrentShader = shaderColor;
 	drawTraverseTreeDepthFirst(root);
