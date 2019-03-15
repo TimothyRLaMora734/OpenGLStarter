@@ -34,6 +34,7 @@ class TrianglesModel {
 public:
 	std::vector<GeneralVertexAttrib> vertices;
 	std::vector<unsigned short> indices;
+    vec4 color;
 
 	void setLayoutPointers(GLint positionLayout) {
 		OPENGL_CMD(glEnableVertexAttribArray(positionLayout));
@@ -48,6 +49,98 @@ public:
 		OPENGL_CMD(glDisableVertexAttribArray(positionLayout));
 	}
 };
+
+static inline TrianglesModel *CreateTriangle() {
+    TrianglesModel *result = new TrianglesModel();
+    
+    //
+    // TOP
+    //
+    result->vertices.push_back(GeneralVertexAttrib(
+                                                   vec3(-0.5f,0.0f,0.0f),// position;
+                                                   vec2(0),// uv;
+                                                   vec3(0, 1, 0),// normal;
+                                                   vec3(0),// tangent;
+                                                   vec3(0)// binormal;
+                                                   ));
+    result->vertices.push_back(GeneralVertexAttrib(
+                                                   vec3(0.5f,0.0f,0.0f),// position;
+                                                   vec2(0),// uv;
+                                                   vec3(0, 1, 0),// normal;
+                                                   vec3(0),// tangent;
+                                                   vec3(0)// binormal;
+                                                   ));
+    result->vertices.push_back(GeneralVertexAttrib(
+                                                   vec3(0.0f,1.0f,0.0f),// position;
+                                                   vec2(0),// uv;
+                                                   vec3(0, 1, 0),// normal;
+                                                   vec3(0),// tangent;
+                                                   vec3(0)// binormal;
+                                                   ));
+    //
+    // Construct Index
+    //
+    for (int i = 0; i < result->vertices.size(); i += 3) {
+        result->indices.push_back(i);
+        result->indices.push_back(i+1);
+        result->indices.push_back(i+2);
+    }
+    
+    return result;
+}
+
+
+static inline TrianglesModel *CreatePlane(const vec3 &dimension) {
+    TrianglesModel *result = new TrianglesModel();
+    
+    vec3 halfDim = dimension * 0.5f;
+    //
+    // TOP
+    //
+    result->vertices.push_back(GeneralVertexAttrib(
+                                                   vec3(halfDim.x, 0, halfDim.z),// position;
+                                                   vec2(0),// uv;
+                                                   vec3(0, 1, 0),// normal;
+                                                   vec3(0),// tangent;
+                                                   vec3(0)// binormal;
+                                                   ));
+    result->vertices.push_back(GeneralVertexAttrib(
+                                                   vec3(halfDim.x, 0, -halfDim.z),// position;
+                                                   vec2(0),// uv;
+                                                   vec3(0, 1, 0),// normal;
+                                                   vec3(0),// tangent;
+                                                   vec3(0)// binormal;
+                                                   ));
+    result->vertices.push_back(GeneralVertexAttrib(
+                                                   vec3(-halfDim.x, 0, -halfDim.z),// position;
+                                                   vec2(0),// uv;
+                                                   vec3(0, 1, 0),// normal;
+                                                   vec3(0),// tangent;
+                                                   vec3(0)// binormal;
+                                                   ));
+    result->vertices.push_back(GeneralVertexAttrib(
+                                                   vec3(-halfDim.x, 0, halfDim.z),// position;
+                                                   vec2(0),// uv;
+                                                   vec3(0, 1, 0),// normal;
+                                                   vec3(0),// tangent;
+                                                   vec3(0)// binormal;
+                                                   ));
+    //
+    // Construct Index
+    //
+    for (int i = 0; i < result->vertices.size(); i += 4) {
+        result->indices.push_back(i);
+        result->indices.push_back(i+1);
+        result->indices.push_back(i+2);
+        
+        result->indices.push_back(i);
+        result->indices.push_back(i + 2);
+        result->indices.push_back(i + 3);
+    }
+    
+    return result;
+}
+
 
 static inline TrianglesModel *CreateBox(const vec3 &dimension) {
 	TrianglesModel *result = new TrianglesModel();

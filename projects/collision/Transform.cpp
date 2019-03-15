@@ -1,420 +1,523 @@
 #include "Transform.h"
 
-void Transform::updateBaseRotation() {
-	if (!dirty_matrixRotation)
-		return;
-	matrixBaseRotation = toMat4(localRotation);
-	dirty_matrixRotation = false;
+
+int stat_num_visited;
+int stat_num_recalculated;
+int stat_draw_recalculated;
+
+
+Transform::Transform(const Transform& v) {}
+void Transform::operator=(const Transform& v) {}
+
+///////////////////////////////////////////////////////
+//
+//
+//
+// Node Hierarchy structure and operations
+//
+//
+//
+///////////////////////////////////////////////////////
+
+Transform* Transform::removeChild(int index) {
+    if (index >= children.size() || index < 0)
+    {
+        fprintf(stderr, "Trying to remove a child that is not in the list...\n");
+        exit(-1);
+        return NULL;
+    }
+    Transform* node = children[index];
+    children.erase(children.begin() + index);
+    return node;
+}
+Transform* Transform::removeChild(Transform * transform) {
+    for (int i=0;i< children.size();i++)
+        if (children[i] == transform) {
+            children.erase(children.begin() + i);
+            transform->parent = NULL;
+            transform->visited = false;
+            return transform;
+        }
+    fprintf(stderr,"Trying to remove a child that is not in the scene...\n");
+    exit(-1);
+    return NULL;
 }
 
-void Transform::OnLocalPositionScaleChange(Property<vec3> *prop) {
-	if (!dirty_matrixRotation)
-		dirty_matrixRotation = true;
-	if (!dirty_matrix)
-		dirty_matrix = true;
-	if (!dirty_matrix_it)
-		dirty_matrix_it = true;
-	if (!dirty_matrix_inv)
-		dirty_matrix_inv = true;
+Transform* Transform::addChild(Transform * transform) {
+    if (transform->parent != NULL)
+        transform->parent->removeChild(transform);
+    transform->parent = this;
+    transform->visited = false;
+    children.push_back(transform);
+    return transform;
 }
 
-void Transform::OnLocalEulerChange(Property<vec3> *prop) {
-	if (!dirty_matrixRotation)
-		dirty_matrixRotation = true;
-	if (!dirty_matrix)
-		dirty_matrix = true;
-	if (!dirty_matrix_it)
-		dirty_matrix_it = true;
-	if (!dirty_matrix_inv)
-		dirty_matrix_inv = true;
-
-	if (prop->value.x < 0)
-		prop->value.x += ceil( - prop->value.x / DEG2RAD(360.0f)) * DEG2RAD(360.0f);
-	if (prop->value.x > DEG2RAD(360.0f))
-		prop->value.x = fmod(prop->value.x, DEG2RAD(360.0f));
-
-	if (prop->value.y < 0)
-		prop->value.y += ceil(-prop->value.y / DEG2RAD(360.0f)) * DEG2RAD(360.0f);
-	if (prop->value.y > DEG2RAD(360.0f))
-		prop->value.y = fmod(prop->value.y, DEG2RAD(360.0f));
-
-	if (prop->value.z < 0)
-		prop->value.z += ceil(-prop->value.z / DEG2RAD(360.0f)) * DEG2RAD(360.0f);
-	if (prop->value.z > DEG2RAD(360.0f))
-		prop->value.z = fmod(prop->value.z, DEG2RAD(360.0f));
-
-
-	localRotation.value = quatFromEuler(prop->value.x, prop->value.y, prop->value.z);
+std::vector<Transform*> &Transform::getChildren() {
+    return children;
 }
 
-void Transform::OnLocalRotationChange(Property<quat> *prop) {
-	if (!dirty_matrixRotation)
-		dirty_matrixRotation = true;
-	if (!dirty_matrix)
-		dirty_matrix = true;
-	if (!dirty_matrix_it)
-		dirty_matrix_it = true;
-	if (!dirty_matrix_inv)
-		dirty_matrix_inv = true;
-
-	extractEuler(localRotation, &localEuler.value.x, &localEuler.value.y, &localEuler.value.z);
+Transform *Transform::getParent() {
+    return parent;
 }
 
-vec3 Transform::forward() {
-	updateBaseRotation();
-	return toVec3(-matrixBaseRotation[2]);
-}
-vec3 Transform::backward() {
-	updateBaseRotation();
-	return toVec3(matrixBaseRotation[2]);
-}
-vec3 Transform::right() {
-	updateBaseRotation();
-	return toVec3(matrixBaseRotation[0]);
-}
-vec3 Transform::left() {
-	updateBaseRotation();
-	return toVec3(-matrixBaseRotation[0]);
-}
-vec3 Transform::up() {
-	updateBaseRotation();
-	return toVec3(matrixBaseRotation[1]);
-}
-vec3 Transform::down() {
-	updateBaseRotation();
-	return toVec3(-matrixBaseRotation[1]);
+void Transform::setParent(Transform *prnt) {
+    if (prnt == NULL) {
+        fprintf(stderr,"Trying to set parent to NULL...\n");
+        exit(-1);
+    }
+    if (parent != NULL)
+        parent->removeChild(this);
+    parent = prnt;
+    if (parent != NULL)
+        parent->addChild(prnt);
+    
 }
 
-Transform::Transform():Node(){
-	localPosition = vec3(0);
-	localEuler = vec3(0);
-	localRotation = quat();
-	scale = vec3(1.0f);
-
-	dirty_matrix = false;
-	matrix = mat4::IdentityMatrix;
-
-	dirty_matrix_it = false;
-	matrix_it = mat4::IdentityMatrix;
-
-	dirty_matrixRotation = false;
-	matrixBaseRotation = mat4::IdentityMatrix;
-
-	dirty_matrix_inv = false;
-	matrix_inv = mat4::IdentityMatrix;
-
-	localPosition.OnChange.add(this, &Transform::OnLocalPositionScaleChange);
-	localEuler.OnChange.add(this, &Transform::OnLocalEulerChange);
-	localRotation.OnChange.add(this, &Transform::OnLocalRotationChange);
-	scale.OnChange.add(this, &Transform::OnLocalPositionScaleChange);
-
-	needToRecomputeMatrix = true;
-	needToRecomputeMatrixIT = true;
-	needToRecomputeMatrixInv = true;
-
-	model = NULL;
-	projection = NULL;
-	view = NULL;
-	modelViewProjectionDirty = true;
+bool Transform::isRoot() {
+    return parent == NULL;
+}
+///////////////////////////////////////////////////////
+//
+//
+//
+// Transform default graph operations
+//
+//
+//
+///////////////////////////////////////////////////////
+void Transform::updateLocalRotationBase() {
+    if (!localRotationBaseDirty)
+        return;
+    localRotationBase = toMat4(localRotation);
+    localRotationBaseDirty = false;
 }
 
-mat4 &Transform::computeMatrixModelViewProjection() {
-	mat4 *transform = NULL;
-
-	if (dirty_matrix) {
-		//
-		// compute the matrix transform
-		//
-		updateBaseRotation();
-
-		matrix = matrixBaseRotation;
-
-		matrix.a1 *= scale.value.x;
-		matrix.a2 *= scale.value.x;
-		matrix.a3 *= scale.value.x;
-
-		matrix.b1 *= scale.value.y;
-		matrix.b2 *= scale.value.y;
-		matrix.b3 *= scale.value.y;
-
-		matrix.c1 *= scale.value.z;
-		matrix.c2 *= scale.value.z;
-		matrix.c3 *= scale.value.z;
-
-		matrix.d1 = localPosition.value.x;
-		matrix.d2 = localPosition.value.y;
-		matrix.d3 = localPosition.value.z;
-
-		dirty_matrix = false;
-		needToRecomputeMatrix = true;
-		modelViewProjectionDirty = true;
-	}
-	Transform* parent = ((Transform*)getParent());
-	if (parent != NULL// && !parent->isRoot()
-		) {
-		mat4 &aux = parent->computeMatrixModelViewProjection();
-		if (matrixParent != aux) {
-			matrixParent = aux;
-			needToRecomputeMatrix = true;
-		}
-		if (needToRecomputeMatrix) {
-			matrixResult = matrixParent * matrix;
-			needToRecomputeMatrix = false;
-		}
-		transform = &matrixResult;
-	}
-	else
-		transform = &matrix;
-
-
-	if (isRoot()) {
-		if ((projection) != projectionCache || (view) != viewCache) {
-			projectionCache = projection;
-			viewCache = view;
-			viewProjection = projectionCache * viewCache;
-			modelViewProjectionDirty = true;
-		}
-		if (modelViewProjectionDirty)
-		{
-			modelViewProjection = viewProjection;// *(*transform);
-			modelViewProjectionDirty = false;
-		}
-		return modelViewProjection;
-	}
-	return (*transform);
+vec3 Transform::getLocalPosition()const{
+    return localPosition;
+}
+vec3 Transform::getLocalEuler()const{
+    return localEuler;
+}
+quat Transform::getLocalRotation()const{
+    return localRotation;
+}
+vec3 Transform::getLocalScale()const{
+    return localScale;
 }
 
-mat4 &Transform::computeMatrix() {
-	if (dirty_matrix) {
-		//
-		// compute the matrix transform
-		//
-		updateBaseRotation();
-
-		matrix = matrixBaseRotation;
-
-		matrix.a1 *= scale.value.x;
-		matrix.a2 *= scale.value.x;
-		matrix.a3 *= scale.value.x;
-
-		matrix.b1 *= scale.value.y;
-		matrix.b2 *= scale.value.y;
-		matrix.b3 *= scale.value.y;
-
-		matrix.c1 *= scale.value.z;
-		matrix.c2 *= scale.value.z;
-		matrix.c3 *= scale.value.z;
-
-		matrix.d1 = localPosition.value.x;
-		matrix.d2 = localPosition.value.y;
-		matrix.d3 = localPosition.value.z;
-
-		dirty_matrix = false;
-		needToRecomputeMatrix = true;
-		modelViewProjectionDirty = true;
-	}
-	Transform* parent = ((Transform*)getParent());
-	if (parent != NULL && !parent->isRoot()) {
-		mat4 &aux = parent->computeMatrix();
-		if (matrixParent != aux) {
-			matrixParent = aux;
-			needToRecomputeMatrix = true;
-		}
-		if (needToRecomputeMatrix) {
-			matrixResult = matrixParent * matrix;
-			needToRecomputeMatrix = false;
-		}
-		return matrixResult;
-	} else
-		return matrix;
+void Transform::setLocalPosition( const vec3 &p ){
+    if (localPosition == p)
+        return;
+    
+    localPosition = p;
+    
+    //if (!localRotationBaseDirty) localRotationBaseDirty = true;
+    if (!localMatrixDirty) localMatrixDirty = true;
+    if (!localMatrixInverseTransposeDirty) localMatrixInverseTransposeDirty = true;
+    if (!localMatrixInverseDirty) localMatrixInverseDirty = true;
+}
+void Transform::setLocalEuler( const vec3 &e){
+    if (localEuler == e)
+        return;
+    
+    localEuler = e;
+    if (localEuler.x < 0)
+        localEuler.x += ceil( - localEuler.x / DEG2RAD(360.0f)) * DEG2RAD(360.0f);
+    if (localEuler.x > DEG2RAD(360.0f))
+        localEuler.x = fmod(localEuler.x, DEG2RAD(360.0f));
+    
+    if (localEuler.y < 0)
+        localEuler.y += ceil(-localEuler.y / DEG2RAD(360.0f)) * DEG2RAD(360.0f);
+    if (localEuler.y > DEG2RAD(360.0f))
+        localEuler.y = fmod(localEuler.y, DEG2RAD(360.0f));
+    
+    if (localEuler.z < 0)
+        localEuler.z += ceil(-localEuler.z / DEG2RAD(360.0f)) * DEG2RAD(360.0f);
+    if (localEuler.z > DEG2RAD(360.0f))
+        localEuler.z = fmod(localEuler.z, DEG2RAD(360.0f));
+    
+    localRotation = quatFromEuler(localEuler.x, localEuler.y, localEuler.z);
+    
+    if (!localRotationBaseDirty) localRotationBaseDirty = true;
+    if (!localMatrixDirty) localMatrixDirty = true;
+    if (!localMatrixInverseTransposeDirty) localMatrixInverseTransposeDirty = true;
+    if (!localMatrixInverseDirty) localMatrixInverseDirty = true;
+}
+void Transform::setLocalRotation( const quat &q ){
+    if (localRotation == q)
+        return;
+    
+    localRotation = q;
+    
+    extractEuler(localRotation, &localEuler.x, &localEuler.y, &localEuler.z);
+    
+    if (!localRotationBaseDirty) localRotationBaseDirty = true;
+    if (!localMatrixDirty) localMatrixDirty = true;
+    if (!localMatrixInverseTransposeDirty) localMatrixInverseTransposeDirty = true;
+    if (!localMatrixInverseDirty) localMatrixInverseDirty = true;
+}
+void Transform::setLocalScale(const vec3 &s){
+    if (localScale == s)
+        return;
+    
+    localScale = s;
+    
+    //if (!localRotationBaseDirty) localRotationBaseDirty = true;
+    if (!localMatrixDirty) localMatrixDirty = true;
+    if (!localMatrixInverseTransposeDirty) localMatrixInverseTransposeDirty = true;
+    if (!localMatrixInverseDirty) localMatrixInverseDirty = true;
 }
 
-mat4 &Transform::computeMatrixIT() {
-	if (dirty_matrix_it) {
 
-		updateBaseRotation();
-
-		matrix_it = matrixBaseRotation;
-
-		vec3 t_inv = -localPosition.value;
-		matrix_it.a4 = matrix_it.a1 * t_inv.x + matrix_it.a2 * t_inv.y + matrix_it.a3 * t_inv.z;
-		matrix_it.b4 = matrix_it.b1 * t_inv.x + matrix_it.b2 * t_inv.y + matrix_it.b3 * t_inv.z;
-		matrix_it.c4 = matrix_it.c1 * t_inv.x + matrix_it.c2 * t_inv.y + matrix_it.c3 * t_inv.z;
-
-		matrix_it[0] *= 1.0f / scale.value.x;
-		matrix_it[1] *= 1.0f / scale.value.y;
-		matrix_it[2] *= 1.0f / scale.value.z;
-
-		dirty_matrix_it = false;
-		needToRecomputeMatrixIT = true;
-	}
-
-	Transform* parent = ((Transform*)getParent());
-	if (parent != NULL && !parent->isRoot()) {
-		//return parent->computeMatrixIT() * matrix_it;
-		mat4 &aux = parent->computeMatrixIT();
-		if (matrix_itParent != aux) {
-			matrix_itParent = aux;
-			needToRecomputeMatrixIT = true;
-		}
-		if (needToRecomputeMatrixIT) {
-			matrix_itResult = matrix_itParent * matrix_it;
-			needToRecomputeMatrixIT = false;
-		}
-		return matrix_itResult;
-	}
-	else
-		return matrix_it;
+mat4 & Transform::getLocalMatrix(){
+    if (localMatrixDirty) {
+        //
+        // compute the matrix transform
+        //
+        updateLocalRotationBase();
+        
+        localMatrix = localRotationBase;
+        
+        localMatrix.a1 *= localScale.x;
+        localMatrix.a2 *= localScale.x;
+        localMatrix.a3 *= localScale.x;
+        
+        localMatrix.b1 *= localScale.y;
+        localMatrix.b2 *= localScale.y;
+        localMatrix.b3 *= localScale.y;
+        
+        localMatrix.c1 *= localScale.z;
+        localMatrix.c2 *= localScale.z;
+        localMatrix.c3 *= localScale.z;
+        
+        localMatrix.d1 = localPosition.x;
+        localMatrix.d2 = localPosition.y;
+        localMatrix.d3 = localPosition.z;
+        
+        localMatrixDirty = false;
+        matrixDirty = true;
+        //renderDirty = true;
+    }
+    return localMatrix;
 }
 
-mat4 &Transform::computeMatrixInv() {
-
-	if (dirty_matrix_inv) {
-		updateBaseRotation();
-
-		matrix_inv = transpose(matrixBaseRotation);
-
-		vec3 s_inv = 1.0f / scale;
-
-		matrix_inv.a1 *= s_inv.x;
-		matrix_inv.a2 *= s_inv.y;
-		matrix_inv.a3 *= s_inv.z;
-
-		matrix_inv.b1 *= s_inv.x;
-		matrix_inv.b2 *= s_inv.y;
-		matrix_inv.b3 *= s_inv.z;
-
-		matrix_inv.c1 *= s_inv.x;
-		matrix_inv.c2 *= s_inv.y;
-		matrix_inv.c3 *= s_inv.z;
-
-		vec3 t_inv = -localPosition.value;
-
-		matrix.d1 = matrix.a1*t_inv.x + matrix.b1*t_inv.y + matrix.c1*t_inv.z;
-		matrix.d2 = matrix.a2*t_inv.x + matrix.b2*t_inv.y + matrix.c2*t_inv.z;
-		matrix.d3 = matrix.a3*t_inv.x + matrix.b3*t_inv.y + matrix.c3*t_inv.z;
-
-		dirty_matrix_inv = false;
-		needToRecomputeMatrixInv = true;
-	}
-
-	Transform* parent = ((Transform*)getParent());
-	if (parent != NULL && !parent->isRoot()) {
-		mat4 &aux = parent->computeMatrixInv();
-		if (matrix_invParent != aux) {
-			matrix_invParent = aux;
-			needToRecomputeMatrixInv = true;
-		}
-		if (needToRecomputeMatrixInv) {
-			matrix_invResult = matrix_inv * matrix_invParent;
-			needToRecomputeMatrixInv = false;
-		}
-		return matrix_invResult;
-		//return matrix_inv * parent->computeMatrixInv();
-	}
-	else
-		return matrix_inv;
+mat4 & Transform::getLocalMatrixInverseTranspose(){
+    if (localMatrixInverseTransposeDirty){
+        updateLocalRotationBase();
+        
+        localMatrixInverseTranspose = localRotationBase;
+        
+        vec3 t_inv = -localPosition;
+        localMatrixInverseTranspose.a4 = localMatrixInverseTranspose.a1 * t_inv.x + localMatrixInverseTranspose.a2 * t_inv.y + localMatrixInverseTranspose.a3 * t_inv.z;
+        localMatrixInverseTranspose.b4 = localMatrixInverseTranspose.b1 * t_inv.x + localMatrixInverseTranspose.b2 * t_inv.y + localMatrixInverseTranspose.b3 * t_inv.z;
+        localMatrixInverseTranspose.c4 = localMatrixInverseTranspose.c1 * t_inv.x + localMatrixInverseTranspose.c2 * t_inv.y + localMatrixInverseTranspose.c3 * t_inv.z;
+        
+        localMatrixInverseTranspose[0] *= 1.0f / localScale.x;
+        localMatrixInverseTranspose[1] *= 1.0f / localScale.y;
+        localMatrixInverseTranspose[2] *= 1.0f / localScale.z;
+        
+        localMatrixInverseTransposeDirty = false;
+        matrixInverseTransposeDirty = true;
+        //renderDirty = true;
+    }
+    return localMatrixInverseTranspose;
 }
+
+mat4 & Transform::getLocalMatrixInverse(){
+    if (localMatrixInverseDirty) {
+        updateLocalRotationBase();
+        
+        localMatrixInverse = transpose(localRotationBase);
+        
+        vec3 s_inv = 1.0f / localScale;
+        
+        localMatrixInverse.a1 *= s_inv.x;
+        localMatrixInverse.a2 *= s_inv.y;
+        localMatrixInverse.a3 *= s_inv.z;
+        
+        localMatrixInverse.b1 *= s_inv.x;
+        localMatrixInverse.b2 *= s_inv.y;
+        localMatrixInverse.b3 *= s_inv.z;
+        
+        localMatrixInverse.c1 *= s_inv.x;
+        localMatrixInverse.c2 *= s_inv.y;
+        localMatrixInverse.c3 *= s_inv.z;
+        
+        vec3 t_inv = -localPosition;
+        
+        localMatrixInverse.d1 = localMatrixInverse.a1*t_inv.x + localMatrixInverse.b1*t_inv.y + localMatrixInverse.c1*t_inv.z;
+        localMatrixInverse.d2 = localMatrixInverse.a2*t_inv.x + localMatrixInverse.b2*t_inv.y + localMatrixInverse.c2*t_inv.z;
+        localMatrixInverse.d3 = localMatrixInverse.a3*t_inv.x + localMatrixInverse.b3*t_inv.y + localMatrixInverse.c3*t_inv.z;
+        
+        localMatrixInverseDirty = false;
+        matrixInverseDirty = true;
+        //renderDirty = true;
+    }
+    return localMatrixInverse;
+}
+
+
+
+///////////////////////////////////////////////////////
+//
+//
+//
+// Transform Global Ops...
+//
+//
+//
+///////////////////////////////////////////////////////
+mat4& Transform::getMatrix(bool useVisitedFlag){
+    
+    if (useVisitedFlag && visited)
+        return matrix;
+    
+    stat_num_recalculated++;
+    
+    mat4 &localM = getLocalMatrix();
+    Transform* parent = getParent();
+    if (parent != NULL && !parent->isRoot()) {
+        mat4 &aux = parent->getMatrix(useVisitedFlag);
+        if (matrixParent != aux) {
+            matrixParent = aux;
+            matrixDirty = true;
+        }
+        if (matrixDirty) {
+            matrix = matrixParent * localM;
+            matrixDirty = false;
+            //renderDirty = true;
+        }
+        return matrix;
+    } else {
+        if (matrixDirty) {
+            matrix = localM;
+            matrixDirty = false;
+            //renderDirty = true;
+        }
+        return matrix;
+    }
+}
+
+mat4& Transform::getMatrixInverseTranspose(bool useVisitedFlag){
+    
+    if (useVisitedFlag && visited)
+        return matrixInverseTranspose;
+    
+    mat4 &localM = getLocalMatrixInverseTranspose();
+    Transform* parent = getParent();
+    if (parent != NULL && !parent->isRoot()) {
+        mat4 &aux = parent->getMatrixInverseTranspose(useVisitedFlag);
+        if (matrixInverseTransposeParent != aux) {
+            matrixInverseTransposeParent = aux;
+            matrixInverseTransposeDirty = true;
+        }
+        if (matrixInverseTransposeDirty) {
+            matrixInverseTranspose = matrixInverseTransposeParent * localM;
+            matrixInverseTransposeDirty = false;
+            //renderDirty = true;
+        }
+        return matrixInverseTranspose;
+    } else{
+        if (matrixInverseTransposeDirty) {
+            matrixInverseTranspose = localM;
+            matrixInverseTransposeDirty = false;
+            //renderDirty = true;
+        }
+        return matrixInverseTranspose;
+    }
+}
+
+mat4& Transform::getMatrixInverse(bool useVisitedFlag){
+    
+    if (useVisitedFlag && visited)
+        return matrixInverse;
+    
+    mat4 &localM = getLocalMatrixInverse();
+    Transform* parent = getParent();
+    if (parent != NULL && !parent->isRoot()) {
+        mat4 &aux = parent->getMatrixInverse(useVisitedFlag);
+        if (matrixInverseParent != aux) {
+            matrixInverseParent = aux;
+            matrixInverseDirty = true;
+        }
+        if (matrixInverseDirty) {
+            matrixInverse = localM * matrixInverseParent;
+            matrixInverseDirty = false;
+            //renderDirty = true;
+        }
+        return matrixInverse;
+    } else {
+        if (matrixInverseDirty) {
+            matrixInverse = localM;
+            matrixInverseDirty = false;
+            //renderDirty = true;
+        }
+        return matrixInverse;
+    }
+}
+
 
 void Transform::setPosition(const vec3 &pos) {
-	localPosition = toVec3(computeMatrixInv() * toVec4(pos - localPosition.value));
+    setLocalPosition( toVec3(getMatrixInverse() * toVec4(pos - localPosition)) );
 }
 
-vec3 Transform::getPosition() {
-	return toVec3(computeMatrix()[3]);
+vec3 Transform::getPosition(bool useVisitedFlag) {
+    return toVec3(getMatrix(useVisitedFlag)[3]);
 }
 
 void Transform::setRotation(const quat &rot) {
-	quat q = extractQuat(computeMatrixInv());
-	localRotation = q * rot * inv( localRotation.value );
+    quat q = extractQuat(getMatrixInverse());
+    setLocalRotation(  q * rot * inv( localRotation ) );
 }
 
-quat Transform::getRotation() {
-	quat q = extractQuat(computeMatrix());
-	return q;
+quat Transform::getRotation(bool useVisitedFlag) {
+    quat q = extractQuat(getMatrix(useVisitedFlag));
+    return q;
 }
 
-//private copy constructores, to avoid copy...
-Transform::Transform(const Transform& v) {
-
+void Transform::setScale(const vec3 &s) {
+    mat4 &m = getMatrixInverse();
+    vec3 newScale = vec3( length( toVec3(m[0]) ) * s.x, length( toVec3(m[1]) ) * s.y, length( toVec3(m[2]) ) * s.z );
+    setLocalScale( newScale );
 }
 
-void Transform::operator=(const Transform& v) {
-
-}
-
-
-
-
-Node::Node(const Node& v) {}
-void Node::operator=(const Node& v) {}
-
-Node::Node() {
-	parent = NULL;
-	root = (Transform*)this;
-}
-
-Node::~Node() {
-}
-
-Transform* Node::addChild(Transform * transform) {
-	if (transform->parent != NULL)
-		transform->parent->removeChild(transform);
-	transform->parent = (Transform*)this;
-	children.push_back(transform);
-	transform->root = root;
-	return transform;
-}
-
-Transform* Node::removeChild(int index) {
-	if (index >= children.size())
-	{
-		fprintf(stderr, "Trying to remove a child that is not in the list...\n");
-		exit(-1);
-		return NULL;
-	}
-	Transform* node = children[index];
-	children.erase(children.begin() + index);
-	return node;
-}
-Transform* Node::removeChild(Transform * transform) {
-	for (int i=0;i< children.size();i++)
-		if (children[i] == transform) {
-			children.erase(children.begin() + i);
-			transform->parent = NULL;
-			transform->root = transform;
-			return transform;
-		}
-	fprintf(stderr,"Trying to remove a child that is not in the scene...\n");
-	exit(-1);
-	return NULL;
-}
-
-std::vector<Transform*> &Node::getChildren() {
-	return children;
-}
-
-Transform *Node::getParent() {
-	return parent;
-}
-
-void Node::setParent(Transform *prnt) {
-	if (prnt == NULL) {
-		fprintf(stderr,"Trying to set parent to NULL...\n");
-		exit(-1);
-	}
-	if (parent != NULL)
-		parent->removeChild((Transform*)this);
-	parent = prnt;
-	parent->addChild(prnt);
-
-}
-
-bool Node::isRoot() {
-	return parent == NULL;
+vec3 Transform::getScale(bool useVisitedFlag) {
+    mat4 &m = getMatrix(useVisitedFlag);
+    return vec3( length( toVec3(m[0]) ), length( toVec3(m[1]) ), length( toVec3(m[2]) ) );
 }
 
 
+///////////////////////////////////////////////////////
 //
-// UpdateTag
 //
+//
+// Transform Render Ops...
+//
+//
+//
+///////////////////////////////////////////////////////
+void Transform::resetVisited(bool forceMarkFalse){
+    if (forceMarkFalse ||
+        localMatrixDirty ||
+        localMatrixInverseTransposeDirty ||
+        localMatrixInverseDirty ||
+        matrixDirty ||
+        matrixInverseTransposeDirty ||
+        matrixInverseDirty){
+        visited = false;
+        forceMarkFalse = true;
+        renderDirty = true;
+    }
+    for (int i = 0; i < children.size(); i++) {
+        children[i]->resetVisited(forceMarkFalse);
+    }
+}
+
+void Transform::preComputeTransforms(){
+    if (!visited) {
+        if (!isRoot()){
+            getMatrix(true);
+            getMatrixInverseTranspose(true);
+            getMatrixInverse(true);
+        }
+        visited = true;
+        stat_num_visited++;
+    }
+    for (int i = 0; i < children.size(); i++) {
+        children[i]->preComputeTransforms();
+    }
+}
+
+void Transform::computeRenderMatrix(const mat4 &viewProjection,
+                         const mat4 &view,
+                         const mat4 &viewIT,
+                         const mat4 &viewInv,
+                         mat4 *mvp,
+                         mat4 *mv,
+                         mat4 *mvIT,
+                         mat4 *mvInv){
+    if (renderDirty || viewProjection != renderViewProjection){
+        
+        stat_draw_recalculated++;
+        
+        renderViewProjection = viewProjection;
+        renderMVP = viewProjection * getMatrix(true);
+        renderMV = view * getMatrix(true);
+        renderMVIT = viewIT * getMatrixInverseTranspose(true);
+        renderMVInv = getMatrixInverse(true) * viewInv;
+        
+        renderDirty = false;
+    }
+    
+    *mvp = renderMVP;
+    *mv = renderMV;
+    *mvIT = renderMVIT;
+    *mvInv = renderMVInv;
+}
+
+///////////////////////////////////////////////////////
+//
+//
+//
+// Object References...
+//
+//
+//
+///////////////////////////////////////////////////////
+
+///////////////////////////////////////////////////////
+//
+//
+//
+// Default Constructor
+//
+//
+//
+///////////////////////////////////////////////////////
+
+Transform::Transform(){
+    //hierarchy ops
+    parent = NULL;
+    //transform
+    localPosition = vec3(0);
+    localEuler = vec3(0);
+    localRotation = quat();
+    localScale = vec3(1.0f);
+    
+    localRotationBase = mat4::IdentityMatrix;
+    localMatrix = mat4::IdentityMatrix;
+    localMatrixInverseTranspose = mat4::IdentityMatrix;
+    localMatrixInverse = mat4::IdentityMatrix;
+    
+    localRotationBaseDirty = false;
+    localMatrixDirty = false;
+    localMatrixInverseTransposeDirty = false;
+    localMatrixInverseDirty = false;
+    
+    matrixDirty = false;
+    matrix = mat4::IdentityMatrix;
+    matrixParent = mat4::IdentityMatrix;
+    matrixInverseTransposeDirty = false;
+    matrixInverseTranspose = mat4::IdentityMatrix;
+    matrixInverseTransposeParent = mat4::IdentityMatrix;
+    matrixInverseDirty = false;
+    matrixInverse = mat4::IdentityMatrix;
+    matrixInverseParent = mat4::IdentityMatrix;
+    
+    model = NULL;
+    
+    visited = true;
+    
+    renderMVP = mat4::IdentityMatrix;
+    renderMV = mat4::IdentityMatrix;
+    renderMVIT = mat4::IdentityMatrix;
+    renderMVInv = mat4::IdentityMatrix;
+    renderViewProjection = mat4::IdentityMatrix;
+    
+    renderDirty = true;
+}
+
+Transform::~Transform(){
+    
+}
+

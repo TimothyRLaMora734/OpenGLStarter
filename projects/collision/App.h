@@ -15,12 +15,9 @@ using namespace aRibeiro;
 
 class App : public AppBase {
 
-
-	FreeMoveCamera freeMoveCamera;
-
-	Transform *root;
-
+    //
     // render state
+    //
     GLRenderState *renderState;
     //
     // time processor
@@ -31,24 +28,21 @@ class App : public AppBase {
     //
     GLShaderColor *shaderColor;
     //
-    // auxiliary matrix
-    //
-    //mat4 projection;
-    //mat4 camera;
-	//mat4 viewProjection;
-    TransformStack<mat4> modelHierarchy;
-    //
     // input helper
     //
     PressReleaseDetector left,right,up,down;
     //
     // auxiliary variables
     //
+    FreeMoveCamera freeMoveCamera;
+    Transform *root;
     bool rotateCounterClockwise;
     float angle_rad;
-    //vec3 cameraPosition;
     vec3 objectPosition;
-	Transform* box;
+	
+    Transform* box;
+    Transform* bigTriangle;
+    Transform* smallTriangle;
     
     void processInput();
     

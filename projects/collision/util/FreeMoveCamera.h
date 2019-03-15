@@ -9,7 +9,42 @@ using namespace aRibeiro;
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
 
-class FreeMoveCamera {
+#include "../Transform.h"
+
+
+
+class BaseCamera{
+protected:
+    mat4 viewProjection;
+    mat4 view;
+    mat4 viewIT;
+    mat4 viewInv;
+public:
+    BaseCamera(){
+        mat4 viewProjection = mat4::IdentityMatrix;
+        mat4 view = mat4::IdentityMatrix;
+        mat4 viewIT = mat4::IdentityMatrix;
+        mat4 viewInv = mat4::IdentityMatrix;
+    }
+    virtual ~BaseCamera(){
+    }
+    virtual mat4& getViewProjection(){
+        return viewProjection;
+    }
+    virtual mat4& getView(){
+        return view;
+    }
+    virtual mat4& getViewIT(){
+        return viewIT;
+    }
+    virtual mat4& getViewInv(){
+        return viewInv;
+    }
+};
+
+
+
+class FreeMoveCamera:public BaseCamera{
 
 	PressReleaseDetector left, right, up, down;
 
@@ -77,7 +112,11 @@ class FreeMoveCamera {
 		if (down.pressed)
 			position -= forwardVec * strafeSpeed * time->deltaTime;
 	}
-
+    
+    quat rotationCache;
+    vec3 positionCache;
+    mat4 projectionCache;
+    
 public:
 
 	Property<float> fovDegrees;
@@ -113,6 +152,7 @@ public:
 		fovDegrees.OnChange.add(this, &FreeMoveCamera::OnUpdateCameraFloatParameter);
 		nearPlane.OnChange.add(this, &FreeMoveCamera::OnUpdateCameraFloatParameter);
 		farPlane.OnChange.add(this, &FreeMoveCamera::OnUpdateCameraFloatParameter);
+        
 	}
 
 	~FreeMoveCamera() {
@@ -120,27 +160,40 @@ public:
 		appBase->WindowSize.OnChange.remove(this, &FreeMoveCamera::OnWindowSizeChanged);
 		appBase->OnUpdate.remove(this, &FreeMoveCamera::Update);
 	}
-
-	mat4 computeTransformMatrix() {
-		return translate(position) * toMat4(rotation);
-	}
-
-	mat4 computeViewMatrix() {
-		//return toMat4(rotation) * translate(-position) ;// inv(computeTransformMatrix());
-		mat4 matrix = toMat4(inv(rotation));
-
-		vec3 t_inv = -position;
-
-		matrix.d1 = matrix.a1*t_inv.x + matrix.b1*t_inv.y + matrix.c1*t_inv.z;
-		matrix.d2 = matrix.a2*t_inv.x + matrix.b2*t_inv.y + matrix.c2*t_inv.z;
-		matrix.d3 = matrix.a3*t_inv.x + matrix.b3*t_inv.y + matrix.c3*t_inv.z;
-
-		return matrix;
-	}
-
-	mat4 computeViewProjectionMatrix() {
-		return projection * computeViewMatrix();
-	}
+    
+    void updateBaseMatrix(){
+        
+        if(rotationCache == rotation && positionCache == position && projectionCache == projection)
+            return;
+        
+        rotationCache = rotation;
+        positionCache = position;
+        projectionCache = projection;
+        
+        mat4 rotationBase = toMat4(rotation);
+        
+        viewInv = rotationBase;
+        
+        viewInv.d1 = position.x;
+        viewInv.d2 = position.y;
+        viewInv.d3 = position.z;
+        
+        view = transpose(rotationBase);
+        viewIT = view;
+        
+        vec3 t_inv = -position;
+        
+        view.d1 = view.a1*t_inv.x + view.b1*t_inv.y + view.c1*t_inv.z;
+        view.d2 = view.a2*t_inv.x + view.b2*t_inv.y + view.c2*t_inv.z;
+        view.d3 = view.a3*t_inv.x + view.b3*t_inv.y + view.c3*t_inv.z;
+        
+        viewIT.a4 = position.x;
+        viewIT.b4 = position.y;
+        viewIT.c4 = position.z;
+        
+        viewProjection = projection * view;
+    }
+    
 };
 
 

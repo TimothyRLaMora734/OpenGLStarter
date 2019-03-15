@@ -5,122 +5,192 @@
 using namespace aRibeiro;
 
 class TrianglesModel;
-class Transform;
 
+extern int stat_num_visited;
+extern int stat_num_recalculated;
+extern int stat_draw_recalculated;
 
-class Node {
-	std::vector<Transform*> children;
-	Transform* parent;
-
-	//private copy constructores, to avoid copy...
-	Node(const Node& v);
-	void operator=(const Node& v);
-
-protected:
-
-	Transform* root;
-
-	Node();
-
+class Transform {
+    Transform(const Transform& v);
+    void operator=(const Transform& v);
+    
+    ///////////////////////////////////////////////////////
+    //
+    //
+    //
+    // Node Hierarchy structure and operations
+    //
+    //
+    //
+    ///////////////////////////////////////////////////////
+private:
+    std::vector<Transform*> children;
+    Transform* parent;
+    
 public:
-	Transform* addChild(Transform* transform);
-	Transform* removeChild(int index);
-	Transform* removeChild(Transform * transform);
-	std::vector<Transform*> &getChildren();
-	Transform *getParent();
-	void setParent(Transform *prnt);
-	bool isRoot();
-
-	virtual ~Node();
+    
+    Transform* removeChild(int index);
+    Transform* removeChild(Transform * transform);
+    Transform* addChild(Transform * transform);
+    std::vector<Transform*> &getChildren();
+    Transform *getParent();
+    void setParent(Transform *prnt);
+    bool isRoot();
+    ///////////////////////////////////////////////////////
+    //
+    //
+    //
+    // Transform default graph operations
+    //
+    //
+    //
+    ///////////////////////////////////////////////////////
+private:
+    vec3 localPosition;
+    vec3 localEuler;
+    quat localRotation;
+    vec3 localScale;
+    
+    bool localRotationBaseDirty;
+    mat4 localRotationBase;
+    
+    bool localMatrixDirty;
+    mat4 localMatrix;
+    bool localMatrixInverseTransposeDirty;
+    mat4 localMatrixInverseTranspose;
+    bool localMatrixInverseDirty;
+    mat4 localMatrixInverse;
+    
+    
+    void updateLocalRotationBase();
+public:
+    
+    vec3 getLocalPosition()const;
+    vec3 getLocalEuler()const;
+    quat getLocalRotation()const;
+    vec3 getLocalScale()const;
+    
+    void setLocalPosition( const vec3 &p );
+    void setLocalEuler( const vec3 &e);
+    void setLocalRotation( const quat &q );
+    void setLocalScale(const vec3 &s);
+    
+    mat4 & getLocalMatrix();
+    mat4 & getLocalMatrixInverseTranspose();
+    mat4 & getLocalMatrixInverse();
+    
+    ///////////////////////////////////////////////////////
+    //
+    //
+    //
+    // Transform Global Ops...
+    //
+    //
+    //
+    ///////////////////////////////////////////////////////
+private:
+    
+    bool matrixDirty;
+    mat4 matrix, matrixParent;
+    bool matrixInverseTransposeDirty;
+    mat4 matrixInverseTranspose, matrixInverseTransposeParent;
+    bool matrixInverseDirty;
+    mat4 matrixInverse, matrixInverseParent;
+    
+public:
+    mat4& getMatrix(bool useVisitedFlag = false);
+    mat4& getMatrixInverseTranspose(bool useVisitedFlag = false);
+    mat4& getMatrixInverse(bool useVisitedFlag = false);
+    
+    void setPosition(const vec3 &pos);
+    vec3 getPosition(bool useVisitedFlag = false);
+    void setRotation(const quat &rot);
+    quat getRotation(bool useVisitedFlag = false);
+    void setScale(const vec3 &s);
+    vec3 getScale(bool useVisitedFlag = false);
+    
+    ///////////////////////////////////////////////////////
+    //
+    //
+    //
+    // Transform Render Ops...
+    //
+    //
+    //
+    ///////////////////////////////////////////////////////
+private:
+    
+    mat4 renderMVP,renderMV,renderMVIT,renderMVInv, renderViewProjection;
+    bool renderDirty;
+public:
+    bool visited;
+    
+    void resetVisited(bool forceMarkFalse = false);
+    void preComputeTransforms();
+    void computeRenderMatrix(const mat4 &viewProjection,
+                         const mat4 &view,
+                         const mat4 &viewIT,
+                         const mat4 &viewInv,
+                         mat4 *mvp,
+                         mat4 *mv,
+                         mat4 *mvIT,
+                             mat4 *mvInv);
+    ///////////////////////////////////////////////////////
+    //
+    //
+    //
+    // Object References...
+    //
+    //
+    //
+    ///////////////////////////////////////////////////////
+private:
+public:
+    TrianglesModel *model;
+    
+    Transform();
+    virtual ~Transform();
 };
 
-class UpdateTag : public Node {
-	uint32_t ownTag;
-public:
-	UpdateTag() {
-		root = NULL;
-		ownTag = -1;
-	}
 
-	void tagModify() {
-		((UpdateTag*)root)->ownTag++;
-	}
+/*
+static void renderExample(Transform *element, BaseCamera *baseCamera) {
+    std::vector<Transform*> &children = element->getChildren();
+    for (int i = 0; i < children.size(); i++) {
+        renderExample(children[i],baseCamera);
+    }
+    
+    if (element->model != NULL) {
+        mat4 mvp;
+        mat4 mv;
+        mat4 mvIT;
+        mat4 mvInv;
+        element->computeRenderMatrix(
+                                     baseCamera->getViewProjection(),
+                                     baseCamera->getView(),
+                                     baseCamera->getViewIT(),
+                                     baseCamera->getViewInv(),
+                                     &mvp,
+                                     &mv,
+                                     &mvIT,
+                                     &mvInv);
+        
+        //
+        // Setup shader matrix...
+        //
+        
+    }
+}
 
-	bool isUpdated() {
-		return ((UpdateTag*)root)->ownTag == ownTag;
-	}
-
-};
-
-class Transform : public Node {
-
-	//private copy constructores, to avoid copy...
-	Transform(const Transform& v);
-	void operator=(const Transform& v);
-
-
-	bool dirty_matrixRotation;
-	mat4 matrixBaseRotation;
-
-	bool dirty_matrix;
-	mat4 matrix;
-	mat4 matrixParent;
-	mat4 matrixResult;
-	bool needToRecomputeMatrix;
-
-	bool dirty_matrix_it;
-	mat4 matrix_it;
-	mat4 matrix_itParent;
-	mat4 matrix_itResult;
-	bool needToRecomputeMatrixIT;
-
-	bool dirty_matrix_inv;
-	mat4 matrix_inv;
-	mat4 matrix_invParent;
-	mat4 matrix_invResult;
-	bool needToRecomputeMatrixInv;
-
-	void updateBaseRotation();
-	void OnLocalPositionScaleChange(Property<vec3> *prop);
-	void OnLocalEulerChange(Property<vec3> *prop);
-	void OnLocalRotationChange(Property<quat> *prop);
-
-public:
-	Property<vec3> localPosition;
-	Property<vec3> localEuler;
-	Property<quat> localRotation;
-	Property<vec3> scale;
-
-	vec3 forward();
-	vec3 backward();
-	vec3 right();
-	vec3 left();
-	vec3 up();
-	vec3 down();
-
-	Transform();
-
-	mat4 &computeMatrix();
-	mat4 &computeMatrixIT();
-	mat4 &computeMatrixInv();
-
-	mat4 &computeMatrixModelViewProjection();
-
-	void setPosition(const vec3 &pos);
-	vec3 getPosition();
-
-	void setRotation(const quat &rot);
-	quat getRotation();
-
-	TrianglesModel *model;
-	mat4 projection, projectionCache;
-	mat4 view, viewCache;
-	mat4 viewProjection;
-	mat4 modelViewProjection;
-	bool modelViewProjectionDirty;
-};
-
-
-
+static void renderExample() {
+    BaseCamera baseCamera;
+    Transform *root = new Transform();
+    
+    root->resetVisited();
+    root->preComputeTransforms();
+    
+    renderExample(root, &baseCamera);
+}
+*/
 
 #endif
