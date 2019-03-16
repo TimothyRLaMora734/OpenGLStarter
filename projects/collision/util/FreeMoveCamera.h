@@ -66,10 +66,10 @@ class FreeMoveCamera:public BaseCamera{
 		iSizeCenter.y = size.y / 2;
 
 		//fix inverted mouse coord
-		iSizeCenter.y = size.y - 1 - iSizeCenter.y;
+		//iSizeCenter.y = size.y - 1 - iSizeCenter.y;
 
 		screenCenter.x = iSizeCenter.x;
-		screenCenter.y = iSizeCenter.y;
+		screenCenter.y = size.y - 1 - iSizeCenter.y;// iSizeCenter.y;
 
 		sf::Mouse::setPosition(iSizeCenter, *appBase->window);
 
