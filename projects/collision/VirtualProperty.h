@@ -43,7 +43,7 @@ public:
 		this->getConst = (T(DelegateFriendObject::*)(void) const)get;
 		this->set = NULL;
 		this->getNormal = NULL;
-		this->setConst = ((DelegateFriendObject::*setConst)(const T&) const)set;
+		this->setConst = (void (DelegateFriendObject::*)(const T&) const)set;
 	}
 
 	template <typename C>
@@ -52,7 +52,7 @@ public:
 		this->getNormal = (T(DelegateFriendObject::*)(void))get;
 		this->set = NULL;
 		this->getConst = NULL;
-		this->setConst = ((DelegateFriendObject::*setConst)(const T&) const)set;
+		this->setConst = (void (DelegateFriendObject::*)(const T&) const)set;
 	}
 
 	void operator=(const T &param) const {
