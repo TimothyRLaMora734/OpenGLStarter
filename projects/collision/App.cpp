@@ -34,53 +34,59 @@ App::App(sf::RenderWindow *window, int w, int h):
     
 	root = new Transform();
 	box = root->addChild(new Transform());
+	box->LocalScale = vec3(0.2f, 0.2f, 0.2f);
 	box->model = CreateBox(vec3(1.0f,1.0f,1.0f));
     box->model->color = vec4(0.0f,0.5f,0.0f,1.0f);
-	box->setLocalScale(vec3(0.2f,0.2f,0.2f));
+	
 
 	Transform* sphere = box->addChild(new Transform());
+	sphere->LocalPosition = vec3(1.0f, 0.0f, 0.0f);
 	sphere->model = CreateSphere(7, 7, 0.5f);
     sphere->model->color = vec4(0.0f,0.0f,0.5f,1.0f);
-	sphere->setLocalPosition(vec3(1.0f,0.0f,0.0f));
+	
 
 	sphere = box->addChild(new Transform());
+	sphere->LocalPosition = vec3(-1.0f, 0.0f, 0.0f);
 	sphere->model = CreateSphere(7, 7, 0.5f);
     sphere->model->color = vec4(0.5f,0.0f,0.0f,1.0f);
-	sphere->setLocalPosition(vec3(-1.0f, 0.0f, 0.0f));
+	
     
     Transform* otherNode = root->addChild(new Transform());
     otherNode->addChild(new Transform());
     otherNode = otherNode->addChild(new Transform())->addChild(new Transform());
-    
+	otherNode->LocalPosition = vec3(0, 0, -5.0f);
     otherNode->model = CreateSphere(3, 3, 0.25f);
     otherNode->model->color = vec4(0.5f,0.0f,0.5f,1.0f);
-    otherNode->setLocalPosition(vec3(0,0,-5.0f));
+    
 
     Transform * plane = root->addChild(new Transform());
     plane->model = CreatePlane(vec3(4.0f,0.0f,4.0f));
     plane->model->color = vec4(0.5f,0.5f,0.5f,1.0f);
     
     smallTriangle = root->addChild(new Transform());
+	smallTriangle->LocalPosition = vec3(0.0f, 0.4f, 0.0f);
+	smallTriangle->LocalScale = vec3(0.2f, 0.2f, 0.2f);
     smallTriangle->model = CreateTriangle();
     smallTriangle->model->color = vec4(1.0f,0.0f,0.0f,1.0f);
-    smallTriangle->setLocalPosition(vec3(0.0f,0.4f,0.0f));
-    smallTriangle->setLocalScale(vec3(0.2f,0.2f,0.2f));
+    
     
     otherNode = smallTriangle->addChild(new Transform());
+	otherNode->LocalPosition = vec3(-1.0f, 0.0f, 0.0f);
     otherNode->model = CreateTriangle();
     otherNode->model->color = vec4(0.0f,1.0f,0.0f,1.0f);
-    otherNode->setLocalPosition(vec3(-1.0f,0.0f,0.0f));
+    
     
     otherNode = smallTriangle->addChild(new Transform());
+	otherNode->LocalPosition = vec3(1.0f, 0.0f, 0.0f);
     otherNode->model = CreateTriangle();
     otherNode->model->color = vec4(0.0f,0.0f,1.0f,1.0f);
-    otherNode->setLocalPosition(vec3(1.0f,0.0f,0.0f));
+    
     
     //smallTriangle =
     bigTriangle = box->addChild(new Transform());
+	bigTriangle->Scale = vec3(1.0f);
     bigTriangle->model = CreateTriangle();
     bigTriangle->model->color = vec4(0.0f,1.0f,1.0f,1.0f);
-    bigTriangle->setScale(vec3(1.0f));
 
     time.update();
 }
@@ -119,8 +125,8 @@ void App::draw() {
     //
     // Update Nodes
     //
-    smallTriangle->setLocalEuler(vec3(0.0f, angle_rad, angle_rad*0.1f));
-    box->setLocalPosition(objectPosition);
+    smallTriangle->LocalEuler = vec3(0.0f, angle_rad, angle_rad*0.1f);
+    box->LocalPosition = objectPosition;
 
     //
     // Draw

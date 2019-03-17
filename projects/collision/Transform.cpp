@@ -6,7 +6,17 @@ int stat_num_recalculated;
 int stat_draw_recalculated;
 
 
-Transform::Transform(const Transform& v) {}
+Transform::Transform(const Transform& v) :
+
+	LocalPosition(this, &Transform::getLocalPosition, &Transform::setLocalPosition),
+	LocalEuler(this, &Transform::getLocalEuler, &Transform::setLocalEuler),
+	LocalRotation(this, &Transform::getLocalRotation, &Transform::setLocalRotation),
+	LocalScale(this, &Transform::getLocalScale, &Transform::setLocalScale),
+
+	Position(this, &Transform::getPosition, &Transform::setPosition),
+	Euler(this, &Transform::getEuler, &Transform::setEuler),
+	Rotation(this, &Transform::getRotation, &Transform::setRotation),
+	Scale(this, &Transform::getScale, &Transform::setScale) {}
 void Transform::operator=(const Transform& v) {}
 
 ///////////////////////////////////////////////////////
@@ -365,9 +375,35 @@ vec3 Transform::getPosition(bool useVisitedFlag) {
     return toVec3(getMatrix(useVisitedFlag)[3]);
 }
 
+vec3 Transform::getPosition() {
+	return toVec3(getMatrix(false)[3]);
+}
+
+void Transform::setEuler(const vec3 &rot) {
+	quat q = extractQuat(getMatrixInverse());
+	setLocalRotation(q * quatFromEuler(rot.x, rot.y, rot.z) * inv(localRotation));
+}
+
+vec3 Transform::getEuler() {
+	vec3 euler;
+	extractEuler(getMatrix(false), &euler.x, &euler.y, &euler.z);
+	return euler;
+}
+
+vec3 Transform::getEuler(bool useVisitedFlag = false) {
+	vec3 euler;
+	extractEuler(getMatrix(useVisitedFlag), &euler.x, &euler.y, &euler.z);
+	return euler;
+}
+
 void Transform::setRotation(const quat &rot) {
     quat q = extractQuat(getMatrixInverse());
     setLocalRotation(  q * rot * inv( localRotation ) );
+}
+
+quat Transform::getRotation() {
+	quat q = extractQuat(getMatrix(false));
+	return q;
 }
 
 quat Transform::getRotation(bool useVisitedFlag) {
@@ -379,6 +415,11 @@ void Transform::setScale(const vec3 &s) {
     mat4 &m = getMatrixInverse();
     vec3 newScale = vec3( length( toVec3(m[0]) ) * s.x, length( toVec3(m[1]) ) * s.y, length( toVec3(m[2]) ) * s.z );
     setLocalScale( newScale );
+}
+
+vec3 Transform::getScale() {
+	mat4 &m = getMatrix(false);
+	return vec3(length(toVec3(m[0])), length(toVec3(m[1])), length(toVec3(m[2])));
 }
 
 vec3 Transform::getScale(bool useVisitedFlag) {
@@ -475,7 +516,18 @@ void Transform::computeRenderMatrix(const mat4 &viewProjection,
 //
 ///////////////////////////////////////////////////////
 
-Transform::Transform(){
+Transform::Transform():
+
+	LocalPosition(this,&Transform::getLocalPosition,&Transform::setLocalPosition),
+	LocalEuler(this, &Transform::getLocalEuler, &Transform::setLocalEuler),
+	LocalRotation(this, &Transform::getLocalRotation, &Transform::setLocalRotation),
+	LocalScale(this, &Transform::getLocalScale, &Transform::setLocalScale),
+
+	Position(this, &Transform::getPosition, &Transform::setPosition),
+	Euler(this, &Transform::getEuler, &Transform::setEuler),
+	Rotation(this, &Transform::getRotation, &Transform::setRotation),
+	Scale(this, &Transform::getScale, &Transform::setScale)
+{
     //hierarchy ops
     parent = NULL;
     //transform
