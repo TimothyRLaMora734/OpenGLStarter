@@ -126,7 +126,7 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 		// https://github.com/g-truc/glm
 		//
 		// get cosine of angle between vectors (-1 -> 1)
-		float CosAlpha = dot( normalize(a), normalize(b) );
+		float CosAlpha = clamp(dot( normalize(a), normalize(b) ), -1.0f, 1.0f);
 		// get angle (0 -> pi)
 		float Alpha = acos(CosAlpha);
 		// get sine of angle between vectors (0 -> 1)
@@ -140,7 +140,7 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 	}
 
 	float angleBetween(const vec3& a, const vec3& b) {
-		float cosA = dot(normalize(a), normalize(b));
+		float cosA = clamp(dot(normalize(a), normalize(b)),-1.0f,1.0f);
 		return acos(cosA);
 	}
 
@@ -215,7 +215,7 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 	vec2 normalize(const vec2& vec) {
 		vec2 result = vec;
 		if (vec == vec2(0)) return vec;
-		const float TOLERANCE = 0.001f;
+		const float TOLERANCE = 1e-6f;
 		// Don't normalize if we don't have to
 		float mag2 = dot(vec, vec);
 		if (fabs(mag2) > TOLERANCE && fabs(mag2 - 1.0f) > TOLERANCE)
@@ -225,7 +225,7 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 	vec3 normalize(const vec3& vec) {
 		vec3 result = vec;
 		if (vec == vec3(0)) return vec;
-		const float TOLERANCE = 0.001f;
+		const float TOLERANCE = 1e-6f;
 		// Don't normalize if we don't have to
 		float mag2 = dot(vec, vec);
 		if (fabs(mag2) > TOLERANCE && fabs(mag2 - 1.0f) > TOLERANCE)
@@ -235,7 +235,7 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 	vec4 normalize(const vec4& vec) {
 		vec4 result = vec;
 		if (vec == vec4(0)) return vec;
-		const float TOLERANCE = 0.001f;
+		const float TOLERANCE = 1e-6f;
 		// Don't normalize if we don't have to
 		float mag2 = dot(vec, vec);
 		if (fabs(mag2) > TOLERANCE && fabs(mag2 - 1.0f) > TOLERANCE)
@@ -1492,7 +1492,7 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 		axis->x = q.x / scale;
 		axis->y = q.y / scale;
 		axis->z = q.z / scale;
-		*angle = acos(q.w) * 2.0f;
+		*angle = acos(clamp(q.w,-1.0f,1.0f)) * 2.0f;
 	}
 	//------------------------------------------------------------------------------
 
@@ -1787,7 +1787,7 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 		return conjugate(q);
 		/*
 		quat result;
-		const float TOLERANCE = 0.001f;
+		const float TOLERANCE = 1e-6f;
 		// Don't normalize if we don't have to
 		float mag2 = q.w * q.w + q.x * q.x + q.y * q.y + q.z * q.z;
 		if (fabs(mag2) > TOLERANCE && fabs(mag2 - 1.0f) > TOLERANCE) {
@@ -1806,7 +1806,9 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 	}
 
 	float angleBetween(const quat& a, const quat& b) {
-		return acos(dot(normalize(a), normalize(b))) * 2.0f;
+		return acos(
+                    clamp(dot(normalize(a), normalize(b)),-1.0f,1.0f)
+                    ) * 2.0f;
 		//return acos( dot(normalize(vec3(a.x, a.y, a.z)), normalize(vec3(b.x, b.y, b.z))) );
 	}
 
@@ -1849,7 +1851,8 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 
 
 	vec3 moveSlerp(const vec3 &current, const vec3 &target, float maxAngleVariation) {
-		const float EPSILON = 1e-6f;
+		//const float EPSILON = 1e-6f;
+        const float EPSILON = 1e-6f;
 		float deltaAngle = angleBetween(current, target);
 		if (deltaAngle < maxAngleVariation + EPSILON)
 			return target;
