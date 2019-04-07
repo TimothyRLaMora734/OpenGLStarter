@@ -131,12 +131,17 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 		float Alpha = acos(CosAlpha);
 		// get sine of angle between vectors (0 -> 1)
 		float SinAlpha = sin(Alpha);
-		// this breaks down when SinAlpha = 0, i.e. Alpha = 0 or pi
-		float t1 = sin( (1.0f - lerp) * Alpha ) / SinAlpha;
-		float t2 = sin(lerp * Alpha) / SinAlpha;
+        
+        // simply perform linear interpolation if sinAlpha = 0
+        if (absv(SinAlpha) < 1e-6f )
+            return a + (b - a) * lerp;
+        
+        // this breaks down when SinAlpha = 0, i.e. Alpha = 0 or pi
+        float t1 = sin( (1.0f - lerp) * Alpha ) / SinAlpha;
+        float t2 = sin(lerp * Alpha) / SinAlpha;
 
-		// interpolate src vectors
-		return a * t1 + b * t2;
+        // interpolate src vectors
+        return a * t1 + b * t2;
 	}
 
 	float angleBetween(const vec3& a, const vec3& b) {
@@ -1850,20 +1855,47 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 	}
 
 
-	vec3 moveSlerp(const vec3 &current, const vec3 &target, float maxAngleVariation) {
+	vec3 moveSlerp(const vec3 &currentParam, const vec3 &target, float maxAngleVariation) {
+        vec3 current = currentParam;
 		//const float EPSILON = 1e-6f;
         const float EPSILON = 1e-6f;
 		float deltaAngle = angleBetween(current, target);
 		if (deltaAngle < maxAngleVariation + EPSILON)
 			return target;
-		return slerp(current, target, maxAngleVariation / deltaAngle);
+        
+        // 180º case interpolation -- force one orientation based on eulerAngle
+        if (deltaAngle >= PI - 1e-6f){
+            static const quat fixedRotation = quatFromEuler(DEG2RAD(0.5f),DEG2RAD(0.5f),DEG2RAD(0.5f));
+            current = fixedRotation * current;
+            deltaAngle = angleBetween(current, target);
+        }
+        
+        float lrpFactor = maxAngleVariation / deltaAngle;
+        vec3 result = slerp(current, target, lrpFactor);
+        
+        float lengthCurrent = length(current);
+        float lengthTarget = length(target);
+        
+        result = normalize(result) * lerp(lengthCurrent, lengthTarget, lrpFactor);
+
+		return result;
 	}
 
-	quat moveSlerp(const quat &current, const quat &target, float maxAngleVariation) {
+	quat moveSlerp(const quat &currentParam, const quat &target, float maxAngleVariation) {
+        quat current = currentParam;
+        
 		const float EPSILON = 1e-6f;
 		float deltaAngle = angleBetween(current, target);
 		if (deltaAngle < maxAngleVariation + EPSILON)
 			return target;
+        
+        // 180º case interpolation -- force one orientation based on eulerAngle
+        if (deltaAngle >= PI - 1e-6f){
+            static const quat fixedRotation = quatFromEuler(DEG2RAD(0.5f),DEG2RAD(0.5f),DEG2RAD(0.5f));
+            current = fixedRotation * current;
+            deltaAngle = angleBetween(current, target);
+        }
+        
 		return slerp(current, target, maxAngleVariation / deltaAngle);
 	}
 
