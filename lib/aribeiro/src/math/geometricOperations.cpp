@@ -1081,6 +1081,31 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 				z.x, z.y, z.z, -dot(z, position),
 				0, 0, 0, 1);
 	}
+    
+    mat4 modelLookAt(const vec3 &front, const vec3 &up, const vec3 &position) {
+        vec3 lookTo = front;
+        vec3 x, y, z;
+        z = normalize(lookTo)*-1;
+        x = normalize(cross(up, z));
+        y = normalize(cross(z, x));
+        return //scale(0.002f,0.002f,0.002f)*
+        mat4(x.x, y.x, z.x, position.x,
+             x.y, y.y, z.y, position.y,
+             x.z, y.z, z.z, position.z,
+             0, 0, 0, 1);
+    }
+    quat quatLookAtRotation(const vec3 &front, const vec3 &up){
+        vec3 lookTo = front;
+        vec3 x, y, z;
+        z = normalize(lookTo)*-1;
+        x = normalize(cross(up, z));
+        y = normalize(cross(z, x));
+        return extractQuat(
+        mat4(x.x, y.x, z.x, 0,
+             x.y, y.y, z.y, 0,
+             x.z, y.z, z.z, 0,
+             0, 0, 0, 1));
+    }
 	//------------------------------------------------------------------------------
 	/*
 	** inverse = invert(src)
@@ -1435,7 +1460,15 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 		return quat(-a.x, -a.y, -a.z, a.w);
 	}
 	//------------------------------------------------------------------------------
-	quat extractQuat(const mat4& m) {
+	quat extractQuat(const mat4& mp) {
+        mat4 m = mp;
+        
+        //normalize rotation part
+        m[0] = toVec4(normalize(toVec3(m[0])));
+        m[1] = toVec4(normalize(toVec3(m[1])));
+        m[2] = toVec4(normalize(toVec3(m[2])));
+        
+        
 		float t = 1.0f + m._11 + m._22 + m._33;
 		// large enough
 		if (t > 0.001f) {

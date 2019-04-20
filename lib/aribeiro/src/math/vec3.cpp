@@ -38,11 +38,17 @@ vec3::vec3( const vec3 &a, const vec3 &b ){
 }
 
 bool vec3::operator==(const vec3&v) const {
-	return memcmp(array, v.array, sizeof(float) * 3) == 0;
+    for(int i=0;i<3;i++){
+        if (absv(array[i]-v.array[i]) > 1e-4f)
+            return false;
+    }
+    return true;
+	//return memcmp(array, v.array, sizeof(float) * 3) == 0;
 }
 
 bool vec3::operator!=(const vec3&v) const {
-	return memcmp(array, v.array, sizeof(float) * 3) != 0;
+    return !((*this) == v);
+	//return memcmp(array, v.array, sizeof(float) * 3) != 0;
 }
 
 vec3& vec3::operator+=(const vec3& v){

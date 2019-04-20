@@ -33,60 +33,78 @@ App::App(sf::RenderWindow *window, int w, int h):
     //
     
 	root = new Transform();
+    
+    
+    
+    cameraPerspective = new ComponentCameraPerspective(this);
+    
+    Transform* cameraTransform = root->addChild(new Transform());
+    cameraTransform->addComponent(cameraPerspective);
+    
+    cameraPerspective->transform->LocalPosition = vec3(0.0f, 0.4f, 2.0f);
+    
 	box = root->addChild(new Transform());
 	box->LocalScale = vec3(0.2f, 0.2f, 0.2f);
-	box->model = CreateBox(vec3(1.0f,1.0f,1.0f));
-    box->model->color = vec4(0.0f,0.5f,0.0f,1.0f);
+    comps.add(
+      box->addComponent(ComponentColorMeshVBO::createBox(vec4(0.0f,0.5f,0.0f,1.0f), vec3(1.0f,1.0f,1.0f)))
+    );
 	
 
 	Transform* sphere = box->addChild(new Transform());
 	sphere->LocalPosition = vec3(1.0f, 0.0f, 0.0f);
-	sphere->model = CreateSphere(7, 7, 0.5f);
-    sphere->model->color = vec4(0.0f,0.0f,0.5f,1.0f);
+    comps.add(
+      sphere->addComponent(ComponentColorMeshVBO::createSphere(vec4(0.0f,0.0f,0.5f,1.0f), 0.5f,7,7))
+    );
 	
 
 	sphere = box->addChild(new Transform());
 	sphere->LocalPosition = vec3(-1.0f, 0.0f, 0.0f);
-	sphere->model = CreateSphere(7, 7, 0.5f);
-    sphere->model->color = vec4(0.5f,0.0f,0.0f,1.0f);
+    comps.add(
+              sphere->addComponent(ComponentColorMeshVBO::createSphere(vec4(0.5f,0.0f,0.0f,1.0f), 0.5f,7,7))
+              );
 	
     
     Transform* otherNode = root->addChild(new Transform());
     otherNode->addChild(new Transform());
     otherNode = otherNode->addChild(new Transform())->addChild(new Transform());
 	otherNode->LocalPosition = vec3(0, 0, -5.0f);
-    otherNode->model = CreateSphere(3, 3, 0.25f);
-    otherNode->model->color = vec4(0.5f,0.0f,0.5f,1.0f);
-    
+    comps.add(
+              otherNode->addComponent(ComponentColorMeshVBO::createSphere(vec4(0.5f,0.0f,0.5f,1.0f), 0.25f,3,3))
+              );
 
     Transform * plane = root->addChild(new Transform());
-    plane->model = CreatePlane(vec3(4.0f,0.0f,4.0f));
-    plane->model->color = vec4(0.5f,0.5f,0.5f,1.0f);
+    comps.add(
+              plane->addComponent(ComponentColorMeshVBO::createPlane(vec4(0.5f,0.5f,0.5f,1.0f), vec3(4.0f,0.0f,4.0f)))
+              );
     
     smallTriangle = root->addChild(new Transform());
 	smallTriangle->LocalPosition = vec3(0.0f, 0.4f, 0.0f);
 	smallTriangle->LocalScale = vec3(0.2f, 0.2f, 0.2f);
-    smallTriangle->model = CreateTriangle();
-    smallTriangle->model->color = vec4(1.0f,0.0f,0.0f,1.0f);
+    comps.add(
+              smallTriangle->addComponent(ComponentColorMeshVBO::createTriangle(vec4(1.0f,0.0f,0.0f,1.0f)))
+              );
     
     
     otherNode = smallTriangle->addChild(new Transform());
 	otherNode->LocalPosition = vec3(-1.0f, 0.0f, 0.0f);
-    otherNode->model = CreateTriangle();
-    otherNode->model->color = vec4(0.0f,1.0f,0.0f,1.0f);
+    comps.add(
+              otherNode->addComponent(ComponentColorMeshVBO::createTriangle(vec4(0.0f,1.0f,0.0f,1.0f)))
+              );
     
     
     otherNode = smallTriangle->addChild(new Transform());
 	otherNode->LocalPosition = vec3(1.0f, 0.0f, 0.0f);
-    otherNode->model = CreateTriangle();
-    otherNode->model->color = vec4(0.0f,0.0f,1.0f,1.0f);
+    comps.add(
+              otherNode->addComponent(ComponentColorMeshVBO::createTriangle(vec4(0.0f,0.0f,1.0f,1.0f)))
+              );
     
     
     //smallTriangle =
     bigTriangle = box->addChild(new Transform());
 	bigTriangle->Scale = vec3(1.0f);
-    bigTriangle->model = CreateTriangle();
-    bigTriangle->model->color = vec4(0.0f,1.0f,1.0f,1.0f);
+    comps.add(
+              bigTriangle->addComponent(ComponentColorMeshVBO::createTriangle(vec4(0.0f,1.0f,1.0f,1.0f)))
+              );
 
     time.update();
 }
@@ -125,9 +143,32 @@ void App::draw() {
     //
     // Update Nodes
     //
-    smallTriangle->LocalEuler = vec3(0.0f, angle_rad, angle_rad*0.1f);
-    box->LocalPosition = objectPosition;
+    
+    cameraPerspective->transform->lookAt(bigTriangle);
 
+    //smallTriangle->Rotation = quatFromEuler(0, angle_rad, angle_rad*0.1f);
+    
+    smallTriangle->Euler = vec3(0.0f, angle_rad, angle_rad*0.1f);
+    
+    //smallTriangle->getChildAt(0)->Euler = (vec3)smallTriangle->getChildAt(0)->Euler;
+    
+    //smallTriangle->getChildAt(0)->LocalRotation = quatFromEuler(0, angle_rad * 0.2f, 0) ;
+    
+    //smallTriangle->getChildAt(0)->lookAt(cameraPerspective->transform);
+    //smallTriangle->getChildAt(0)->Rotation = (quat)smallTriangle->getChildAt(0)->Rotation * quatFromEuler(0, DEG2RAD(180.0f), 0);
+    
+    //smallTriangle->getChildAt(0)->Rotation = (quat)smallTriangle->getChildAt(0)->Rotation;
+    
+    //smallTriangle->getChildAt(0)->Scale = (vec3)smallTriangle->getChildAt(0)->Scale;
+    
+    
+    
+    //smallTriangle->Euler = (vec3)smallTriangle->Euler;
+    //smallTriangle->Rotation = (quat)smallTriangle->Rotation;
+    
+    //box->LocalPosition = objectPosition;
+    box->Position = objectPosition;
+    
     //
     // Draw
     //
@@ -162,6 +203,54 @@ void App::drawPrimitive(GLuint oglPrimitive, const mat4 &modelViewProjection, co
 }
 
 void App::drawTraverseTreeDepthFirst(Transform *element) {
+    
+    bool alreadySetupMatrix = false;
+    
+    for(int i=0;i<element->getComponentCount();i++){
+        Component* component = element->getComponentAt(i);
+        if (component->getType() == ComponentTypeColorMeshVBO){
+            // Setup matrix
+            if (!alreadySetupMatrix){
+                alreadySetupMatrix = true;
+                mat4 mvp;
+                mat4 mv;
+                mat4 mvIT;
+                mat4 mvInv;
+                /*
+                element->computeRenderMatrix(
+                                             freeMoveCamera.getViewProjection(),
+                                             freeMoveCamera.getView(),
+                                             freeMoveCamera.getViewIT(),
+                                             freeMoveCamera.getViewInv(),
+                                             &mvp,
+                                             &mv,
+                                             &mvIT,
+                                             &mvInv);*/
+                element->computeRenderMatrix(cameraPerspective->viewProjection,
+                                             cameraPerspective->view,
+                                             cameraPerspective->viewIT,
+                                             cameraPerspective->viewInv,
+                                             &mvp,
+                                             &mv,
+                                             &mvIT,
+                                             &mvInv);
+                
+                shaderColor->setMatrix(mvp);
+            }
+            // render object
+            {
+                ComponentColorMeshVBO* componentColorMeshVBO = (ComponentColorMeshVBO*)component;
+                shaderColor->setColor( componentColorMeshVBO->color );
+                componentColorMeshVBO->setLayoutPointers(GLShaderColor::vPosition);
+                
+                componentColorMeshVBO->draw();
+                
+                componentColorMeshVBO->unsetLayoutPointers(GLShaderColor::vPosition);
+            }
+        }
+    }
+    
+    /*
 	if (element->model != NULL) {
         mat4 mvp;
         mat4 mv;
@@ -182,11 +271,14 @@ void App::drawTraverseTreeDepthFirst(Transform *element) {
 		element->model->setLayoutPointers(GLShaderColor::vPosition);
 
 		element->model->draw();
+        
+        element->model->unsetLayoutPointers(GLShaderColor::vPosition);
 	}
+     */
+    
 
-	std::vector<Transform*> &children = element->getChildren();
-	for (int i = 0; i < children.size(); i++) {
-		drawTraverseTreeDepthFirst(children[i]);
+	for (int i = 0; i < element->getChildCount(); i++) {
+		drawTraverseTreeDepthFirst(element->getChildAt(i));
 	}
 }
 
@@ -202,6 +294,8 @@ void App::drawModelsFromTree() {
     root->resetVisited();
     root->preComputeTransforms();
     
+    cameraPerspective->precomputeViewProjection(true);
+    
 	drawTraverseTreeDepthFirst(root);
     
     printf("visited: %i\ttransform recalc: %i\tdraw recalc: %i\n",
@@ -210,17 +304,21 @@ void App::drawModelsFromTree() {
            stat_draw_recalculated
            );
 
-	TrianglesModel::unsetLayoutPointers(GLShaderColor::vPosition);
+	//TrianglesModel::unsetLayoutPointers(GLShaderColor::vPosition);
 
 }
 
 void App::deleteTree(Transform **element) {
-	std::vector<Transform*> &children = (*element)->getChildren();
-	for (int i = children.size()-1; i >=0 ; i--) {
+	for (int i = (*element)->getChildCount()-1; i >=0 ; i--) {
 		Transform * t = (*element)->removeChild(i);
 		deleteTree(&t);
 	}
+    /*
 	if ((*element)->model != NULL)
 		setNullAndDelete((*element)->model);
+     */
+    for(int i=(*element)->getComponentCount()-1;i>=0;i--){
+        comps.remove((*element)->removeComponentAt(i));
+    }
 	setNullAndDelete(*element);
 }

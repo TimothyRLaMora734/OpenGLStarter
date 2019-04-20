@@ -36,13 +36,127 @@ AppBase *app = NULL;
 void freeOpenGLResources();
 void processSingleEvent(sf::RenderWindow &window, sf::Event &event);
 
+
+void testTransform() {
+    
+    // root
+    //  + n1 (30 degrees)
+    //    + n2
+    //  + n3 (30 degrees)
+    Transform * root = new Transform();
+    
+    Transform * n1 = root->addChild(new Transform());
+    
+    n1->LocalRotation = quatFromEuler(DEG2RAD(30.0f), 0, DEG2RAD(30.0f));
+    
+    n1->LocalScale = vec3(1.5f);//,2.0f,3.0f);
+    
+    Transform * n2 = n1->addChild(new Transform());
+    
+    //check n2 global rotation... need to be equal the n1 localrotation
+    float angle = angleBetween((quat)n1->LocalRotation, (quat)n2->Rotation);
+    if (angle > 1e-3f){
+        printf("error...");
+        exit(-1);
+    }
+    
+    vec3 s1,s2;
+    s1 = n1->LocalScale;
+    s2 = n2->Scale;
+    
+    if (distance(s1,s2)> 1e-4f){
+        printf("error...");
+        exit(-1);
+    }
+    
+    printf("s2: %f %f %f\n",s2.x,s2.y,s2.z);
+    n2->LocalRotation = quatFromEuler(0, 0, DEG2RAD(30.0f));
+    s2 = n2->Scale;
+    printf("s2: %f %f %f\n",s2.x,s2.y,s2.z);
+    
+    //n2->LocalRotation = quat();
+    //n2->LocalPosition = vec3(10,6,5);
+    s2 = n2->Scale;
+    printf("s2: %f %f %f\n",s2.x,s2.y,s2.z);
+    
+    
+    mat4 a;
+    mat4 b;
+    
+    a = n2->getMatrix();
+    printf("\na\n");
+    printf("%f %f %f %f\n",a.a1,a.b1,a.c1,a.d1);
+    printf("%f %f %f %f\n",a.a2,a.b2,a.c2,a.d2);
+    printf("%f %f %f %f\n",a.a3,a.b3,a.c3,a.d3);
+    printf("%f %f %f %f\n",a.a4,a.b4,a.c4,a.d4);
+    
+    //n2->Euler = (vec3)n2->Euler;
+    
+    s1 = n2->Scale;
+    
+    n2->Scale = (vec3)n2->Scale;
+    
+    s2 = n2->Scale;
+    
+    b = n2->getMatrix();
+    printf("\nb\n");
+    printf("%f %f %f %f\n",b.a1,b.b1,b.c1,b.d1);
+    printf("%f %f %f %f\n",b.a2,b.b2,b.c2,b.d2);
+    printf("%f %f %f %f\n",b.a3,b.b3,b.c3,b.d3);
+    printf("%f %f %f %f\n",b.a4,b.b4,b.c4,b.d4);
+    
+    if (a != b){
+        printf("error...");
+        exit(-1);
+    }
+    
+    
+    a = transpose(inv(n2->getMatrix()));
+    b = n2->getMatrixInverseTranspose();
+    printf("\na\n");
+    printf("%f %f %f %f\n",a.a1,a.b1,a.c1,a.d1);
+    printf("%f %f %f %f\n",a.a2,a.b2,a.c2,a.d2);
+    printf("%f %f %f %f\n",a.a3,a.b3,a.c3,a.d3);
+    printf("%f %f %f %f\n",a.a4,a.b4,a.c4,a.d4);
+    
+    printf("\nb\n");
+    printf("%f %f %f %f\n",b.a1,b.b1,b.c1,b.d1);
+    printf("%f %f %f %f\n",b.a2,b.b2,b.c2,b.d2);
+    printf("%f %f %f %f\n",b.a3,b.b3,b.c3,b.d3);
+    printf("%f %f %f %f\n",b.a4,b.b4,b.c4,b.d4);
+    if ( a != b ){
+        printf("error...");
+        exit(-1);
+    }
+    
+    n2->LocalRotation = quatFromEuler(0, DEG2RAD(30.0f), 0);
+    
+    
+    Transform * n3 = root->addChild(new Transform());
+    
+    n3->LocalRotation = quatFromEuler(DEG2RAD(30.0f), 0, DEG2RAD(30.0f)) * quatFromEuler(0, DEG2RAD(30.0f), 0);
+    
+    
+    angle = angleBetween((quat)n3->LocalRotation, (quat)n2->Rotation);
+    if (angle > 1e-3f){
+        printf("error...");
+        exit(-1);
+    }
+    
+    
+}
+
 int main(int argc, char* argv[]) {
+    
+    //testTransform();return 0;
     
     PlatformPath::setWorkingPath(PlatformPath::getExecutablePath(argv[0]));
     
     sf::ContextSettings contextSettings;
     contextSettings.depthBits = 24;
     contextSettings.sRgbCapable = false;
+    
+    contextSettings.antialiasingLevel = 0;
     
     // OpenGL 2.0 context
     contextSettings.majorVersion = 2;
@@ -119,6 +233,10 @@ int main(int argc, char* argv[]) {
     //app->WindowSize = iSize(window.getSize().x, window.getSize().y);
     //app->OnSetSize.call(window.getSize().x, window.getSize().y);
     //SpaceInvaderGlobal->setupViewport(window.getSize().x, window.getSize().y);
+    
+    
+    //glEnable(GL_LINE_SMOOTH);
+    //glHint(GL_LINE_SMOOTH_HINT,GL_NICEST);
     
     //
     // Main Loop

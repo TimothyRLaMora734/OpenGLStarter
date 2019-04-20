@@ -18,10 +18,16 @@ quat::quat( const quat &v ){
     *this = v;
 }
 bool quat::operator==(const quat&v) const {
-	return memcmp(array, v.array, sizeof(float) * 4) == 0;
+    for(int i=0;i<4;i++){
+        if (absv(array[i]-v.array[i]) > 1e-4f)
+            return false;
+    }
+    return true;
+	//return memcmp(array, v.array, sizeof(float) * 4) == 0;
 }
 bool quat::operator!=(const quat&v) const {
-	return memcmp(array, v.array, sizeof(float) * 4) != 0;
+    return !((*this) == v);
+	//return memcmp(array, v.array, sizeof(float) * 4) != 0;
 }
 
 float& quat::operator[](const int v){

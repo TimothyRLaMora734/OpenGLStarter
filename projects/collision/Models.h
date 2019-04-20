@@ -6,6 +6,7 @@
 #include <aribeiro/aribeiro.h>
 using namespace aRibeiro;
 
+/*
 class GeneralVertexAttrib {
 public:
 	vec3 position;
@@ -472,5 +473,7 @@ static inline TrianglesModel *CreateSphere(int sectorCount, int stackCount, floa
 
 	return result;
 }
+
+*/
 
 #endif

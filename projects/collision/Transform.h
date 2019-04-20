@@ -3,6 +3,10 @@
 
 #include "VirtualProperty.h"
 
+#include "Components/Component.h"
+#include "Components/ComponentMesh.h"
+#include "Components/ComponentCamera.h"
+
 #include <aribeiro/aribeiro.h>
 using namespace aRibeiro;
 
@@ -34,7 +38,10 @@ public:
 	Transform* removeChild(int index);
 	Transform* removeChild(Transform * transform);
 	Transform* addChild(Transform * transform);
-	std::vector<Transform*> &getChildren();
+	//std::vector<Transform*> &getChildren();
+    int getChildCount();
+    Transform* getChildAt(int);
+    
 	Transform *getParent();
 	void setParent(Transform *prnt);
 	bool isRoot();
@@ -116,6 +123,8 @@ public:
 	void setScale(const vec3 &s);
 	vec3 getScale();
 	vec3 getScale(bool useVisitedFlag);
+    
+    void lookAt(const Transform* to, const vec3 &worldUp = vec3(0,1,0));
 
 	///////////////////////////////////////////////////////
 	//
@@ -163,6 +172,9 @@ public:
 	VirtualProperty<vec3> Euler;
 	VirtualProperty<quat> Rotation;
 	VirtualProperty<vec3> Scale;
+    
+    mat4& worldToLocalMatrix(bool useVisitedFlag=false);
+    mat4& LocalToWorldMatrix(bool useVisitedFlag=false);
 
 
 	///////////////////////////////////////////////////////
@@ -175,8 +187,20 @@ public:
 	//
 	///////////////////////////////////////////////////////
 private:
+    std::vector<Component*> components;
 public:
-	TrianglesModel *model;
+    Component* addComponent(Component*);
+    Component* removeComponent(Component*);
+    Component* removeComponentAt(int);
+    Component* findComponent(ComponentType)const;
+    std::vector<Component*> findComponents(ComponentType)const;
+    int getComponentCount()const;
+    Component* getComponentAt(int);
+    
+    Component* findComponentInChildren(ComponentType)const;
+    std::vector<Component*> findComponentsInChildren(ComponentType)const;
+    
+	//TrianglesModel *model;
 
 	Transform();
 	virtual ~Transform();

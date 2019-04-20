@@ -62,8 +62,18 @@ Transform* Transform::addChild(Transform * transform) {
     return transform;
 }
 
-std::vector<Transform*> &Transform::getChildren() {
-    return children;
+//std::vector<Transform*> &Transform::getChildren() {
+//    return children;
+//}
+
+int Transform::getChildCount() {
+    return children.size();
+}
+
+Transform* Transform::getChildAt(int i) {
+    if (i>=0 && i<children.size())
+        return children[i];
+    return NULL;
 }
 
 Transform *Transform::getParent() {
@@ -262,6 +272,8 @@ mat4 & Transform::getLocalMatrixInverse(){
         localMatrixInverseDirty = false;
         matrixInverseDirty = true;
         //renderDirty = true;
+        
+        //localMatrixInverse = inv( getLocalMatrix() );
     }
     return localMatrixInverse;
 }
@@ -368,7 +380,10 @@ mat4& Transform::getMatrixInverse(bool useVisitedFlag){
 
 
 void Transform::setPosition(const vec3 &pos) {
-    setLocalPosition( toVec3(getMatrixInverse() * toVec4(pos - localPosition)) );
+    if (parent != NULL && !parent->isRoot())
+        setLocalPosition( toVec3(parent->getMatrixInverse() * toPtn4(pos)) );
+    else
+        setLocalPosition( pos );
 }
 
 vec3 Transform::getPosition(bool useVisitedFlag) {
@@ -376,57 +391,77 @@ vec3 Transform::getPosition(bool useVisitedFlag) {
 }
 
 vec3 Transform::getPosition() {
-	return toVec3(getMatrix(false)[3]);
+	return getPosition(false);
 }
 
 void Transform::setEuler(const vec3 &rot) {
-	quat q = extractQuat(getMatrixInverse());
-	setLocalRotation(q * quatFromEuler(rot.x, rot.y, rot.z) * inv(localRotation));
+    if (parent != NULL && parent->isRoot())
+        setLocalEuler( rot );
+    
+    quat q = extractQuat(parent->getMatrixInverse());
+    setLocalRotation( q * quatFromEuler(rot.x, rot.y, rot.z) );
 }
 
 vec3 Transform::getEuler() {
-	vec3 euler;
-	extractEuler(getMatrix(false), &euler.x, &euler.y, &euler.z);
-	return euler;
+    return getEuler(false);
 }
 
 vec3 Transform::getEuler(bool useVisitedFlag = false) {
-	vec3 euler;
-	extractEuler(getMatrix(useVisitedFlag), &euler.x, &euler.y, &euler.z);
-	return euler;
+    if (parent != NULL && parent->isRoot())
+        return localEuler;
+    
+    vec3 euler;
+    extractEuler(getMatrix(useVisitedFlag), &euler.x, &euler.y, &euler.z);
+    return euler;
 }
 
 void Transform::setRotation(const quat &rot) {
-    quat q = extractQuat(getMatrixInverse());
-    setLocalRotation(  q * rot * inv( localRotation ) );
+    if (parent != NULL && parent->isRoot())
+        setLocalRotation( rot );
+        
+    quat q = extractQuat(parent->getMatrixInverse());
+    setLocalRotation( q * rot );
 }
 
 quat Transform::getRotation() {
-	quat q = extractQuat(getMatrix(false));
-	return q;
+    return getRotation(false);
 }
 
 quat Transform::getRotation(bool useVisitedFlag) {
+    if (parent != NULL && parent->isRoot())
+        return localRotation;
+    
     quat q = extractQuat(getMatrix(useVisitedFlag));
     return q;
 }
 
 void Transform::setScale(const vec3 &s) {
-    mat4 &m = getMatrixInverse();
-    vec3 newScale = vec3( length( toVec3(m[0]) ) * s.x, length( toVec3(m[1]) ) * s.y, length( toVec3(m[2]) ) * s.z );
-    setLocalScale( newScale );
+    if (parent != NULL && parent->isRoot())
+        setLocalScale( s );
+    
+    mat4 &m = parent->getMatrixInverse();
+    setLocalScale( vec3( length( toVec3(m[0]) ) * s.x, length( toVec3(m[1]) ) * s.y, length( toVec3(m[2]) ) * s.z ) );
 }
 
 vec3 Transform::getScale() {
-	mat4 &m = getMatrix(false);
-	return vec3(length(toVec3(m[0])), length(toVec3(m[1])), length(toVec3(m[2])));
+    return getScale(false);
 }
 
 vec3 Transform::getScale(bool useVisitedFlag) {
-    mat4 &m = getMatrix(useVisitedFlag);
-    return vec3( length( toVec3(m[0]) ), length( toVec3(m[1]) ), length( toVec3(m[2]) ) );
+    if (parent != NULL && parent->isRoot())
+        return localScale;
+    
+    mat4 m = getMatrix(useVisitedFlag);
+    return vec3(
+                length( vec3(m.a1,m.a2,m.a3) ),
+                length( vec3(m.b1,m.b2,m.b3) ),
+                length( vec3(m.c1,m.c2,m.c3) ) );
 }
 
+void Transform::lookAt(const Transform* to, const vec3 &worldUp) {
+    vec3 lookVector = (vec3)to->Position - (vec3)Position;
+    Rotation = quatLookAtRotation(lookVector, worldUp);
+}
 
 ///////////////////////////////////////////////////////
 //
@@ -496,6 +531,15 @@ void Transform::computeRenderMatrix(const mat4 &viewProjection,
     *mvInv = renderMVInv;
 }
 
+
+mat4& Transform::worldToLocalMatrix(bool useVisitedFlag) {
+    return getMatrixInverse(useVisitedFlag);
+}
+
+mat4& Transform::LocalToWorldMatrix(bool useVisitedFlag) {
+    return getMatrix(useVisitedFlag);
+}
+
 ///////////////////////////////////////////////////////
 //
 //
@@ -505,6 +549,91 @@ void Transform::computeRenderMatrix(const mat4 &viewProjection,
 //
 //
 ///////////////////////////////////////////////////////
+
+
+Component* Transform::addComponent(Component*c){
+    components.push_back(c);
+    c->transform = this;
+    return c;
+}
+
+Component* Transform::removeComponent(Component*c){
+    for(int i=0;i<components.size();i++) {
+        if (components[i] == c){
+            components.erase(components.begin()+i);
+            c->transform = NULL;
+            return c;
+        }
+    }
+    return NULL;
+}
+
+Component* Transform::removeComponentAt(int i) {
+    if (i>=0&&i<components.size()){
+        Component * result = components[i];
+        components.erase(components.begin()+i);
+        result->transform = NULL;
+        return result;
+    }
+    return NULL;
+}
+
+Component* Transform::findComponent(ComponentType t)const{
+    for(int i=0;i<components.size();i++) {
+        if (components[i]->getType() == t){
+            return components[i];
+        }
+    }
+    return NULL;
+}
+
+std::vector<Component*> Transform::findComponents(ComponentType t) const{
+    std::vector<Component*> result;
+    for(int i=0;i<components.size();i++) {
+        if (components[i]->getType() == t){
+            result.push_back(components[i]);
+        }
+    }
+    return result;
+}
+
+int Transform::getComponentCount()const{
+    return components.size();
+}
+Component* Transform::getComponentAt(int i){
+    if (i>=0&&i<components.size())
+        return components[i];
+    return NULL;
+}
+
+
+Component* Transform::findComponentInChildren(ComponentType t)const{
+    Component* result = NULL;
+    for(int i=0;i<children.size();i++){
+        result = children[i]->findComponent(t);
+        if (result != NULL)
+            return result;
+        result = children[i]->findComponentInChildren(t);
+        if (result != NULL)
+            return result;
+    }
+    return result;
+}
+
+std::vector<Component*> Transform::findComponentsInChildren(ComponentType t)const{
+    std::vector<Component*> result;
+    std::vector<Component*> parcialResult;
+    for(int i=0;i<children.size();i++){
+        parcialResult = children[i]->findComponents(t);
+        if (parcialResult.size()>0)
+            result.insert(result.end(), parcialResult.begin(), parcialResult.end());
+        parcialResult = children[i]->findComponentsInChildren(t);
+        if (parcialResult.size()>0)
+            result.insert(result.end(), parcialResult.begin(), parcialResult.end());
+    }
+    return result;
+}
+
 
 ///////////////////////////////////////////////////////
 //
@@ -556,7 +685,7 @@ Transform::Transform():
     matrixInverse = mat4::IdentityMatrix;
     matrixInverseParent = mat4::IdentityMatrix;
     
-    model = NULL;
+    //model = NULL;
     
     visited = true;
     

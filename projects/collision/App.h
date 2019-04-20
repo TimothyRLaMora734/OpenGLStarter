@@ -8,6 +8,7 @@ using namespace aRibeiro;
 #include "util/GLRenderState.h"
 #include "util/FreeMoveCamera.h"
 #include "Models.h"
+#include "util/ReferenceCounter.h"
 
 #include <SFML/System.hpp>
 #include <SFML/Window.hpp>
@@ -43,6 +44,12 @@ class App : public AppBase {
     Transform* box;
     Transform* bigTriangle;
     Transform* smallTriangle;
+    
+    ComponentCameraPerspective *cameraPerspective;
+    
+    ReferenceCounter <Component*>comps;
+    
+    //ComponentColorMeshVBO* activeComponentColorMeshVBO;
     
     void processInput();
     

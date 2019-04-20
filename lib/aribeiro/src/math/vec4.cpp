@@ -38,10 +38,16 @@ vec4::vec4( const vec4 &a, const vec4 &b ){
     w = b.w - a.w;
 }
 bool vec4::operator==(const vec4&v) const {
-	return memcmp(array, v.array, sizeof(float) * 4) == 0;
+    for(int i=0;i<4;i++){
+        if (absv(array[i]-v.array[i]) > 1e-4f)
+            return false;
+    }
+    return true;
+	//return memcmp(array, v.array, sizeof(float) * 4) == 0;
 }
 bool vec4::operator!=(const vec4&v) const {
-	return memcmp(array, v.array, sizeof(float) * 4) != 0;
+    return !((*this) == v);
+	//return memcmp(array, v.array, sizeof(float) * 4) != 0;
 }
 vec4& vec4::operator+=(const vec4& v){
     x+=v.x;

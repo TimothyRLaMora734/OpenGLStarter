@@ -76,11 +76,17 @@ tensor4& mat4::asTensor4()const{
 }
 
 bool mat4::operator==(const mat4&v) const {
-	return memcmp(array, v.array, sizeof(float) * 16) == 0;
+    for(int i=0;i<16;i++){
+        if (absv(array[i]-v.array[i]) > 1e-4f)
+            return false;
+    }
+    return true;
+	//return memcmp(array, v.array, sizeof(float) * 16) == 0;
 }
 
 bool mat4::operator!=(const mat4&v) const {
-	return memcmp(array, v.array, sizeof(float) * 16) != 0;
+    return !((*this) == v);
+	//return memcmp(array, v.array, sizeof(float) * 16) != 0;
 }
 
 
