@@ -536,7 +536,7 @@ mat4& Transform::worldToLocalMatrix(bool useVisitedFlag) {
     return getMatrixInverse(useVisitedFlag);
 }
 
-mat4& Transform::LocalToWorldMatrix(bool useVisitedFlag) {
+mat4& Transform::localToWorldMatrix(bool useVisitedFlag) {
     return getMatrix(useVisitedFlag);
 }
 

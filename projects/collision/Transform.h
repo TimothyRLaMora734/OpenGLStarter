@@ -174,7 +174,7 @@ public:
 	VirtualProperty<vec3> Scale;
     
     mat4& worldToLocalMatrix(bool useVisitedFlag=false);
-    mat4& LocalToWorldMatrix(bool useVisitedFlag=false);
+    mat4& localToWorldMatrix(bool useVisitedFlag=false);
 
 
 	///////////////////////////////////////////////////////

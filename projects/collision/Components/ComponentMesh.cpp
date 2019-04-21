@@ -2,6 +2,10 @@
 
 
 
+const ComponentType ComponentColorMesh::Type = ComponentTypeColorMesh;
+
+const ComponentType ComponentColorMeshVBO::Type = ComponentTypeColorMeshVBO;
+
 
 void setTriangle(std::vector<unsigned short> *indices,
                  std::vector<vec3> *vertices,

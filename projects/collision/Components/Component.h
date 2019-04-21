@@ -13,7 +13,10 @@ enum ComponentType{
     ComponentTypeColorMesh = 6,
     ComponentTypeColorMeshVBO = 7,
     
-    ComponentTypeFpsBehaviour = 8,
+    //
+    // User Defined Realtime-Type
+    //
+    ComponentTypeFps = 8,
     
 };
 
@@ -23,13 +26,19 @@ class Component {
 private:
     Component(const Component& v);
     void operator=(const Component& v);
+    bool mStartCalled;
 protected:
     ComponentType type;
     Component(ComponentType type);
+    virtual void start();
 public:
     Transform *transform;
     ComponentType getType() const ;
-    virtual ~Component() ;
+    virtual ~Component();
+    
+    void callStartOnce();
+    
+    //friend class App;
 };
 
 #endif

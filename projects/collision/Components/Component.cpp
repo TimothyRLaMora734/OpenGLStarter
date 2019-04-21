@@ -8,6 +8,7 @@ void Component::operator=(const Component& v){}
 Component::Component(ComponentType type){
     this->type = type;
     transform = NULL;
+    mStartCalled = false;
 }
 
 ComponentType Component::getType() const {
@@ -15,5 +16,15 @@ ComponentType Component::getType() const {
 }
 
 Component::~Component() {
+}
+
+void Component::start(){
+}
+
+void Component::callStartOnce() {
+    if (mStartCalled)
+        return;
+    mStartCalled = true;
+    start();
 }
 

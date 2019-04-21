@@ -68,6 +68,14 @@ public:
 		else
 			return (thiz->*getNormal)();
 	}
+    
+    bool operator==(const T &param) const {
+        return (T)(*this) == param;
+    }
+    
+    bool operator!=(const T &param) const {
+        return (T)(*this) != param;
+    }
 
 };
 

@@ -15,52 +15,25 @@ using namespace aRibeiro;
 #include <SFML/Graphics.hpp>
 
 class App : public AppBase {
-
-    //
-    // render state
-    //
     GLRenderState *renderState;
-    //
-    // time processor
-    //
+    GLShaderColor *shaderColor;
     PlatformTime time;
     //
-    // default drawing shader
+    // Graph Variables
     //
-    GLShaderColor *shaderColor;
-    //
-    // input helper
-    //
-    PressReleaseDetector left,right,up,down;
-    //
-    // auxiliary variables
-    //
-    FreeMoveCamera freeMoveCamera;
     Transform *root;
     bool rotateCounterClockwise;
     float angle_rad;
-    vec3 objectPosition;
 	
     Transform* box;
     Transform* bigTriangle;
     Transform* smallTriangle;
-    
     ComponentCameraPerspective *cameraPerspective;
-    
     ReferenceCounter <Component*>comps;
     
-    //ComponentColorMeshVBO* activeComponentColorMeshVBO;
-    
-    void processInput();
-    
-    void OnWindowResize(Property<iSize> *prop);
-    
-    void drawPrimitive(GLuint oglPrimitive, const mat4 &modelViewProjection, const vec3 vertexBuffer[], const vec4 &color, int count);
-
+    // Scene Graph Ops
 	void drawTraverseTreeDepthFirst(Transform *element);
-
 	void drawModelsFromTree();
-
 	void deleteTree(Transform **element);
 
 public:
@@ -68,9 +41,5 @@ public:
 	virtual ~App();
 	virtual void draw();
 };
-
-
-
-
 
 #endif

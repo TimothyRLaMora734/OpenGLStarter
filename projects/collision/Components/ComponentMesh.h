@@ -44,6 +44,8 @@ void setSphere(float radius, int sectorCount, int stackCount,
 class ComponentColorMesh: public Component {
 public:
     
+    static const ComponentType Type;
+    
     std::vector<vec3> vertices;
     std::vector<unsigned short> indices;
     vec4 color;
@@ -68,6 +70,9 @@ public:
 
 class ComponentColorMeshVBO: public Component {
 public:
+    
+    static const ComponentType Type;
+    
     GLVertexBufferObject *data;
     GLVertexBufferObject *index;
     int indexCount;
