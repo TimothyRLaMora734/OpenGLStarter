@@ -1457,6 +1457,8 @@ ARIBEIRO_API mat4 rotate(const float _ang_,const vec3 &axis);
 /// \return A 4x4 matrix
 ///
 ARIBEIRO_API mat4 projection_perspective(const float FovY,const float aspectX, const float near_, const float far_);
+ARIBEIRO_API mat4 projection_perspectiveLH(const float FovY,const float aspectX, const float near_, const float far_);
+
 //------------------------------------------------------------------------------
 /// \brief Creates a projection matrix
 ///
@@ -1516,6 +1518,7 @@ ARIBEIRO_API mat4 projection_ortho(const float Left,const float Right,const floa
 ARIBEIRO_API mat4 lookAt(const vec3 &front, const vec3 &up, const vec3 &position);
 ARIBEIRO_API mat4 modelLookAt(const vec3 &front, const vec3 &up, const vec3 &position);
 ARIBEIRO_API quat quatLookAtRotation(const vec3 &front, const vec3 &up);
+ARIBEIRO_API quat quatLookAtRotationLH(const vec3 &front, const vec3 &up);
 //------------------------------------------------------------------------------
 
 /// \brief Computes the inverse of a 4x4 matrix

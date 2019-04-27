@@ -2,6 +2,62 @@
 using namespace aRibeiro;
 #include "App.h"
 
+
+
+Transform* loadSceneTestCollision()
+{
+    Transform* _0 = new Transform();
+    _0->Name = std::string("TestCollision");
+    _0->LocalPosition = vec3(0,0,0);
+    _0->LocalRotation = quat(0,0,0,1);
+    _0->LocalScale = vec3(1,1,1);
+    {
+        Transform* _1 = _0->addChild(new Transform());
+        _1->Name = std::string("Main Camera");
+        _1->LocalPosition = vec3(0,1.84,-2.12);
+        _1->LocalRotation = quat(0.3571975,0,0,0.9340289);
+        _1->LocalScale = vec3(1,1,1);
+    }
+    {
+        Transform* _2 = _0->addChild(new Transform());
+        _2->Name = std::string("Camera1");
+        _2->LocalPosition = vec3(0,0,0);
+        _2->LocalRotation = quat(0,0,0,1);
+        _2->LocalScale = vec3(1,1,1);
+        {
+            Transform* _3 = _2->addChild(new Transform());
+            _3->Name = std::string("CubeCollision");
+            _3->LocalPosition = vec3(-1.5,0,0);
+            _3->LocalRotation = quat(0.2044709,-0.6768985,0.204471,0.6768985);
+            _3->LocalScale = vec3(0.32,0.32,1);
+        }
+        {
+            Transform* _4 = _2->addChild(new Transform());
+            _4->Name = std::string("SphereCollision");
+            _4->LocalPosition = vec3(1.5,0,0);
+            _4->LocalRotation = quat(0,-0.7071068,0,0.7071068);
+            _4->LocalScale = vec3(1,1,1);
+        }
+    }
+    {
+        Transform* _5 = _0->addChild(new Transform());
+        _5->Name = std::string("Cube");
+        _5->LocalPosition = vec3(0,0,1.5);
+        _5->LocalRotation = quat(0,0,0,1);
+        _5->LocalScale = vec3(1,1,1);
+    }
+    {
+        Transform* _6 = _0->addChild(new Transform());
+        _6->Name = std::string("RedSphere");
+        _6->LocalPosition = vec3(0,0,-1.5);
+        _6->LocalRotation = quat(-0.4548343,0.327839,0.1847353,0.8071681);
+        _6->LocalScale = vec3(1,1,1);
+    }
+    return _0;
+}
+
+
+
 App::App(sf::RenderWindow *window, int w, int h):
 	AppBase(window,w,h)
 {
@@ -9,11 +65,14 @@ App::App(sf::RenderWindow *window, int w, int h):
     shaderColor = new GLShaderColor();
 
     //initialize auxiliary variables
-    angle_rad = 0;
-    rotateCounterClockwise = true;
+    //angle_rad = 0;
+    //rotateCounterClockwise = true;
 
     //setup renderstate
     renderState->ClearColor = vec4(1.0f,1.0f,250.0f/255.0f,1.0f);
+    
+    renderState->FrontFace = FrontFaceCW;
+    
     renderState->Wireframe = WireframeBack;
 	renderState->CullFace = CullFaceNone;
 	//renderState->Wireframe = WireframeBoth;
@@ -23,57 +82,51 @@ App::App(sf::RenderWindow *window, int w, int h):
     // Construct scene graph
     //
     
-	root = new Transform();
+    root = loadSceneTestCollision();
+    
+    Transform *mainCameraTransform = root->findTransformByName("Main Camera");
+    mainCameraTransform->addComponent(cameraPerspective = new ComponentCameraPerspective(this));
+    mainCameraTransform->addComponent(new ComponentFps(this));
 
-    cameraPerspective = new ComponentCameraPerspective(this);
+    //cameraPerspective->rightHanded = true;
     
-    Transform* cameraTransform = root->addChild(new Transform());
-    comps.add(cameraTransform->addComponent(cameraPerspective));
-    comps.add(cameraTransform->addComponent(new ComponentFps(this)));
     
-    cameraPerspective->transform->LocalPosition = vec3(0.0f, 0.4f, 2.0f);
+    root->findTransformByName("Cube")->addComponent(ComponentColorMeshVBO::createBox(vec4(0.0f,0.5f,0.0f,1.0f), vec3(1.0f,1.0f,1.0f)));
     
-	box = root->addChild(new Transform());
-	box->LocalScale = vec3(0.2f, 0.2f, 0.2f);
-    box->Position = vec3(0,-1.5f,-1);
-    comps.add(box->addComponent(ComponentColorMeshVBO::createBox(vec4(0.0f,0.5f,0.0f,1.0f), vec3(1.0f,1.0f,1.0f))));
-	
-
-	Transform* sphere = box->addChild(new Transform());
-	sphere->LocalPosition = vec3(1.0f, 0.0f, 0.0f);
-    comps.add(sphere->addComponent(ComponentColorMeshVBO::createSphere(vec4(0.0f,0.0f,0.5f,1.0f), 0.5f,7,7)));
-	
-	sphere = box->addChild(new Transform());
-	sphere->LocalPosition = vec3(-1.0f, 0.0f, 0.0f);
-    comps.add(sphere->addComponent(ComponentColorMeshVBO::createSphere(vec4(0.5f,0.0f,0.0f,1.0f), 0.5f,7,7)));
-	
-    Transform* otherNode = root->addChild(new Transform());
-    otherNode->addChild(new Transform());
-    otherNode = otherNode->addChild(new Transform())->addChild(new Transform());
-	otherNode->LocalPosition = vec3(0, 0, -5.0f);
-    comps.add(otherNode->addComponent(ComponentColorMeshVBO::createSphere(vec4(0.5f,0.0f,0.5f,1.0f), 0.25f,3,3)));
-
-    Transform * plane = root->addChild(new Transform());
-    comps.add(plane->addComponent(ComponentColorMeshVBO::createPlane(vec4(0.5f,0.5f,0.5f,1.0f), vec3(4.0f,0.0f,4.0f))));
+    std::vector<Transform*> spheres = root->findTransformsByName("RedSphere");
+    if (spheres.size() > 0){
+        Component* sphereModel = ComponentColorMeshVBO::createSphere(vec4(0.5f,0.0f,0.0f,1.0f), 0.5f,16,16);
+        for (int i=0;i<spheres.size();i++)
+            comps.add(spheres[i]->addComponent(sphereModel));
+    }
     
-    smallTriangle = root->addChild(new Transform());
-	smallTriangle->LocalPosition = vec3(0.0f, 0.4f, 0.0f);
-	smallTriangle->LocalScale = vec3(0.2f, 0.2f, 0.2f);
-    comps.add(smallTriangle->addComponent(ComponentColorMeshVBO::createTriangle(vec4(1.0f,0.0f,0.0f,1.0f))));
+    spheres = root->findTransformsByName("MagentaSphere");
+    if (spheres.size() > 0){
+        Component* sphereModel = ComponentColorMeshVBO::createSphere(vec4(0.5f,0.0f,0.5f,1.0f), 0.5f,16,16);
+        for (int i=0;i<spheres.size();i++)
+            comps.add(spheres[i]->addComponent(sphereModel));
+    }
     
-    otherNode = smallTriangle->addChild(new Transform());
-	otherNode->LocalPosition = vec3(-1.0f, 0.0f, 0.0f);
-    comps.add(otherNode->addComponent(ComponentColorMeshVBO::createTriangle(vec4(0.0f,1.0f,0.0f,1.0f))));
+    root->findTransformByName("CubeCollision")->addComponent(ComponentColorMeshVBO::createBox(vec4(0.0f,0.5f,0.0f,1.0f), vec3(1.0f,1.0f,1.0f)));
     
-    otherNode = smallTriangle->addChild(new Transform());
-	otherNode->LocalPosition = vec3(1.0f, 0.0f, 0.0f);
-    comps.add(otherNode->addComponent(ComponentColorMeshVBO::createTriangle(vec4(0.0f,0.0f,1.0f,1.0f))));
+    root->findTransformByName("SphereCollision")->addComponent(ComponentColorMeshVBO::createSphere(vec4(0.0f,0.0f,0.5f,1.0f), 0.5f,16,16));
     
-    //smallTriangle =
-    bigTriangle = box->addChild(new Transform());
-	bigTriangle->Scale = vec3(1.0f);
-    comps.add(bigTriangle->addComponent(ComponentColorMeshVBO::createTriangle(vec4(0.0f,1.0f,1.0f,1.0f))));
-
+    
+    
+    
+    
+    ComponentCameraPerspective* cameraTest;
+    camera1 = root->findTransformByName("Camera1");
+    camera1->addComponent(cameraTest = new ComponentCameraPerspective(this));
+    
+    //cameraTest->rightHanded = true;
+    cameraTest->nearPlane = 0.5f;
+    cameraTest->farPlane = 2.5f;
+    cameraTest->addLinesComponent();
+    
+    //camera1->lookAtLeftHanded(root->findTransformByName("RedSphere"));
+    
+    
     time.update();
 }
 
@@ -97,6 +150,7 @@ void App::draw() {
     //
     // Update Parameters
     //
+    /*
     if (rotateCounterClockwise)
         angle_rad += time.deltaTime * DEG2RAD(200.0f);
     else
@@ -106,14 +160,19 @@ void App::draw() {
     box->Position = move(box->Position,  vec3(0,1,-1), time.deltaTime * 0.25f);
     if (box->Position == vec3(0,1,-1))
         box->Position = vec3(0,-1.5f,-1);
-    
+    */
     //
     // Update Nodes
     //
     
+    /*
     //cameraPerspective->transform->lookAt(bigTriangle);
     smallTriangle->Euler = vec3(0.0f, angle_rad, angle_rad*0.1f);
+    */
     
+    //vec3 euler = camera1->LocalEuler;
+    //euler.y += time.deltaTime * DEG2RAD(10.0f);
+    //camera1->LocalEuler = euler;
     
     OnLateUpdate(&time);
     
@@ -133,7 +192,10 @@ void App::drawTraverseTreeDepthFirst(Transform *element) {
         component->callStartOnce();
         
         // First Setup Transform Matrix
-        if (component->getType() == ComponentTypeColorMeshVBO
+        if ((
+             component->getType() == ComponentTypeColorMeshVBO ||
+             component->getType() == ComponentTypeLinesVBO
+             )
             &&
             !alreadySetupMatrix){
             alreadySetupMatrix = true;
@@ -162,6 +224,19 @@ void App::drawTraverseTreeDepthFirst(Transform *element) {
             componentColorMeshVBO->draw();
             componentColorMeshVBO->unsetLayoutPointers(GLShaderColor::vPosition);
         }
+        
+        else if (component->getType() == ComponentTypeLinesVBO){
+            ComponentLinesVBO* componentLinesVBO = (ComponentLinesVBO*)component;
+            
+            renderState->LineWidth = componentLinesVBO->width;
+            shaderColor->setColor( componentLinesVBO->color );
+            
+            componentLinesVBO->setLayoutPointers(GLShaderColor::vPosition);
+            componentLinesVBO->draw();
+            componentLinesVBO->unsetLayoutPointers(GLShaderColor::vPosition);
+            
+        }
+        
     }
     
 	for (int i = 0; i < element->getChildCount(); i++)

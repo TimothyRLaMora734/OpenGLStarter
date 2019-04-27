@@ -21,7 +21,7 @@ namespace collision {
         
 	public:
         
-        Plane right, left, bottom, top, back, front;
+        Plane positivex, negativex, bottom, top, near, far;
         vec3 vertices[8];
         
         Plane& operator[](int idx);

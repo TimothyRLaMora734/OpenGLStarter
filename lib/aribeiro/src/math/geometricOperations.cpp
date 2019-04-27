@@ -1044,6 +1044,30 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 			0, 0, (near_ + far_) / (near_ - far_), (2.0f*near_*far_) / (near_ - far_),
 			0, 0, -1, 0);
 	}
+    
+    mat4 projection_perspectiveLH(const float FovY, const float aspectX, const float near_, const float far_) {
+        
+        /*
+         f=cotangent(CampoDeVisao/2)
+         matriz:
+         
+         f/aspect  0      0                           0
+         0         f      0                           0
+         0         0    -(zfar+znear)/(znear-zfar)    (2*zfar*znear)/(znear-zfar)
+         0         0     1                           0
+         */
+        if ((aspectX == 0.0f) || (near_ - far_) == 0) {
+            return mat4::IdentityMatrix;
+        }
+        float focus = (float)tanf(DEG2RAD(FovY) / 2.0f);
+        if (focus == 0.0f) focus = 0.000000000002f;
+        focus = 1.0f / focus;
+        return mat4(focus / aspectX, 0, 0, 0,
+                    0, focus, 0, 0,
+                    0, 0, -(near_ + far_) / (near_ - far_), (2.0f*near_*far_) / (near_ - far_),
+                    0, 0, 1, 0);
+    }
+    
 	//------------------------------------------------------------------------------
 	// unidade da distancia focal em relação a mesma unidade do width e height
 	//  ex.: se considerar milimetros (mm) então distancia focal de 35mm para tela de 50x30 mm
@@ -1105,6 +1129,19 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
              x.y, y.y, z.y, 0,
              x.z, y.z, z.z, 0,
              0, 0, 0, 1));
+    }
+    
+    quat quatLookAtRotationLH(const vec3 &front, const vec3 &up){
+        vec3 lookTo = front;
+        vec3 x, y, z;
+        z = normalize(lookTo);
+        x = normalize(cross(up, z));
+        y = normalize(cross(z, x));
+        return extractQuat(
+                           mat4(x.x, y.x, z.x, 0,
+                                x.y, y.y, z.y, 0,
+                                x.z, y.z, z.z, 0,
+                                0, 0, 0, 1));
     }
 	//------------------------------------------------------------------------------
 	/*

@@ -7,6 +7,7 @@ int stat_draw_recalculated;
 
 
 Transform::Transform(const Transform& v) :
+    Parent(this,&Transform::getParent, &Transform::setParent),
 
 	LocalPosition(this, &Transform::getLocalPosition, &Transform::setLocalPosition),
 	LocalEuler(this, &Transform::getLocalEuler, &Transform::setLocalEuler),
@@ -16,7 +17,8 @@ Transform::Transform(const Transform& v) :
 	Position(this, &Transform::getPosition, &Transform::setPosition),
 	Euler(this, &Transform::getEuler, &Transform::setEuler),
 	Rotation(this, &Transform::getRotation, &Transform::setRotation),
-	Scale(this, &Transform::getScale, &Transform::setScale) {}
+	Scale(this, &Transform::getScale, &Transform::setScale),
+    Name(this,&Transform::getName,&Transform::setName) {}
 void Transform::operator=(const Transform& v) {}
 
 ///////////////////////////////////////////////////////
@@ -38,6 +40,9 @@ Transform* Transform::removeChild(int index) {
     }
     Transform* node = children[index];
     children.erase(children.begin() + index);
+    
+    //removeMapName(node);
+    
     return node;
 }
 Transform* Transform::removeChild(Transform * transform) {
@@ -46,6 +51,9 @@ Transform* Transform::removeChild(Transform * transform) {
             children.erase(children.begin() + i);
             transform->parent = NULL;
             transform->visited = false;
+            
+            //removeMapName(transform);
+            
             return transform;
         }
     fprintf(stderr,"Trying to remove a child that is not in the scene...\n");
@@ -59,6 +67,9 @@ Transform* Transform::addChild(Transform * transform) {
     transform->parent = this;
     transform->visited = false;
     children.push_back(transform);
+    
+    //insertMapName(transform);
+    
     return transform;
 }
 
@@ -87,9 +98,9 @@ void Transform::setParent(Transform *prnt) {
     }
     if (parent != NULL)
         parent->removeChild(this);
-    parent = prnt;
-    if (parent != NULL)
-        parent->addChild(prnt);
+    //parent = prnt;
+    if (prnt != NULL)
+        prnt->addChild(this);
     
 }
 
@@ -157,6 +168,15 @@ void Transform::setLocalEuler( const vec3 &e){
         localEuler.z = fmod(localEuler.z, DEG2RAD(360.0f));
     
     localRotation = quatFromEuler(localEuler.x, localEuler.y, localEuler.z);
+    
+    /*
+     Unity Euler angles are: yxz
+     
+    localRotation =
+    quatFromAxisAngle(vec3(0.0, 1.0, 0.0), localEuler.y) *
+    quatFromAxisAngle(vec3(1.0, 0.0, 0.0), localEuler.x) *
+    quatFromAxisAngle(vec3(0.0, 0.0, 1.0), localEuler.z);
+     */
     
     if (!localRotationBaseDirty) localRotationBaseDirty = true;
     if (!localMatrixDirty) localMatrixDirty = true;
@@ -458,9 +478,14 @@ vec3 Transform::getScale(bool useVisitedFlag) {
                 length( vec3(m.c1,m.c2,m.c3) ) );
 }
 
-void Transform::lookAt(const Transform* to, const vec3 &worldUp) {
+void Transform::lookAtRightHanded(const Transform* to, const vec3 &worldUp) {
     vec3 lookVector = (vec3)to->Position - (vec3)Position;
     Rotation = quatLookAtRotation(lookVector, worldUp);
+}
+
+void Transform::lookAtLeftHanded(const Transform* to, const vec3 &worldUp) {
+    vec3 lookVector = (vec3)to->Position - (vec3)Position;
+    Rotation = quatLookAtRotationLH(lookVector, worldUp);
 }
 
 ///////////////////////////////////////////////////////
@@ -550,6 +575,29 @@ mat4& Transform::localToWorldMatrix(bool useVisitedFlag) {
 //
 ///////////////////////////////////////////////////////
 
+/*
+void Transform::insertMapName(Transform *node){
+    
+    name2children[node->name].push_back(node);
+    
+}
+
+void Transform::removeMapName(Transform *node){
+    std::map<std::string,std::vector<Transform*> >::iterator it;
+    it = name2children.find(node->name);
+    if (it != name2children.end()){
+        std::vector<Transform*> &vector = it->second;
+        for(int j=0;j<vector.size();j++){
+            if (vector[j] == node){
+                vector.erase(vector.begin()+j);
+                break;
+            }
+        }
+        if (vector.size() == 0)
+            name2children.erase(it);
+    }
+}
+*/
 
 Component* Transform::addComponent(Component*c){
     components.push_back(c);
@@ -634,6 +682,55 @@ std::vector<Component*> Transform::findComponentsInChildren(ComponentType t)cons
     return result;
 }
 
+void Transform::setName(const std::string &p){
+    if (name == p)
+        return;
+    
+    //if (this->parent != NULL)
+        //this->parent->removeMapName(this);
+    name = p;
+    //if (this->parent != NULL)
+        //this->parent->insertMapName(this);
+}
+const std::string& Transform::getName()const{
+    return name;
+}
+
+//VirtualProperty<std::string> Name;
+
+Transform * Transform::findTransformByName(const std::string &name, int maxLevel) {
+    if (this->name == name)
+        return this;
+    if (maxLevel > 0){
+        Transform * result;
+        for(int i=0;i<children.size();i++){
+            result = children[i]->findTransformByName(name,maxLevel-1);
+            if (result != NULL)
+                return result;
+        }
+    }
+    return NULL;
+}
+
+
+std::vector<Transform*> Transform::findTransformsByName(const std::string &name, int maxLevel) {
+    std::vector<Transform*> result;
+    std::vector<Transform*> parcialResult;
+    
+    if (this->name == name)
+        result.push_back(this);
+    
+    if (maxLevel > 0){
+        for(int i=0;i<children.size();i++){
+            parcialResult = children[i]->findTransformsByName(name,maxLevel-1);
+            if (parcialResult.size()>0)
+                result.insert(result.end(), parcialResult.begin(), parcialResult.end());
+        }
+    }
+    
+    return result;
+}
+
 
 ///////////////////////////////////////////////////////
 //
@@ -646,7 +743,7 @@ std::vector<Component*> Transform::findComponentsInChildren(ComponentType t)cons
 ///////////////////////////////////////////////////////
 
 Transform::Transform():
-
+    Parent(this,&Transform::getParent, &Transform::setParent),
 	LocalPosition(this,&Transform::getLocalPosition,&Transform::setLocalPosition),
 	LocalEuler(this, &Transform::getLocalEuler, &Transform::setLocalEuler),
 	LocalRotation(this, &Transform::getLocalRotation, &Transform::setLocalRotation),
@@ -655,7 +752,9 @@ Transform::Transform():
 	Position(this, &Transform::getPosition, &Transform::setPosition),
 	Euler(this, &Transform::getEuler, &Transform::setEuler),
 	Rotation(this, &Transform::getRotation, &Transform::setRotation),
-	Scale(this, &Transform::getScale, &Transform::setScale)
+	Scale(this, &Transform::getScale, &Transform::setScale),
+
+    Name(this,&Transform::getName,&Transform::setName)
 {
     //hierarchy ops
     parent = NULL;

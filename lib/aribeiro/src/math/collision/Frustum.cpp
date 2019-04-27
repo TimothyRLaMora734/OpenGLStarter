@@ -31,49 +31,89 @@ namespace collision {
 					8 _13,9 _23,10_33,11_43,
 					12_14,13_24,14_34,15_44;
 		*/
-		vec4 aux = clipMatrix[3] - clipMatrix[0];
-		right.normal = toVec3(aux);
-		right.distance = -aux.w;
-		right.normalize();
+        
+        if (matrix.c4<0) {
+            //
+            //right handed
+            //
+            vec4 aux = clipMatrix[3] - clipMatrix[0];
+            positivex.normal = toVec3(aux);
+            positivex.distance = -aux.w;
+            positivex.normalize();
 
-		aux = clipMatrix[3] + clipMatrix[0];
-		left.normal = toVec3(aux);
-		left.distance = -aux.w;
-		left.normalize();
+            aux = clipMatrix[3] + clipMatrix[0];
+            negativex.normal = toVec3(aux);
+            negativex.distance = -aux.w;
+            negativex.normalize();
 
-		aux = clipMatrix[3] + clipMatrix[1];
-		bottom.normal = toVec3(aux);
-		bottom.distance = -aux.w;
-		bottom.normalize();
+            aux = clipMatrix[3] + clipMatrix[1];
+            bottom.normal = toVec3(aux);
+            bottom.distance = -aux.w;
+            bottom.normalize();
 
-		aux = clipMatrix[3] - clipMatrix[1];
-		top.normal = toVec3(aux);
-		top.distance = -aux.w;
-		top.normalize();
+            aux = clipMatrix[3] - clipMatrix[1];
+            top.normal = toVec3(aux);
+            top.distance = -aux.w;
+            top.normalize();
 
-		aux = clipMatrix[3] - clipMatrix[2];
-		front.normal = toVec3(aux);
-		front.distance = -aux.w;
-		front.normalize();
+            aux = clipMatrix[3] + clipMatrix[2];
+            near.normal = toVec3(aux);
+            near.distance = -aux.w;
+            near.normalize();
 
-		aux = clipMatrix[3] + clipMatrix[2];
-		back.normal = toVec3(aux);
-		back.distance = -aux.w;
-		back.normalize();
+            aux = clipMatrix[3] - clipMatrix[2];
+            far.normal = toVec3(aux);
+            far.distance = -aux.w;
+            far.normalize();
+            
+        } else {
+            //
+            // Left Handed
+            //
+            vec4 aux = clipMatrix[3] - clipMatrix[0];
+            positivex.normal = toVec3(aux);
+            positivex.distance = -aux.w;
+            positivex.normalize();
+            
+            aux = clipMatrix[3] + clipMatrix[0];
+            negativex.normal = toVec3(aux);
+            negativex.distance = -aux.w;
+            negativex.normalize();
+            
+            aux = clipMatrix[3] + clipMatrix[1];
+            bottom.normal = toVec3(aux);
+            bottom.distance = -aux.w;
+            bottom.normalize();
+            
+            aux = clipMatrix[3] - clipMatrix[1];
+            top.normal = toVec3(aux);
+            top.distance = -aux.w;
+            top.normalize();
+            
+            aux = clipMatrix[3] + clipMatrix[2];
+            near.normal = toVec3(aux);
+            near.distance = -aux.w;
+            near.normalize();
+            
+            aux = clipMatrix[3] - clipMatrix[2];
+            far.normal = toVec3(aux);
+            far.distance = -aux.w;
+            far.normalize();
+        }
         
         //
         // Compute vertices
         //
         
-        Plane::intersectPlanes(right, top, front, &vertices[0]);
-        Plane::intersectPlanes(right, bottom, front, &vertices[1]);
-        Plane::intersectPlanes(left, bottom, front, &vertices[2]);
-        Plane::intersectPlanes(left, top, front, &vertices[3]);
+        Plane::intersectPlanes(positivex, top, near, &vertices[0]);
+        Plane::intersectPlanes(positivex, bottom, near, &vertices[1]);
+        Plane::intersectPlanes(negativex, bottom, near, &vertices[2]);
+        Plane::intersectPlanes(negativex, top, near, &vertices[3]);
         
-        Plane::intersectPlanes(right, top, back, &vertices[4]);
-        Plane::intersectPlanes(right, bottom, back, &vertices[5]);
-        Plane::intersectPlanes(left, bottom, back, &vertices[6]);
-        Plane::intersectPlanes(left, top, back, &vertices[7]);
+        Plane::intersectPlanes(positivex, top, far, &vertices[4]);
+        Plane::intersectPlanes(positivex, bottom, far, &vertices[5]);
+        Plane::intersectPlanes(negativex, bottom, far, &vertices[6]);
+        Plane::intersectPlanes(negativex, top, far, &vertices[7]);
         
         
         
@@ -84,11 +124,11 @@ namespace collision {
 	}
 
     Plane& Frustum::operator[](int idx){
-        return ((&right)[idx]);
+        return ((&positivex)[idx]);
     }
     
     const Plane& Frustum::operator[](int idx)const {
-        return ((&right)[idx]);
+        return ((&positivex)[idx]);
     }
     
 	Frustum::Frustum(const mat4& projection) {

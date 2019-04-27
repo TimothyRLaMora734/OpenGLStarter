@@ -6,6 +6,7 @@
 #include "Components/Component.h"
 #include "Components/ComponentMesh.h"
 #include "Components/ComponentCamera.h"
+#include "Components/ComponentLines.h"
 
 #include <aribeiro/aribeiro.h>
 using namespace aRibeiro;
@@ -45,6 +46,8 @@ public:
 	Transform *getParent();
 	void setParent(Transform *prnt);
 	bool isRoot();
+    
+    VirtualProperty<Transform *> Parent;
 	///////////////////////////////////////////////////////
 	//
 	//
@@ -124,7 +127,8 @@ public:
 	vec3 getScale();
 	vec3 getScale(bool useVisitedFlag);
     
-    void lookAt(const Transform* to, const vec3 &worldUp = vec3(0,1,0));
+    void lookAtRightHanded(const Transform* to, const vec3 &worldUp = vec3(0,1,0));
+    void lookAtLeftHanded(const Transform* to, const vec3 &worldUp = vec3(0,1,0));
 
 	///////////////////////////////////////////////////////
 	//
@@ -188,6 +192,11 @@ public:
 	///////////////////////////////////////////////////////
 private:
     std::vector<Component*> components;
+    std::string name;
+    //std::map< std::string, std::vector<Transform*> > name2children;
+    
+    //void insertMapName(Transform *t);
+    //void removeMapName(Transform *t);
 public:
     Component* addComponent(Component*);
     Component* removeComponent(Component*);
@@ -200,7 +209,12 @@ public:
     Component* findComponentInChildren(ComponentType)const;
     std::vector<Component*> findComponentsInChildren(ComponentType)const;
     
-	//TrianglesModel *model;
+    void setName(const std::string &p);
+    const std::string& getName()const;
+    VirtualProperty<std::string> Name;
+    
+    Transform * findTransformByName(const std::string &name, int maxLevel = INT_MAX);
+    std::vector<Transform*> findTransformsByName(const std::string &name, int maxLevel = INT_MAX);
 
 	Transform();
 	virtual ~Transform();

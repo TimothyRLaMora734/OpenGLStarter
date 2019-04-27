@@ -5,18 +5,20 @@
 enum ComponentType{
     ComponentTypeNone = 0,
     
-    ComponentTypeAABB = 1,
-    ComponentTypeCamera = 2,
-    ComponentTypeLines = 3,
-    ComponentTypeMesh = 4,
-    ComponentTypeSphere = 5,
-    ComponentTypeColorMesh = 6,
-    ComponentTypeColorMeshVBO = 7,
+    ComponentTypeLines,
+    ComponentTypeLinesVBO,
+    ComponentTypeColorMesh,
+    ComponentTypeColorMeshVBO,
+    
+    ComponentTypeAABB,
+    ComponentTypeCameraPerspective,
+    ComponentTypeMesh,
+    ComponentTypeSphere,
     
     //
     // User Defined Realtime-Type
     //
-    ComponentTypeFps = 8,
+    ComponentTypeFps,
     
 };
 

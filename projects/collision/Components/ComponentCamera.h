@@ -19,6 +19,11 @@ class ComponentCameraPerspective:public Component {
                                     
     void OnUpdateCameraFloatParameter(Property<float> *prop);
     void OnWindowSizeChanged(Property<iSize> *prop);
+    
+    void OnLeftHandedChanged(Property<bool> *prop);
+    void OnRightHandedChanged(Property<bool> *prop);
+    
+    void configureProjection();
 public:
     
     static const ComponentType Type;
@@ -26,6 +31,9 @@ public:
     Property<float> fovDegrees;
     Property<float> nearPlane;
     Property<float> farPlane;
+    
+    Property<bool> leftHanded;
+    Property<bool> rightHanded;
     
     mat4 projection;
     
@@ -38,11 +46,14 @@ public:
     mat4 view;
     mat4 viewIT;
     mat4 viewInv;
+    
+    void addLinesComponent();
 };
 
 
 class ComponentFps:public Component {
     AppBase *app;
+    ComponentCameraPerspective *camera;
     
     PressReleaseDetector left, right, up, down;
     sf::Vector2i iSizeCenter;

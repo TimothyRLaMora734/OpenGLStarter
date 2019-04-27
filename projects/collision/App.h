@@ -22,12 +22,16 @@ class App : public AppBase {
     // Graph Variables
     //
     Transform *root;
-    bool rotateCounterClockwise;
-    float angle_rad;
+    //bool rotateCounterClockwise;
+    //float angle_rad;
 	
-    Transform* box;
-    Transform* bigTriangle;
-    Transform* smallTriangle;
+    //Transform* box;
+    //Transform* bigTriangle;
+    //Transform* smallTriangle;
+    
+    Transform* camera1;
+    
+    
     ComponentCameraPerspective *cameraPerspective;
     ReferenceCounter <Component*>comps;
     

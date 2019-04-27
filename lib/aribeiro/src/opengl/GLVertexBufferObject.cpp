@@ -26,15 +26,21 @@ namespace aRibeiro {
         OPENGL_CMD( glDeleteBuffers(1, &mVBO) );
     }
     
-    void GLVertexBufferObject::uploadData(void* data, int sizeBytes) const {
+    void GLVertexBufferObject::uploadData(void* data, int sizeBytes, bool dynamic) const {
         OPENGL_CMD( glBindBuffer(GL_ARRAY_BUFFER, mVBO) );
-        OPENGL_CMD( glBufferData(GL_ARRAY_BUFFER, sizeBytes, data, GL_STATIC_DRAW) );
+        if (dynamic)
+            OPENGL_CMD( glBufferData(GL_ARRAY_BUFFER, sizeBytes, data, GL_DYNAMIC_DRAW) );
+        else
+            OPENGL_CMD( glBufferData(GL_ARRAY_BUFFER, sizeBytes, data, GL_STATIC_DRAW) );
         OPENGL_CMD( glBindBuffer(GL_ARRAY_BUFFER, 0) );
     }
     
-    void GLVertexBufferObject::uploadIndex(void* data, int sizeBytes) const {
+    void GLVertexBufferObject::uploadIndex(void* data, int sizeBytes, bool dynamic) const {
         OPENGL_CMD( glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mVBO) );
-        OPENGL_CMD( glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeBytes, data, GL_STATIC_DRAW) );
+        if (dynamic)
+            OPENGL_CMD( glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeBytes, data, GL_DYNAMIC_DRAW) );
+        else
+            OPENGL_CMD( glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeBytes, data, GL_STATIC_DRAW) );
         OPENGL_CMD( glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0) );
     }
     

@@ -17,9 +17,9 @@ namespace aRibeiro {
         
         virtual ~GLVertexBufferObject();
         
-        void uploadData(void* data, int sizeBytes) const ;
+        void uploadData(void* data, int sizeBytes, bool dynamic = false) const ;
         
-        void uploadIndex(void* data, int sizeBytes) const ;
+        void uploadIndex(void* data, int sizeBytes, bool dynamic = false) const ;
         
         void setIndex() const ;
         

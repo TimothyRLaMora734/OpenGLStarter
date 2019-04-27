@@ -21,6 +21,9 @@ public:
                 map.erase(c);
                 setNullAndDelete(c);
             }
+        } else {
+            //erase data if the reference is not in the map
+            setNullAndDelete(c);
         }
     }
     ~ReferenceCounter() {
@@ -53,6 +56,9 @@ public:
                 map.erase(c);
                 setNullAndDeleteArray(c);
             }
+        } else {
+            //erase data if the reference is not in the map
+            setNullAndDelete(c);
         }
     }
     ~ReferenceCounterArray() {
