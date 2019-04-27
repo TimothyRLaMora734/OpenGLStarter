@@ -83,7 +83,7 @@ void ComponentCameraPerspective::addLinesComponent() {
      frustum.vertices[4]+frustum.vertices[5]
      )*0.25f;
     linesVBO->vertices.push_back(ptnInPlane);
-    linesVBO->vertices.push_back(ptnInPlane + frustum.positivex.normal * 0.2f);
+    linesVBO->vertices.push_back(ptnInPlane + frustum.rightPlane.normal * 0.2f);
     
     ptnInPlane =
     (
@@ -91,7 +91,7 @@ void ComponentCameraPerspective::addLinesComponent() {
      frustum.vertices[4]+frustum.vertices[7]
      )*0.25f;
     linesVBO->vertices.push_back(ptnInPlane);
-    linesVBO->vertices.push_back(ptnInPlane + frustum.top.normal * 0.2f);
+    linesVBO->vertices.push_back(ptnInPlane + frustum.topPlane.normal * 0.2f);
     
     ptnInPlane =
     (
@@ -99,7 +99,7 @@ void ComponentCameraPerspective::addLinesComponent() {
      frustum.vertices[2]+frustum.vertices[3]
      )*0.25f;
     linesVBO->vertices.push_back(ptnInPlane);
-    linesVBO->vertices.push_back(ptnInPlane + frustum.near.normal * 0.2f);
+    linesVBO->vertices.push_back(ptnInPlane + frustum.nearPlane.normal * 0.2f);
     
     linesVBO->vertices.push_back(frustum.vertices[0]);
     linesVBO->vertices.push_back(frustum.vertices[1]);
