@@ -29,7 +29,7 @@ void SharedPointerDatabase::notifyDeletion(void* ref) {
 	std::map <void *, std::vector<SharedPointerBase*> >::iterator it = refs.find(ref);
 	if (it != refs.end()) {
 		std::vector<SharedPointerBase*> &pointers = it->second;
-		for (int i = 0; i < pointers.size(); i++)
+		for (unsigned int i = 0; i < pointers.size(); i++)
 			pointers[i]->setNULL(false);
 		refs.erase(it);
 	}
@@ -47,7 +47,7 @@ void SharedPointerDatabase::unregisterPointer(SharedPointerBase *pointer, void *
 	std::map <void *, std::vector<SharedPointerBase*> >::iterator it = refs.find(ref);
 	if (it != refs.end()) {
 		std::vector<SharedPointerBase*> &pointers = it->second;
-		for (int i = 0; i < pointers.size(); i++) {
+		for (unsigned int i = 0; i < pointers.size(); i++) {
 			if (pointers[i] == pointer) {
 				pointers.erase(pointers.begin() + i);
 
