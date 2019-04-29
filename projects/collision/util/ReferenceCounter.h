@@ -2,6 +2,8 @@
 #ifndef ReferenceCounter__H
 #define ReferenceCounter__H
 
+#include "../SharedPointer.h"
+
 #include <map>
 
 template <typename T>
@@ -14,18 +16,36 @@ public:
         map[c]++;
         return c;
     }
+
+	bool willDeleteOnRemove(T c) {
+		if (map.find(c) != map.end()) {
+			//map[c]--;
+			if (map[c] <= 1) {
+				return true;
+			}
+		}
+		else {
+			//erase data if the reference is not in the map
+			return true;
+		}
+		return false;
+	}
+
     void remove(T c){
         if (map.find(c) != map.end()){
             map[c]--;
             if (map[c] <= 0){
                 map.erase(c);
+				//SharedPointerDatabase::getInstance()->notifyDeletion(c);
                 setNullAndDelete(c);
             }
         } else {
             //erase data if the reference is not in the map
+			//SharedPointerDatabase::getInstance()->notifyDeletion(c);
             setNullAndDelete(c);
         }
     }
+
     ~ReferenceCounter() {
         typename std::map<T,int>::iterator it = map.begin();
         while (it != map.end()){

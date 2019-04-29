@@ -5,6 +5,8 @@
 #include <aribeiro/aribeiro.h>
 using namespace aRibeiro;
 
+#include "../SharedPointer.h"
+
 //
 // Events
 //

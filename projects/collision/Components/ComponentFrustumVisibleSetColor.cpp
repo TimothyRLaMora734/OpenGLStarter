@@ -7,21 +7,24 @@ ComponentFrustumVisibleSetColor::ComponentFrustumVisibleSetColor() :Component(Co
 }
 
 ComponentFrustumVisibleSetColor::~ComponentFrustumVisibleSetColor() {
-
+	if (frustumPtr != NULL) {
+		frustumPtr->OnBecomeVisible.remove(this, &ComponentFrustumVisibleSetColor::OnBecomeVisible);
+		frustumPtr->OnBecomeInvisible.remove(this, &ComponentFrustumVisibleSetColor::OnBecomeInvisible);
+	}
 }
 
 void ComponentFrustumVisibleSetColor::start() {
-	vbo = (ComponentColorMeshVBO *)transform->findComponent(ComponentTypeColorMeshVBO);
-	frustum = (ComponentFrustumCulling *)transform->findComponent(ComponentTypeFrustumCulling);
+	vboPtr = (ComponentColorMeshVBO *)transform->findComponent(ComponentTypeColorMeshVBO);
+	frustumPtr = (ComponentFrustumCulling *)transform->findComponent(ComponentTypeFrustumCulling);
 
-	frustum->OnBecomeVisible.add(this, &ComponentFrustumVisibleSetColor::OnBecomeVisible);
-	frustum->OnBecomeInvisible.add(this, &ComponentFrustumVisibleSetColor::OnBecomeInvisible);
+	frustumPtr->OnBecomeVisible.add(this, &ComponentFrustumVisibleSetColor::OnBecomeVisible);
+	frustumPtr->OnBecomeInvisible.add(this, &ComponentFrustumVisibleSetColor::OnBecomeInvisible);
 }
 
 void ComponentFrustumVisibleSetColor::OnBecomeVisible(Component *f, Component *camera) {
-	vbo->color = vec4(0.5f, 0.5f, 0.0f, 1.0f);
+	vboPtr->color = vec4(0.5f, 0.5f, 0.0f, 1.0f);
 }
 
 void ComponentFrustumVisibleSetColor::OnBecomeInvisible(Component *f, Component *camera) {
-	vbo->color = vec4(0.5f, 0.0f, 0.0f, 1.0f);
+	vboPtr->color = vec4(0.5f, 0.0f, 0.0f, 1.0f);
 }

@@ -101,7 +101,7 @@ App::App(sf::RenderWindow *window, int w, int h):
 
 			spheres[i]->addComponent(ComponentFrustumCulling::createShapeSphere(vec3(0),0.5f));
 			spheres[i]->addComponent(new ComponentFrustumVisibleSetColor());
-
+			
 		}
     }
     
@@ -295,7 +295,10 @@ void App::deleteTree(Transform **element) {
 		deleteTree(&t);
 	}
     for(int i=(*element)->getComponentCount()-1;i>=0;i--){
-        comps.remove((*element)->removeComponentAt(i));
+		Component* component = (*element)->removeComponentAt(i);
+		//if (comps.willDeleteOnRemove(component))
+			//SharedPointerDatabase::getInstance()->notifyDeletion(component);
+        comps.remove(component);
     }
 	setNullAndDelete(*element);
 }

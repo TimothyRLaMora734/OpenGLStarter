@@ -798,6 +798,6 @@ Transform::Transform():
 }
 
 Transform::~Transform(){
-    
+	SharedPointerDatabase::getInstance()->notifyDeletion(this);
 }
 

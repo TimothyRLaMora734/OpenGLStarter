@@ -12,8 +12,8 @@ using namespace aRibeiro;
 class ComponentFrustumVisibleSetColor : public Component {
 public:
 
-	ComponentColorMeshVBO *vbo;
-	ComponentFrustumCulling *frustum;
+	SharedPointer<ComponentColorMeshVBO> vboPtr;
+	SharedPointer<ComponentFrustumCulling> frustumPtr;
 
 	ComponentFrustumVisibleSetColor();
 	~ComponentFrustumVisibleSetColor();

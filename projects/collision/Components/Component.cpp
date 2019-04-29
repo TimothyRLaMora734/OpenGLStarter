@@ -16,6 +16,7 @@ ComponentType Component::getType() const {
 }
 
 Component::~Component() {
+	SharedPointerDatabase::getInstance()->notifyDeletion(this);
 }
 
 void Component::start(){
