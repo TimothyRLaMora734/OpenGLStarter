@@ -40,6 +40,8 @@ class App : public AppBase {
 	void drawModelsFromTree();
 	void deleteTree(Transform **element);
 
+	void processCameraVisibilityExample(Transform *element, ComponentCameraPerspective *camera, const collision::Frustum &frustum);
+
 public:
     App(sf::RenderWindow *window, int w, int h);
 	virtual ~App();

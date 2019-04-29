@@ -96,8 +96,13 @@ App::App(sf::RenderWindow *window, int w, int h):
     std::vector<Transform*> spheres = root->findTransformsByName("RedSphere");
     if (spheres.size() > 0){
         Component* sphereModel = ComponentColorMeshVBO::createSphere(vec4(0.5f,0.0f,0.0f,1.0f), 0.5f,16,16);
-        for (int i=0;i<spheres.size();i++)
-            comps.add(spheres[i]->addComponent(sphereModel));
+		for (int i = 0; i < spheres.size(); i++) {
+			comps.add(spheres[i]->addComponent(sphereModel));
+
+			spheres[i]->addComponent(ComponentFrustumCulling::createShapeSphere(vec3(0),0.5f));
+			spheres[i]->addComponent(new ComponentFrustumVisibleSetColor());
+
+		}
     }
     
     spheres = root->findTransformsByName("MagentaSphere");
@@ -124,6 +129,7 @@ App::App(sf::RenderWindow *window, int w, int h):
     cameraTest->farPlane = 2.5f;
     cameraTest->addLinesComponent();
     
+
     //camera1->lookAtLeftHanded(root->findTransformByName("RedSphere"));
     
     
@@ -170,9 +176,17 @@ void App::draw() {
     smallTriangle->Euler = vec3(0.0f, angle_rad, angle_rad*0.1f);
     */
     
-    //vec3 euler = camera1->LocalEuler;
-    //euler.y += time.deltaTime * DEG2RAD(10.0f);
-    //camera1->LocalEuler = euler;
+    vec3 euler = camera1->LocalEuler;
+    euler.y += time.deltaTime * DEG2RAD(10.0f);
+    camera1->LocalEuler = euler;
+
+	vec3 p = camera1->LocalPosition;
+	static float f = 0;
+	f = fmod(f + time.deltaTime*DEG2RAD(30.0f), DEG2RAD(360));
+
+	p = camera1->LocalRotation * vec3(0,0,1) * cos(f) * 2.0f;
+
+	camera1->LocalPosition = p;
     
     OnLateUpdate(&time);
     
@@ -265,6 +279,14 @@ void App::drawModelsFromTree() {
 
 	//TrianglesModel::unsetLayoutPointers(GLShaderColor::vPosition);
 
+	//
+	// Process camera visibility example
+	//
+	ComponentCameraPerspective *cameraComponent = (ComponentCameraPerspective *)camera1->findComponent(ComponentTypeCameraPerspective);
+	cameraComponent->precomputeViewProjection(true);
+	collision::Frustum frustum(cameraComponent->projection,cameraComponent->view);
+	
+	processCameraVisibilityExample(root, cameraComponent, frustum);
 }
 
 void App::deleteTree(Transform **element) {
@@ -276,4 +298,30 @@ void App::deleteTree(Transform **element) {
         comps.remove((*element)->removeComponentAt(i));
     }
 	setNullAndDelete(*element);
+}
+
+
+void App::processCameraVisibilityExample(Transform *element, ComponentCameraPerspective *camera, const collision::Frustum &frustum) {
+
+	bool alreadySetupMatrix = false;
+
+	ComponentFrustumCulling *frustumCulling = (ComponentFrustumCulling *)element->findComponent(ComponentTypeFrustumCulling);
+
+	if (frustumCulling != NULL) {
+		//check the frustum
+		if (frustumCulling->cullingShape == CullingShapeSphere) {
+			mat4 &m = element->getMatrix(true);
+			vec3 scale = element->getScale(true);
+
+			collision::Sphere sphere(
+				toVec3(m * toPtn4(frustumCulling->sphereCenter)),
+				frustumCulling->sphereRadius * minimum(minimum(scale.x, scale.y), scale.z)
+			);
+
+			frustumCulling->setVisibilityFromCamera(camera, collision::Frustum::sphereOverlapsFrustum(sphere, frustum));
+		}
+	}
+
+	for (int i = 0; i < element->getChildCount(); i++)
+		processCameraVisibilityExample(element->getChildAt(i), camera, frustum);
 }

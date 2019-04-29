@@ -471,7 +471,7 @@ vec3 Transform::getScale(bool useVisitedFlag) {
     if (parent != NULL && parent->isRoot())
         return localScale;
     
-    mat4 m = getMatrix(useVisitedFlag);
+    mat4 &m = getMatrix(useVisitedFlag);
     return vec3(
                 length( vec3(m.a1,m.a2,m.a3) ),
                 length( vec3(m.b1,m.b2,m.b3) ),

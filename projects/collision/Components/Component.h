@@ -2,6 +2,17 @@
 #ifndef Components___H
 #define Components___H
 
+#include <aribeiro/aribeiro.h>
+using namespace aRibeiro;
+
+//
+// Events
+//
+class Component;
+
+BEGIN_DECLARE_DELEGATE(VoidEvent) CALL_PATTERN() END_DECLARE_DELEGATE;
+BEGIN_DECLARE_DELEGATE(TwoComponentsEvent, Component* a, Component* b) CALL_PATTERN(a,b) END_DECLARE_DELEGATE;
+
 enum ComponentType{
     ComponentTypeNone = 0,
     
@@ -19,6 +30,7 @@ enum ComponentType{
     // User Defined Realtime-Type
     //
     ComponentTypeFps,
+	ComponentTypeFrustumCulling
     
 };
 

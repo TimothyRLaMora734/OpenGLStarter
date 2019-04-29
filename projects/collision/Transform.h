@@ -7,6 +7,9 @@
 #include "Components/ComponentMesh.h"
 #include "Components/ComponentCamera.h"
 #include "Components/ComponentLines.h"
+#include "Components/ComponentFrustumCulling.h"
+
+#include "Components/ComponentFrustumVisibleSetColor.h"
 
 #include <aribeiro/aribeiro.h>
 using namespace aRibeiro;
