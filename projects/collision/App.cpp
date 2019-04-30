@@ -90,8 +90,11 @@ App::App(sf::RenderWindow *window, int w, int h):
 
     //cameraPerspective->rightHanded = true;
     
-    
-    root->findTransformByName("Cube")->addComponent(ComponentColorMeshVBO::createBox(vec4(0.0f,0.5f,0.0f,1.0f), vec3(1.0f,1.0f,1.0f)));
+	Transform* cube = root->findTransformByName("Cube");
+	cube->addComponent(ComponentColorMeshVBO::createBox(vec4(0.0f,0.5f,0.0f,1.0f), vec3(1.0f,1.0f,1.0f)));
+	cube->addComponent(ComponentFrustumCulling::createShapeAABB(collision::AABB(vec3(-0.5f), vec3(0.5f))));
+	cube->addComponent(new ComponentFrustumVisibleSetColor());
+
     
     std::vector<Transform*> spheres = root->findTransformsByName("RedSphere");
     if (spheres.size() > 0){
@@ -180,11 +183,11 @@ void App::draw() {
     euler.y += time.deltaTime * DEG2RAD(10.0f);
     camera1->LocalEuler = euler;
 
-	vec3 p = camera1->LocalPosition;
+	vec3 p;// = camera1->LocalPosition;
 	static float f = 0;
 	f = fmod(f + time.deltaTime*DEG2RAD(30.0f), DEG2RAD(360));
 
-	p = camera1->LocalRotation * vec3(0,0,1) * cos(f) * 2.0f;
+	p = camera1->LocalRotation * vec3(0,0,1) * cos(f) * 4.0f;
 
 	camera1->LocalPosition = p;
     
@@ -304,7 +307,7 @@ void App::deleteTree(Transform **element) {
 }
 
 
-void App::processCameraVisibilityExample(Transform *element, ComponentCameraPerspective *camera, const collision::Frustum &frustum) {
+void App::processCameraVisibilityExample(Transform *element, ComponentCameraPerspective *&camera, const collision::Frustum &frustum) {
 
 	bool alreadySetupMatrix = false;
 
@@ -322,6 +325,19 @@ void App::processCameraVisibilityExample(Transform *element, ComponentCameraPers
 			);
 
 			frustumCulling->setVisibilityFromCamera(camera, collision::Frustum::sphereOverlapsFrustum(sphere, frustum));
+		}
+		else if (frustumCulling->cullingShape == CullingShapeAABB) {
+			mat4 &m = element->getMatrix(true);
+			vec3 scale = element->getScale(true);
+
+			vec3 center = toVec3(m * toPtn4(frustumCulling->aabbCenter));
+			vec3 dimension = frustumCulling->aabbDimension * scale;
+
+			dimension *= 0.5f;
+
+			collision::AABB aabb = collision::AABB(center - dimension, center + dimension);
+
+			frustumCulling->setVisibilityFromCamera(camera, collision::Frustum::aabbOverlapsFrustum(aabb, frustum));
 		}
 	}
 

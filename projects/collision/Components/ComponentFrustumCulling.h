@@ -10,7 +10,8 @@ using namespace aRibeiro;
 
 enum CullingShape {
 	CullingShapeNone,
-	CullingShapeSphere
+	CullingShapeSphere,
+	CullingShapeAABB
 };
 
 class ComponentFrustumCulling : public Component {
@@ -20,8 +21,14 @@ class ComponentFrustumCulling : public Component {
 public:
 
 	CullingShape cullingShape;
+
+	//sphere shape
 	vec3 sphereCenter;
 	float sphereRadius;
+
+	//aabb
+	vec3 aabbDimension;
+	vec3 aabbCenter;
 
 	static const ComponentType Type;
 
@@ -29,6 +36,7 @@ public:
 	~ComponentFrustumCulling();
 
 	static ComponentFrustumCulling *createShapeSphere(const vec3& sphereCenter, float sphereRadius);
+	static ComponentFrustumCulling *createShapeAABB(const collision::AABB& aabb);
 
 	//Property<bool> VisibleFromFrustum;
 	//this, cameraPerspective

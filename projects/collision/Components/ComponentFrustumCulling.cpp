@@ -20,6 +20,16 @@ ComponentFrustumCulling *ComponentFrustumCulling::createShapeSphere(const vec3& 
 	return result;
 }
 
+ComponentFrustumCulling *ComponentFrustumCulling::createShapeAABB(const collision::AABB& aabb) {
+	ComponentFrustumCulling *result = new ComponentFrustumCulling();
+
+	result->cullingShape = CullingShapeAABB;
+	result->aabbCenter = (aabb.min_box + aabb.max_box) * 0.5f;
+	result->aabbDimension = aabb.max_box - aabb.min_box;
+
+	return result;
+}
+
 void ComponentFrustumCulling::setVisibilityFromCamera(Component* cameraPerspective, bool visibility) {
 	std::map<Component*, bool>::iterator it;
 	it = visibleFromCameras.find(cameraPerspective);
