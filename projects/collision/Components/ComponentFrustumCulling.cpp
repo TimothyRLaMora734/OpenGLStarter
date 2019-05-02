@@ -1,4 +1,5 @@
 #include "ComponentFrustumCulling.h"
+#include "../Transform.h"
 
 const ComponentType ComponentFrustumCulling::Type = ComponentTypeFrustumCulling;
 
@@ -7,7 +8,47 @@ ComponentFrustumCulling::ComponentFrustumCulling():Component(ComponentTypeFrustu
 }
 
 ComponentFrustumCulling::~ComponentFrustumCulling() {
+    //precisa de evento de attach to transform e detach from transform para lidar com essas situações
+    if (transform != NULL)
+        transform->OnVisited.remove(this, &ComponentFrustumCulling::OnTransformVisited);
+}
 
+void ComponentFrustumCulling::computeFinalPositions(bool visitedFlag){
+    if (cullingShape == CullingShapeSphere){
+        mat4 &m = transform->getMatrix(visitedFlag);
+        vec3 scale = transform->getScale(visitedFlag);
+        
+        sphere = collision::Sphere(
+                                   toVec3(m * toPtn4(sphereCenter)),
+                                   sphereRadius * minimum(minimum(scale.x, scale.y), scale.z)
+                                   );
+    } else if (cullingShape == CullingShapeAABB){
+        mat4 &m = transform->getMatrix(visitedFlag);
+        vec3 scale = transform->getScale(visitedFlag);
+        
+        vec3 center = toVec3(m * toPtn4(aabbCenter));
+        vec3 dimension = aabbDimension * scale;
+        
+        dimension *= 0.5f;
+        
+        aabb = collision::AABB(center - dimension, center + dimension);
+    }
+}
+
+void ComponentFrustumCulling::start() {
+    computeFinalPositions(false);
+}
+
+void ComponentFrustumCulling::attachToTransform(Transform *t) {
+    t->OnVisited.add(this, &ComponentFrustumCulling::OnTransformVisited);
+}
+
+void ComponentFrustumCulling::detachFromTransform(Transform *t) {
+    t->OnVisited.remove(this, &ComponentFrustumCulling::OnTransformVisited);
+}
+
+void ComponentFrustumCulling::OnTransformVisited(Transform *t) {
+    computeFinalPositions(true);
 }
 
 ComponentFrustumCulling *ComponentFrustumCulling::createShapeSphere(const vec3& sphereCenter, float sphereRadius) {

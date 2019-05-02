@@ -309,12 +309,22 @@ void App::deleteTree(Transform **element) {
 
 void App::processCameraVisibilityExample(Transform *element, ComponentCameraPerspective *&camera, const collision::Frustum &frustum) {
 
-	bool alreadySetupMatrix = false;
+	//bool alreadySetupMatrix = false;
 
 	ComponentFrustumCulling *frustumCulling = (ComponentFrustumCulling *)element->findComponent(ComponentTypeFrustumCulling);
 
 	if (frustumCulling != NULL) {
+        
+        if (frustumCulling->cullingShape == CullingShapeSphere) {
+            frustumCulling->setVisibilityFromCamera(camera, collision::Frustum::sphereOverlapsFrustum(frustumCulling->sphere, frustum));
+        }
+        else if (frustumCulling->cullingShape == CullingShapeAABB) {
+            frustumCulling->setVisibilityFromCamera(camera, collision::Frustum::aabbOverlapsFrustum(frustumCulling->aabb, frustum));
+        }
+        
+        
 		//check the frustum
+        /*
 		if (frustumCulling->cullingShape == CullingShapeSphere) {
 			mat4 &m = element->getMatrix(true);
 			vec3 scale = element->getScale(true);
@@ -339,6 +349,7 @@ void App::processCameraVisibilityExample(Transform *element, ComponentCameraPers
 
 			frustumCulling->setVisibilityFromCamera(camera, collision::Frustum::aabbOverlapsFrustum(aabb, frustum));
 		}
+         */
 	}
 
 	for (int i = 0; i < element->getChildCount(); i++)

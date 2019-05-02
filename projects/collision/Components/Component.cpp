@@ -29,3 +29,10 @@ void Component::callStartOnce() {
     start();
 }
 
+void Component::attachToTransform(Transform *t) {
+    
+}
+
+void Component::detachFromTransform(Transform *t) {
+    
+}

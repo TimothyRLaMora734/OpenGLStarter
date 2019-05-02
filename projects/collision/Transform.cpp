@@ -523,6 +523,8 @@ void Transform::preComputeTransforms(){
         }
         visited = true;
         stat_num_visited++;
+        
+        OnVisited(this);
     }
     for (int i = 0; i < children.size(); i++) {
         children[i]->preComputeTransforms();
@@ -602,6 +604,7 @@ void Transform::removeMapName(Transform *node){
 Component* Transform::addComponent(Component*c){
     components.push_back(c);
     c->transform = this;
+    c->attachToTransform(this);
     return c;
 }
 
@@ -609,7 +612,10 @@ Component* Transform::removeComponent(Component*c){
     for(int i=0;i<components.size();i++) {
         if (components[i] == c){
             components.erase(components.begin()+i);
+            Transform *t = c->transform;
             c->transform = NULL;
+            if (t != NULL)
+                c->detachFromTransform(t);
             return c;
         }
     }
@@ -620,7 +626,10 @@ Component* Transform::removeComponentAt(int i) {
     if (i>=0&&i<components.size()){
         Component * result = components[i];
         components.erase(components.begin()+i);
+        Transform *t = result->transform;
         result->transform = NULL;
+        if (t != NULL)
+            result->detachFromTransform(t);
         return result;
     }
     return NULL;

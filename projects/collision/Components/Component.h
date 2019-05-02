@@ -54,6 +54,9 @@ public:
     
     void callStartOnce();
     
+    virtual void attachToTransform(Transform *t);
+    virtual void detachFromTransform(Transform *t);
+    
     //friend class App;
 };
 
