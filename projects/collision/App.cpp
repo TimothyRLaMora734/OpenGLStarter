@@ -206,7 +206,7 @@ void App::drawTraverseTreeDepthFirst(Transform *element) {
     for(int i=0;i<element->getComponentCount();i++){
         Component* component = element->getComponentAt(i);
         //check start called from component
-        component->callStartOnce();
+        //component->callStartOnce();
         
         // First Setup Transform Matrix
         if ((
@@ -269,6 +269,8 @@ void App::drawModelsFromTree() {
     
     root->resetVisited();
     root->preComputeTransforms();
+    
+    StartEventManager::getInstance()->processAllComponentsWithTransform();
     
     cameraPerspective->precomputeViewProjection(true);
     
