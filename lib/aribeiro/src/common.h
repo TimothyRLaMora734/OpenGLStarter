@@ -1,6 +1,8 @@
 #ifndef asilva_defs_h
 #define asilva_defs_h
 
+#include "stdlib.h" // NULL definition
+
 //#pragma warning( disable : <number> )
 
 #ifdef _WIN32
