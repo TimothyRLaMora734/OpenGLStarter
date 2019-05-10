@@ -112,7 +112,7 @@ private:
 	bool matrixDirty;
 	mat4 matrix, matrixParent;
 	bool matrixInverseTransposeDirty;
-	mat4 matrixInverseTranspose, matrixInverseTransposeParent;
+    mat4 matrixInverseTranspose;//, matrixInverseTransposeParent;
 	bool matrixInverseDirty;
 	mat4 matrixInverse, matrixInverseParent;
 
