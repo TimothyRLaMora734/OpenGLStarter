@@ -22,11 +22,11 @@ class EasingEqDrawer {
 	LineRenderer lineGraphic;
 
 	GLSquare square;
-	
+
 	public:
 
 	EasingEqDrawer():points(40), lineSquare(4), lineGraphic(256) {
-		
+
 		lineSquare.data[0] = vec3(0,0,0);
 		lineSquare.data[1] = vec3(1,0,0);
 		lineSquare.data[2] = vec3(1,1,0);
@@ -43,7 +43,7 @@ class EasingEqDrawer {
 			float lerp = (float)i/float(lineGraphic.data.size()-1);
 			lineGraphic.data[i] = vec3(lerp, interpolationfunction(0,1,lerp), 0.0f );
 		}
-		
+
 		shader->enable();
 
 		//
@@ -61,7 +61,7 @@ class EasingEqDrawer {
 
 		//draw font
 		const mat4 fontTransform = translate(0.5f, 1.0f, 0) * scale(0.0025f, 0.0025f, 0.0025f);
-		
+
 		collision::AABB aabb = font->computeBounds(text);
 		vec3 center = -aabb.max_box * 0.5f;
 		center.y += font->getLineHeight();
@@ -76,7 +76,7 @@ class EasingEqDrawer {
 	}
 
 	void drawAllFunctions(const mat4 &baseMatrix, GLShaderColor * shader, GLFont *font, PlatformTime *time) {
-		
+
 		//mat4 base_inv = inv_faster(baseMatrix);
 		mat4 base_inv = inv(baseMatrix);
 
@@ -122,6 +122,7 @@ class EasingEqDrawer {
 
 		int total = 40;// (sizeof(funcs) / sizeof(interplFunc));
 
+		glLineWidth(2.0f);
 		//
 		// draw charts
 		//
@@ -138,7 +139,7 @@ class EasingEqDrawer {
 				aux = aux * translate(1.0f, 0, 0);
 				if (j == 3)
 					aux = aux * translate(0.5f, 0, 0);
-			
+
 			}
 			mvp = mvp * translate(0, 1.5f, 0);
 		}

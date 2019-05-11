@@ -192,7 +192,7 @@ void Menu::render(float deltaTime) {
 
 	intensidade = fmod(intensidade, 2.0f);
 
-	float intensity = 0.6 + 0.2 * abs (fmod(intensidade, 2.0f) - 1.0);
+	float intensity = 0.6f + 0.2f * absv (fmod(intensidade, 2.0f) - 1.0f);
 
 
 	//desenho do menu

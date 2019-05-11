@@ -58,6 +58,9 @@ void AABBitem::render()const {
 		vec3(position.x             , position.y            , 0.0f),
 		vec3(position.x + img_dim.x , position.y            , 0.0f),
 		vec3(position.x + img_dim.x , position.y + img_dim.y, 0.0f),
+
+		vec3(position.x             , position.y            , 0.0f),
+		vec3(position.x + img_dim.x , position.y + img_dim.y, 0.0f),
 		vec3(position.x             , position.y + img_dim.y, 0.0f)
 	};
 
@@ -65,10 +68,13 @@ void AABBitem::render()const {
 		vec2(0, 1),
 		vec2(1, 1),
 		vec2(1, 0),
+
+		vec2(0, 1),
+		vec2(1, 0),
 		vec2(0, 0)
 	};
 
-	render->drawTexture(img, vec4(1.0f), GL_QUADS, vpos, vuv, 4);
+	render->drawTexture(img, vec4(1.0f), GL_TRIANGLES, vpos, vuv, 6);
 
 	//img.draw(position);
 }

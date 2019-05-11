@@ -40,6 +40,59 @@
 #include <cstring>
 #include <cassert>
 
+
+
+#ifdef NDEBUG
+    #define SFML_OPENGL_CMD(expr) expr
+#else
+
+#define SFML_OPENGL_CMD(expr) do { \
+		expr; \
+		const char* file=__FILE__; unsigned int line=__LINE__; const char* expression=#expr; \
+		GLenum errorCode = glGetError(); \
+		if (errorCode != GL_NO_ERROR) \
+		{ \
+			const char* fileString = file; \
+			const char* error = "Unknown error"; \
+			const char* description = "No description"; \
+			switch (errorCode) \
+			{ \
+			case GL_INVALID_ENUM: \
+			{ \
+				error = "GL_INVALID_ENUM"; \
+				description = "An unacceptable value has been specified for an enumerated argument."; \
+				break; \
+			} \
+			case GL_INVALID_VALUE: \
+			{ \
+				error = "GL_INVALID_VALUE"; \
+				description = "A numeric argument is out of range."; \
+				break; \
+			} \
+			case GL_INVALID_OPERATION: \
+			{ \
+				error = "GL_INVALID_OPERATION"; \
+				description = "The specified operation is not allowed in the current state."; \
+				break; \
+			} \
+			case GL_OUT_OF_MEMORY: \
+			{ \
+				error = "GL_OUT_OF_MEMORY"; \
+				description = "There is not enough memory left to execute the command."; \
+				break; \
+			} \
+			} \
+			printf("An internal OpenGL call failed in %s(%i). \n" \
+				"Expression:%s\n" \
+				"Error description:%s\n" \
+				"%s\n\n", fileString, line, expression, error, description); \
+			exit(-1); \
+		} \
+	} while (false)
+
+#endif
+
+
 #if !defined(SFML_OPENGL_ES)
 
     #if defined(SFML_SYSTEM_WINDOWS)
@@ -227,14 +280,21 @@ void GlContext::initResource()
         sharedContext = new ContextType(NULL);
         sharedContext->initialize(ContextSettings());
 
+        //check for errors on glGetError
+        SFML_OPENGL_CMD( glGetString(GL_VERSION) );
+
         // Load our extensions vector
         extensions.clear();
 
         // Check whether a >= 3.0 context is available
+#if !defined(ARIBEIRO_RPI)
         int majorVersion = 0;
         glGetIntegerv(GL_MAJOR_VERSION, &majorVersion);
 
         if (glGetError() == GL_INVALID_ENUM)
+#else
+        if (1)
+#endif
         {
             // Try to load the < 3.0 way
             const char* extensionString = reinterpret_cast<const char*>(glGetString(GL_EXTENSIONS));
@@ -570,6 +630,7 @@ void GlContext::initialize(const ContextSettings& requestedSettings)
     int majorVersion = 0;
     int minorVersion = 0;
 
+#ifndef ARIBEIRO_RPI
     // Try the new way first
     glGetIntegerv(GL_MAJOR_VERSION, &majorVersion);
     glGetIntegerv(GL_MINOR_VERSION, &minorVersion);
@@ -580,14 +641,21 @@ void GlContext::initialize(const ContextSettings& requestedSettings)
         m_settings.minorVersion = static_cast<unsigned int>(minorVersion);
     }
     else
+#endif
     {
         // Try the old way
-        const GLubyte* version = glGetString(GL_VERSION);
+        const GLubyte* version;
+        SFML_OPENGL_CMD( version = glGetString(GL_VERSION) );
         if (version)
         {
+        #if defined(ARIBEIRO_RPI)
+            m_settings.majorVersion = version[strlen((const char*)version)-1-2] - '0';
+            m_settings.minorVersion = version[strlen((const char*)version)-1] - '0';
+        #else
             // The beginning of the returned string is "major.minor" (this is standard)
             m_settings.majorVersion = version[0] - '0';
             m_settings.minorVersion = version[2] - '0';
+        #endif
         }
         else
         {

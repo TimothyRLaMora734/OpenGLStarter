@@ -113,6 +113,10 @@ void Slider::render(const int ID, const unsigned int time_ms) {
 		vec3(pos.x                         , pos.y                         , 0.0f),
 		vec3(pos.x + (float)bolinha->width , pos.y                         , 0.0f),
 		vec3(pos.x + (float)bolinha->width , pos.y + (float)bolinha->height, 0.0f),
+
+
+		vec3(pos.x                         , pos.y                         , 0.0f),
+		vec3(pos.x + (float)bolinha->width , pos.y + (float)bolinha->height, 0.0f),
 		vec3(pos.x                         , pos.y + (float)bolinha->height, 0.0f)
 		};
 
@@ -120,10 +124,13 @@ void Slider::render(const int ID, const unsigned int time_ms) {
 			vec2(0, 1),
 			vec2(1, 1),
 			vec2(1, 0),
+
+			vec2(0, 1),
+			vec2(1, 0),
 			vec2(0, 0)
 		};
 
-		render->drawTexture(bolinha, vec4(1.0f), GL_QUADS, vpos2, vuv, 4);
+		render->drawTexture(bolinha, vec4(1.0f), GL_TRIANGLES, vpos2, vuv, 6);
 
 	}
 

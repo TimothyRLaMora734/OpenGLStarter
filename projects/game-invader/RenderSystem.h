@@ -10,6 +10,8 @@
 
 #include <wchar.h>
 
+#include <glew/glew.h>
+
 #include <aribeiro/aribeiro.h>
 using namespace aRibeiro;
 using namespace collision;

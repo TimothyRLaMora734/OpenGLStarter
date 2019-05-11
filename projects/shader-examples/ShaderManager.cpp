@@ -18,7 +18,7 @@ ShaderManager::ShaderManager(RenderSystem *renderSystem) {
 
 	insideGroup["filters"].push_back("Laplace");
 	insideGroup["filters"].push_back("Blur");
-	
+
 	//insideGroup["ilumination"].push_back("GLShaderTextureColor");
 	insideGroup["ilumination"].push_back("BlinPhongVertex");
 	insideGroup["ilumination"].push_back("BlinPhongPixel");
@@ -97,7 +97,7 @@ ShaderManager::ShaderManager(RenderSystem *renderSystem) {
 	shaders["ProceduralTexture"] = new ShaderProceduralTexture();
 	shaders_draw_map["ProceduralTexture"] = &ShaderManager::draw_ShaderProceduralTexture;
 	shaders_is_post_processing["ProceduralTexture"] = false;
-		
+
 	//
 	// Initialize Parameters
 	//
@@ -109,7 +109,7 @@ ShaderManager::ShaderManager(RenderSystem *renderSystem) {
 
 	diffuse = GLTexture::loadFromPNG("resources/images/rock.png");
 	bumpmap = GLTexture::loadFromPNG("resources/images/rock+bump+cone.png");
-		
+
 	lightPosition = vec3(0.0f, 0.0f, 1.5f);
 	lightAmbient = vec3(0.2f, 0.2f, 0.2f);
 	lightDiffuse = vec3(0.7f, 0.7f, 0.9f);
@@ -118,21 +118,22 @@ ShaderManager::ShaderManager(RenderSystem *renderSystem) {
 
 	conemap = GLTexture::loadFromPNG("resources/images/rock+bump+cone.png");
 	conedepth = 0.5f;
-	
+
     //framebuffer = new GLTexture();
-    
+
     framebuffer = new GLFramebufferObject();
-    framebuffer->depth = new GLTexture();
+    //framebuffer->depth = new GLTexture();
+    framebuffer->useRenderbufferDepth = true;
     framebuffer->color.push_back(new GLTexture());
     framebuffer->setSize(32,32);
     framebuffer->attachTextures();
-    
+
     framebufferBlur = new GLFramebufferObject();
     //framebufferBlur->depth = new GLTexture();
     framebufferBlur->color.push_back(new GLTexture());
     framebufferBlur->setSize(32,32);
     framebufferBlur->attachTextures();
-    
+
 	framebufferNeighbor = vec2(1);
 	laplaceIntensity = 1.0f;
 	laplaceBlend = 1.0f;
@@ -163,12 +164,12 @@ ShaderManager::~ShaderManager() {
     setNullAndDelete(framebuffer->color[0]);
     setNullAndDelete(framebuffer->depth);
     setNullAndDelete(framebuffer);
-    
+
     setNullAndDelete(framebufferBlur->color[0]);
     setNullAndDelete(framebufferBlur->depth);
     setNullAndDelete(framebufferBlur);
-    
-    
+
+
 	setNullAndDelete(defaultTexture);
 	setNullAndDelete(diffuse);
 	setNullAndDelete(bumpmap);
@@ -232,7 +233,7 @@ void ShaderManager::draw_ShaderBumpMapping(GLShader *baseshader, GLint ogl_primi
 
 	diffuse->active(0);
 	shader->setDiffuse(0);
-		
+
 	bumpmap->active(1);
 	shader->setBumpMap(1);
 
@@ -450,7 +451,7 @@ void ShaderManager::draw_ShaderLaplace(GLShader *baseshader, GLint ogl_primitive
 	shader->setFramebufferTexelNeighbor(framebufferNeighbor);
 
 	shader->setModelViewProjection(render->getMVP());
-		
+
 	shader->setIntensity(laplaceIntensity);
 	shader->setBlend(laplaceBlend);
 
@@ -470,46 +471,52 @@ void ShaderManager::draw_ShaderLaplace(GLShader *baseshader, GLint ogl_primitive
 }
 
 void ShaderManager::draw_ShaderBlur(GLShader *baseshader, GLint ogl_primitive, const VertexAttrib *vertexBuffer, int vertexCount) {
-    
+
     if (blurSteps == 0){
-        
+
         glClear(GL_COLOR_BUFFER_BIT);
-        
+
         RenderSystem * render = RenderSystem::getSingleton();
-        
+
         render->projection.push();
         render->projection.top = mat4::IdentityMatrix;
-        
+
         render->model.push();
         render->model.top = mat4::IdentityMatrix;// * scale (1,-1,1);
-        
+
         render->shader->enable();
         render->shader->setColor(vec4(1.0f));
         //normalized mapped quad draw..
-        
+
         const vec3 vpos[] = {
-            
+
             vec3(-1, -1, 0.0f),
             vec3(1, -1, 0.0f),
             vec3(1, 1, 0.0f),
+
+            vec3(-1, -1, 0.0f),
+            vec3(1, 1, 0.0f),
             vec3(-1, 1, 0.0f)
         };
-        
+
         const vec2 vuv[] = {
             vec2(0, 0),
             vec2(1, 0),
             vec2(1, 1),
+
+            vec2(0, 0),
+            vec2(1, 1),
             vec2(0, 1)
         };
-        
-        render->drawTexture(framebuffer->color[0], GL_QUADS, vpos, vuv, 4);
-        
+
+        render->drawTexture(framebuffer->color[0], GL_TRIANGLES, vpos, vuv, 6);
+
         render->model.pop();
         render->projection.pop();
         return;
     }
-    
-    
+
+
 	ShaderBlur *shader = (ShaderBlur*)baseshader;
 
 	shader->enable();
@@ -533,14 +540,14 @@ void ShaderManager::draw_ShaderBlur(GLShader *baseshader, GLint ogl_primitive, c
 		shader->setHorizontal();
 		OPENGL_CMD(glDrawArrays(ogl_primitive, 0, vertexCount));
 		//framebuffer->copyFrameBuffer();
-        
+
         framebufferBlur->color[0]->active(0);
-        
+
         if (i== blurSteps-1)
             GLFramebufferObject::disable();
         else
             framebuffer->enable();
-        
+
 		shader->setVertical();
 		OPENGL_CMD(glDrawArrays(ogl_primitive, 0, vertexCount));
 		//framebuffer->copyFrameBuffer();

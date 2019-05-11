@@ -48,7 +48,11 @@ void Tetris::drawMovableCubes(const unsigned int time_interval) {
 
 
 	//draw flashs
-	glPushAttrib(GL_ENABLE_BIT);
+	//glPushAttrib(GL_ENABLE_BIT);
+	GLboolean depthTest;
+    glGetBooleanv (GL_DEPTH_TEST, &depthTest);
+
+    if (depthTest)
 	glDisable(GL_DEPTH_TEST);
 
 	// additive blend
@@ -105,7 +109,10 @@ void Tetris::drawMovableCubes(const unsigned int time_interval) {
 
 	//back normal transparency
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glPopAttrib();
+
+	if (depthTest)
+        glEnable(GL_DEPTH_TEST);
+	//glPopAttrib();
 
 
 
@@ -475,7 +482,11 @@ void Tetris::render(const unsigned int time_ms, const vec2 &screenCenter) {
 			translate(-1, -1, 0) *
 			scale(1.0f / screenCenter.x, 1.0f / screenCenter.y, 1);
 
-		glPushAttrib(GL_ENABLE_BIT);
+		//glPushAttrib(GL_ENABLE_BIT);
+		GLboolean depthTest;
+        glGetBooleanv (GL_DEPTH_TEST, &depthTest);
+
+        if (depthTest)
 		glDisable(GL_DEPTH_TEST);
 
 		if (countdownToShowX2 > 0) {
@@ -494,7 +505,11 @@ void Tetris::render(const unsigned int time_ms, const vec2 &screenCenter) {
 			render->drawTexture_center(x4, screenCenter);
 			countdownToShowX4 -= (int)diffRender;
 		}
-		glPopAttrib();
+
+		if (depthTest)
+            glEnable(GL_DEPTH_TEST);
+
+		//glPopAttrib();
 
 		render->projection.pop();
 		//glMatrixMode(GL_PROJECTION);   glPopMatrix();

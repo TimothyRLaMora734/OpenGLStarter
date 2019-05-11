@@ -53,16 +53,22 @@ void PlayState::render(float deltatime, vec2 screensize) {
 			vec3(0,0, 0.0f),
 			vec3(dim.x,0, 0.0f),
 			vec3(dim.x,dim.y, 0.0f),
+
+			vec3(0,0, 0.0f),
+			vec3(dim.x,dim.y, 0.0f),
 			vec3(0,dim.y, 0.0f)
 		};
     vec4 vcolor[] = { //color
 			BackGroundColor1,
 			BackGroundColor1,
 			BackGroundColor2,
+
+			BackGroundColor1,
+			BackGroundColor2,
 			BackGroundColor2
 		};
 
-	spaceInvader->render->drawColor(GL_QUADS, vpos, vcolor, 4);
+	spaceInvader->render->drawColor(GL_TRIANGLES, vpos, vcolor, 6);
 
 	spaceInvader->render->popProjection();
 
@@ -135,15 +141,21 @@ void PlayState::render(float deltatime, vec2 screensize) {
                 vec3(0,0,0),
                 vec3(dim.x,0,0),
                 vec3(dim.x,dim.y * 0.0525,0),
+
+                vec3(0,0,0),
+                vec3(dim.x,dim.y * 0.0525,0),
                 vec3(0,dim.y * 0.0525,0)
             };
             vec4 vcolor[] = { //color
                 vec4(0.5f,0.5f,0.5f,0.5f),
                 vec4(0.5f,0.5f,0.5f,0.5f),
                 vec4(0.5f,0.5f,0.5f,0.5f),
+
+                vec4(0.5f,0.5f,0.5f,0.5f),
+                vec4(0.5f,0.5f,0.5f,0.5f),
                 vec4(0.5f,0.5f,0.5f,0.5f)
             };
-			spaceInvader->render->drawColor(GL_QUADS, vpos, vcolor, 4);
+			spaceInvader->render->drawColor(GL_TRIANGLES, vpos, vcolor, 6);
             }
 
 

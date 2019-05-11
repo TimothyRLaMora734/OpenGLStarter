@@ -43,10 +43,20 @@ namespace aRibeiro {
 		width = 0;
 		height = 0;
 
+		useRenderbufferDepth = false;
+		mDepthRenderbuffer = 0;
+
 		OPENGL_CMD(glGenFramebuffersEXT(1, &mFbo));
+
 	}
 
 	GLFramebufferObject::~GLFramebufferObject() {
+
+        if (useRenderbufferDepth && mDepthRenderbuffer != 0 ) {
+            OPENGL_CMD(glDeleteRenderbuffers(1, &mDepthRenderbuffer));
+            mDepthRenderbuffer = 0;
+        }
+
 		if (glIsFramebufferEXT(mFbo))
 			glDeleteFramebuffersEXT(1, &mFbo);
 		mFbo = 0;
@@ -58,8 +68,16 @@ namespace aRibeiro {
 	void GLFramebufferObject::attachTextures() {
 		if (initialized)
 			return;
-
 		initialized = true;
+
+		//check render buffer creation
+        if (useRenderbufferDepth) {
+            OPENGL_CMD(glGenRenderbuffers(1, &mDepthRenderbuffer));
+            OPENGL_CMD(glBindRenderbuffer(GL_RENDERBUFFER, mDepthRenderbuffer));
+            OPENGL_CMD(glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, width, height));
+            //OPENGL_CMD(glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height));
+            OPENGL_CMD(glBindRenderbuffer(GL_RENDERBUFFER, 0));
+        }
 
 		if ((int)color.size() > maxDrawBuffers()) {
 			fprintf(stderr,
@@ -91,8 +109,12 @@ namespace aRibeiro {
 		}
 
 		if (stencil != NULL) {
-			OPENGL_CMD(glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_STENCIL_ATTACHMENT, GL_TEXTURE_2D, stencil->mTexture, 0));
+			OPENGL_CMD(glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_STENCIL_ATTACHMENT_EXT, GL_TEXTURE_2D, stencil->mTexture, 0));
 		}
+
+		if (useRenderbufferDepth)
+            OPENGL_CMD(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, mDepthRenderbuffer));
+            //glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
 
 		//check the fbo attachment status...
 		GLenum status = (GLenum)glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
@@ -134,9 +156,10 @@ namespace aRibeiro {
 			exit(-1);
 			break;
 		}
-		
-		//set the draw buffers to this FBO
-		OPENGL_CMD(glDrawBuffers(color.size(), DrawBuffersUnit));
+
+		if (GLEW_ARB_draw_buffers)
+            //set the draw buffers to this FBO
+            OPENGL_CMD(glDrawBuffers(color.size(), DrawBuffersUnit));
 
 		OPENGL_CMD(glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0));
 	}
@@ -149,12 +172,24 @@ namespace aRibeiro {
             return;
 		this->width = w;
 		this->height = h;
-		if (depth != NULL)
+		if (depth != NULL){
+            if (!GLEW_ARB_depth_texture){
+                printf("Error, this hardware does not support depth texture...\n");
+                exit(-1);
+            }
 			depth->setSize(w, h, depthFormat);
+        }
 		if (stencil != NULL)
 			stencil->setSize(w, h, stencilFormat);
 		for (int i = 0; i < (int)color.size(); i++)
 			color[i]->setSize(w, h, colorFormat);
+
+        if (useRenderbufferDepth && mDepthRenderbuffer != 0 ) {
+            OPENGL_CMD(glBindRenderbuffer(GL_RENDERBUFFER, mDepthRenderbuffer));
+            OPENGL_CMD(glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, width, height));
+            //OPENGL_CMD(glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height));
+            OPENGL_CMD(glBindRenderbuffer(GL_RENDERBUFFER, 0));
+        }
 	}
 
 	void GLFramebufferObject::enable() {
@@ -173,17 +208,18 @@ namespace aRibeiro {
 
 	int GLFramebufferObject::currentDepthBits() {
 		int depthBits;
-		glGetIntegerv(GL_DEPTH_BITS, &depthBits);
+		OPENGL_CMD(glGetIntegerv(GL_DEPTH_BITS, &depthBits));
 		return depthBits;
 	}
 	int GLFramebufferObject::maxColorAttachments() {
 		int v;
-		glGetIntegerv(GL_MAX_COLOR_ATTACHMENTS_EXT, &v);
+		OPENGL_CMD(glGetIntegerv(GL_MAX_COLOR_ATTACHMENTS_EXT, &v));
 		return v;
 	}
 	int GLFramebufferObject::maxDrawBuffers() {
-		int v;
-		glGetIntegerv(GL_MAX_DRAW_BUFFERS, &v);
+		int v = 1;
+		if (GLEW_ARB_draw_buffers)
+            OPENGL_CMD(glGetIntegerv(GL_MAX_DRAW_BUFFERS, &v));
 		return v;
 	}
 

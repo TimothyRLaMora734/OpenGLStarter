@@ -3,7 +3,27 @@ project (aribeiro)
 #include_directories( ${GLOBAL_INCLUDE_DIR} )
 
 set( ARIBEIRO_INCLUDE_DIR ${GLOBAL_INCLUDE_DIR})
-set( ARIBEIRO_LIBRARIES ${OPENGL_LIBRARIES})
+
+if(ARIBEIRO_RPI)
+
+    #find_package(EGL REQUIRED)
+    #find_package(GLES REQUIRED)
+    #include_directories(${EGL_INCLUDE_DIR} ${GLES_INCLUDE_DIR})
+
+        # Workaround: we need to use gles2 on the rpi version
+        #get_filename_component(GLES2PATH ${GLES_LIBRARY} PATH)
+        #find_library(GLES2_LIBRARY brcmGLESv2 ${GLES2PATH})
+        # fallback to old vendor library name
+        #if(${GLES2_LIBRARY} STREQUAL "GLES2_LIBRARY-NOTFOUND")
+            #find_library(GLES2_LIBRARY GLESv2 ${GLES2PATH})
+        #endif()
+
+    #set( ARIBEIRO_LIBRARIES ${EGL_INCLUDE_DIR} ${GLES_INCLUDE_DIR} ${GLES2_LIBRARY})
+
+
+else()
+    set( ARIBEIRO_LIBRARIES ${OPENGL_LIBRARIES})
+endif()
 
 if(WIN32)
 	#for path operations
@@ -16,6 +36,12 @@ endif()
 # inside framework dependencies
 #
 set(ARIBEIRO_LIBRARIES ${ARIBEIRO_LIBRARIES} glew convertutf png_static zlib )
+
+if (ARIBEIRO_RPI)
+	#set(ARIBEIRO_INCLUDE_DIR ${ARIBEIRO_INCLUDE_DIR} /opt/vc/lib/)
+	set(ARIBEIRO_LIBRARIES ${ARIBEIRO_LIBRARIES} bcm_host openmaxil vcos vchiq_arm) #pthread
+	message (STATUS "All Link Libs: ${ARIBEIRO_LIBRARIES}")
+endif()
 
 if (${OS_TARGET} STREQUAL "linux")
 
@@ -37,7 +63,7 @@ set( PUBLIC_HEADERS
 
 		src/aribeiro.h
 		src/common.h
-		
+
 		src/math/all_math.h
 		src/math/BresenhamIterator.h
 		src/math/constants.h
@@ -49,10 +75,10 @@ set( PUBLIC_HEADERS
 		src/math/vec2.h
 		src/math/vec3.h
 		src/math/vec4.h
-		
-		
+
+
 		${math_collision_h}
-		
+
 		src/platform/PlatformMutex.h
 		src/platform/PlatformThread.h
 		src/platform/PlatformSleep.h
@@ -89,7 +115,7 @@ set( PUBLIC_HEADERS
 		src/opengl/font/GLFont.h
 		src/opengl/font/GLStripText.h
 
-		
+
 		)
 
 set( PRIVATE_HEADERS )
@@ -104,9 +130,9 @@ set( SRC
 		src/math/vec2.cpp
 		src/math/vec3.cpp
 		src/math/vec4.cpp
-		
+
 		${math_collision_src}
-		
+
 		src/platform/PlatformMutex.cpp
 		src/platform/PlatformThread.cpp
 		src/platform/PlatformSleep.cpp
@@ -146,7 +172,7 @@ set( SRC
 		src/aribeiro.h
 		src/common.h
 	)
-	
+
 	source_group("math" FILES
 		src/math/all_math.h
 		src/math/AABB.h
@@ -171,12 +197,12 @@ set( SRC
 		src/math/vec3.cpp
 		src/math/vec4.cpp
 	)
-	
+
 	source_group("math\\collision" FILES
 		${math_collision_h}
 		${math_collision_src}
 	)
-	
+
 	source_group("platform" FILES
 		src/platform/PlatformMutex.h
 		src/platform/PlatformThread.h
@@ -213,7 +239,7 @@ set( SRC
         src/util/ColorConversion.h
         src/util/ColorConversion.cpp
 	)
-	
+
 	source_group("util\\win32" FILES
 		src/util/win32/drand48.h
 		src/util/win32/drand48.cpp
@@ -244,14 +270,14 @@ set( SRC
 	)
 
 	source_group("opengl\\draw" FILES
-		
+
 		src/opengl/draw/GLSquare.h
 		src/opengl/draw/GLSquare.cpp
 
 	)
 
 	source_group("opengl\\font" FILES
-		
+
 		src/opengl/font/Font.h
 		src/opengl/font/GLFont.h
 		src/opengl/font/GLStripText.h
@@ -261,7 +287,7 @@ set( SRC
 		src/opengl/font/GLStripText.cpp
 
 	)
-	
+
 
 #endif()
 

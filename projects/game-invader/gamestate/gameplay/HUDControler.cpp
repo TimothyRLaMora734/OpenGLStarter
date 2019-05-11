@@ -46,15 +46,21 @@ void HUDcontroler::innerDraw(vec2 screensize) {
 			vec3(0,            screensize.y - 0.15*400.0, 0.0f),
 			vec3(screensize.x, screensize.y - 0.15*400.0, 0.0f),
 			vec3(screensize.x, screensize.y, 0.0f),
+
+			vec3(0,            screensize.y - 0.15*400.0, 0.0f),
+			vec3(screensize.x, screensize.y, 0.0f),
 			vec3(0,            screensize.y, 0.0f)
 		};
     vec4 vcolor[] = { //color
 			vec4(0.5  ,0.5  ,1 ,0.5),
 			vec4(0.5  ,0.5  ,1 ,0.5),
 			vec4(1  ,1  ,1 ,0.5),
+
+			vec4(0.5  ,0.5  ,1 ,0.5),
+			vec4(1  ,1  ,1 ,0.5),
 			vec4(1  ,1  ,1 ,0.5)
 		};
-	spaceInvader->render->drawColor(GL_QUADS, vpos, vcolor, 4 );
+	spaceInvader->render->drawColor(GL_TRIANGLES, vpos, vcolor, 6 );
 
     }
 

@@ -9,6 +9,8 @@ using namespace aRibeiro;
 
 class PointRenderer {
 
+    std::vector<vec3> triangles;
+
 public:
 
 	std::vector<vec3> data;
@@ -22,9 +24,16 @@ public:
 		const int COORDS_PER_POS = 3;
 		const int STRUCTURE_STRIDE_BYTES = sizeof(vec3);
 
+        triangles.clear();
+		for(int i=0;i<data.size();i++){
+            triangles.push_back( data[i] + vec3(0,0.01f,0) );
+            triangles.push_back( data[i] + vec3(-0.01f,-0.01f,0));
+            triangles.push_back( data[i] + vec3(0.01f,-0.01f,0));
+		}
+
 		OPENGL_CMD(glEnableVertexAttribArray(GLShaderColor::vPosition));
-		OPENGL_CMD(glVertexAttribPointer(GLShaderColor::vPosition, COORDS_PER_POS, GL_FLOAT, false, STRUCTURE_STRIDE_BYTES, &data[0]));
-		OPENGL_CMD(glDrawArrays(GL_POINTS, 0, data.size()));
+		OPENGL_CMD(glVertexAttribPointer(GLShaderColor::vPosition, COORDS_PER_POS, GL_FLOAT, false, STRUCTURE_STRIDE_BYTES, &triangles[0]));
+		OPENGL_CMD(glDrawArrays(GL_TRIANGLES, 0, triangles.size()));
 		OPENGL_CMD(glDisableVertexAttribArray(GLShaderColor::vPosition));
 
 	}

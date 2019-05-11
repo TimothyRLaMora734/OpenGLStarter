@@ -82,6 +82,8 @@ int main(int argc, char* argv[]) {
 		exit(-1);
 	}
 
+	printf("Extensions: %s\n", glGetString(GL_EXTENSIONS));
+
 	//
 	// OpenGL Initial state
 	//

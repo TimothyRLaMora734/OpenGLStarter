@@ -47,9 +47,9 @@ int main(int argc, char* argv[]) {
 	// OpenGL 2.0 context
 	contextSettings.majorVersion = 2;
 	contextSettings.majorVersion = 1;
-    
+
     //contextSettings.antialiasingLevel = 1;
-    
+
 	//
 	// get fullscreen modes and look the near desktop mode resolution
 	//
@@ -88,7 +88,7 @@ int main(int argc, char* argv[]) {
 		sf::Style::Default,
 		contextSettings);
 #endif
-    
+
     currentWindow = &window;
 
 	window.setVerticalSyncEnabled(true);
@@ -107,12 +107,11 @@ int main(int argc, char* argv[]) {
 		GLEW_ARB_fragment_shader      &&
 		GLEW_ARB_texture_non_power_of_two &&
 		GLEW_ARB_framebuffer_object &&
-		GLEW_ARB_draw_buffers &&
-          
-          GLEW_ARB_vertex_buffer_object &&
-          (GLEW_ARB_vertex_array_object || GLEW_APPLE_vertex_array_object) &&
-		//GLEW_ARB_framebuffer_no_attachments && -- n funciona no macos
-		GLEW_ARB_depth_texture
+		//GLEW_ARB_draw_buffers &&
+        GLEW_ARB_vertex_buffer_object// &&
+        //(GLEW_ARB_vertex_array_object || GLEW_APPLE_vertex_array_object) &&
+        //GLEW_ARB_framebuffer_no_attachments && -- n funciona no macos
+		//GLEW_ARB_depth_texture
 		)) {
 		fprintf(stderr,"Hardware does not support the required opengl features.\n");
         fprintf(stderr,"  GL_ARB_multitexture %i\n", GLEW_ARB_multitexture);
@@ -126,7 +125,7 @@ int main(int argc, char* argv[]) {
         fprintf(stderr,"  GL_ARB_vertex_buffer_object %i\n", GLEW_ARB_vertex_buffer_object);
         fprintf(stderr,"  GL_ARB_vertex_array_object %i\n", (GLEW_ARB_vertex_array_object || GLEW_APPLE_vertex_array_object));
         fprintf(stderr,"  GL_ARB_depth_texture %i\n", GLEW_ARB_depth_texture);
-        
+
 		exit(-1);
 	}
 

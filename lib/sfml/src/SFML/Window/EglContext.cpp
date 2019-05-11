@@ -36,7 +36,7 @@
 #ifdef SFML_SYSTEM_ANDROID
     #include <SFML/System/Android/Activity.hpp>
 #endif
-#ifdef SFML_SYSTEM_LINUX
+#if defined(SFML_SYSTEM_LINUX) && !defined(ARIBEIRO_RPI)
     #include <X11/Xlib.h>
 #endif
 
@@ -201,7 +201,12 @@ void EglContext::setVerticalSyncEnabled(bool enabled)
 void EglContext::createContext(EglContext* shared)
 {
     const EGLint contextVersion[] = {
+    #if defined(ARIBEIRO_RPI)
+        // request a context using Open GL ES 2.0
+        EGL_CONTEXT_CLIENT_VERSION, 2,
+    #else
         EGL_CONTEXT_CLIENT_VERSION, 1,
+    #endif
         EGL_NONE
     };
 
@@ -248,7 +253,12 @@ EGLConfig EglContext::getBestConfig(EGLDisplay display, unsigned int bitsPerPixe
         EGL_STENCIL_SIZE, settings.stencilBits,
         EGL_SAMPLE_BUFFERS, settings.antialiasingLevel,
         EGL_SURFACE_TYPE, EGL_WINDOW_BIT | EGL_PBUFFER_BIT,
-        EGL_RENDERABLE_TYPE, EGL_OPENGL_ES_BIT,
+
+        #ifdef ARIBEIRO_RPI
+            EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
+        #else
+            EGL_RENDERABLE_TYPE, EGL_OPENGL_ES_BIT,
+        #endif
         EGL_NONE
     };
 
@@ -268,24 +278,24 @@ EGLConfig EglContext::getBestConfig(EGLDisplay display, unsigned int bitsPerPixe
 void EglContext::updateSettings()
 {
     EGLint tmp;
-    
+
     // Update the internal context settings with the current config
     eglCheck(eglGetConfigAttrib(m_display, m_config, EGL_DEPTH_SIZE, &tmp));
     m_settings.depthBits = tmp;
-    
+
     eglCheck(eglGetConfigAttrib(m_display, m_config, EGL_STENCIL_SIZE, &tmp));
     m_settings.stencilBits = tmp;
-    
+
     eglCheck(eglGetConfigAttrib(m_display, m_config, EGL_SAMPLES, &tmp));
     m_settings.antialiasingLevel = tmp;
-    
+
     m_settings.majorVersion = 1;
     m_settings.minorVersion = 1;
     m_settings.attributeFlags = ContextSettings::Default;
 }
 
 
-#ifdef SFML_SYSTEM_LINUX
+#if defined(SFML_SYSTEM_LINUX) && !defined(ARIBEIRO_RPI)
 ////////////////////////////////////////////////////////////
 XVisualInfo EglContext::selectBestVisual(::Display* XDisplay, unsigned int bitsPerPixel, const ContextSettings& settings)
 {

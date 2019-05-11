@@ -68,7 +68,7 @@ ARIBEIRO_API vec4 operator*(const mat4 &mat, const vec4 &vec);
 ///
 ARIBEIRO_API vec4 operator*(const vec4 &vec, const mat4 &mat);
 
-/// \brief Rotate quaternion a according quaternion b. 
+/// \brief Rotate quaternion a according quaternion b.
 ///
 /// The result is not normalized
 ///
@@ -79,7 +79,7 @@ ARIBEIRO_API vec4 operator*(const vec4 &vec, const mat4 &mat);
 ///
 ARIBEIRO_API quat operator^(const quat &a, const quat &b);
 
-/// \brief Rotate quaternion a according quaternion b. 
+/// \brief Rotate quaternion a according quaternion b.
 ///
 /// The result will be normalized
 ///
@@ -1281,31 +1281,31 @@ ARIBEIRO_API mat4 inv(const mat4& m);
 /// \author Alessandro Ribeiro
 /// \return The OpenGL modelview matrix of opengl state
 ///
-ARIBEIRO_API mat4 getModelviewFromOpenGL();
+//ARIBEIRO_API mat4 getModelviewFromOpenGL();
 /// \brief Reads the projection matrix from the Opengl and return it as a mat4
 ///
 /// \author Alessandro Ribeiro
 /// \return The OpenGL projection matrix of opengl state
 ///
-ARIBEIRO_API mat4 getProjectionFromOpenGL();
+//ARIBEIRO_API mat4 getProjectionFromOpenGL();
 /// \brief Reads the texture matrix from the Opengl and return it as a mat4
 ///
 /// \author Alessandro Ribeiro
 /// \return The OpenGL texture matrix of opengl state
 ///
-ARIBEIRO_API mat4 getTextureFromGL();
+//ARIBEIRO_API mat4 getTextureFromGL();
 /// \brief Writes a mat4 to the current active matrix of OpenGL state
 ///
 /// \author Alessandro Ribeiro
 /// \param m The source matrix
 ///
-ARIBEIRO_API void loadMatrixToGL(const mat4& m);
+//ARIBEIRO_API void loadMatrixToGL(const mat4& m);
 /// \brief Multiply a mat4 to the current active matrix of OpenGL state
 ///
 /// \author Alessandro Ribeiro
 /// \param m The source matrix
 ///
-ARIBEIRO_API void mulMatrixToGL(const mat4& m);
+//ARIBEIRO_API void mulMatrixToGL(const mat4& m);
 /// \brief Creates a translation 4x4 matrix
 ///
 /// \author Alessandro Ribeiro
@@ -1561,8 +1561,8 @@ ARIBEIRO_API bool unproject(vec3 pointInWindow,
 /// \param worldPtn The return parameter with the unprojected point
 /// \return True if it is possible to compute the point, false if the projection of the modelView is singular
 ///
-ARIBEIRO_API bool GL_unproject(const vec3 &pointInWindow,
-                                vec3 *worldPtn);
+//ARIBEIRO_API bool GL_unproject(const vec3 &pointInWindow,
+//                                vec3 *worldPtn);
 //------------------------------------------------------------------------------
 /// \brief Computes the result of the projection of a point in the projection plane
 ///
@@ -1590,8 +1590,8 @@ ARIBEIRO_API bool project(vec3 worldPtn,
 /// \param pointInWindow The return parameter with the 2D point projected screen
 /// \return True if it is possible to compute the point, false if the projection of the modelView is singular
 ///
-ARIBEIRO_API bool GL_project(const vec3 &worldPtn,
-                vec3 *pointInWindow);
+//ARIBEIRO_API bool GL_project(const vec3 &worldPtn,
+//                vec3 *pointInWindow);
     //
     // quaternion operations based on http://assimp.sourceforge.net/,
     //  http://www.gpwiki.org/index.php/OpenGL:Tutorials:Using_Quaternions_to_represent_rotation
@@ -1638,7 +1638,7 @@ ARIBEIRO_API bool GL_project(const vec3 &worldPtn,
     ///
     ARIBEIRO_API quat slerp(const quat& a,const quat& b,const float lerp);
     //------------------------------------------------------------------------------
-    
+
 	/// \brief Multiply two quaternions in a right handed fashion (like mat4 multiplication)
     ///
     /// \author Alessandro Ribeiro
@@ -1649,7 +1649,7 @@ ARIBEIRO_API bool GL_project(const vec3 &worldPtn,
     //ARIBEIRO_API quat mul(const quat& a,const quat& b);
 
     //------------------------------------------------------------------------------
-    
+
 	/// \brief Apply the quaternion multiplication directly over a point
     ///
     /// \author Alessandro Ribeiro
@@ -1660,7 +1660,7 @@ ARIBEIRO_API bool GL_project(const vec3 &worldPtn,
     //ARIBEIRO_API vec3 rotateVec(const quat& a,const vec3& v);
 
     //------------------------------------------------------------------------------
-    
+
 	/// \brief Apply the quaternion multiplication directly over a vec4
     ///
     /// The vec4 will be rotated according the x,y,z coords. The w component will be copied from the parameter to the result.
@@ -1727,7 +1727,7 @@ ARIBEIRO_API bool GL_project(const vec3 &worldPtn,
     ///
     ARIBEIRO_API void extractAxisAngle(const quat& q, vec3 *axis, float *angle);
 	//------------------------------------------------------------------------------
-    
+
 	/// \brief Convert the quaternion to Euler representation. Notice: Not found an algorithm that works...
     ///
     /// \author Alessandro Ribeiro

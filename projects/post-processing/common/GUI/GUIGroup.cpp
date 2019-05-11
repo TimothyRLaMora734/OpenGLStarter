@@ -35,7 +35,7 @@ int GUIGroup::addSlider(const vec2 &min,
 int GUIGroup::addLabel(GLFont *f,
 	const char*text,
 	const vec2 &pos,
-	const bool centerV, const bool centerH, 
+	const bool centerV, const bool centerH,
 	float size) {
 	DEBUG_PRINT("[GUIGroup] ADDING LABEL");
 	UIs.push_back(new Label(this, f, text, pos, centerV, centerH, size));
@@ -44,7 +44,7 @@ int GUIGroup::addLabel(GLFont *f,
 int GUIGroup::addLabelBtn(GLFont *f,
 	const char*text,
 	const vec2 &pos, const vec2 &dim,
-	const bool centerV, const bool centerH, 
+	const bool centerV, const bool centerH,
 	float size) {
 	DEBUG_PRINT("[GUIGroup] ADDING LABEL--BUTTON");
 	UIs.push_back(new LabelBtn(this, f, text, pos, dim, centerV, centerH, size));
@@ -78,13 +78,20 @@ void GUIGroup::render(const unsigned int time_ms, const bool showCursor) {
 	render->projection.top = mat4::IdentityMatrix;
 	render->model.top = translate(-1, -1, 0) * scale(screenRes_inv.x, screenRes_inv.y, 1);
 
-	glPushAttrib(GL_ENABLE_BIT);
-	glDisable(GL_DEPTH_TEST);
+	//glPushAttrib(GL_ENABLE_BIT);
+	GLboolean depthTest;
+    glGetBooleanv (GL_DEPTH_TEST, &depthTest);
+
+    if (depthTest)
+        glDisable(GL_DEPTH_TEST);
 
 	for (unsigned int i = 0; i < UIs.size(); i++)
 		UIs[i]->render(i, time_ms);
 
-	glPopAttrib();
+    if (depthTest)
+        glEnable(GL_DEPTH_TEST);
+
+	//glPopAttrib();
 
 	render->projection.pop();
 	render->model.pop();
