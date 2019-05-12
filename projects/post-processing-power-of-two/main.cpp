@@ -92,7 +92,7 @@ int main(int argc, char* argv[]) {
 	window.setVerticalSyncEnabled(true);
 	window.setFramerateLimit(0);
 
-	window.setMouseCursorVisible(true);
+	window.setMouseCursorVisible(false);
 
 	//
 	// Check hardware capabilities

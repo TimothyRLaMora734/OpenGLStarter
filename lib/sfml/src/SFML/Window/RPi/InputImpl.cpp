@@ -50,6 +50,20 @@
 #include <linux/input.h>
 #include <errno.h>
 
+namespace sf
+{
+namespace priv
+{
+extern uint32_t _hack_window_width;
+extern uint32_t _hack_window_height;
+
+sf::Vector2i      mousePos;                                // current mouse position
+
+}
+}
+
+
+
 namespace
 {
     struct TouchSlot {
@@ -67,7 +81,7 @@ namespace
     };
 
     sf::Mutex         inpMutex;                                // threadsafe? maybe...
-    sf::Vector2i      mousePos;                                // current mouse position
+    //sf::Vector2i      mousePos;                                // current mouse position
 
     std::vector<int>  fds;                                     // list of open file descriptors for /dev/input
     std::vector<bool> mouseMap(sf::Mouse::ButtonCount, false); // track whether keys are down
@@ -349,8 +363,8 @@ namespace
                     {
                         ev.type = ie.value ? sf::Event::MouseButtonPressed : sf::Event::MouseButtonReleased;
                         ev.mouseButton.button = mb;
-                        ev.mouseButton.x = mousePos.x;
-                        ev.mouseButton.y = mousePos.y;
+                        ev.mouseButton.x = sf::priv::mousePos.x;
+                        ev.mouseButton.y = sf::priv::mousePos.y;
 
                         mouseMap[mb] = ie.value;
                         return true;
@@ -397,32 +411,45 @@ namespace
                 }
                 else if ( ie.type == EV_REL )
                 {
+                    int oldValue;
                     bool posChange = false;
                     switch ( ie.code )
                     {
                     case REL_X:
-                        mousePos.x += ie.value;
-                        posChange = true;
+                        oldValue = sf::priv::mousePos.x;
+                        sf::priv::mousePos.x += ie.value;
+                        if (sf::priv::mousePos.x < 0)
+                            sf::priv::mousePos.x = 0;
+                        else if (sf::priv::mousePos.x >= sf::priv::_hack_window_width)
+                            sf::priv::mousePos.x = sf::priv::_hack_window_width - 1;
+
+                        posChange = oldValue != sf::priv::mousePos.x;//true;
                         break;
 
                     case REL_Y:
-                        mousePos.y += ie.value;
-                        posChange = true;
+                        oldValue = sf::priv::mousePos.y;
+                        sf::priv::mousePos.y += ie.value;
+                        if (sf::priv::mousePos.y < 0)
+                            sf::priv::mousePos.y = 0;
+                        else if (sf::priv::mousePos.y >= sf::priv::_hack_window_height)
+                            sf::priv::mousePos.y = sf::priv::_hack_window_height - 1;
+
+                        posChange = oldValue != sf::priv::mousePos.y;//true;
                         break;
 
                     case REL_WHEEL:
                         ev.type = sf::Event::MouseWheelMoved;
                         ev.mouseWheel.delta = ie.value;
-                        ev.mouseWheel.x = mousePos.x;
-                        ev.mouseWheel.y = mousePos.y;
+                        ev.mouseWheel.x = sf::priv::mousePos.x;
+                        ev.mouseWheel.y = sf::priv::mousePos.y;
                         return true;
                     }
 
                     if ( posChange )
                     {
                         ev.type = sf::Event::MouseMoved;
-                        ev.mouseMove.x = mousePos.x;
-                        ev.mouseMove.y = mousePos.y;
+                        ev.mouseMove.x = sf::priv::mousePos.x;
+                        ev.mouseMove.y = sf::priv::mousePos.y;
                         return true;
                     }
                 }

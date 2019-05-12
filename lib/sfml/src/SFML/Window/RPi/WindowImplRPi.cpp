@@ -37,10 +37,16 @@
 ////////////////////////////////////////////////////////////
 // Private data
 ////////////////////////////////////////////////////////////
+
 namespace sf
 {
 namespace priv
 {
+
+extern sf::Vector2i      mousePos; // hack to initialize the mouse position
+
+uint32_t _hack_window_width;
+uint32_t _hack_window_height;
 
 ////////////////////////////////////////////////////////////
 WindowImplRPi::WindowImplRPi(WindowHandle handle)
@@ -74,13 +80,33 @@ WindowImplRPi::WindowImplRPi(VideoMode mode, const String& title, unsigned long 
     // create an EGL window surface
     graphics_get_display_size(0 /* LCD */, &screen_width, &screen_height);
 
-    dst_rect.x = 0;
-    dst_rect.y = 0;
-    dst_rect.width = mode.width;
-    dst_rect.height = mode.height;
-    
+    if( style & sf::Style::Fullscreen )
+    {
+        //fullscreen scale the src rect (stretch both width and height)
+        dst_rect.x = 0;
+        dst_rect.y = 0;
+        dst_rect.width = screen_width;
+        dst_rect.height = screen_height;
+    }
+    else
+    {
+        //draw centered screen on the display
+        dst_rect.x = (screen_width - mode.width) >> 1;//0;
+        dst_rect.y = (screen_height - mode.height) >> 1;//0;
+        dst_rect.width = mode.width;
+        dst_rect.height = mode.height;
+    }
+
+    _hack_window_width = mode.width;
+    _hack_window_height = mode.height;
+    mousePos = sf::Vector2i(_hack_window_width>>1,_hack_window_height>>1);
+
+
+
     src_rect.x = 0;
     src_rect.y = 0;
+    //src_rect.width = 0;
+    //src_rect.height = 0;
     src_rect.width = mode.width << 16;
     src_rect.height = mode.height << 16;
 
@@ -88,8 +114,8 @@ WindowImplRPi::WindowImplRPi(VideoMode mode, const String& title, unsigned long 
     dispman_update = vc_dispmanx_update_start( 0 );
 
     dispman_element = vc_dispmanx_element_add( dispman_update, m_display,
-       0/*layer*/, &dst_rect, 0/*src*/,
-       &src_rect, DISPMANX_PROTECTION_NONE, &dispman_alpha, 0/*clamp*/, DISPMANX_NO_ROTATE );
+                      0/*layer*/, &dst_rect, 0/*src*/,
+                      &src_rect, DISPMANX_PROTECTION_NONE, &dispman_alpha, 0/*clamp*/, DISPMANX_NO_ROTATE );
 
     m_nativeWindow.element = dispman_element;
     m_nativeWindow.width = mode.width;
