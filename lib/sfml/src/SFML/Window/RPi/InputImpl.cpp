@@ -62,6 +62,8 @@ namespace priv
 extern uint32_t _hack_window_width;
 extern uint32_t _hack_window_height;
 
+//bool _hack_should_disable_keyboard_and_mouse = false;
+
 sf::Vector2i      mousePos;                                // current mouse position
 
 //
@@ -71,6 +73,10 @@ class XInputBlockMouse
 {
 public:
     XInputBlockMouse(){
+
+    }
+
+    void disable(){
         system(
             "if [ -x \"$(command -v xinput)\" ]; then "
             "xinput --disable `xinput | grep -i mouse | tr -d \" \" | cut -d\" \" -f2 | cut -d\"=\" -f2 | cut -f1`"
@@ -298,8 +304,9 @@ void uninit( void )
 
 void init()
 {
-
     sf::priv::inputTerminal.disable(sf::priv::StdInputTerminal::Blocking | sf::priv::StdInputTerminal::Echo);
+    sf::priv::mouseDisabler.disable();
+
 
     for ( int i=0; i<32; i++ )
     {
