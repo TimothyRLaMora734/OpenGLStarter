@@ -64,7 +64,29 @@ extern uint32_t _hack_window_height;
 
 sf::Vector2i      mousePos;                                // current mouse position
 
-
+//
+// disable Xorg mouse input
+//
+class XInputBlockMouse
+{
+public:
+    XInputBlockMouse(){
+        system(
+            "if [ -x \"$(command -v xinput)\" ]; then "
+            "xinput --disable `xinput | grep -i mouse | tr -d \" \" | cut -d\" \" -f2 | cut -d\"=\" -f2 | cut -f1`"
+            "; fi;"
+        );
+    }
+    ~XInputBlockMouse()
+    {
+        system(
+            "if [ -x \"$(command -v xinput)\" ]; then "
+            "xinput --enable `xinput | grep -i mouse | tr -d \" \" | cut -d\" \" -f2 | cut -d\"=\" -f2 | cut -f1`"
+            "; fi;"
+        );
+    }
+};
+XInputBlockMouse mouseDisabler;
 
 //
 // Experimental Classes to disable terminal echo & blocking
