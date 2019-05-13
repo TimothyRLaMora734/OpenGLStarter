@@ -253,12 +253,22 @@ public:
 
         RenderSystem *render = RenderSystem::getSingleton();
 
+        
+        GLboolean depthTest;
+        glGetBooleanv (GL_DEPTH_TEST, &depthTest);
+        
+        if (depthTest)
+            glDisable(GL_DEPTH_TEST);
+        
         render->projection.push();
         render->projection.top = mat4::IdentityMatrix;
         render->model.top = translate(-1, -1, 0) *
                             scale(2.0f / (float)w, 2.0f / (float)h, 1);
 		render->drawTexture_center(cursor, cursorPos);
 		render->projection.pop();
+        
+        if (depthTest)
+            glEnable(GL_DEPTH_TEST);
 
 	}
 
