@@ -24,11 +24,17 @@ void drawCube() {
 		{vec3(-1,-1,1),vec2(0,1),vec3(0,0,1),vec3(1,0,0),vec3(0,1,0)},
 		{vec3(1,-1,1),vec2(1,1),vec3(0,0,1),vec3(1,0,0),vec3(0,1,0)},
 		{vec3(1, 1,1),vec2(1,0),vec3(0,0,1),vec3(1,0,0),vec3(0,1,0)},
+
+		{vec3(-1,-1,1),vec2(0,1),vec3(0,0,1),vec3(1,0,0),vec3(0,1,0)},
+		{vec3(1, 1,1),vec2(1,0),vec3(0,0,1),vec3(1,0,0),vec3(0,1,0)},
 		{vec3(-1, 1,1),vec2(0,0),vec3(0,0,1),vec3(1,0,0),vec3(0,1,0)},
 
 		// tras - OK
 		{vec3(1,-1,-1),vec2(0,1),vec3(0,0,-1),vec3(-1,0,0),vec3(0,1,0)},
 		{vec3(-1, -1,-1),vec2(1,1),vec3(0,0,-1),vec3(-1,0,0),vec3(0,1,0)},
+		{vec3(-1, 1,-1),vec2(1,0),vec3(0,0,-1),vec3(-1,0,0),vec3(0,1,0)},
+
+		{vec3(1,-1,-1),vec2(0,1),vec3(0,0,-1),vec3(-1,0,0),vec3(0,1,0)},
 		{vec3(-1, 1,-1),vec2(1,0),vec3(0,0,-1),vec3(-1,0,0),vec3(0,1,0)},
 		{vec3(1,1,-1),vec2(0,0),vec3(0,0,-1),vec3(-1,0,0),vec3(0,1,0)},
 
@@ -36,11 +42,17 @@ void drawCube() {
 		{vec3(1, -1, 1),vec2(0,1),vec3(1,0,0),vec3(0,0,-1),vec3(0,-1,0)},
 		{vec3(1, -1, -1),vec2(1,1),vec3(1,0,0),vec3(0,0,-1),vec3(0,-1,0)},
 		{vec3(1, 1, -1),vec2(1,0),vec3(1,0,0),vec3(0,0,-1),vec3(0,-1,0)},
+
+		{vec3(1, -1, 1),vec2(0,1),vec3(1,0,0),vec3(0,0,-1),vec3(0,-1,0)},
+		{vec3(1, 1, -1),vec2(1,0),vec3(1,0,0),vec3(0,0,-1),vec3(0,-1,0)},
 		{vec3(1, 1, 1),vec2(0,0),vec3(1,0,0),vec3(0,0,-1),vec3(0,-1,0)},
 
 		//esquerda ok
 		{vec3(-1, -1, -1),vec2(0,1),vec3(-1,0,0),vec3(0,0,1),vec3(0,1,0)},
 		{vec3(-1, -1, 1),vec2(1,1),vec3(-1,0,0),vec3(0,0,1),vec3(0,1,0)},
+		{vec3(-1, 1, 1),vec2(1,0),vec3(-1,0,0),vec3(0,0,1),vec3(0,1,0)},
+
+		{vec3(-1, -1, -1),vec2(0,1),vec3(-1,0,0),vec3(0,0,1),vec3(0,1,0)},
 		{vec3(-1, 1, 1),vec2(1,0),vec3(-1,0,0),vec3(0,0,1),vec3(0,1,0)},
 		{vec3(-1, 1,-1),vec2(0,0),vec3(-1,0,0),vec3(0,0,1),vec3(0,1,0)},
 
@@ -48,21 +60,27 @@ void drawCube() {
 		{vec3(-1, -1, -1),vec2(0,1),vec3(0,-1,0),vec3(1,0,0),vec3(0,0,1)},
 		{vec3(1, -1,-1),vec2(1,1),vec3(0,-1,0),vec3(1,0,0),vec3(0,0,1)},
 		{vec3(1, -1, 1),vec2(1,0),vec3(0,-1,0),vec3(1,0,0),vec3(0,0,1)},
+
+		{vec3(-1, -1, -1),vec2(0,1),vec3(0,-1,0),vec3(1,0,0),vec3(0,0,1)},
+		{vec3(1, -1, 1),vec2(1,0),vec3(0,-1,0),vec3(1,0,0),vec3(0,0,1)},
 		{vec3(-1, -1, 1),vec2(0,0),vec3(0,-1,0),vec3(1,0,0),vec3(0,0,1)},
 
 		//cima
 		{vec3(-1, 1, 1),vec2(0,1),vec3(0,1,0),vec3(1,0,0),vec3(0,0,-1)},
 		{vec3(1, 1, 1),vec2(1,1),vec3(0,1,0),vec3(1,0,0),vec3(0,0,-1)},
 		{vec3(1, 1,-1),vec2(1,0),vec3(0,1,0),vec3(1,0,0),vec3(0,0,-1)},
+
+		{vec3(-1, 1, 1),vec2(0,1),vec3(0,1,0),vec3(1,0,0),vec3(0,0,-1)},
+		{vec3(1, 1,-1),vec2(1,0),vec3(0,1,0),vec3(1,0,0),vec3(0,0,-1)},
 		{vec3(-1, 1, -1),vec2(0,0),vec3(0,1,0),vec3(1,0,0),vec3(0,0,-1)}
-		
+
 	};
-	
+
 	static bool runonce = true;
 
 	if (runonce) {
 		//fix tangent
-		for (int i = 0; i < 24; i += 4)
+		for (int i = 0; i < 36; i += 6)
 		{
 			vec3 t = normalize(buffer[i + 1].position - buffer[i + 0].position);
 			//vec3 t = buffer[i + 0].tangent;
@@ -75,7 +93,7 @@ void drawCube() {
 				exit(-1);
 			}
 
-			for (int j = 0; j < 4; j++) {
+			for (int j = 0; j < 6; j++) {
 				buffer[i + j].normal = n;
 				buffer[i + j].tangent = t;
 				buffer[i + j].binormal = b;
@@ -84,10 +102,10 @@ void drawCube() {
 
 		runonce = false;
 	}
-	
-	
 
-	shaderManager->setupShaderParametersAndDraw(GL_QUADS, buffer, 24);
+
+
+	shaderManager->setupShaderParametersAndDraw(GL_TRIANGLES, buffer, 36);
 
 }
 
@@ -141,6 +159,28 @@ void drawXYplane(int div) {
 				buffer.push_back(vattrib);
 			}
 
+
+
+
+			uv = vec2(jF*fator, iF*fator);
+			pos = vec3(-1.0f + fator + -fator + jF * fator * 2.0f, -1.0f + fator + -fator + iF * fator * 2.0f, 0);
+
+			{
+				uv.y = 1.0f - uv.y;
+				VertexAttrib vattrib = { pos,uv,normal,tangent,binormal };
+				buffer.push_back(vattrib);
+			}
+
+
+			uv = vec2((jF + 1.0f)*fator, (iF + 1.0f)*fator);
+			pos = vec3(-1.0f +fator + fator + jF * fator * 2.0f, -1.0f + fator + fator + iF * fator * 2.0f, 0);
+
+			{
+				uv.y = 1.0f - uv.y;
+				VertexAttrib vattrib = { pos,uv,normal,tangent,binormal };
+				buffer.push_back(vattrib);
+			}
+
 			uv = vec2((jF)*fator, (iF + 1.0f)*fator);
 			pos = vec3(-1.0f + fator + -fator + jF * fator * 2.0f , -1.0f + fator + fator + iF * fator * 2.0f, 0);
 
@@ -152,7 +192,7 @@ void drawXYplane(int div) {
 		}
 	}
 
-	shaderManager->setupShaderParametersAndDraw(GL_QUADS, &buffer[0], buffer.size());
+	shaderManager->setupShaderParametersAndDraw(GL_TRIANGLES, &buffer[0], buffer.size());
 
 }
 
@@ -172,10 +212,14 @@ void drawXYplane() {
 		{vec3(-1,-1,0),vec2(0,1),vec3(0,0,1),vec3(1,0,0),vec3(0,1,0)},
 		{vec3(1,-1,0),vec2(1,1),vec3(0,0,1),vec3(1,0,0),vec3(0,1,0)},
 		{vec3(1, 1,0),vec2(1,0),vec3(0,0,1),vec3(1,0,0),vec3(0,1,0)},
+
+
+		{vec3(-1,-1,0),vec2(0,1),vec3(0,0,1),vec3(1,0,0),vec3(0,1,0)},
+		{vec3(1, 1,0),vec2(1,0),vec3(0,0,1),vec3(1,0,0),vec3(0,1,0)},
 		{vec3(-1, 1,0),vec2(0,0),vec3(0,0,1),vec3(1,0,0),vec3(0,1,0)}
 	};
 
-	shaderManager->setupShaderParametersAndDraw(GL_QUADS, buffer, 4);
+	shaderManager->setupShaderParametersAndDraw(GL_TRIANGLES, buffer, 6);
 
 }
 
@@ -195,10 +239,13 @@ void drawNormalizedMappedQuad() {
 		{vec3(-1,-1,0),vec2(0,0),vec3(0,0,1),vec3(1,0,0),vec3(0,1,0)},
 		{vec3(1,-1,0),vec2(1,0),vec3(0,0,1),vec3(1,0,0),vec3(0,1,0)},
 		{vec3(1, 1,0),vec2(1,1),vec3(0,0,1),vec3(1,0,0),vec3(0,1,0)},
+
+		{vec3(-1,-1,0),vec2(0,0),vec3(0,0,1),vec3(1,0,0),vec3(0,1,0)},
+		{vec3(1, 1,0),vec2(1,1),vec3(0,0,1),vec3(1,0,0),vec3(0,1,0)},
 		{vec3(-1, 1,0),vec2(0,1),vec3(0,0,1),vec3(1,0,0),vec3(0,1,0)}
 	};
 
-	shaderManager->setupShaderParametersAndDraw(GL_QUADS, buffer, 4);
+	shaderManager->setupShaderParametersAndDraw(GL_TRIANGLES, buffer, 6);
 
 }
 

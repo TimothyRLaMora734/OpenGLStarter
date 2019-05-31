@@ -120,10 +120,13 @@ namespace aRibeiro {
 	// can read rgb(GL_RGB) from framebuffer, or the depth component (GL_DEPTH_COMPONENT24)
 	void GLTexture::setSize(int w, int h, GLuint format) {
 		OPENGL_CMD(glBindTexture(GL_TEXTURE_2D, mTexture));
-        
+
 		if (format == GL_DEPTH_COMPONENT16 ||
-			format == GL_DEPTH_COMPONENT24 ||
-			format == GL_DEPTH_COMPONENT32) {
+			format == GL_DEPTH_COMPONENT24
+			#ifndef ARIBEIRO_RPI
+			|| format == GL_DEPTH_COMPONENT32
+			#endif
+			) {
 
 			OPENGL_CMD(glTexImage2D(GL_TEXTURE_2D, 0, format, w, h, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0));
 
@@ -133,7 +136,7 @@ namespace aRibeiro {
 
 		}
 		else if (format == GL_STENCIL_INDEX8) {
-			
+
 			OPENGL_CMD(glTexImage2D(GL_TEXTURE_2D, 0, format, w, h, 0, GL_STENCIL_INDEX, GL_UNSIGNED_BYTE, 0));
 
 			//depth buffer force to nearest filtering...
@@ -151,17 +154,19 @@ namespace aRibeiro {
 			OPENGL_CMD(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST));
 			OPENGL_CMD(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
 		}
+		#ifndef ARIBEIRO_RPI
 		else if (format == GL_RGBA16F ||
 			format == GL_RGB16F ||
 			format == GL_RGBA32F ||
 			format == GL_RGB32F) {
 			OPENGL_CMD(glTexImage2D(GL_TEXTURE_2D, 0, format, w, h, 0, GL_RGBA, GL_FLOAT, 0));
 		}
+		#endif
 		else
             OPENGL_CMD(glTexImage2D(GL_TEXTURE_2D, 0, format, w, h, 0, format, GL_UNSIGNED_BYTE, 0));
-        
-        
-        
+
+
+
 		width = w;
 		height = h;
 	}
@@ -174,13 +179,19 @@ namespace aRibeiro {
 
 	void GLTexture::active(int id) {
 		OPENGL_CMD(glActiveTexture(GL_TEXTURE0 + id));
-		OPENGL_CMD(glEnable(GL_TEXTURE_2D));
+		#if !defined(ARIBEIRO_RPI)
+            OPENGL_CMD(glEnable(GL_TEXTURE_2D));
+		#endif
 		OPENGL_CMD(glBindTexture(GL_TEXTURE_2D, mTexture));
 	}
 
 	void GLTexture::deactive(int id) {
 		OPENGL_CMD(glActiveTexture(GL_TEXTURE0 + id));
-		OPENGL_CMD(glDisable(GL_TEXTURE_2D));
+		#if !defined(ARIBEIRO_RPI)
+            OPENGL_CMD(glDisable(GL_TEXTURE_2D));
+        #else
+            OPENGL_CMD(glBindTexture(GL_TEXTURE_2D, 0));
+		#endif
 	}
 
 	GLTexture::~GLTexture()
@@ -228,11 +239,34 @@ namespace aRibeiro {
 
 	void GLTexture::writeToPNG(const char* filename, bool invertY) {
 
-        active(0);
+        #ifdef ARIBEIRO_RPI
+
+        //
+        // OpenGLES needs to create a framebuffer to copy the pixels
+        //
+        GLuint fbo;
+        glGenFramebuffers(1, &fbo);
+        glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, mTexture, 0);
+
         char *buff = new char[width*height*4];
-        glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, buff);
+        glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, buff);
+
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        glDeleteFramebuffers(1, &fbo);
+
         PNGHelper::writePNG(filename, width, height,4,buff, !invertY);
-        deactive(0);
+        delete[] buff;
+
+        #else
+
+            active(0);
+            char *buff = new char[width*height*4];
+            glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, buff);
+            PNGHelper::writePNG(filename, width, height,4,buff, !invertY);
+            delete[] buff;
+            deactive(0);
+        #endif
 
 	}
 

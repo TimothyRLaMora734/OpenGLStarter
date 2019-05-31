@@ -37,22 +37,35 @@ enum ComponentType{
 };
 
 class Transform;
+class Component;
+
+class StartEventManager{
+    std::vector<Component *> componentList;
+public:
+    static StartEventManager* getInstance();
+    void registerNewComponent(Component *c);
+    void unregisterComponent(Component *c);
+    void processAllComponentsWithTransform();
+};
 
 class Component {
 private:
     Component(const Component& v);
     void operator=(const Component& v);
-    bool mStartCalled;
+    //bool mStartCalled;
 protected:
     ComponentType type;
     Component(ComponentType type);
-    virtual void start();
 public:
     Transform *transform;
     ComponentType getType() const ;
     virtual ~Component();
     
-    void callStartOnce();
+    virtual void start();
+    //void callStartOnce();
+    
+    virtual void attachToTransform(Transform *t);
+    virtual void detachFromTransform(Transform *t);
     
     //friend class App;
 };

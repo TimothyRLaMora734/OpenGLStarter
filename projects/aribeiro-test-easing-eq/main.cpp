@@ -75,19 +75,58 @@ int main(int argc, char* argv[]) {
 #else
 	// 640x480 window
 	sf::RenderWindow window(
-		sf::VideoMode(640, 480),
+		sf::VideoMode(640, 480, 32),
 		"Template",
 		sf::Style::Default,
 		contextSettings);
 #endif
+ // /opt/vc/lib/libbrcmEGL.so /opt/vc/lib/libbrcmGLESv2.so
+//OpenGL ES-CM 1.1
+ /*
+/usr/bin/c++   -g
+CMakeFiles/aribeiro-test-easing-eq.dir/main.cpp.o  -o ../../bin/aribeiro-test-easing-eq
+-L/opt/vc/lib -Wl,-rpath,/opt/vc/lib
+../../bin/libaribeirod.a
+../../bin/libsfml-window-s-d.a
+../../bin/libsfml-graphics-s-d.a
+../../bin/libglewd.a
+../../bin/libconvertutfd.a
+../../bin/libpng16d.a
+../../bin/libzd.a
+-lbcm_host
+-lopenmaxil
+-lvcos
+-lvchiq_arm
+-lpthread
+../../bin/libsfml-window-s-d.a
+/lib/arm-linux-gnueabihf/libudev.so
+../../bin/libsfml-system-s-d.a
+-lrt
+/opt/vc/lib/libbrcmEGL.so
+/opt/vc/lib/libbrcmGLESv2.so
+/usr/lib/arm-linux-gnueabihf/libfreetype.so
+/usr/lib/arm-linux-gnueabihf/libjpeg.so
+/usr/lib/arm-linux-gnueabihf/libm.so
+-lpthread
+
+ */
 
 	window.setVerticalSyncEnabled(true);
 	window.setFramerateLimit(0);
 
+	// clear current error... the window system seems to create an OpenGL Context with an error in GL commands...
+	//glGetError();
+
+
+	const char* str;
+	OPENGL_CMD ( str = (const char*)glGetString(GL_VERSION) );
+    printf("str: %s\n",str);
+    // OpenGL ES-CM 1.1
 
 	//
 	// Check hardware capabilities
 	//
+	#ifndef ARIBEIRO_RPI
 	glewInit();
 	if (!(GLEW_ARB_multitexture   &&
 		GLEW_ARB_shading_language_100 &&
@@ -97,26 +136,29 @@ int main(int argc, char* argv[]) {
 		perror("Hardware does not support the required opengl features.\n");
 		exit(-1);
 	}
+	#endif
 
 	//
 	// OpenGL Initial state
 	//
-	glDisable(GL_DEPTH_TEST);
-	glEnable(GL_CULL_FACE);
-	glFrontFace(GL_CCW);
+	OPENGL_CMD( glDisable(GL_DEPTH_TEST) );
+	OPENGL_CMD( glEnable(GL_CULL_FACE) );
+	OPENGL_CMD( glFrontFace(GL_CCW) );
 
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	OPENGL_CMD( glEnable(GL_BLEND) );
+	OPENGL_CMD( glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA) );
 
 	glLineWidth(2.0f);
+	#ifndef ARIBEIRO_RPI
 	glEnable(GL_LINE_SMOOTH);
 	glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
 
 	glPointSize(4.0f);
+    #endif
 
-	glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
+	OPENGL_CMD( glClearColor(1.0f, 1.0f, 1.0f, 0.0f) );
 
-	glViewport(0, 0, window.getSize().x, window.getSize().y);
+	OPENGL_CMD( glViewport(0, 0, window.getSize().x, window.getSize().y) );
 
 	//
 	// Data structures

@@ -48,6 +48,9 @@ void StarsBackGroundDraw::draw(float deltaTime){
 				vec3(-5,-5, 0),
 				vec3( 5,-5, 0),
 				vec3( 5, 5, 0),
+
+				vec3(-5,-5, 0),
+				vec3( 5, 5, 0),
 				vec3(-5, 5, 0)
 		  };
 
@@ -55,13 +58,16 @@ void StarsBackGroundDraw::draw(float deltaTime){
 			vec2(0, 5) + toModify,
 			vec2(5, 5) + toModify,
 			vec2(5, 0) + toModify,
+
+			vec2(0, 5) + toModify,
+			vec2(5, 0) + toModify,
 			vec2(0, 0) + toModify
 		};
 
 
   spaceInvader->render->drawTexture(
 	  spaceInvader->resources->StarsImg,
-	  GL_QUADS, vpos, vuv, 4 );
+	  GL_TRIANGLES, vpos, vuv, 6 );
 
 }
 
@@ -82,6 +88,9 @@ void StarsBackGroundDraw::draw(float deltaTime){
         vec3(-5,-5, 0),
         vec3(5,-5, 0),
         vec3(5, 5, 0),
+
+        vec3(-5,-5, 0),
+        vec3(5, 5, 0),
         vec3(-5, 5, 0)
   };
 
@@ -89,12 +98,15 @@ void StarsBackGroundDraw::draw(float deltaTime){
         vec2(0, 2) + toModify,
         vec2(2, 2) + toModify,
         vec2(2, 0) + toModify,
+
+        vec2(0, 2) + toModify,
+        vec2(2, 0) + toModify,
         vec2(0, 0) + toModify
   };
 
   spaceInvader->render->drawTexture(
 	  spaceInvader->resources->StarsImg,
-	  GL_QUADS, vpos, vuv, 4 );
+	  GL_TRIANGLES, vpos, vuv, 6 );
 
   }
 
@@ -113,18 +125,24 @@ void StarsBackGroundDraw::customDraw(const vec2 &deslocamento){
 			  vec3(-5,-5, 0),
 			  vec3(5,-5, 0),
 			  vec3(5, 5, 0),
+
+			  vec3(-5,-5, 0),
+			  vec3(5, 5, 0),
 			  vec3(-5, 5, 0)
 		};
     vec2 vuv[] = { //uv
 			vec2(0, 5) + deslocamento,
 			vec2(5, 5) + deslocamento,
 			vec2(5, 0) + deslocamento,
+
+			vec2(0, 5) + deslocamento,
+			vec2(5, 0) + deslocamento,
 			vec2(0, 0) + deslocamento
 		};
 
 	spaceInvader->render->drawTexture(
 		spaceInvader->resources->StarsImg,
-		GL_QUADS, vpos, vuv, 4
+		GL_TRIANGLES, vpos, vuv, 6
 	);
 
 	}
@@ -135,6 +153,9 @@ void StarsBackGroundDraw::customDraw(const vec2 &deslocamento){
 			  vec3(-5,-5, 0),
 			  vec3(5,-5, 0),
 			  vec3(5, 5, 0),
+
+			  vec3(-5,-5, 0),
+			  vec3(5, 5, 0),
 			  vec3(-5, 5, 0)
 		};
 
@@ -142,12 +163,15 @@ void StarsBackGroundDraw::customDraw(const vec2 &deslocamento){
         vec2(0, 2) + deslocamento,
         vec2(2, 2) + deslocamento,
         vec2(2, 0) + deslocamento,
+
+        vec2(0, 2) + deslocamento,
+        vec2(2, 0) + deslocamento,
         vec2(0, 0) + deslocamento
     };
 
 	spaceInvader->render->drawTexture(
 		spaceInvader->resources->StarsImg,
-		GL_QUADS, vpos, vuv ,4
+		GL_TRIANGLES, vpos, vuv ,6
 	);
 
 	}

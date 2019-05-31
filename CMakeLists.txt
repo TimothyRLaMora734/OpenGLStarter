@@ -21,9 +21,17 @@ if (${CMAKE_SYSTEM_NAME} STREQUAL "Android")
 	set( ARCH_TARGET ${CMAKE_ANDROID_ARCH_ABI} )
 else()
 	if( CMAKE_SIZEOF_VOID_P EQUAL 8 )
-		set( ARCH_TARGET x64 )
+        if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "arm")
+            set( ARCH_TARGET arm64 )
+        else()
+            set( ARCH_TARGET x64 )
+		endif()
 	else()
-		set( ARCH_TARGET x86 )
+        if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "arm")
+            set( ARCH_TARGET arm32 )
+        else()
+            set( ARCH_TARGET x86 )
+		endif()
 	endif()
 	if(WIN32)
 	  set( OS_TARGET win )
@@ -56,6 +64,31 @@ else()
 	elseif(APPLE)
 	  set( OS_TARGET mac )
 	else()
+
+      include(CheckIncludeFile)
+      include(CheckIncludeFileCXX)
+      #find_path(
+        #GLES_SDK_INCLUDE_DIR
+        #NAMES "bcm_host.h"
+        #PATH_SUFFIXES ""
+      #)
+      #CHECK_INCLUDE_FILE("/opt/vc/include/bcm_host.h" BCMHOST)
+      #find_file (BCMHOST NAMES "/opt/vc/include/bcm_host.h")
+
+      #CHECK_INCLUDE_FILE(/opt/vc/include/bcm_host.h BCMHOST)
+      #message(STATUS "BCMHOST ${BCMHOST}" )
+
+      if( NOT ARIBEIRO_RPI )
+        set( ARIBEIRO_RPI false CACHE BOOL
+             "Set this if you are buinding for Raspberry PI"
+             FORCE )
+      endif()
+
+      message(STATUS "********************************")
+	  message(STATUS "* You can set the ARIBEIRO_RPI *")
+	  message(STATUS "* to build for Raspberry Pi    *")
+	  message(STATUS "********************************")
+
 	  set( OS_TARGET linux )
 
       if( NOT CMAKE_BUILD_TYPE )
@@ -129,6 +162,35 @@ if (${OS_TARGET} STREQUAL "mac")
 
 	#flag to fix static linking on macOS
 	#add_definitions(-ObjC)
+
+endif()
+
+
+if (ARIBEIRO_RPI)
+	message(STATUS "*************************************")
+	message(STATUS "* Building project for Raspberry Pi *")
+	message(STATUS "*************************************")
+
+	add_definitions(-DARIBEIRO_RPI)
+	link_directories(/opt/vc/lib/)
+
+	#SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -L/opt/vc/lib/")
+
+
+	# bcmhost.h seems to assume these directories are in the include path
+    include_directories(
+        /opt/vc/include/interface/vcos/pthreads
+        /opt/vc/include/interface/vmcs_host/linux
+        /opt/vc/include
+    )
+
+    set(EGL_INCLUDE_DIR /opt/vc/include)
+    set(EGL_LIBRARY /opt/vc/lib/libbrcmEGL.so)
+    set(GLES_INCLUDE_DIR /opt/vc/include)
+    set(GLES_LIBRARY /opt/vc/lib/libbrcmGLESv2.so)
+
+    set(SFML_OPENGL_ES 1)
+
 
 endif()
 

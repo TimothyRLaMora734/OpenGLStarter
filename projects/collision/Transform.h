@@ -20,6 +20,10 @@ extern int stat_num_visited;
 extern int stat_num_recalculated;
 extern int stat_draw_recalculated;
 
+class Transform;
+
+BEGIN_DECLARE_DELEGATE(TransformVisitedEvent, Transform* t) CALL_PATTERN(t) END_DECLARE_DELEGATE;
+
 class Transform {
 	Transform(const Transform& v);
 	void operator=(const Transform& v);
@@ -108,7 +112,7 @@ private:
 	bool matrixDirty;
 	mat4 matrix, matrixParent;
 	bool matrixInverseTransposeDirty;
-	mat4 matrixInverseTranspose, matrixInverseTransposeParent;
+    mat4 matrixInverseTranspose;//, matrixInverseTransposeParent;
 	bool matrixInverseDirty;
 	mat4 matrixInverse, matrixInverseParent;
 
@@ -159,6 +163,9 @@ public:
 		mat4 *mv,
 		mat4 *mvIT,
 		mat4 *mvInv);
+    
+    TransformVisitedEvent OnVisited;
+    
 	///////////////////////////////////////////////////////
 	//
 	//

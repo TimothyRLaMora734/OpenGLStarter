@@ -5,24 +5,24 @@
 ** Copyright (C) 2002-2008, Marcelo E. Magallon <mmagallo[]debian org>
 ** Copyright (C) 2002, Lev Povalahev
 ** All rights reserved.
-** 
-** Redistribution and use in source and binary forms, with or without 
+**
+** Redistribution and use in source and binary forms, with or without
 ** modification, are permitted provided that the following conditions are met:
-** 
-** * Redistributions of source code must retain the above copyright notice, 
+**
+** * Redistributions of source code must retain the above copyright notice,
 **   this list of conditions and the following disclaimer.
-** * Redistributions in binary form must reproduce the above copyright notice, 
-**   this list of conditions and the following disclaimer in the documentation 
+** * Redistributions in binary form must reproduce the above copyright notice,
+**   this list of conditions and the following disclaimer in the documentation
 **   and/or other materials provided with the distribution.
-** * The name of the author may be used to endorse or promote products 
+** * The name of the author may be used to endorse or promote products
 **   derived from this software without specific prior written permission.
 **
-** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
-** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
 ** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE 
-** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR 
-** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
+** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
 ** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
 ** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
 ** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
@@ -56,7 +56,7 @@
 
 /*
 ** Copyright (c) 2007 The Khronos Group Inc.
-** 
+**
 ** Permission is hereby granted, free of charge, to any person obtaining a
 ** copy of this software and/or associated documentation files (the
 ** "Materials"), to deal in the Materials without restriction, including
@@ -64,10 +64,10 @@
 ** distribute, sublicense, and/or sell copies of the Materials, and to
 ** permit persons to whom the Materials are furnished to do so, subject to
 ** the following conditions:
-** 
+**
 ** The above copyright notice and this permission notice shall be included
 ** in all copies or substantial portions of the Materials.
-** 
+**
 ** THE MATERIALS ARE PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 ** EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 ** MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
@@ -80,6 +80,129 @@
 #ifndef __glew_h__
 #define __glew_h__
 #define __GLEW_H__
+
+
+
+
+// Raspberry Pi specific hackery...
+//
+#if defined(ARIBEIRO_RPI)
+    // Workaround the rpi's GLES1 not implementing glBlendQuationOES
+    #ifndef GLEXT_glBlendEquationOES
+        #include <GLES2/gl2.h>
+        #include <GLES2/gl2ext.h>
+
+        #define GLEXT_glBlendEquationOES              glBlendEquation
+    #endif
+
+    // Workaround no sRGB defined
+    #ifndef GL_EXT_sRGB
+        #define GL_EXT_sRGB                           0
+    #endif
+
+    // Maybe not the best place for this, needed for Texture.cpp compile...
+    #ifndef GL_SRGB8_ALPHA8_EXT
+        #define GL_SRGB8_ALPHA8_EXT                   0x8C43
+    #endif
+
+    //
+    // Ext
+    //
+    #define GL_DEPTH_COMPONENT24 GL_DEPTH_COMPONENT24_OES
+
+    #define GL_COLOR_ATTACHMENT0_EXT GL_COLOR_ATTACHMENT0_NV
+    #define GL_COLOR_ATTACHMENT1_EXT GL_COLOR_ATTACHMENT1_NV
+    #define GL_COLOR_ATTACHMENT2_EXT GL_COLOR_ATTACHMENT2_NV
+    #define GL_COLOR_ATTACHMENT3_EXT GL_COLOR_ATTACHMENT3_NV
+    #define GL_COLOR_ATTACHMENT4_EXT GL_COLOR_ATTACHMENT4_NV
+    #define GL_COLOR_ATTACHMENT5_EXT GL_COLOR_ATTACHMENT5_NV
+    #define GL_COLOR_ATTACHMENT6_EXT GL_COLOR_ATTACHMENT6_NV
+    #define GL_COLOR_ATTACHMENT7_EXT GL_COLOR_ATTACHMENT7_NV
+    #define GL_COLOR_ATTACHMENT8_EXT GL_COLOR_ATTACHMENT8_NV
+    #define GL_COLOR_ATTACHMENT9_EXT GL_COLOR_ATTACHMENT9_NV
+    #define GL_COLOR_ATTACHMENT10_EXT GL_COLOR_ATTACHMENT10_NV
+    #define GL_COLOR_ATTACHMENT11_EXT GL_COLOR_ATTACHMENT11_NV
+    #define GL_COLOR_ATTACHMENT12_EXT GL_COLOR_ATTACHMENT12_NV
+    #define GL_COLOR_ATTACHMENT13_EXT GL_COLOR_ATTACHMENT13_NV
+    #define GL_COLOR_ATTACHMENT14_EXT GL_COLOR_ATTACHMENT14_NV
+    #define GL_COLOR_ATTACHMENT15_EXT GL_COLOR_ATTACHMENT15_NV
+
+    #define GL_MAX_COLOR_ATTACHMENTS_EXT GL_MAX_COLOR_ATTACHMENTS_NV
+    #define GL_MAX_DRAW_BUFFERS GL_MAX_DRAW_BUFFERS_NV
+
+    #define glDrawBuffers glDrawBuffersNV
+
+    #define GL_DEPTH_STENCIL GL_DEPTH_STENCIL_OES
+    #define GL_UNSIGNED_INT_24_8 GL_UNSIGNED_INT_24_8_OES
+    #define GL_DEPTH24_STENCIL8 GL_DEPTH24_STENCIL8_OES
+
+    #define glGenVertexArrays glGenVertexArraysOES
+    #define glDeleteVertexArrays glDeleteVertexArraysOES
+    #define glBindVertexArray glBindVertexArrayOES
+
+    //
+    // OGL 2.0
+    //
+    #define glGenFramebuffersEXT glGenFramebuffers
+    #define glIsFramebufferEXT glIsFramebuffer
+    #define glDeleteFramebuffersEXT glDeleteFramebuffers
+    #define glBindFramebufferEXT glBindFramebuffer
+    #define glFramebufferTexture2DEXT glFramebufferTexture2D
+    #define glCheckFramebufferStatusEXT glCheckFramebufferStatus
+
+    #define GL_FRAMEBUFFER_EXT GL_FRAMEBUFFER
+    #define GL_DEPTH_ATTACHMENT_EXT GL_DEPTH_ATTACHMENT
+    #define GL_STENCIL_ATTACHMENT_EXT GL_STENCIL_ATTACHMENT
+    #define GL_FRAMEBUFFER_COMPLETE_EXT GL_FRAMEBUFFER_COMPLETE
+    #define GL_FRAMEBUFFER_UNSUPPORTED_EXT GL_FRAMEBUFFER_UNSUPPORTED
+    #define GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT_EXT GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT
+
+    #define GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS
+    #define GL_FRAMEBUFFER_INCOMPLETE_FORMATS_EXT 0x8CDA
+    #define GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_EXT 0x8CDB
+    #define GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT 0x8CDC
+
+    #define glClearDepth glClearDepthf
+
+    //function prototype
+    static inline void glewInit(){}
+
+    #define GLEW_ARB_multitexture         1
+    #define GLEW_ARB_shading_language_100 1
+    #define GLEW_ARB_shader_objects       1
+    #define GLEW_ARB_vertex_shader        1
+    #define GLEW_ARB_fragment_shader      1
+    #define GLEW_ARB_texture_non_power_of_two 1
+    #define GLEW_ARB_framebuffer_object       1
+    #define GLEW_ARB_draw_buffers             0
+    #define GLEW_ARB_depth_texture            0
+    #define GLEW_ARB_vertex_buffer_object  1
+    #define GLEW_ARB_vertex_array_object   0
+    #define GLEW_APPLE_vertex_array_object 0
+
+    /*
+    RPi extensions:
+GL_OES_compressed_ETC1_RGB8_texture
+GL_OES_compressed_paletted_texture
+GL_OES_texture_npot
+GL_OES_depth24
+GL_OES_vertex_half_float
+GL_OES_EGL_image
+GL_OES_EGL_image_external
+GL_EXT_discard_framebuffer
+GL_OES_rgb8_rgba8
+GL_OES_depth32
+GL_OES_mapbuffer
+GL_EXT_texture_format_BGRA8888
+GL_APPLE_rgb_422
+GL_EXT_debug_marker
+    */
+
+
+#else
+
+
+
 
 //force static link and build...
 #ifndef GLEW_STATIC
@@ -20114,5 +20237,7 @@ GLEWAPI const GLubyte * GLEWAPIENTRY glewGetString (GLenum name);
 
 #undef GLAPI
 /* #undef GLEWAPI */
+
+#endif
 
 #endif /* __glew_h__ */

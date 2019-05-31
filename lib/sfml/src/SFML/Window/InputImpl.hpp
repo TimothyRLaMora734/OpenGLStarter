@@ -33,7 +33,11 @@
 #if defined(SFML_SYSTEM_WINDOWS)
     #include <SFML/Window/Win32/InputImpl.hpp>
 #elif defined(SFML_SYSTEM_LINUX) || defined(SFML_SYSTEM_FREEBSD)
-    #include <SFML/Window/Unix/InputImpl.hpp>
+    #if defined(ARIBEIRO_RPI)
+        #include <SFML/Window/RPi/InputImpl.hpp>
+    #else
+        #include <SFML/Window/Unix/InputImpl.hpp>
+    #endif
 #elif defined(SFML_SYSTEM_MACOS)
     #include <SFML/Window/OSX/InputImpl.hpp>
 #elif defined(SFML_SYSTEM_IOS)

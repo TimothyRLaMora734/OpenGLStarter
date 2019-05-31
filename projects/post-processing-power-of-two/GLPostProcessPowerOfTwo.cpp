@@ -19,7 +19,8 @@ namespace aRibeiro {
         potHeight = -1;
 
         firstRender = new GLFramebufferObject();
-        firstRender->depth = new GLTexture();
+        //firstRender->depth = new GLTexture();
+        firstRender->useRenderbufferDepth = true;
         firstRender->color.push_back(new GLTexture());
 
         for (int i=0;i<2;i++){
@@ -38,7 +39,7 @@ namespace aRibeiro {
 
     GLPostProcessPowerOfTwo::~GLPostProcessPowerOfTwo() {
 
-        setNullAndDelete( firstRender->depth );
+        //setNullAndDelete( firstRender->depth );
         setNullAndDelete( firstRender->color[0] );
         setNullAndDelete( firstRender );
         for (int i=0;i<2;i++){
@@ -91,8 +92,12 @@ namespace aRibeiro {
         if (pipeline.size() == 0)
             return;
 
-        glPushAttrib(GL_ENABLE_BIT);
-        glDisable(GL_DEPTH_TEST);
+        //glPushAttrib(GL_ENABLE_BIT);
+        GLboolean depthTest;
+        glGetBooleanv (GL_DEPTH_TEST, &depthTest);
+
+        if (depthTest)
+            glDisable(GL_DEPTH_TEST);
 
         GLFramebufferObject* src = firstRender;
         GLFramebufferObject* dst = fbo[current];
@@ -109,7 +114,9 @@ namespace aRibeiro {
             }
         }
 
-        glPopAttrib();
+        if (depthTest)
+            glEnable(GL_DEPTH_TEST);
+        //glPopAttrib();
     }
 
 
@@ -129,6 +136,10 @@ namespace aRibeiro {
             vec2(drawQuadMaxUV.x, drawQuadMaxUV.y),
             vec2(0, drawQuadMaxUV.y)
         };
+        const uint8_t indices[] = {
+            0,1,2,
+            0,2,3
+        };
 
         shader->setTexelNeighbor(texelNeighbor);
         shader->setTexelMaxUVAccess(texelMaxUVAccess);
@@ -138,7 +149,8 @@ namespace aRibeiro {
         OPENGL_CMD(glEnableVertexAttribArray(shader->aVec2UV));
         OPENGL_CMD(glVertexAttribPointer(shader->aVec2UV, 2, GL_FLOAT, false, sizeof(vec2), &vuv[0]));
 
-        OPENGL_CMD(glDrawArrays(GL_QUADS, 0, 4));
+        //OPENGL_CMD(glDrawArrays(GL_QUADS, 0, 4));
+        OPENGL_CMD(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, indices));
 
         OPENGL_CMD(glDisableVertexAttribArray(shader->aVec2Position));
         OPENGL_CMD(glDisableVertexAttribArray(shader->aVec2UV));

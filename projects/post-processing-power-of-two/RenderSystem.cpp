@@ -38,7 +38,7 @@ RenderSystem::RenderSystem() {
 
 	//glEnable(GL_ALPHA_TEST);
 	//glAlphaFunc(GL_GREATER, 1.0 / 255.0);
-
+#ifndef ARIBEIRO_RPI
 	glDisable(GL_ALPHA_TEST);
 
 	//glEnable(GL_LINE_SMOOTH);
@@ -46,6 +46,7 @@ RenderSystem::RenderSystem() {
 
 	//glEnable(GL_DEPTH_TEST);
 	glDisable(GL_LIGHTING);
+#endif
 
 	glLineWidth(2.0);
 	//glLineWidth(1);
@@ -74,7 +75,7 @@ RenderSystem::~RenderSystem() {
 }
 
 void RenderSystem::releaseGLResources() {
-	
+
 	//setNullAndDelete(shaderManager);
 
 	setNullAndDelete(shader);
@@ -152,6 +153,9 @@ void RenderSystem::drawAABB_2D(const AABB &aabb, const vec4 &color) {
 		vec3(aabb.min_box.x, aabb.min_box.y, 0.0f),
 		vec3(aabb.max_box.x, aabb.min_box.y, 0.0f),
 		vec3(aabb.max_box.x, aabb.max_box.y, 0.0f),
+
+		vec3(aabb.min_box.x, aabb.min_box.y, 0.0f),
+		vec3(aabb.max_box.x, aabb.max_box.y, 0.0f),
 		vec3(aabb.min_box.x, aabb.max_box.y, 0.0f)
 	};
 
@@ -159,10 +163,12 @@ void RenderSystem::drawAABB_2D(const AABB &aabb, const vec4 &color) {
 		color,
 		color,
 		color,
+		color,
+		color,
 		color
 	};
 
-	drawColor(GL_QUADS, pos, vcolor, 4);
+	drawColor(GL_TRIANGLES, pos, vcolor, 6);
 }
 
 
@@ -195,6 +201,9 @@ void RenderSystem::drawAABB_Lines(const AABB &aabb, const vec4 &color) {
 
 void RenderSystem::drawAABB_Cube(const AABB &aabb, const vec4 &color) {
 
+    exit(-1);
+
+/*
 	vec3 pos[] = {
 		vec3(aabb.min_box.x,aabb.min_box.y,aabb.min_box.z), vec3(aabb.min_box.x,aabb.max_box.y,aabb.min_box.z),
 		vec3(aabb.max_box.x, aabb.max_box.y, aabb.min_box.z), vec3(aabb.max_box.x, aabb.min_box.y, aabb.min_box.z),
@@ -222,6 +231,7 @@ void RenderSystem::drawAABB_Cube(const AABB &aabb, const vec4 &color) {
 	};
 
 	drawColor(GL_QUADS, pos, vcolor, 24);
+	*/
 }
 
 void RenderSystem::drawTexture_center(GLTexture *texture, const vec2 &p) {
@@ -232,6 +242,9 @@ void RenderSystem::drawTexture_center(GLTexture *texture, const vec2 &p) {
 		vec3(-center.x + p.x, -center.y + p.y, 0.0f),
 		vec3(center.x + p.x, -center.y + p.y, 0.0f),
 		vec3(center.x + p.x,  center.y + p.y, 0.0f),
+
+		vec3(-center.x + p.x, -center.y + p.y, 0.0f),
+		vec3(center.x + p.x,  center.y + p.y, 0.0f),
 		vec3(-center.x + p.x,  center.y + p.y, 0.0f)
 	};
 
@@ -239,10 +252,13 @@ void RenderSystem::drawTexture_center(GLTexture *texture, const vec2 &p) {
 		vec2(0, 1),
 		vec2(1, 1),
 		vec2(1, 0),
+
+		vec2(0, 1),
+		vec2(1, 0),
 		vec2(0, 0)
 	};
 
-	drawTexture(texture, GL_QUADS, vpos, vuv, 4);
+	drawTexture(texture, GL_TRIANGLES, vpos, vuv, 6);
 
 }
 
@@ -253,6 +269,9 @@ void RenderSystem::drawTexture(GLTexture *texture, const AABB &aabb) {
 		vec3(aabb.min_box.x, aabb.min_box.y, 0.0f),
 		vec3(aabb.max_box.x, aabb.min_box.y, 0.0f),
 		vec3(aabb.max_box.x, aabb.max_box.y, 0.0f),
+
+		vec3(aabb.min_box.x, aabb.min_box.y, 0.0f),
+		vec3(aabb.max_box.x, aabb.max_box.y, 0.0f),
 		vec3(aabb.min_box.x, aabb.max_box.y, 0.0f)
 	};
 
@@ -260,10 +279,13 @@ void RenderSystem::drawTexture(GLTexture *texture, const AABB &aabb) {
 		vec2(0, 1),
 		vec2(1, 1),
 		vec2(1, 0),
+
+		vec2(0, 1),
+		vec2(1, 0),
 		vec2(0, 0)
 	};
 
-	drawTexture(texture, GL_QUADS, vpos, vuv, 4);
+	drawTexture(texture, GL_TRIANGLES, vpos, vuv, 6);
 }
 
 void RenderSystem::drawTexture(GLTexture *texture, vec4 color, GLuint oglPrimitive, const vec3 *vertexBuffer, const vec2 *uvBuffer, int count) {
@@ -304,7 +326,7 @@ void RenderSystem::drawSphere(GLTexture *texture, int sectorCount, int stackCoun
 
     //std::vector<vec3> lines;
     //std::vector<vec4> colors;
-    
+
 	std::vector<VertexAttrib> vertices;
 	std::vector<unsigned short> indices;
 
@@ -351,10 +373,10 @@ void RenderSystem::drawSphere(GLTexture *texture, int sectorCount, int stackCoun
 
             vec3 p = vec3(x,z,-y);
             vec3 normal = vec3(nx,nz,-ny);
-            
+
             vec3 tangent = normalize( cross(vec3(0,1,0),normal) );
             vec3 binormal = normalize( cross(normal, tangent) );
-            
+
             /*
             //draw normal
             lines.push_back(p);
@@ -367,8 +389,8 @@ void RenderSystem::drawSphere(GLTexture *texture, int sectorCount, int stackCoun
             colors.push_back(vec4(0.5,1.0,0.5,1.0));
             colors.push_back(vec4(0.5,1.0,0.5,1.0));
             */
-            
-            
+
+
 			VertexAttrib va = {
 				p,// position;
 				vec2(s,t),// uv;
@@ -380,23 +402,23 @@ void RenderSystem::drawSphere(GLTexture *texture, int sectorCount, int stackCoun
 			vertices.push_back(va);
 		}
 	}
-    
+
     int k1, k2;
     int i = 0;
-    
+
     //
     // Fix tangent and binormal from poles
     //
     k1 = i * (sectorCount + 1);     // beginning of current stack
     k2 = k1 + sectorCount + 1;      // beginning of next stack
-    
+
     for (int j = 0; j < sectorCount; ++j, ++k1, ++k2)
     {
         // k1+1 => k2 => k2+1
         int index1 = k1 + 1;
         int index2 = k2;
         int index3 = k2 + 1;
-        
+
         vertices[index1].tangent = normalize( vertices[index2].tangent + vertices[index3].tangent );
         vertices[index1].binormal = normalize( cross( vertices[index1].normal, vertices[index1].tangent ) );
         /*
@@ -406,23 +428,23 @@ void RenderSystem::drawSphere(GLTexture *texture, int sectorCount, int stackCoun
         colors.push_back(vec4(1.0,0.5,0.5,1.0));
         colors.push_back(vec4(1.0,0.5,0.5,1.0));
         */
-        
+
     }
-    
+
     i = (stackCount - 1);
     k1 = i * (sectorCount + 1);     // beginning of current stack
     k2 = k1 + sectorCount + 1;      // beginning of next stack
-    
+
     for (int j = 0; j < sectorCount; ++j, ++k1, ++k2)
     {
         // k1+1 => k2 => k2+1
         int index1 = k1;
         int index2 = k2;
         int index3 = k1 + 1;
-        
+
         vertices[index2].tangent = normalize( vertices[index1].tangent + vertices[index3].tangent );
         vertices[index2].binormal = normalize( cross( vertices[index2].normal, vertices[index2].tangent ) );
-        
+
         /*
         //draw tangent
         lines.push_back(vertices[index2].position);
@@ -432,7 +454,7 @@ void RenderSystem::drawSphere(GLTexture *texture, int sectorCount, int stackCoun
         */
     }
 
-	
+
 	for (i = 0; i < stackCount; ++i)
 	{
 		k1 = i * (sectorCount + 1);     // beginning of current stack
@@ -482,7 +504,7 @@ void RenderSystem::drawSphere(GLTexture *texture, int sectorCount, int stackCoun
 
 	OPENGL_CMD(glDisableVertexAttribArray(shader->vPosition));
 	OPENGL_CMD(glDisableVertexAttribArray(shader->vUV));
-    
+
     //draw lines
     //drawColor(GL_LINES, &lines[0], &colors[0], lines.size());
 

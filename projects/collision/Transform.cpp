@@ -243,6 +243,10 @@ mat4 & Transform::getLocalMatrix(){
 
 mat4 & Transform::getLocalMatrixInverseTranspose(){
     if (localMatrixInverseTransposeDirty){
+        
+        localMatrixInverseTranspose = transpose( getLocalMatrixInverse() );
+        
+        /*
         updateLocalRotationBase();
         
         localMatrixInverseTranspose = localRotationBase;
@@ -255,6 +259,8 @@ mat4 & Transform::getLocalMatrixInverseTranspose(){
         localMatrixInverseTranspose[0] *= 1.0f / localScale.x;
         localMatrixInverseTranspose[1] *= 1.0f / localScale.y;
         localMatrixInverseTranspose[2] *= 1.0f / localScale.z;
+        
+        */
         
         localMatrixInverseTransposeDirty = false;
         matrixInverseTransposeDirty = true;
@@ -294,6 +300,11 @@ mat4 & Transform::getLocalMatrixInverse(){
         //renderDirty = true;
         
         //localMatrixInverse = inv( getLocalMatrix() );
+        
+        //[optimization] ->
+        //   the inverse transpose dont need to be recalculated...
+        //   just need to transpose the inverse
+        getLocalMatrixInverseTranspose();
     }
     return localMatrixInverse;
 }
@@ -345,9 +356,18 @@ mat4& Transform::getMatrixInverseTranspose(bool useVisitedFlag){
     if (useVisitedFlag && visited)
         return matrixInverseTranspose;
     
+    if (matrixInverseTransposeDirty) {
+        matrixInverseTranspose = transpose(getMatrixInverse(useVisitedFlag));
+        matrixInverseTransposeDirty = false;
+    }
+    
+    return matrixInverseTranspose;
+    
+    /*
     mat4 &localM = getLocalMatrixInverseTranspose();
     Transform* parent = getParent();
     if (parent != NULL && !parent->isRoot()) {
+        
         mat4 &aux = parent->getMatrixInverseTranspose(useVisitedFlag);
         if (matrixInverseTransposeParent != aux) {
             matrixInverseTransposeParent = aux;
@@ -367,6 +387,7 @@ mat4& Transform::getMatrixInverseTranspose(bool useVisitedFlag){
         }
         return matrixInverseTranspose;
     }
+    */
 }
 
 mat4& Transform::getMatrixInverse(bool useVisitedFlag){
@@ -523,6 +544,8 @@ void Transform::preComputeTransforms(){
         }
         visited = true;
         stat_num_visited++;
+        
+        OnVisited(this);
     }
     for (int i = 0; i < children.size(); i++) {
         children[i]->preComputeTransforms();
@@ -602,6 +625,7 @@ void Transform::removeMapName(Transform *node){
 Component* Transform::addComponent(Component*c){
     components.push_back(c);
     c->transform = this;
+    c->attachToTransform(this);
     return c;
 }
 
@@ -609,7 +633,10 @@ Component* Transform::removeComponent(Component*c){
     for(int i=0;i<components.size();i++) {
         if (components[i] == c){
             components.erase(components.begin()+i);
+            Transform *t = c->transform;
             c->transform = NULL;
+            if (t != NULL)
+                c->detachFromTransform(t);
             return c;
         }
     }
@@ -620,7 +647,10 @@ Component* Transform::removeComponentAt(int i) {
     if (i>=0&&i<components.size()){
         Component * result = components[i];
         components.erase(components.begin()+i);
+        Transform *t = result->transform;
         result->transform = NULL;
+        if (t != NULL)
+            result->detachFromTransform(t);
         return result;
     }
     return NULL;
@@ -779,7 +809,7 @@ Transform::Transform():
     matrixParent = mat4::IdentityMatrix;
     matrixInverseTransposeDirty = false;
     matrixInverseTranspose = mat4::IdentityMatrix;
-    matrixInverseTransposeParent = mat4::IdentityMatrix;
+    //matrixInverseTransposeParent = mat4::IdentityMatrix;
     matrixInverseDirty = false;
     matrixInverse = mat4::IdentityMatrix;
     matrixInverseParent = mat4::IdentityMatrix;

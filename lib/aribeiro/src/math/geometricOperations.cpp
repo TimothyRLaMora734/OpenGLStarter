@@ -19,10 +19,12 @@
 #elif defined(WIN32) || \
 	      defined(_WIN32) || defined(_WIN32_) || \
 		  defined(__MSVC)
-#include <windows.h>
-#include <GL/gl.h>
+    #include <windows.h>
+    #include <GL/gl.h>
 #elif defined(__linux__)
-#include <GL/gl.h>
+    #ifndef ARIBEIRO_RPI
+        #include <GL/gl.h>
+    #endif
 #endif
 #endif
 
@@ -131,11 +133,11 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 		float Alpha = acos(CosAlpha);
 		// get sine of angle between vectors (0 -> 1)
 		float SinAlpha = sin(Alpha);
-        
+
         // simply perform linear interpolation if sinAlpha = 0
         if (absv(SinAlpha) < 1e-6f )
             return a + (b - a) * lerp;
-        
+
         // this breaks down when SinAlpha = 0, i.e. Alpha = 0 or pi
         float t1 = sin( (1.0f - lerp) * Alpha ) / SinAlpha;
         float t2 = sin(lerp * Alpha) / SinAlpha;
@@ -820,7 +822,7 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 	}
 	*/
 
-
+/*
 	mat4 getModelviewFromOpenGL() {
 		mat4 retorno;
 #ifdef ASILVA_INCLUDE_OPENGL_HEADERS
@@ -866,6 +868,7 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 		throw std::runtime_error("You must include GL headers to use the math->OpenGL integration functions.");
 #endif
 	}
+*/
 
 	mat4 translate(const float _x_, const float _y_, const float _z_) {
 		return mat4(1, 0, 0, _x_,
@@ -1044,13 +1047,13 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 			0, 0, (near_ + far_) / (near_ - far_), (2.0f*near_*far_) / (near_ - far_),
 			0, 0, -1, 0);
 	}
-    
+
     mat4 projection_perspectiveLH(const float FovY, const float aspectX, const float near_, const float far_) {
-        
+
         /*
          f=cotangent(CampoDeVisao/2)
          matriz:
-         
+
          f/aspect  0      0                           0
          0         f      0                           0
          0         0    -(zfar+znear)/(znear-zfar)    (2*zfar*znear)/(znear-zfar)
@@ -1067,7 +1070,7 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
                     0, 0, -(near_ + far_) / (near_ - far_), (2.0f*near_*far_) / (near_ - far_),
                     0, 0, 1, 0);
     }
-    
+
 	//------------------------------------------------------------------------------
 	// unidade da distancia focal em relação a mesma unidade do width e height
 	//  ex.: se considerar milimetros (mm) então distancia focal de 35mm para tela de 50x30 mm
@@ -1105,7 +1108,7 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 				z.x, z.y, z.z, -dot(z, position),
 				0, 0, 0, 1);
 	}
-    
+
     mat4 modelLookAt(const vec3 &front, const vec3 &up, const vec3 &position) {
         vec3 lookTo = front;
         vec3 x, y, z;
@@ -1130,7 +1133,7 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
              x.z, y.z, z.z, 0,
              0, 0, 0, 1));
     }
-    
+
     quat quatLookAtRotationLH(const vec3 &front, const vec3 &up){
         vec3 lookTo = front;
         vec3 x, y, z;
@@ -1226,6 +1229,7 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 		return true;
 	}
 	//------------------------------------------------------------------------------
+	/*
 	bool GL_unproject(const vec3 &pointInWindow,
 		vec3 *worldPtn) {
 #ifdef ASILVA_INCLUDE_OPENGL_HEADERS
@@ -1241,7 +1245,7 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 #else
 		throw std::runtime_error("You must include GL headers to use the math->OpenGL integration functions.");
 #endif
-	}
+	}*/
 
 	//------------------------------------------------------------------------------
 	// retorna false se a matriz final é singular e n pode ser invertida
@@ -1264,6 +1268,7 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 		return true;
 	}
 	//------------------------------------------------------------------------------
+	/*
 	bool GL_project(const vec3 &worldPtn,
 		vec3 *pointInWindow) {
 #ifdef ASILVA_INCLUDE_OPENGL_HEADERS
@@ -1279,7 +1284,7 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 #else
 		throw std::runtime_error("You must include GL headers to use the math->OpenGL integration functions.");
 #endif
-	}
+	}*/
 
 
 
@@ -1415,7 +1420,7 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 			k1 = sin((0.0f + lerp) * fAngle) * fOneOverSin;
 		}
 
-		return normalize( 
+		return normalize(
 			quat(
 			k0 * a.x + k1 * y2.x,
 			k0 * a.y + k1 * y2.y,
@@ -1485,12 +1490,12 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 		);
 
 		/*
-		return 
-			quatFromAxisAngle(vec3(0.0, 0.0, 1.0), yaw) * 
-			quatFromAxisAngle(vec3(0.0, 1.0, 0.0), pitch) * 
+		return
+			quatFromAxisAngle(vec3(0.0, 0.0, 1.0), yaw) *
+			quatFromAxisAngle(vec3(0.0, 1.0, 0.0), pitch) *
 			quatFromAxisAngle(vec3(1.0, 0.0, 0.0), roll);
 		*/
-		
+
 	}
 	//------------------------------------------------------------------------------
 	quat conjugate(const quat& a) {
@@ -1499,13 +1504,13 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 	//------------------------------------------------------------------------------
 	quat extractQuat(const mat4& mp) {
         mat4 m = mp;
-        
+
         //normalize rotation part
         m[0] = toVec4(normalize(toVec3(m[0])));
         m[1] = toVec4(normalize(toVec3(m[1])));
         m[2] = toVec4(normalize(toVec3(m[2])));
-        
-        
+
+
 		float t = 1.0f + m._11 + m._22 + m._33;
 		// large enough
 		if (t > 0.001f) {
@@ -1589,10 +1594,10 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 		res[2] = atan2(r11, r12);
 	}
 
-	// note: 
+	// note:
 	// return values of res[] depends on rotSeq.
 	// i.e.
-	// for rotSeq zyx, 
+	// for rotSeq zyx,
 	// x = res[0], y = res[1], z = res[2]
 	// for rotSeq xyz
 	// z = res[0], y = res[1], x = res[2]
@@ -1777,13 +1782,13 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 		// http://bediyap.com/programming/convert-quaternion-to-euler-rotations/ - Doesn't work
 		float res[3];
 		quaternion2Euler(q, res, zxy);
-		
+
 		*roll = res[1];
 		*pitch = res[0];
 		*yaw = res[2];
 
 		*/
-		
+
 		/*
 		//https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles -- Doesn't work
 
@@ -1806,7 +1811,7 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 
 		//*/
 
-		
+
 		/*
 		//https://www.gamedev.net/forums/topic/166424-quaternion-to-euler/ -- Doesn't work
 		float sqw;
@@ -1836,7 +1841,7 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 		double unit = sqx + sqy + sqz + sqw; // if normalised is one, otherwise is correction factor
 		double test = q.x*q.y + q.z*q.w;
 
-		
+
 		if (test > 0.499*unit) { // singularity at north pole
 			*pitch = 2.0 * atan2(q.x, q.w);
 			*yaw = PI / 2.0;
@@ -1932,20 +1937,20 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 		float deltaAngle = angleBetween(current, target);
 		if (deltaAngle < maxAngleVariation + EPSILON)
 			return target;
-        
+
         // 180º case interpolation -- force one orientation based on eulerAngle
         if (deltaAngle >= PI - 1e-6f){
             static const quat fixedRotation = quatFromEuler(DEG2RAD(0.5f),DEG2RAD(0.5f),DEG2RAD(0.5f));
             current = fixedRotation * current;
             deltaAngle = angleBetween(current, target);
         }
-        
+
         float lrpFactor = maxAngleVariation / deltaAngle;
         vec3 result = slerp(current, target, lrpFactor);
-        
+
         float lengthCurrent = length(current);
         float lengthTarget = length(target);
-        
+
         result = normalize(result) * lerp(lengthCurrent, lengthTarget, lrpFactor);
 
 		return result;
@@ -1953,19 +1958,19 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 
 	quat moveSlerp(const quat &currentParam, const quat &target, float maxAngleVariation) {
         quat current = currentParam;
-        
+
 		const float EPSILON = 1e-6f;
 		float deltaAngle = angleBetween(current, target);
 		if (deltaAngle < maxAngleVariation + EPSILON)
 			return target;
-        
+
         // 180º case interpolation -- force one orientation based on eulerAngle
         if (deltaAngle >= PI - 1e-6f){
             static const quat fixedRotation = quatFromEuler(DEG2RAD(0.5f),DEG2RAD(0.5f),DEG2RAD(0.5f));
             current = fixedRotation * current;
             deltaAngle = angleBetween(current, target);
         }
-        
+
 		return slerp(current, target, maxAngleVariation / deltaAngle);
 	}
 

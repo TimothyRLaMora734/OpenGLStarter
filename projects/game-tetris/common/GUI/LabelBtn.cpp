@@ -10,7 +10,7 @@ void LabelBtn::ajustPosBtn() {
 	p = originalPosB;
 
 	//vec2 center = (vec2(aabb.max_box.x, aabb.max_box.y) + vec2(aabb.min_box.x, aabb.min_box.y)) * 0.5f;
-	
+
 	vec2 center = p;
 
 	if (centx) {
@@ -30,8 +30,8 @@ void LabelBtn::ajustPosBtn() {
 
 	Label::setPosition(center);
 
-	
-	
+
+
 }
 LabelBtn::LabelBtn(ActionProcessor *actionPerformer, GLFont *f,
 	const char*text,
@@ -56,11 +56,17 @@ void LabelBtn::render(const int ID, const unsigned int time_ms) {
 		vec3(p                         , 0.0f),
 		vec3((p + quadDim * vec2(1, 0)), 0.0f),
 		vec3((p + quadDim * vec2(1, 1)), 0.0f),
+
+		vec3(p                         , 0.0f),
+		vec3((p + quadDim * vec2(1, 1)), 0.0f),
 		vec3((p + quadDim * vec2(0, 1)), 0.0f)
 	};
 
 	const vec4 vColor_selected[] = {
 		vec4(vec3(0.3f, 0.35f, 0.35f),1.0f),
+		vec4(vec3(0.3f, 0.35f, 0.35f),1.0f),
+		vec4(vec3(0.3f, 0.35f, 0.35f),1.0f),
+
 		vec4(vec3(0.3f, 0.35f, 0.35f),1.0f),
 		vec4(vec3(0.3f, 0.35f, 0.35f),1.0f),
 		vec4(vec3(0.3f, 0.35f, 0.35f),1.0f)
@@ -70,13 +76,16 @@ void LabelBtn::render(const int ID, const unsigned int time_ms) {
 		vec4(vec3(0.2f, 0.25f, 0.25f),1.0f),
 		vec4(vec3(0.2f, 0.25f, 0.25f),1.0f),
 		vec4(vec3(0.2f, 0.25f, 0.25f),1.0f),
+
+		vec4(vec3(0.2f, 0.25f, 0.25f),1.0f),
+		vec4(vec3(0.2f, 0.25f, 0.25f),1.0f),
 		vec4(vec3(0.2f, 0.25f, 0.25f),1.0f)
 	};
 
 	if (selected)
-		render->drawColor(GL_QUADS, vpos, vColor_selected, 4);
+		render->drawColor(GL_TRIANGLES, vpos, vColor_selected, 6);
 	else
-		render->drawColor(GL_QUADS, vpos, vColor_not_selected, 4);
+		render->drawColor(GL_TRIANGLES, vpos, vColor_not_selected, 6);
 
 
 	/*

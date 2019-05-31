@@ -86,6 +86,7 @@ void GLRenderState::OnBlendModeChange(Property<BlendModeType> *prop) {
 
 }
 void GLRenderState::OnAlphaTestChange(Property<AlphaTestType> *prop) {
+	#ifndef ARIBEIRO_RPI
 	switch (prop->value) {
 	case AlphaTestDisabled:
 		glDisable(GL_ALPHA_TEST);
@@ -111,12 +112,17 @@ void GLRenderState::OnAlphaTestChange(Property<AlphaTestType> *prop) {
 		glAlphaFunc(GL_GEQUAL, AlphaRef.value);
 		break;
 	}
+
+	#endif
 }
 void GLRenderState::OnAlphaRefChange(Property<float> *prop) {
 	//forward the alpha ref change to another processor
 	OnAlphaTestChange(&AlphaTest);
 }
 void GLRenderState::OnLineSmoothHintChange(Property<HintType> *prop) {
+
+#ifndef ARIBEIRO_RPI
+
 	switch (prop->value) {
 	case HintDisabled:
 		glDisable(GL_LINE_SMOOTH);
@@ -130,14 +136,19 @@ void GLRenderState::OnLineSmoothHintChange(Property<HintType> *prop) {
 		glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
 		break;
 	}
+#endif
 }
 void GLRenderState::OnLineWidthChange(Property<float> *prop) {
 	glLineWidth(prop->value);
 }
 void GLRenderState::OnPointSizeChange(Property<float> *prop) {
+#ifndef ARIBEIRO_RPI
 	glPointSize(prop->value);
+#endif
 }
 void GLRenderState::OnWireframeChange(Property<WireframeType> *prop) {
+
+#ifndef ARIBEIRO_RPI
 	switch (prop->value) {
 	case WireframeDisabled:
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -152,6 +163,8 @@ void GLRenderState::OnWireframeChange(Property<WireframeType> *prop) {
 		glPolygonMode(GL_BACK, GL_LINE);
 		break;
 	}
+#endif
+
 }
 void GLRenderState::OnCurrentShaderChange(Property<GLShader*> *prop) {
 	if (prop->value == NULL)
@@ -250,7 +263,9 @@ void GLRenderState::initialize(int w, int h) {
 	//
 	// Not using fixed pipeline lighting
 	//
+	#ifndef ARIBEIRO_RPI
 	glDisable(GL_LIGHTING);
+	#endif
 
 }
 

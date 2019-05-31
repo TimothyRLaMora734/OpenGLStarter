@@ -40,7 +40,7 @@ namespace aRibeiro {
 				description = "The specified operation is not allowed in the current state.";
 				break;
 			}
-
+#ifndef ARIBEIRO_RPI
 			case GL_STACK_OVERFLOW:
 			{
 				error = "GL_STACK_OVERFLOW";
@@ -54,7 +54,7 @@ namespace aRibeiro {
 				description = "This command would cause a stack underflow.";
 				break;
 			}
-
+#endif
 			case GL_OUT_OF_MEMORY:
 			{
 				error = "GL_OUT_OF_MEMORY";
@@ -82,11 +82,19 @@ namespace aRibeiro {
 
 	void PlatformGL::checkShaderStatus(int shader) {
 		GLint success;
+		#ifdef ARIBEIRO_RPI
+		OPENGL_CMD(glGetShaderiv(shader, GL_COMPILE_STATUS, &success));
+		#else
 		OPENGL_CMD(glGetObjectParameterivARB(shader, GL_OBJECT_COMPILE_STATUS_ARB, &success));
+		#endif
 		if (success == GL_FALSE)
 		{
 			char log[1024];
+			#ifdef ARIBEIRO_RPI
+			OPENGL_CMD(glGetShaderInfoLog(shader, sizeof(log), 0, log));
+			#else
 			OPENGL_CMD(glGetInfoLogARB(shader, sizeof(log), 0, log));
+			#endif
 			printf("Failed to compile shader: %s\n", log);
 			exit(-1);
 		}
@@ -94,11 +102,19 @@ namespace aRibeiro {
 
 	void PlatformGL::checkProgramStatus(int program) {
 		GLint success;
+		#ifdef ARIBEIRO_RPI
+		OPENGL_CMD(glGetProgramiv(program, GL_LINK_STATUS, &success));
+		#else
 		OPENGL_CMD(glGetObjectParameterivARB(program, GL_OBJECT_LINK_STATUS_ARB, &success));
+		#endif
 		if (success == GL_FALSE)
 		{
 			char log[1024];
+			#ifdef ARIBEIRO_RPI
+			OPENGL_CMD(glGetProgramInfoLog(program, sizeof(log), 0, log));
+			#else
 			OPENGL_CMD(glGetInfoLogARB(program, sizeof(log), 0, log));
+			#endif
 			printf("Failed to link shader: %s\n", log);
 			exit(-1);
 		}

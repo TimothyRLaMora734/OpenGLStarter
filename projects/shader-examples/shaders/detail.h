@@ -45,11 +45,27 @@ public:
 	static const int aVec3Normal = 2;
 	static const int aVec3Tangent = 3;
 	static const int aVec3Binormal = 4;
-	
+
 	ShaderBumpMapping():GLShader() {
 
 		const char vertexShaderCode[] = {
+
+		#if defined(ARIBEIRO_RPI)
+		"mat4 transpose(in mat4 inMatrix) { "
+            "vec4 i0 = inMatrix[0]; "
+            "vec4 i1 = inMatrix[1]; "
+            "vec4 i2 = inMatrix[2]; "
+            "vec4 i3 = inMatrix[3]; "
+            "return mat4( "
+                "vec4(i0.x, i1.x, i2.x, i3.x), "
+                "vec4(i0.y, i1.y, i2.y, i3.y), "
+                "vec4(i0.z, i1.z, i2.z, i3.z), "
+                "vec4(i0.w, i1.w, i2.w, i3.w) "
+            "); "
+        "}"
+		#else
 			"#version 120\n"//opengl 2.1 - transpose function
+        #endif
 
 			//attributes
 			"attribute vec3 aVec3Position;"
@@ -98,7 +114,7 @@ public:
 			//uniforms
 			"uniform sampler2D uSampler2DDiffuse;"
 			"uniform sampler2D uSampler2DBumpMap;"
-			
+
 			"uniform vec3 uVec3LightAmbient;"// = {0.3,0.3,0.3};
 			"uniform vec3 uVec3LightDiffuse;"// = {0.7,0.7,0.7};
 			"uniform vec3 uVec3LightSpecular;"// = {0.4,0.4,0.4};
@@ -111,7 +127,7 @@ public:
 			"varying vec3 vVec3Eye;"
 			"varying vec3 vVec3Light;"
 			"varying vec2 vVec2UV;"
-			
+
 			//noemal map function
 			// do normal mapping using given texture coordinate
 			// tangent space phong lighting with optional border clamp
@@ -138,7 +154,7 @@ public:
 				"float spec = clamp(dot(normalize(l - v),normal), 0.0, 1.0);"
 
 				// attenuation factor
-				//float att = 1.0 - max(0,l.z); 
+				//float att = 1.0 - max(0,l.z);
 				//att = 1.0 - att*att;
 
 				// compute final color
@@ -156,7 +172,7 @@ public:
 			"void main() {"
 			"  vec4 result = normal_mapping(vVec2UV);"
 			"  gl_FragColor = result;"
-			"}" 
+			"}"
 		};
 
 		LoadShaderProgram(vertexShaderCode, fragmentShaderCode);
@@ -181,7 +197,7 @@ public:
 		uMat4ModelViewProjection = getUniformLocation("uMat4ModelViewProjection");
 		uMat4ModelView = getUniformLocation("uMat4ModelView");
 		uMat4ModelViewInverseTranspose = getUniformLocation("uMat4ModelViewInverseTranspose");
-		
+
 
 	}
 
@@ -230,7 +246,7 @@ public:
 
 
 protected:
-    
+
     void setupAttribLocation() {
         bindAttribLocation(ShaderBumpMapping::aVec3Position, "aVec3Position");
         bindAttribLocation(ShaderBumpMapping::aVec2UV, "aVec2UV");
@@ -238,7 +254,7 @@ protected:
         bindAttribLocation(ShaderBumpMapping::aVec3Tangent, "aVec3Tangent");
         bindAttribLocation(ShaderBumpMapping::aVec3Binormal, "aVec3Binormal");
     }
-    
+
 };
 
 
@@ -278,7 +294,22 @@ public:
 	ShaderConeStepMappingOriginal() :GLShader() {
 
 		const char vertexShaderCode[] = {
+        #if defined(ARIBEIRO_RPI)
+            "mat4 transpose(in mat4 inMatrix) { "
+                "vec4 i0 = inMatrix[0]; "
+                "vec4 i1 = inMatrix[1]; "
+                "vec4 i2 = inMatrix[2]; "
+                "vec4 i3 = inMatrix[3]; "
+                "return mat4( "
+                    "vec4(i0.x, i1.x, i2.x, i3.x), "
+                    "vec4(i0.y, i1.y, i2.y, i3.y), "
+                    "vec4(i0.z, i1.z, i2.z, i3.z), "
+                    "vec4(i0.w, i1.w, i2.w, i3.w) "
+                "); "
+            "}"
+		#else
 			"#version 120\n"//opengl 2.1 - transpose function
+        #endif
 
 			//attributes
 			"attribute vec3 aVec3Position;"
@@ -367,7 +398,7 @@ public:
 				"float spec = clamp(dot(normalize(l - v),normal), 0.0, 1.0);"
 
 				// attenuation factor
-				//float att = 1.0 - max(0,l.z); 
+				//float att = 1.0 - max(0,l.z);
 				//att = 1.0 - att*att;
 
 				// compute final color
@@ -473,10 +504,10 @@ public:
 	void setLightShine(float v) {
 		setUniform(uFloatLightShine, v);
 	}
-    
-    
+
+
 protected:
-    
+
     void setupAttribLocation() {
         bindAttribLocation(ShaderConeStepMappingOriginal::aVec3Position, "aVec3Position");
         bindAttribLocation(ShaderConeStepMappingOriginal::aVec2UV, "aVec2UV");
@@ -484,7 +515,7 @@ protected:
         bindAttribLocation(ShaderConeStepMappingOriginal::aVec3Tangent, "aVec3Tangent");
         bindAttribLocation(ShaderConeStepMappingOriginal::aVec3Binormal, "aVec3Binormal");
     }
-    
+
 };
 
 #endif

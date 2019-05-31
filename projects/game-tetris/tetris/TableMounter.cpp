@@ -72,7 +72,9 @@ void TableMounter2D::glDraw() {
 		}
 	}
 
-	glPushAttrib(GL_LINE_BIT);
+	//glPushAttrib(GL_LINE_BIT);
+	float linew;
+	glGetFloatv(GL_LINE_WIDTH, &linew);
 	glLineWidth(1);
 
 	//glColor3f(0.4, 1, 1);
@@ -91,7 +93,8 @@ void TableMounter2D::glDraw() {
 	}
 
 	//glColor3f(1, 1, 1);
-	glPopAttrib();
+	//glPopAttrib();
+	glLineWidth(linew);
 	/*
 		for(int y=0;y<altura;y++){
 		  for(int x=0;x<9;x++){

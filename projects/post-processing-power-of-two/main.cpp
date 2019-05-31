@@ -86,13 +86,13 @@ int main(int argc, char* argv[]) {
 		sf::Style::Default,
 		contextSettings);
 #endif
-    
+
     currentWindow = &window;
 
 	window.setVerticalSyncEnabled(true);
 	window.setFramerateLimit(0);
 
-	window.setMouseCursorVisible(true);
+	window.setMouseCursorVisible(false);
 
 	//
 	// Check hardware capabilities
@@ -104,10 +104,10 @@ int main(int argc, char* argv[]) {
 		GLEW_ARB_vertex_shader        &&
 		GLEW_ARB_fragment_shader      &&
 		GLEW_ARB_texture_non_power_of_two &&
-		GLEW_ARB_framebuffer_object &&
-		GLEW_ARB_draw_buffers &&
+		GLEW_ARB_framebuffer_object //&&
+		//GLEW_ARB_draw_buffers &&
 		//GLEW_ARB_framebuffer_no_attachments && -- n funciona no macos
-		GLEW_ARB_depth_texture
+		//GLEW_ARB_depth_texture
 		)) {
 		perror("Hardware does not support the required opengl features.\n");
 		exit(-1);

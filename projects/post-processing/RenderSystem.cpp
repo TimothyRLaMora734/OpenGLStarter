@@ -13,16 +13,17 @@ RenderSystem *RenderSystem::getSingleton() {
 
 RenderSystem::RenderSystem(){
 
-    
-    
+
+
     sphere = new SphereModel(32, 32, 1.0f);
     sphereModelVBO = new SphereModelVBO(sphere);
-    sphereModelVAO = new SphereModelVAO(sphereModelVBO, GLShaderTextureColor::vPosition, GLShaderTextureColor::vUV);
-    
+    //sphereModelVAO = new SphereModelVAO(sphereModelVBO, GLShaderTextureColor::vPosition, GLShaderTextureColor::vUV);
+    sphereModelVAO = NULL;
+
     setNullAndDelete(sphere);
-    setNullAndDelete(sphereModelVBO);
-    
-    
+    //setNullAndDelete(sphereModelVBO);
+
+
 
 	glClearColor(0, 0, 0, 1);
 	glEnable(GL_CULL_FACE);
@@ -49,6 +50,7 @@ RenderSystem::RenderSystem(){
 	//glEnable(GL_ALPHA_TEST);
 	//glAlphaFunc(GL_GREATER, 1.0 / 255.0);
 
+#ifndef ARIBEIRO_RPI
 	glDisable(GL_ALPHA_TEST);
 
 	//glEnable(GL_LINE_SMOOTH);
@@ -56,6 +58,7 @@ RenderSystem::RenderSystem(){
 
 	//glEnable(GL_DEPTH_TEST);
 	glDisable(GL_LIGHTING);
+#endif
 
 	glLineWidth(2.0);
 	//glLineWidth(1);
@@ -84,12 +87,12 @@ RenderSystem::~RenderSystem() {
 }
 
 void RenderSystem::releaseGLResources() {
-	
+
 	//setNullAndDelete(shaderManager);
 
 	setNullAndDelete(shader);
 	setNullAndDelete(shaderVertexColor);
-    
+
     setNullAndDelete(sphere);
     setNullAndDelete(sphereModelVBO);
     setNullAndDelete(sphereModelVAO);
@@ -166,6 +169,9 @@ void RenderSystem::drawAABB_2D(const AABB &aabb, const vec4 &color) {
 		vec3(aabb.min_box.x, aabb.min_box.y, 0.0f),
 		vec3(aabb.max_box.x, aabb.min_box.y, 0.0f),
 		vec3(aabb.max_box.x, aabb.max_box.y, 0.0f),
+
+		vec3(aabb.min_box.x, aabb.min_box.y, 0.0f),
+		vec3(aabb.max_box.x, aabb.max_box.y, 0.0f),
 		vec3(aabb.min_box.x, aabb.max_box.y, 0.0f)
 	};
 
@@ -173,10 +179,12 @@ void RenderSystem::drawAABB_2D(const AABB &aabb, const vec4 &color) {
 		color,
 		color,
 		color,
+		color,
+		color,
 		color
 	};
 
-	drawColor(GL_QUADS, pos, vcolor, 4);
+	drawColor(GL_TRIANGLES, pos, vcolor, 6);
 }
 
 
@@ -208,7 +216,8 @@ void RenderSystem::drawAABB_Lines(const AABB &aabb, const vec4 &color) {
 }
 
 void RenderSystem::drawAABB_Cube(const AABB &aabb, const vec4 &color) {
-
+exit(-1);
+/*
 	vec3 pos[] = {
 		vec3(aabb.min_box.x,aabb.min_box.y,aabb.min_box.z), vec3(aabb.min_box.x,aabb.max_box.y,aabb.min_box.z),
 		vec3(aabb.max_box.x, aabb.max_box.y, aabb.min_box.z), vec3(aabb.max_box.x, aabb.min_box.y, aabb.min_box.z),
@@ -236,6 +245,7 @@ void RenderSystem::drawAABB_Cube(const AABB &aabb, const vec4 &color) {
 	};
 
 	drawColor(GL_QUADS, pos, vcolor, 24);
+	*/
 }
 
 void RenderSystem::drawTexture_center(GLTexture *texture, const vec2 &p) {
@@ -246,6 +256,9 @@ void RenderSystem::drawTexture_center(GLTexture *texture, const vec2 &p) {
 		vec3(-center.x + p.x, -center.y + p.y, 0.0f),
 		vec3(center.x + p.x, -center.y + p.y, 0.0f),
 		vec3(center.x + p.x,  center.y + p.y, 0.0f),
+
+		vec3(-center.x + p.x, -center.y + p.y, 0.0f),
+		vec3(center.x + p.x,  center.y + p.y, 0.0f),
 		vec3(-center.x + p.x,  center.y + p.y, 0.0f)
 	};
 
@@ -253,10 +266,13 @@ void RenderSystem::drawTexture_center(GLTexture *texture, const vec2 &p) {
 		vec2(0, 1),
 		vec2(1, 1),
 		vec2(1, 0),
+
+		vec2(0, 1),
+		vec2(1, 0),
 		vec2(0, 0)
 	};
 
-	drawTexture(texture, GL_QUADS, vpos, vuv, 4);
+	drawTexture(texture, GL_TRIANGLES, vpos, vuv, 6);
 
 }
 
@@ -267,6 +283,9 @@ void RenderSystem::drawTexture(GLTexture *texture, const AABB &aabb) {
 		vec3(aabb.min_box.x, aabb.min_box.y, 0.0f),
 		vec3(aabb.max_box.x, aabb.min_box.y, 0.0f),
 		vec3(aabb.max_box.x, aabb.max_box.y, 0.0f),
+
+		vec3(aabb.min_box.x, aabb.min_box.y, 0.0f),
+		vec3(aabb.max_box.x, aabb.max_box.y, 0.0f),
 		vec3(aabb.min_box.x, aabb.max_box.y, 0.0f)
 	};
 
@@ -274,10 +293,13 @@ void RenderSystem::drawTexture(GLTexture *texture, const AABB &aabb) {
 		vec2(0, 1),
 		vec2(1, 1),
 		vec2(1, 0),
+
+		vec2(0, 1),
+		vec2(1, 0),
 		vec2(0, 0)
 	};
 
-	drawTexture(texture, GL_QUADS, vpos, vuv, 4);
+	drawTexture(texture, GL_TRIANGLES, vpos, vuv, 6);
 }
 
 void RenderSystem::drawTexture(GLTexture *texture, vec4 color, GLuint oglPrimitive, const vec3 *vertexBuffer, const vec2 *uvBuffer, int count) {
@@ -325,22 +347,23 @@ void RenderSystem::drawSphere(GLTexture *texture, int sectorCount, int stackCoun
 	texture->active(0);
 	shader->setTexture(0);
 	shader->setColor(color);
-    
+
+	/*
     sphereModelVAO->enable();
     sphereModelVAO->draw();
     sphereModelVAO->disable();
-    
-    /*
-    sphereModelVBO.setLayoutPointers(GLShaderTextureColor::vPosition, GLShaderTextureColor::vUV);
-    sphereModelVBO.draw();
-    sphereModelVBO.unsetLayoutPointers(GLShaderTextureColor::vPosition, GLShaderTextureColor::vUV);
     */
+
+    sphereModelVBO->setLayoutPointers(GLShaderTextureColor::vPosition, GLShaderTextureColor::vUV);
+    sphereModelVBO->draw();
+    sphereModelVBO->unsetLayoutPointers(GLShaderTextureColor::vPosition, GLShaderTextureColor::vUV);
+
     /*
     sphere.setLayoutPointers(GLShaderTextureColor::vPosition, GLShaderTextureColor::vUV);
     sphere.draw();
     sphere.unsetLayoutPointers(GLShaderTextureColor::vPosition, GLShaderTextureColor::vUV);
     */
-    
+
 }
 
 void RenderSystem::drawTexture(GLTexture *texture, GLuint oglPrimitive, const vec3 *vertexBuffer, const vec2 *uvBuffer, int count) {

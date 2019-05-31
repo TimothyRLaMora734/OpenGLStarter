@@ -25,15 +25,26 @@ public:
 	//sphere shape
 	vec3 sphereCenter;
 	float sphereRadius;
+    collision::Sphere sphere;
 
 	//aabb
 	vec3 aabbDimension;
 	vec3 aabbCenter;
+    collision::AABB aabb;
 
 	static const ComponentType Type;
 
 	ComponentFrustumCulling();
 	~ComponentFrustumCulling();
+    
+    void computeFinalPositions(bool visitedFlag);
+    
+    void start();
+    void attachToTransform(Transform *t);
+    void detachFromTransform(Transform *t);
+    
+    
+    void OnTransformVisited(Transform *t);
 
 	static ComponentFrustumCulling *createShapeSphere(const vec3& sphereCenter, float sphereRadius);
 	static ComponentFrustumCulling *createShapeAABB(const collision::AABB& aabb);
