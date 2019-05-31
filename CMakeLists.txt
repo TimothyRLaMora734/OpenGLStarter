@@ -234,6 +234,7 @@ add_subdirectory( projects/post-processing )
 add_subdirectory( projects/post-processing-power-of-two )
 add_subdirectory( projects/collision )
 add_subdirectory( projects/puc2019 )
+add_subdirectory( projects/raytracer )
 
 #
 # Tools
