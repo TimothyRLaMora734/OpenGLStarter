@@ -46,7 +46,7 @@ vec2& vec2::operator-=(const vec2& v){
     return (*this);
 }
 
-vec2 vec2::operator-(){
+vec2 vec2::operator-() const{
     return vec2(-x,-y);
 }
 

@@ -130,7 +130,7 @@ class ARIBEIRO_API vec4{
     /// \author Alessandro Ribeiro
     /// \return A copy of the current instance after the negation operation
     ///
-    vec4 operator-();
+    vec4 operator-() const;
     /// \brief Component-wise multiply operator overload
     ///
     /// Multiply the vector by the components of another vector

@@ -65,7 +65,7 @@ vec3& vec3::operator-=(const vec3& v){
     return (*this);
 }
 
-vec3 vec3::operator-(){
+vec3 vec3::operator-() const{
     return vec3(-x,-y,-z);
 }
 

@@ -40,7 +40,7 @@ tensor4& tensor4::operator-=(const tensor4& v){
     _41-=v._41;_42-=v._42;_43-=v._43;_44-=v._44;
     return *this;
 }
-tensor4 tensor4::operator-(){
+tensor4 tensor4::operator-() const{
     return tensor4(-_11,-_21,-_31,-_41,
                    -_12,-_22,-_32,-_42,
                    -_13,-_23,-_33,-_43,
@@ -93,11 +93,17 @@ mat4& tensor4::asMat4()const{
 }
 
 bool tensor4::operator==(const tensor4&v) const {
-	return memcmp(array, v.array, sizeof(float) * 16) == 0;
+    for(int i=0;i<16;i++){
+        if (absv(array[i]-v.array[i]) > 1e-4f)
+            return false;
+    }
+    return true;
+	//return memcmp(array, v.array, sizeof(float) * 16) == 0;
 }
 
 bool tensor4::operator!=(const tensor4&v) const {
-	return memcmp(array, v.array, sizeof(float) * 16) != 0;
+    return !((*this) == v);
+	//return memcmp(array, v.array, sizeof(float) * 16) != 0;
 }
 
 }

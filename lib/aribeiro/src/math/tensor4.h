@@ -90,7 +90,7 @@ class ARIBEIRO_API tensor4{
     /// \author Alessandro Ribeiro
     /// \return A copy of the current instance after the negation operation
     ///
-    tensor4 operator-();
+    tensor4 operator-() const;
 
     /// \brief Component-wise multiply operator overload
     ///

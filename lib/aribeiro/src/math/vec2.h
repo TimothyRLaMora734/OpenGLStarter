@@ -99,7 +99,7 @@ class ARIBEIRO_API vec2{
     /// \author Alessandro Ribeiro
     /// \return A copy of the current instance after the negation operation
     ///
-    vec2 operator-();
+    vec2 operator-()const;
 
     /// \brief Component-wise multiply operator overload
     ///

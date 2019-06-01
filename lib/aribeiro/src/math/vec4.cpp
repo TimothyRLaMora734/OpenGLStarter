@@ -63,7 +63,7 @@ vec4& vec4::operator-=(const vec4& v){
     w-=v.w;
     return (*this);
 }
-vec4 vec4::operator-(){
+vec4 vec4::operator-() const{
     return vec4(-x,-y,-z,-w);
 }
 vec4& vec4::operator*=(const vec4& v){

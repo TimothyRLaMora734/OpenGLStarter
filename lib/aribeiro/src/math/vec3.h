@@ -124,7 +124,7 @@ class ARIBEIRO_API vec3{
     /// \author Alessandro Ribeiro
     /// \return A copy of the current instance after the negation operation
     ///
-    vec3 operator-();
+    vec3 operator-() const;
     /// \brief Component-wise multiply operator overload
     ///
     /// Multiply the vector by the components of another vector
