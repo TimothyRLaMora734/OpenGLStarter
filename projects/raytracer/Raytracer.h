@@ -12,90 +12,42 @@ class Raytracer {
 	//
 	// camera cache
 	//
-	vec3 P0_P1, P1_P3;
-	vec3 v0;
+    vec3 cameraZ;
+    vec3 cameraX;
+    vec3 cameraY;
+    
+    float f;//focal distance (distance from projection plane)
+    float tangentY;
+    float tangentXaspect;
 
 	void preComputeCameraCache() {
-		vec3 cameraZ = normalize(camera.eyePos - camera.eyeLookToPosition);
-		vec3 right = cross(camera.eyeUp, cameraZ);
-		vec3 up = cross(cameraZ, right);
-
-		//another way to calculate...
-		collision::Frustum frustum(
-			projection_perspective(camera.fieldOfView, (float)width / (float)height, 0.1f, 10.0f),
-			lookAt(-cameraZ,
-				up,
-				camera.eyePos));
-		
-		P0_P1 = vec3(frustum.vertices[0], frustum.vertices[3]);
-		P1_P3 = vec3(frustum.vertices[3], frustum.vertices[2]);
-
-		P0_P1 = P0_P1 * (1.0f / (float)(width - 1));
-		P1_P3 = P1_P3 * (1.0f / (float)(height - 1));
-
-		v0 = frustum.vertices[0];
+        cameraZ = normalize( camera.eyePos - camera.eyeLookToPosition );
+        cameraX = normalize( cross(camera.eyeUp, cameraZ) );
+        cameraY = normalize( cross(cameraZ, cameraX) );
+        
+        f = 1.0f;
+        tangentY = 2.0f * f * tanf(DEG2RAD(camera.fieldOfView) / 2.0f);
+        tangentXaspect = tangentY * ((float)width / (float)height);
 	}
 
 	collision::Ray generateRay(int x, int y) {
 		collision::Ray ray;
-
-		/*
-
-		vec3 centerDir = normalize(camera.eyeLookToPosition - camera.eyePos);
-		vec3 right = cross(centerDir, camera.eyeUp);
-		vec3 up = cross(right, centerDir);
-
-		float xFloat = ((float)x / (float)(width - 1) - 0.5f) * 2.0f;
-		float yFloat = -((float)y / (float)(height - 1) - 0.5f) * 2.0f;
-
-		//aspect calculation
-		xFloat *= (float)width / (float)height;
-
-		//field of view calculation
-		float tangent = 2.0f * tan( DEG2RAD(camera.fieldOfView) / 2.0f );
-		xFloat *= tangent;
-		yFloat *= tangent;
-
-		ray.origin = centerDir + xFloat * right + yFloat * up;
-		ray.dir = normalize(ray.origin);
-		ray.origin = camera.eyePos + ray.origin;
-
-		*/
-
-
-
-/*
-		vec3 cameraZ = normalize(camera.eyePos - camera.eyeLookToPosition);
-		vec3 right = cross(camera.eyeUp, cameraZ);
-		vec3 up = cross(cameraZ, right);
-
-
-		ray.origin = camera.eyePos;
-
-		float xFloat = ((float)x / (float)(width - 1) - 0.5f);
-		float yFloat = -((float)y / (float)(height - 1) - 0.5f);
-
-		float f = 1.0f;
-		float tangentA = PI * f * tanf(DEG2RAD(camera.fieldOfView) / 2.0f);
-		float tangentBaspect = tangentA * ((float)width / (float)height);
-
-		ray.dir = 
-				-f * cameraZ +
-				yFloat * tangentA * up +
-				xFloat * tangentBaspect * right;
-
-
-		ray.dir = normalize(ray.dir);
-
-*/
-
-		vec3 pos = 
-			P0_P1 * (float)(width - 1 - x) +
-			P1_P3 * (float)(y) +
-			v0;
-		
-		ray.origin = camera.eyePos;
-		ray.dir = normalize(pos - camera.eyePos);
+        
+        // compute pixel range x[-0.5,0.5] y[0.5,-0.5]
+        float xFloat = (((float)x + 0.5f) / (float)(width) - 0.5f);
+        float yFloat = -(((float)y + 0.5f) / (float)(height) - 0.5f);
+        
+        //compute the tangent plane (pixel positions in 3D space)
+        ray.dir =
+        - f * cameraZ +
+        yFloat * tangentY * cameraY +
+        xFloat * tangentXaspect * cameraX;
+        
+        //setup ray origin
+        ray.origin = camera.eyePos + ray.dir;
+        
+        //normalize ray direction
+        ray.dir = normalize(ray.dir);
 		
 		return ray;
 	}
