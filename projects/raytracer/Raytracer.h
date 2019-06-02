@@ -7,25 +7,6 @@ using namespace aRibeiro;
 #include "FileReader.h"
 #include "RaytracerObjects.h"
 
-bool refractRay(const vec3 &ray,const vec3 &normal, vec3 *vOut, float ni, float nr ){
-    vec3 L = normalize(-ray);
-    
-    float ni_nr = ni/nr;
-    float cos_i = dot( normal, L );
-    
-    float cos_r = 1.0f - ni_nr*ni_nr*( 1.0f - cos_i*cos_i );
-    
-    if (cos_r <=0)
-        return false;
-    
-    cos_r = sqrt(cos_r);
-    
-    vec3 T = (ni_nr*cos_i - cos_r) * normal - ni_nr * L;
-    
-    *vOut = normalize( T );
-    return true;
-}
-
 class Raytracer {
 
 	//
@@ -194,7 +175,11 @@ public:
 	}
 
 	void run() {
+        PlatformTime time;
+        
+        time.update();
 		printf("run ");
+        #pragma omp parallel for
 		for (int y = 0; y < height; y++) {
 			printf(".");
 			for (int x = 0; x < width; x++) {
@@ -213,6 +198,9 @@ public:
 			}
 		}
 		printf("\n");
+        time.update();
+        printf("time: %f secs\n", time.deltaTime);
+        
 	}
 
 	void save(const std::string &fileout) {
