@@ -294,6 +294,28 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 	vec4 reflect(const vec4& a, const vec4& N) {
 		return (a - N * (2.0f * dot(a, N)));
 	}
+    
+    //------------------------------------------------------------------------------
+    
+    bool refract(const vec3 &rayDir,const vec3 &normal, float ni, float nr, vec3 *vOut ){
+        vec3 L = normalize(-rayDir);
+        
+        float ni_nr = ni/nr;
+        float cos_i = dot( normal, L );
+        
+        float cos_r = 1.0f - ni_nr*ni_nr*( 1.0f - cos_i*cos_i );
+        
+        if (cos_r <=0)
+            return false;
+        
+        cos_r = sqrt(cos_r);
+        
+        vec3 T = (ni_nr*cos_i - cos_r) * normal - ni_nr * L;
+        
+        *vOut = normalize( T );
+        return true;
+    }
+    
 	//------------------------------------------------------------------------------
 	/*
 	  Funções que retornam o tamanho quadrado de um vetor

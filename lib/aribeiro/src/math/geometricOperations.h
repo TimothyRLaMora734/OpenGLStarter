@@ -442,6 +442,23 @@ ARIBEIRO_API vec3 reflect( const vec3& a, const vec3& N );
 /// \return The reflected vector 'a' considering the normal N
 ///
 ARIBEIRO_API vec4 reflect( const vec4& a, const vec4& N );
+
+/// \brief snell law refraction, vector implementation
+///
+/// from input ray, normal, ni and nr calculate the refracted vector
+/// ni = source index of refraction
+/// nr = target index of refraction
+///
+/// \author Alessandro Ribeiro
+/// \sa refract( const vec3 &ray,const vec3 &normal, float ni, float nr, vec3 *vOut )
+/// \param rayDir Incident ray direction
+/// \param normal The normal of a surface (unit vector)
+/// \param ni source index of refraction
+/// \param nr target index of refraction
+/// \param vOut output vector
+/// \return true if vector is calculated, false if this is a total internal reflection case
+ARIBEIRO_API bool refract(const vec3 &rayDir,const vec3 &normal, float ni, float nr, vec3 *vOut );
+
 //------------------------------------------------------------------------------
 
 /// \brief Computes the squared length of a vector
