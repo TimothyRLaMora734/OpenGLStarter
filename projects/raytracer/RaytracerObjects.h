@@ -22,7 +22,7 @@ bool RayCastSphere(const collision::Ray &ray, const collision::Sphere &sphere, f
 	OC = Ec - R0;
 	auxDoc2 = dot(OC, OC);
 	float sqrRadius = sphere.radius*sphere.radius;
-	if (auxDoc2 > sqrRadius + sqrRadius * EPSILON) {//o raio não esta dentro da esfera
+	if (auxDoc2 > sqrRadius + sqrRadius * EPSILON) {//o raio nao esta dentro da esfera
 		tm = dot(OC, r);
 		if (tm > EPSILON) {//raio na direcao da esfera
 			ta = sqrRadius - auxDoc2 + tm * tm;
@@ -38,7 +38,7 @@ bool RayCastSphere(const collision::Ray &ray, const collision::Sphere &sphere, f
 		}
 	}
 	else if (auxDoc2 < sqrRadius - sqrRadius * EPSILON) {
-		//o raio está dentro da esfera
+		//o raio esta dentro da esfera
 		tm = dot(OC, r);
 		ta = sqrRadius - auxDoc2 + tm * tm;
 		ta = sqrt(ta);
@@ -58,9 +58,9 @@ bool RayCastPlane(const collision::Ray &ray, const collision::Plane &plane, floa
 	planeNormal = plane.normal;
 	aux_vd = dot(planeNormal, ray.dir);
 	if (aux_vd >= -EPSILON)
-		return false; //paralelo na direção do raio ou na direção contrária do raio
+		return false; //paralelo na direcao do raio ou na direcao contraria do raio
 	v0 = -(dot(planeNormal, ray.origin) + plane.distance);
-	if (abs(v0) < EPSILON) 
+	if (absv(v0) < EPSILON)
 		return false;
 	t = v0 / aux_vd;
 	if (t > EPSILON) {
