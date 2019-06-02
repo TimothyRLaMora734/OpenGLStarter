@@ -7,6 +7,25 @@ using namespace aRibeiro;
 #include "FileReader.h"
 #include "RaytracerObjects.h"
 
+bool refractRay(const vec3 &ray,const vec3 &normal, vec3 *vOut, float ni, float nr ){
+    vec3 L = normalize(-ray);
+    
+    float ni_nr = ni/nr;
+    float cos_i = dot( normal, L );
+    
+    float cos_r = 1.0f - ni_nr*ni_nr*( 1.0f - cos_i*cos_i );
+    
+    if (cos_r <=0)
+        return false;
+    
+    cos_r = sqrt(cos_r);
+    
+    vec3 T = (ni_nr*cos_i - cos_r) * normal - ni_nr * L;
+    
+    *vOut = normalize( T );
+    return true;
+}
+
 class Raytracer {
 
 	//
@@ -90,14 +109,17 @@ class Raytracer {
 		vec3 normal;
 		Object *object;
 
+        if ( max_depth <= 0 )
+            return vec3(0.0f);
+        
 		if (calculateCollision(ray, &t, &normal, &object)) {
 			//
 			// Make the illumination calculation
 			//
 			vec3 collisionPos = ray.origin + ray.dir*t;
-
-			vec3 pigmentColor = object->pigment->getColor(collisionPos);
-
+            
+            vec3 pigmentColor = object->pigment->getColor(collisionPos);
+            
 			return pigmentColor;
 		}
 		else
