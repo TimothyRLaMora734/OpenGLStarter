@@ -2,13 +2,13 @@
 #include "all_math.h"
 
 #include <math.h>
-#include <string.h>
+#include <string.h>//memcpy
 
 namespace aRibeiro{
 
-#define mkIndex(y, x) ((y)*4+(x))
+//#define mkIndex(y, x) ((y)*4+(x))
 
-
+/*
 mat4::mat4(){
     _11=_12=_13=_14=_21=_22=_23=_24=
     _31=_32=_33=_34=_41=_42=_43=_44= 0;
@@ -71,9 +71,9 @@ vec4 mat4::operator[](const int v)const {
 	return *((vec4*)&array[v * 4]);
 }
 
-tensor4& mat4::asTensor4()const{
-    return *((tensor4*)this);
-}
+//tensor4& mat4::asTensor4()const{
+//    return *((tensor4*)this);
+//}
 
 bool mat4::operator==(const mat4&v) const {
     for(int i=0;i<16;i++){
@@ -88,7 +88,7 @@ bool mat4::operator!=(const mat4&v) const {
     return !((*this) == v);
 	//return memcmp(array, v.array, sizeof(float) * 16) != 0;
 }
-
+*/
 
 const mat4 mat4::IdentityMatrix(1,0,0,0,
                                 0,1,0,0,

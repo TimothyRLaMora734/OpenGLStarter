@@ -51,8 +51,8 @@ const float SPD_FLT_INF = SPD_FLOAT_INFINITY_UNION.value;
 
 
 
-    const float EPSILON = 1e-4;//0.001f;
-    const float EPSILON2 = 1e-6;//0.0001f;
+    const float EPSILON = 1e-4f;//0.001f;
+    const float EPSILON2 = 1e-6f;//0.0001f;
 
 #ifdef __cplusplus
 }

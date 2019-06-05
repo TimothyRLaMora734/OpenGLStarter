@@ -2,6 +2,7 @@
 #define all_math_h
 
 #include "constants.h"
+#include "floatOPs.h"
 
 //basic types
 #include "vec2.h"

@@ -59,23 +59,18 @@ FILE( GLOB math_collision_h src/math/collision/*.h )
 FILE( GLOB opengl_src src/opengl/*.cpp)
 FILE( GLOB opengl_h src/opengl/*.h )
 
+FILE( GLOB util_src src/util/*.cpp)
+FILE( GLOB util_h src/util/*.h )
+
+FILE( GLOB math_src src/math/*.cpp)
+FILE( GLOB math_h src/math/*.h )
+
 set( PUBLIC_HEADERS
 
 		src/aribeiro.h
 		src/common.h
 
-		src/math/all_math.h
-		src/math/BresenhamIterator.h
-		src/math/constants.h
-		src/math/EasingEquations.h
-		src/math/geometricOperations.h
-		src/math/mat4.h
-		src/math/quat.h
-		src/math/tensor4.h
-		src/math/vec2.h
-		src/math/vec3.h
-		src/math/vec4.h
-
+		${math_h}
 
 		${math_collision_h}
 
@@ -87,17 +82,8 @@ set( PUBLIC_HEADERS
 		src/platform/PlatformTime.h
 		src/platform/PlatformGL.h
 
-		src/util/Delegate.h
-        src/util/Property.h
-		src/util/GetFirstMacAddress.h
-		src/util/SetNullAndDelete.h
-		src/util/NetworkConstants.h
-		src/util/PNGHelper.h
-		src/util/TransformStack.h
-		src/util/Random.h
-		src/util/win32/drand48.h
-		src/util/PressReleaseDetector.h
-        src/util/ColorConversion.h
+        ${util_h}
+        src/util/win32/drand48.h
 
 
         ${opengl_h}
@@ -122,14 +108,7 @@ set( PRIVATE_HEADERS )
 
 set( SRC
 
-		src/math/BresenhamIterator.cpp
-		src/math/geometricOperations.cpp
-		src/math/mat4.cpp
-		src/math/quat.cpp
-		src/math/tensor4.cpp
-		src/math/vec2.cpp
-		src/math/vec3.cpp
-		src/math/vec4.cpp
+		${math_src}
 
 		${math_collision_src}
 
@@ -141,12 +120,8 @@ set( SRC
 		src/platform/PlatformTime.cpp
 		src/platform/PlatformGL.cpp
 
-		src/util/GetFirstMacAddress.cpp
-		src/util/PNGHelper.cpp
-		src/util/Random.cpp
-		src/util/win32/drand48.cpp
-		src/util/PressReleaseDetector.cpp
-        src/util/ColorConversion.cpp
+		${util_src}
+        src/util/win32/drand48.cpp
 
         ${opengl_src}
 
@@ -174,28 +149,8 @@ set( SRC
 	)
 
 	source_group("math" FILES
-		src/math/all_math.h
-		src/math/AABB.h
-		src/math/BresenhamIterator.h
-		src/math/constants.h
-		#src/math/defs.h
-		src/math/EasingEquations.h
-		src/math/geometricOperations.h
-		src/math/mat4.h
-		src/math/quat.h
-		src/math/tensor4.h
-		src/math/vec2.h
-		src/math/vec3.h
-		src/math/vec4.h
-		src/math/AABB.cpp
-		src/math/BresenhamIterator.cpp
-		src/math/geometricOperations.cpp
-		src/math/mat4.cpp
-		src/math/quat.cpp
-		src/math/tensor4.cpp
-		src/math/vec2.cpp
-		src/math/vec3.cpp
-		src/math/vec4.cpp
+		${math_h}
+        ${math_src}
 	)
 
 	source_group("math\\collision" FILES
@@ -223,21 +178,8 @@ set( SRC
 	)
 
 	source_group("util" FILES
-		src/util/Delegate.h
-        src/util/Property.h
-		src/util/GetFirstMacAddress.h
-		src/util/SetNullAndDelete.h
-		src/util/GetFirstMacAddress.cpp
-		src/util/NetworkConstants.h
-		src/util/PNGHelper.h
-		src/util/PNGHelper.cpp
-		src/util/TransformStack.h
-		src/util/Random.h
-		src/util/Random.cpp
-		src/util/PressReleaseDetector.h
-		src/util/PressReleaseDetector.cpp
-        src/util/ColorConversion.h
-        src/util/ColorConversion.cpp
+		${util_h}
+        ${util_src}
 	)
 
 	source_group("util\\win32" FILES

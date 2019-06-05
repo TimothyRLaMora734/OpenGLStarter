@@ -31,6 +31,7 @@
 
 namespace aRibeiro {
 
+    /*
 #define OPERATION_IMPLEMENTATION(TTYPE)\
 TTYPE operator/( const TTYPE& vecA, const TTYPE& vecB ){ return (TTYPE(vecA)/=vecB); } \
 TTYPE operator/( const TTYPE& vec , const float value ){ return (TTYPE(vec)/=value); } \
@@ -44,17 +45,18 @@ TTYPE operator+( const float value, const TTYPE& vec  ){ return (TTYPE(value)+=v
 TTYPE operator-( const TTYPE& vecA, const TTYPE& vecB ){ return (TTYPE(vecA)-=vecB); } \
 TTYPE operator-( const TTYPE& vec , const float value ){ return (TTYPE(vec)-=value); } \
 TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=vec); }
-
-	OPERATION_IMPLEMENTATION(vec2)
-		OPERATION_IMPLEMENTATION(vec3)
-		OPERATION_IMPLEMENTATION(vec4)
-		OPERATION_IMPLEMENTATION(tensor4)
+*/
+	//OPERATION_IMPLEMENTATION(vec2)
+		//OPERATION_IMPLEMENTATION(vec3)
+		//OPERATION_IMPLEMENTATION(vec4)
+		//OPERATION_IMPLEMENTATION(tensor4)
 
 
 	//[ 11 12 13 14 ]  [ x ]      [ x11+y12+z13+w14 ]
 	//[ 21 22 23 24 ]  [ y ]   =  [ x21+y22+z23+w24 ]
 	//[ 31 32 33 34 ]  [ z ]      [ x31+y32+z33+w34 ]
 	//[ 41 42 43 44 ]  [ w ]      [ x41+y42+z43+w44 ]
+    /*
 	vec4 operator*(const mat4 &mat, const vec4 &vec) {
 		vec4 result;
 		result.x = mat._11*vec.x + mat._12*vec.y + mat._13*vec.z + mat._14*vec.w;
@@ -62,12 +64,13 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 		result.z = mat._31*vec.x + mat._32*vec.y + mat._33*vec.z + mat._34*vec.w;
 		result.w = mat._41*vec.x + mat._42*vec.y + mat._43*vec.z + mat._44*vec.w;
 		return result;
-	}
+	}*/
 
 	//            [ 11 12 13 14 ]
 	//(x y z w)   [ 21 22 23 24 ]   =  (11x+21y+31z+41w  12x+22y+32z+42w  13x+23y+33z+43w  14x+24y+34z+44w)
 	//            [ 31 32 33 34 ]
 	//            [ 41 42 43 44 ]
+    /*
 	vec4 operator*(const vec4 &vec, const mat4 &mat) {
 		vec4 result;
 		result.x = mat._11*vec.x + mat._21*vec.y + mat._31*vec.z + mat._41*vec.w;
@@ -76,10 +79,11 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 		result.w = mat._14*vec.x + mat._24*vec.y + mat._34*vec.z + mat._44*vec.w;
 		return result;
 	}
+     */
 
 
 
-
+/*
 	quat operator^(const quat &a, const quat &b) {
 
 		return quat(
@@ -88,8 +92,8 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 					a.w * b.z + a.z * b.w + a.x * b.y - a.y * b.x,
 					a.w * b.w - a.x * b.x - a.y * b.y - a.z * b.z
 				) ;
-	}
-
+	}*/
+/*
 	quat operator*(const quat &a, const quat &b) {
 
 		return normalize(
@@ -100,8 +104,9 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 			a.w * b.w - a.x * b.x - a.y * b.y - a.z * b.z
 		)
 		);
-	}
+	}*/
 
+    /*
 	vec3 operator*(const quat &a, const vec3 &v) {
 		//quat result = mul(a, mul(quat(v.x, v.y, v.z, 0.0f), conjugate(a)));
 		//
@@ -110,7 +115,9 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 		quat result = a ^ quat(v.x, v.y, v.z, 0.0f) ^ conjugate(a);
 		return vec3(result.x, result.y, result.z);
 	}
+     */
 
+    /*
 	vec4 operator*(const quat &a, const vec4 &v) {
 		//quat result = mul(a, mul(quat(v.x, v.y, v.z, 0.0f), conjugate(a)));
 		//quat result = a * quat(v.x, v.y, v.z, 0.0f) * conjugate(a);
@@ -120,8 +127,9 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 		quat result = a ^ quat(v.x, v.y, v.z, 0.0f) ^ conjugate(a);
 		return vec4(result.x, result.y, result.z, v.w);
 	}
+*/
 
-
+    /*
 	vec3 slerp(const vec3& a, const vec3& b, const float lerp) {
 
 		//
@@ -145,11 +153,14 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
         // interpolate src vectors
         return a * t1 + b * t2;
 	}
+     */
 
+    /*
 	float angleBetween(const vec3& a, const vec3& b) {
 		float cosA = clamp(dot(normalize(a), normalize(b)),-1.0f,1.0f);
 		return acos(cosA);
 	}
+     */
 
 
 	//typedef vec2 float2;
@@ -165,18 +176,27 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 			 vec3 -> vec4
 			 vec3 -> ptn4
 	*/
+    /*
 	vec3 toVec3(const vec4 &v) {
 		return vec3(v.x, v.y, v.z);
 	}
+    */
+    /*
 	vec3 toVec3_PerspDiv(const vec4 &v) {
 		return vec3(v.x, v.y, v.z)*(1.0f / v.w);
 	}
+     */
+    /*
 	vec4 toVec4(const vec3 &v) {
 		return vec4(v.x, v.y, v.z, 0);
 	}
+    */
+    /*
 	vec4 toPtn4(const vec3 &v) {
 		return vec4(v.x, v.y, v.z, 1);
 	}
+    */
+    /*
 	// retorna um vetor dado um ângulo e raio
 	vec2 polarToVec2(float pAngle, float pRadius)
 	{
@@ -186,6 +206,7 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 
 		return vec;
 	}
+     */
 
 
 
@@ -195,16 +216,19 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 	/*
 	  função que calcula o produto vetorial entre dois vetores de dimensão 3
 	*/
+    /*
 	vec3 cross(const vec3& a, const vec3& b) {
 		return vec3((a.y * b.z - b.y * a.z),
 			(b.x * a.z - a.x * b.z),
 			(a.x * b.y - b.x * a.y));
 	}
+     */
 	//------------------------------------------------------------------------------
 	/*
 	  Funções que retornam o produto escalar entre dois vetores
 	  para as dimensões:  2 D, 3 D, 4 D
 	*/
+    /*
 	float dot(const vec2& a, const vec2& b) {
 		return (a.x * b.x + a.y * b.y);
 	}
@@ -214,11 +238,13 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 	float dot(const vec4& a, const vec4& b) {
 		return (a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w);
 	}
+     */
 	//------------------------------------------------------------------------------
 	/*
 	  Funções que normalizam um determinado vetor, tornando-o
 	  unitáio para as dimensões:  2 D, 3 D, 4 D
 	*/
+    /*
 	vec2 normalize(const vec2& vec) {
 		vec2 result = vec;
 		if (vec == vec2(0)) return vec;
@@ -229,6 +255,8 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 			result = (vec * (1.0f / sqrtf(mag2)));
 		return result;
 	}
+     */
+    /*
 	vec3 normalize(const vec3& vec) {
 		vec3 result = vec;
 		if (vec == vec3(0)) return vec;
@@ -239,6 +267,8 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 			result = (vec * (1.0f / sqrtf(mag2)));
 		return result;
 	}
+     */
+    /*
 	vec4 normalize(const vec4& vec) {
 		vec4 result = vec;
 		if (vec == vec4(0)) return vec;
@@ -249,21 +279,25 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 			result = (vec * (1.0f / sqrtf(mag2)));
 		return result;
 	}
+     */
 	//------------------------------------------------------------------------------
 	/*
 	  Funções que limitam os valores internos do vetor
 	  limitando seus valores máximos e mínimos de cada componente
 	  para as dimensões:  1 D, 2 D, 3 D, 4 D
 	*/
-	float clamp(const float value, const float min, const float max) {
-		return (value < min) ? min : ((value > max) ? max : value);
-	}
+	//float clamp(const float value, const float min, const float max) {
+		//return (value < min) ? min : ((value > max) ? max : value);
+	//}
+    /*
 	vec2 clamp(const vec2& value, const vec2& min, const vec2& max) {
 		return vec2(
 			(value.x < min.x) ? min.x : ((value.x > max.x) ? max.x : value.x),
 			(value.y < min.y) ? min.y : ((value.y > max.y) ? max.y : value.y)
 		);
 	}
+     */
+    /*
 	vec3 clamp(const vec3& value, const vec3& min, const vec3& max) {
 		return vec3(
 			(value.x < min.x) ? min.x : ((value.x > max.x) ? max.x : value.x),
@@ -271,6 +305,8 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 			(value.z < min.z) ? min.z : ((value.z > max.z) ? max.z : value.z)
 		);
 	}
+     */
+    /*
 	vec4 clamp(const vec4& value, const vec4& min, const vec4& max) {
 		return vec4(
 			(value.x < min.x) ? min.x : ((value.x > max.x) ? max.x : value.x),
@@ -279,12 +315,14 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 			(value.w < min.w) ? min.w : ((value.w > max.w) ? max.w : value.w)
 		);
 	}
+     */
 
 	//------------------------------------------------------------------------------
 	/*
 	  Funções que retornam o vetor refletido de acordo com uma determinada Normal
 	  para as dimensões:  2 D, 3 D, 4 D
 	*/
+    /*
 	vec2 reflect(const vec2& a, const vec2& N) {
 		return (a - N * (2.0f * dot(a, N)));
 	}
@@ -293,10 +331,10 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 	}
 	vec4 reflect(const vec4& a, const vec4& N) {
 		return (a - N * (2.0f * dot(a, N)));
-	}
+	}*/
     
     //------------------------------------------------------------------------------
-    
+    /*
     bool refract(const vec3 &rayDir,const vec3 &normal, float ni, float nr, vec3 *vOut ){
         vec3 L = normalize(-rayDir);
         
@@ -315,12 +353,14 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
         *vOut = normalize( T );
         return true;
     }
+    */
     
 	//------------------------------------------------------------------------------
 	/*
 	  Funções que retornam o tamanho quadrado de um vetor
 	  para as dimensões:  2 D, 3 D, 4 D
 	*/
+    /*
 	float sqrLength(const vec2 &a) {
 		return dot(a, a);
 	}
@@ -330,11 +370,13 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 	float sqrLength(const vec4 &a) {
 		return dot(a, a);
 	}
+    */
 	//------------------------------------------------------------------------------
 	/*
 	  Funções que retornam o tamanho de um vetor
 	  para as dimensões:  2 D, 3 D, 4 D
 	*/
+    /*
 	float length(const vec2 &a) {
 		return sqrtf(dot(a, a));
 	}
@@ -344,16 +386,18 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 	float length(const vec4 &a) {
 		return sqrtf(dot(a, a));
 	}
+    */
 	//------------------------------------------------------------------------------
 	/*
 	  Funções que retornam a distâcia
 	  quadrada de um dado ponto até outro
 	  para as dimensões:  1 D, 2 D, 3 D, 4 D
 	*/
-	float sqrDistance(const float a, const float b) {
-		float ab = b - a;
-		return ab * ab;
-	}
+	//float sqrDistance(const float a, const float b) {
+		//float ab = b - a;
+		//return ab * ab;
+	//}
+    /*
 	float sqrDistance(const vec2 &a, const vec2 &b) {
 		vec2 ab = b - a;
 		return dot(ab, ab);
@@ -366,17 +410,18 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 		vec3 ab = b - a;
 		return dot(ab, ab);
 	}
+    */
 	//------------------------------------------------------------------------------
 	/*
 	  Funções que retornam a distâcia
 	  de um dado ponto até outro
 	  para as dimensões:  1 D, 2 D, 3 D, 4 D
 	*/
-	float distance(const float a, const float b) {
-		float ab = b - a;
-		//return sqrtf(ab*ab);
-		return absv(ab);
-	}
+	//float distance(const float a, const float b) {
+		//float ab = b - a;
+		//return absv(ab);
+	//}
+    /*
 	float distance(const vec2 &a, const vec2 &b) {
 		vec2 ab = b - a;
 		return sqrtf(dot(ab, ab));
@@ -389,6 +434,7 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 		vec3 ab = b - a;
 		return sqrtf(dot(ab, ab));
 	}
+    */
 	//------------------------------------------------------------------------------
 	/*
 	  Funções que retornam o componente paralelo a
@@ -403,6 +449,7 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 		  o componente paralelo de v2 sobre unitV
 		  é dado por vOut
 	*/
+    /*
 	vec2 parallelComponent(const vec2 &a, const vec2 &unitV) {
 		return unitV * (dot(a, unitV));//dot(a,unitV) É a projeção de a em unitV
 	}
@@ -412,6 +459,7 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 	vec4 parallelComponent(const vec4 &a, const vec4 &unitV) {
 		return unitV * (dot(a, unitV));//dot(a,unitV) É a projeção de a em unitV
 	}
+    */
 	//------------------------------------------------------------------------------
 	/*
 	  Funções que retornam o componente perpendicular a
@@ -426,6 +474,7 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 		  o componente perpendicular de v2 sobre unitV
 		  é dado por vOut
 	*/
+    /*
 	vec2 perpendicularComponent(const vec2 &a, const vec2 &unitV) {
 		return a - unitV * (dot(a, unitV)); //unitV*(dot(a,unitV)) É o componenete paralelo
 	}
@@ -435,11 +484,13 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 	vec4 perpendicularComponent(const vec4 &a, const vec4 &unitV) {
 		return a - unitV * (dot(a, unitV)); //unitV*(dot(a,unitV)) É o componenete paralelo
 	}
+    */
 	//------------------------------------------------------------------------------
 	/*
 	  realiza a decomposicao de vetores em seus componentes:
 		  paralelo e perpendicular
 	*/
+    /*
 	void vecDecomp(const vec2 &a, const vec2 &unitV,
 		vec2 *perpendicular, vec2 *paralelo) {
 		*paralelo = unitV * (dot(a, unitV));
@@ -455,12 +506,14 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 		*paralelo = unitV * (dot(a, unitV));
 		*perpendicular = a - *paralelo;
 	}
+    */
 	//------------------------------------------------------------------------------
 	/*
 	  Funções que limitam um determinado ponto a um limite quadrático
 	  maximo : em 2d um cículo; em 3d uma esfera; em 4d sei lá o que.
 	  Para as dimensões:   2 D, 3 D, 4 D
 	*/
+    /*
 	vec2 quadraticClamp(const vec2 &point, const vec2 &center, const float maxRadius) {
 		vec2 direction = point - center;
 		float length = sqrtf(sqrLength(direction));
@@ -482,11 +535,13 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 			return center + direction * (maxRadius / length);
 		return point;
 	}
+     */
 	//------------------------------------------------------------------------------
 	/*
 	  Funções que retornam o maximo ou minimo
 	  Para as dimensões:   1 D, 2 D, 3D, 4D
 	*/
+    /*
 	float maximum(const vec2 &a) {
 		return (a.x > a.y) ? (a.x) : (a.y);
 	}
@@ -496,9 +551,12 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 	float maximum(const vec4 &a) {
 		return (a.x > a.y) ? ((a.x > a.z) ? ((a.x > a.w) ? (a.x) : (a.w)) : (a.z)) : (a.y);
 	}
-	float maximum(const float a, const float b) {
-		return (a > b) ? a : b;
-	}
+     */
+	
+    //float maximum(const float a, const float b) {
+		//return (a > b) ? a : b;
+	//}
+    /*
 	vec2 maximum(const vec2 &a, const vec2 &b) {
 		return vec2((a.x > b.x) ? a.x : b.x,
 			(a.y > b.y) ? a.y : b.y);
@@ -514,6 +572,9 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 			(a.z > b.z) ? a.z : b.z,
 			(a.w > b.w) ? a.w : b.w);
 	}
+    */
+    
+    /*
 	float minimum(const vec2 &a) {
 		return (a.x < a.y) ? (a.x) : (a.y);
 	}
@@ -523,9 +584,11 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 	float minimum(const vec4 &a) {
 		return (a.x < a.y) ? ((a.x < a.z) ? ((a.x < a.w) ? (a.x) : (a.w)) : (a.z)) : (a.y);
 	}
-	float minimum(const float a, const float b) {
-		return (a < b) ? a : b;
-	}
+     */
+	//float minimum(const float a, const float b) {
+		//return (a < b) ? a : b;
+	//}
+    /*
 	vec2 minimum(const vec2 &a, const vec2 &b) {
 		return vec2((a.x < b.x) ? a.x : b.x,
 			(a.y < b.y) ? a.y : b.y);
@@ -541,6 +604,7 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 			(a.z < b.z) ? a.z : b.z,
 			(a.w < b.w) ? a.w : b.w);
 	}
+    */
 	//------------------------------------------------------------------------------
 	/*
 	  Funções que retornam 1 se o nmero for maior ou igual a zero
@@ -548,9 +612,9 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 						  -1 se o numero for menor que zero
 	  Para as dimensões:   1 D
 	*/
-	float sign(const float a) {
-		return (a >= 0) ? 1.0f : -1.0f;
-	}
+	//float sign(const float a) {
+		//return (a >= 0) ? 1.0f : -1.0f;
+	//}
 	//------------------------------------------------------------------------------
 	/*
 	  Funções que retornam o valor absoluto para cada componente
@@ -579,12 +643,14 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 			abs(a.z),
 			abs(a.w));
 	}
+    
 
 #else
 
-	float absv(float a) {
-		return (a < 0) ? (-a) : (a);
-	}
+	//float absv(float a) {
+		//return (a < 0) ? (-a) : (a);
+	//}
+    /*
 	vec2 absv(const vec2 &a) {
 		return vec2((a.x < 0) ? (-a.x) : (a.x),
 			(a.y < 0) ? (-a.y) : (a.y));
@@ -600,7 +666,7 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 			(a.z < 0) ? (-a.z) : (a.z),
 			(a.w < 0) ? (-a.w) : (a.w));
 	}
-
+*/
 #endif
 
 	//------------------------------------------------------------------------------
@@ -614,10 +680,11 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 	  Funções que retornam a interpolação linear entre 2 pontos
 	  para as dimensões:  1 D, 2 D, 3 D, 4 D
 	*/
-	float lerp(const float a, const  float b, const float fator) {
+	//float lerp(const float a, const  float b, const float fator) {
 		//  return a+(b-a)*fator;
-		return a * (1.0f - fator) + (b*fator);
-	}
+		//return a * (1.0f - fator) + (b*fator);
+	//}
+    /*
 	vec2 lerp(const vec2 &a, const  vec2 &b, const float fator) {
 		//  return a+(b-a)*fator;
 		return a * (1.0f - fator) + (b*fator);
@@ -630,10 +697,11 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 		//  return a+(b-a)*fator;
 		return a * (1.0f - fator) + (b*fator);
 	}
-	tensor4 lerp(const tensor4 &a, const  tensor4 &b, const float fator) {
+	mat4 lerp(const mat4 &a, const  mat4 &b, const float fator) {
 		//  return a+(b-a)*fator;
 		return a * (1.0f - fator) + (b*fator);
 	}
+     */
 
 
 	/*
@@ -641,10 +709,12 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 	não é afetado pela projeção perspectiva se os coeficientes U e V forem calculados
 	no triangulo no espaço euclidiano.
 	*/
+    /*
 	vec3 barylerp(float u, float v, const vec3 &v0, const vec3 &v1, const vec3 &v2) {
 		// return v0*(1-uv[0]-uv[1])+v1*uv[0]+v2*uv[1];
 		return v0 * (1 - u - v) + v1 * u + v2 * v;
 	}
+     */
 
 	//dx - [0..1]
 	//dy - [0..1]
@@ -657,6 +727,7 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 	//     |        |         |
 	//  A-f(0,0) ---*----- B-f(1,0)
 	//
+    /*
 	vec3 blerp(vec3 A, vec3 B, vec3 C, vec3 D,
 		float dx, float dy) {
 		float omdx = 1.0f - dx,
@@ -664,6 +735,7 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 		return omdx * omdy*A + omdx * dy*D +
 			dx * omdy*B + dx * dy*C;
 	}
+     */
 
 	/*
 	q(t) = 0.5 * (1.0f,t,t2,t3)  *
@@ -680,7 +752,7 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 
 	o valor de t deve estar entre 0 e 1
 	*/
-
+/*
 	vec3 splineCatmullRom(vec3 P0, vec3 P1, vec3 P2, vec3 P3, float t) {
 		return 0.5f *((2.0f * P1) +
 			(P2 - P0) * t +
@@ -694,6 +766,7 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 			(2.0f*P0 - 5.0f*P1 + 4.0f*P2 - P3) * (t*t) +
 			(3.0f*P1 - P0 - 3.0f*P2 + P3) * (t*t*t));
 	}
+    */
 
 
 
@@ -702,14 +775,15 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 	//{
 	//using namespace vectorOperations;
 	//using namespace vectorConversion;
-
+/*
 	mat4 extractRotation(const mat4& m) {
 		return mat4(m._11, m._12, m._13, 0,
 			m._21, m._22, m._23, 0,
 			m._31, m._32, m._33, 0,
 			0, 0, 0, 1);
 	}
-
+*/
+    /*
 	vec3 extractXaxis(const mat4& m) {
 		return vec3(m._11, m._21, m._31);
 	}
@@ -719,18 +793,21 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 	vec3 extractZaxis(const mat4& m) {
 		return vec3(m._13, m._23, m._33);
 	}
-
 	vec3 extractTranslation(const mat4& m) {
 		return vec3(m._14, m._24, m._34);
 	}
+    */
 
+    /*
 	mat4 transpose(const mat4& m) {
 		return mat4(m._11, m._21, m._31, m._41,
 			m._12, m._22, m._32, m._42,
 			m._13, m._23, m._33, m._43,
 			m._14, m._24, m._34, m._44);
 	}
+     */
 
+    /*
 #define mkIndex(y, x) ((y)*4+(x))
 
 	mat4 inv(const mat4& m) {
@@ -836,6 +913,8 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 		return retorno;
 	}
 
+     */
+    
 	/*
 	mat4 inv_faster(const mat4& m) {
 		mat4 result;
@@ -891,7 +970,7 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 #endif
 	}
 */
-
+/*
 	mat4 translate(const float _x_, const float _y_, const float _z_) {
 		return mat4(1, 0, 0, _x_,
 			0, 1, 0, _y_,
@@ -912,7 +991,9 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 			0, 0, 1, _v_.z,
 			0, 0, 0, 1);
 	}
+ */
 	//------------------------------------------------------------------------------
+    /*
 	mat4 scale(const float _x_, const float _y_, const float _z_) {
 		return mat4(_x_, 0, 0, 0,
 			0, _y_, 0, 0,
@@ -933,10 +1014,12 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 			0, 0, _v_.z, 0,
 			0, 0, 0, 1);
 	}
+     */
 	//------------------------------------------------------------------------------
 	/*
 	  rotation in right_handed system
 	*/
+    /*
 	mat4 xRotate(const float _phi_) {
 		float c = cos(_phi_);
 		float s = sin(_phi_);
@@ -966,11 +1049,15 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 			0, 0, 1, 0,
 			0, 0, 0, 1);
 	}
+    */
 	//------------------------------------------------------------------------------
+    /*
 	mat4 eulerRotate(float roll, float pitch, float yaw) {
 		return zRotate(yaw) * yRotate(pitch) * xRotate(roll);
 	}
+     */
 	//------------------------------------------------------------------------------
+    /*
 	void extractEuler(mat4 m, float *roll, float *pitch, float *yaw) {
 		//
 		// https://www.learnopencv.com/rotation-matrix-to-euler-angles/
@@ -997,6 +1084,7 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 		*pitch = y;
 		*yaw = z;
 	}
+    */
 	//------------------------------------------------------------------------------
 	/*
 	openglRotation
@@ -1016,10 +1104,9 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 
 	*/
 	//------------------------------------------------------------------------------
+    /*
 	mat4 rotate(const float _ang_, float x, float y, float z) {
-		/*
-		  depois tem como otimizar esta rotação
-		*/
+		// depois tem como otimizar esta rotação
 		float length_inv = sqrt(x*x + y * y + z * z);
 		if (length_inv == 0) throw std::runtime_error("division by zero");
 		length_inv = 1.0f / length_inv;
@@ -1033,31 +1120,32 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 			y*x*(1 - c) + z * s, y*y*(1 - c) + c, y*z*(1 - c) - x * s, 0,
 			x*z*(1 - c) - y * s, y*z*(1 - c) + x * s, z*z*(1 - c) + c, 0,
 			0, 0, 0, 1);
-		//*/
-		/*
+		
 		  //transposto -- rota�o em sentido hor�io
-		  return  mat4(x*x*(1-c)+c  ,  y*x*(1-c)+z*s  ,  x*z*(1-c)-y*s,   0  ,
-					   x*y*(1-c)-z*s,  y*y*(1-c)+c    ,  y*z*(1-c)+x*s,   0  ,
-					   x*z*(1-c)+y*s,  y*z*(1-c)-x*s  ,  z*z*(1-c)+c  ,   0  ,
-						   0        ,        0        ,      0        ,   1  );
-		*/
+		//  return  mat4(x*x*(1-c)+c  ,  y*x*(1-c)+z*s  ,  x*z*(1-c)-y*s,   0  ,
+		//			   x*y*(1-c)-z*s,  y*y*(1-c)+c    ,  y*z*(1-c)+x*s,   0  ,
+		//			   x*z*(1-c)+y*s,  y*z*(1-c)-x*s  ,  z*z*(1-c)+c  ,   0  ,
+		//				   0        ,        0        ,      0        ,   1  );
 	}
+    */
 	//------------------------------------------------------------------------------
+    /*
 	mat4 rotate(const float _ang_, const vec3 &axis) {
 		return rotate(_ang_, axis.x, axis.y, axis.z);
 	}
+    */
 	//------------------------------------------------------------------------------
+    /*
 	mat4 projection_perspective(const float FovY, const float aspectX, const float near_, const float far_) {
 
-		/*
-		   f=cotangent(CampoDeVisao/2)
-		matriz:
-
-		f/aspect  0      0                           0
-		0         f      0                           0
-		0         0    (zfar+znear)/(znear-zfar)    (2*zfar*znear)/(znear-zfar)
-		0         0     -1                           0
-		   */
+		//   f=cotangent(CampoDeVisao/2)
+		//matriz:
+        //
+		//f/aspect  0      0                           0
+		//0         f      0                           0
+		//0         0    (zfar+znear)/(znear-zfar)    (2*zfar*znear)/(znear-zfar)
+		//0         0     -1                           0
+		   
 		if ((aspectX == 0.0f) || (near_ - far_) == 0) {
 			return mat4::IdentityMatrix;
 		}
@@ -1069,18 +1157,16 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 			0, 0, (near_ + far_) / (near_ - far_), (2.0f*near_*far_) / (near_ - far_),
 			0, 0, -1, 0);
 	}
-
+     */
+/*
     mat4 projection_perspectiveLH(const float FovY, const float aspectX, const float near_, const float far_) {
-
-        /*
-         f=cotangent(CampoDeVisao/2)
-         matriz:
-
-         f/aspect  0      0                           0
-         0         f      0                           0
-         0         0    -(zfar+znear)/(znear-zfar)    (2*zfar*znear)/(znear-zfar)
-         0         0     1                           0
-         */
+         //f=cotangent(CampoDeVisao/2)
+         //matriz:
+         //
+         //f/aspect  0      0                           0
+         //0         f      0                           0
+         //0         0    -(zfar+znear)/(znear-zfar)    (2*zfar*znear)/(znear-zfar)
+         //0         0     1                           0
         if ((aspectX == 0.0f) || (near_ - far_) == 0) {
             return mat4::IdentityMatrix;
         }
@@ -1092,7 +1178,9 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
                     0, 0, -(near_ + far_) / (near_ - far_), (2.0f*near_*far_) / (near_ - far_),
                     0, 0, 1, 0);
     }
-
+*/
+    
+    /*
 	//------------------------------------------------------------------------------
 	// unidade da distancia focal em relação a mesma unidade do width e height
 	//  ex.: se considerar milimetros (mm) então distancia focal de 35mm para tela de 50x30 mm
@@ -1103,21 +1191,27 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 		float aspectX = w / h;
 		return projection_perspective(fovY, aspectX, near_, far_);
 	}
+    */
 	//------------------------------------------------------------------------------
+    /*
 	mat4 projection_frustum(const float Left, const float Right, const float Bottom, const float Top, const float Near, const float Far) {
 		return mat4((2 * Near) / (Right - Left), 0, (Right + Left) / (Right - Left), 0,
 			0, (2 * Near) / (Top - Bottom), (Top + Bottom) / (Top - Bottom), 0,
 			0, 0, (-(Far + Near)) / (Far - Near), (-2 * Far*Near) / (Far - Near),
 			0, 0, -1, 0);
 	}
+     */
 	//------------------------------------------------------------------------------
+    /*
 	mat4 projection_ortho(const float Left, const float Right, const float Bottom, const float Top, const float Near, const float Far) {
 		return mat4(2.0f / (Right - Left), 0, 0, -(Right + Left) / (Right - Left),
 			0, 2.0f / (Top - Bottom), 0, -(Top + Bottom) / (Top - Bottom),
 			0, 0, -2.0f / (Far - Near), -(Far + Near) / (Far - Near),
 			0, 0, 0, 1);
 	}
+     */
 	//------------------------------------------------------------------------------
+    /*
 	mat4 lookAt(const vec3 &front, const vec3 &up, const vec3 &position) {
 		vec3 lookTo = front;
 		vec3 x, y, z;
@@ -1130,6 +1224,7 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 				z.x, z.y, z.z, -dot(z, position),
 				0, 0, 0, 1);
 	}
+    
 
     mat4 modelLookAt(const vec3 &front, const vec3 &up, const vec3 &position) {
         vec3 lookTo = front;
@@ -1168,6 +1263,7 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
                                 x.z, y.z, z.z, 0,
                                 0, 0, 0, 1));
     }
+     */
 	//------------------------------------------------------------------------------
 	/*
 	** inverse = invert(src)
@@ -1221,6 +1317,7 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 	}
 	*/
 	//------------------------------------------------------------------------------
+    /*
 	// retorna false se a matriz final é singular e n pode ser invertida
 	bool unproject(vec3 pointInWindow,
 		const mat4 &modelViewMatrix,
@@ -1235,14 +1332,12 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 			return false;
 		}
 
-		/*
-		if (!inverse_alternative(modelViewProjection_inverse, &modelViewProjection_inverse))
-			return false;
-		*/
-		/* Map x and y from window coordinates */
+		//if (!inverse_alternative(modelViewProjection_inverse, &modelViewProjection_inverse))
+			//return false;
+		// Map x and y from window coordinates
 		pointInWindow.x = (pointInWindow.x - float(viewportX)) / float(viewportW);
 		pointInWindow.y = (pointInWindow.y - float(viewportY)) / float(viewportH);
-		/* Map to range -1 to 1 */
+		// Map to range -1 to 1
 		pointInWindow = pointInWindow * 2.0f - 1.0f;
 		vec4 position_homogeneos = modelViewProjection_inverse * vec4(pointInWindow, 1);
 		if (position_homogeneos.w == 0.0)
@@ -1250,6 +1345,7 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 		*worldPtn = toVec3_PerspDiv(position_homogeneos);
 		return true;
 	}
+*/
 	//------------------------------------------------------------------------------
 	/*
 	bool GL_unproject(const vec3 &pointInWindow,
@@ -1271,6 +1367,7 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 
 	//------------------------------------------------------------------------------
 	// retorna false se a matriz final é singular e n pode ser invertida
+    /*
 	bool project(vec3 worldPtn,
 		const mat4 &modelViewMatrix,
 		const mat4 &projectionMatrix,
@@ -1281,14 +1378,15 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 		if (position_homogeneos.w == 0.0)
 			return false;
 		vec3 result = toVec3_PerspDiv(position_homogeneos);
-		/* Map x, y and z to range 0-1 */
+		// Map x, y and z to range 0-1
 		result = result * 0.5f + 0.5f;
-		/* Map x,y to viewport */
+		// Map x,y to viewport
 		result.x = result.x*float(viewportW) + float(viewportX);
 		result.y = result.y*float(viewportH) + float(viewportY);
 		*pointInWindow = result;
 		return true;
 	}
+     */
 	//------------------------------------------------------------------------------
 	/*
 	bool GL_project(const vec3 &worldPtn,
@@ -1317,6 +1415,7 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 	//namespace quaternionOperations{
 
 		//------------------------------------------------------------------------------
+    /*
 	quat toQuat(const vec3& vp) {
 		vec3 v = normalize(vp);
 		const float t = 1.0f - (v.x*v.x) - (v.y*v.y) - (v.z*v.z);
@@ -1326,7 +1425,9 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 		else
 			return quat(v.x, v.y, v.z, sqrt(t));
 	}
+    */
 	//------------------------------------------------------------------------------
+    /*
 	quat normalize(const quat& q) {
 		quat result = q;
 		const float TOLERANCE = 1e-6f;
@@ -1341,74 +1442,44 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 			result.z = q.z * magInv;
 		}
 
-		/*
-		float qmagsq = q.w * q.w + q.x * q.x + q.y * q.y + q.z * q.z;
-		if (std::abs(1.0f - qmagsq) < TOLERANCE) {
-			float invMag = 2.0f / (1.0f + qmagsq);
-			result.w = q.w * invMag;
-			result.x = q.x * invMag;
-			result.y = q.y * invMag;
-			result.z = q.z * invMag;
-		} else {
-			float invMag = 1.0f / sqrt(qmagsq);
-			result.w = q.w * invMag;
-			result.x = q.x * invMag;
-			result.y = q.y * invMag;
-			result.z = q.z * invMag;
-		}
-		*/
+		
+		//float qmagsq = q.w * q.w + q.x * q.x + q.y * q.y + q.z * q.z;
+		//if (std::abs(1.0f - qmagsq) < TOLERANCE) {
+			//float invMag = 2.0f / (1.0f + qmagsq);
+			//result.w = q.w * invMag;
+			//result.x = q.x * invMag;
+			//result.y = q.y * invMag;
+			//result.z = q.z * invMag;
+		//} else {
+			//float invMag = 1.0f / sqrt(qmagsq);
+			//result.w = q.w * invMag;
+			//result.x = q.x * invMag;
+			//result.y = q.y * invMag;
+			//result.z = q.z * invMag;
+		//}
+		
 
 		return result;
 	}
+*/
 	//------------------------------------------------------------------------------
+    /*
 	float sqrLength(const quat& q) {
 		return q.w * q.w + q.x * q.x + q.y * q.y + q.z * q.z;
 	}
+    */
 	//------------------------------------------------------------------------------
+    /*
 	float length(const quat& q) {
 		return sqrt(q.w * q.w + q.x * q.x + q.y * q.y + q.z * q.z);
 	}
+    */
 	//------------------------------------------------------------------------------
 	// Performs a spherical interpolation between two quaternions
 	// Implementation adopted from the gmtl project.
+    /*
 	quat slerp(const quat& a, const quat& b, const float lerp) {
-		/*
-		if (lerp <= 0.0f) return a;
-		if (lerp >= 1.0f) return b;
-
-		// calc cosine theta
-		float cosom = a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w;
-
-		// adjust signs (if necessary)
-		quat end = b;
-		if (cosom < 0.0f) {
-			cosom = -cosom;
-			end.x = -end.x;   // Reverse all signs
-			end.y = -end.y;
-			end.z = -end.z;
-			end.w = -end.w;
-		}
-
-		// Calculate coefficients
-		float sclp, sclq;
-		if ((1.0f - cosom) > 0.0001f) { // 0.0001 -> some epsillon
-			// Standard case (slerp)
-			float omega, sinom;
-			omega = acos(cosom); // extract theta from dot product's cos theta
-			sinom = sin(omega);
-			sclp = sin((1.0f - lerp) * omega) / sinom;
-			sclq = sin(lerp * omega) / sinom;
-		}
-		else {
-			// Very close, do linear interp (because it's faster)
-			sclp = 1.0f - lerp;
-			sclq = lerp;
-		}
-		return quat(sclp * a.x + sclq * end.x,
-			sclp * a.y + sclq * end.y,
-			sclp * a.z + sclq * end.z,
-			sclp * a.w + sclq * end.w);
-		*/
+		
 		//
 		// https://github.com/g-truc/glm
 		//
@@ -1452,6 +1523,8 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 		)
 		;
 	}
+    
+    */
 	//------------------------------------------------------------------------------
 	/*
 	// Multiplying q1 with q2 applies the rotation q2 to q1
@@ -1477,6 +1550,7 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 	}
 	*/
 	//------------------------------------------------------------------------------
+    /*
 	quat quatFromAxisAngle(const vec3& axis, const float angle_rad) {
 		float sinAngle;
 		float angle = angle_rad * 0.5f;
@@ -1487,7 +1561,9 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 			(vn.z * sinAngle),
 			cos(angle));
 	}
+    */
 	//------------------------------------------------------------------------------
+    /*
 	quat quatFromEuler(float roll, float pitch, float yaw) {
 
 		pitch *= 0.5f;
@@ -1511,19 +1587,21 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 			cosRoll * cosPitchCosYaw + sinRoll * sinPitchSinYaw
 		);
 
-		/*
-		return
-			quatFromAxisAngle(vec3(0.0, 0.0, 1.0), yaw) *
-			quatFromAxisAngle(vec3(0.0, 1.0, 0.0), pitch) *
-			quatFromAxisAngle(vec3(1.0, 0.0, 0.0), roll);
-		*/
+		//return
+			//quatFromAxisAngle(vec3(0.0, 0.0, 1.0), yaw) *
+			//quatFromAxisAngle(vec3(0.0, 1.0, 0.0), pitch) *
+			//quatFromAxisAngle(vec3(1.0, 0.0, 0.0), roll);
 
 	}
+*/
 	//------------------------------------------------------------------------------
+    /*
 	quat conjugate(const quat& a) {
 		return quat(-a.x, -a.y, -a.z, a.w);
 	}
+    */
 	//------------------------------------------------------------------------------
+    /*
 	quat extractQuat(const mat4& mp) {
         mat4 m = mp;
 
@@ -1567,7 +1645,9 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 				(m._21 - m._12) / s);
 		}
 	}
+     */
 	//------------------------------------------------------------------------------
+    /*
 	mat4 toMat4(const quat& q) {
 		float x2 = q.x * q.x;
 		float y2 = q.y * q.y;
@@ -1588,7 +1668,9 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 			0.0f, 0.0f, 0.0f, 1.0f);
 
 	}
+     */
 	//------------------------------------------------------------------------------
+    /*
 	void extractAxisAngle(const quat& q, vec3 *axis, float *angle) {
 		float scale = sqrt(q.x * q.x + q.y * q.y + q.z * q.z);
 		axis->x = q.x / scale;
@@ -1596,6 +1678,7 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 		axis->z = q.z / scale;
 		*angle = acos(clamp(q.w,-1.0f,1.0f)) * 2.0f;
 	}
+     */
 	//------------------------------------------------------------------------------
 
 	/*
@@ -1745,7 +1828,7 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 
 	//all algorithms failed to extract the euler angles...
 
-	void extractEuler(quat q, float *roll, float *pitch, float *yaw) {
+//	void extractEuler(quat q, float *roll, float *pitch, float *yaw) {
 
 		/*
 		float x2 = q.x * q.x;
@@ -1798,7 +1881,7 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 
 
 		// can't find an algorithm that works... so use the mat4 to get the euler angles...
-		extractEuler(toMat4(q), roll, pitch, yaw);
+		//extractEuler(toMat4(q), roll, pitch, yaw);
 
 		/*
 		// http://bediyap.com/programming/convert-quaternion-to-euler-rotations/ - Doesn't work
@@ -1883,10 +1966,10 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 
 		//*/
 
-	}
+	//}
 	//------------------------------------------------------------------------------
-	quat inv(const quat &q) {
-		return conjugate(q);
+	//quat inv(const quat &q) {
+		//return conjugate(q);
 		/*
 		quat result;
 		const float TOLERANCE = 1e-6f;
@@ -1901,32 +1984,36 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 		}
 		return result;
 		*/
-	}
+	//}
 	//------------------------------------------------------------------------------
+    /*
 	float dot(const quat& a, const quat& b) {
 		return a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w;
 	}
+     */
 
+    /*
 	float angleBetween(const quat& a, const quat& b) {
 		return acos(
                     clamp(dot(normalize(a), normalize(b)),-1.0f,1.0f)
                     ) * 2.0f;
 		//return acos( dot(normalize(vec3(a.x, a.y, a.z)), normalize(vec3(b.x, b.y, b.z))) );
 	}
+     */
 
 
 
 
 	//------------------------------------------------------------------------------
 
-	float move(float current, float target, float maxDistanceVariation) {
-		const float EPSILON = 1e-6f;
-		float deltaDistance = distance(current, target);
-		if (deltaDistance < maxDistanceVariation + EPSILON)
-			return target;
-		return lerp(current, target, maxDistanceVariation / deltaDistance);
-	}
-
+	//float move(float current, float target, float maxDistanceVariation) {
+		//const float EPSILON = 1e-6f;
+		//float deltaDistance = distance(current, target);
+		//if (deltaDistance < maxDistanceVariation + EPSILON)
+			//return target;
+		//return lerp(current, target, maxDistanceVariation / deltaDistance);
+	//}
+/*
 	vec2 move(const vec2 &current, const vec2 &target, float maxDistanceVariation) {
 		const float EPSILON = 1e-6f;
 		float deltaDistance = distance(current, target);
@@ -1934,7 +2021,8 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 			return target;
 		return lerp(current, target, maxDistanceVariation / deltaDistance);
 	}
-
+ */
+/*
 	vec3 move(const vec3 &current, const vec3 &target, float maxDistanceVariation) {
 		const float EPSILON = 1e-6f;
 		float deltaDistance = distance(current, target);
@@ -1942,7 +2030,8 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 			return target;
 		return lerp(current, target, maxDistanceVariation / deltaDistance);
 	}
-
+ */
+/*
 	vec4 move(const vec4 &current, const vec4 &target, float maxDistanceVariation) {
 		const float EPSILON = 1e-6f;
 		float deltaDistance = distance(current, target);
@@ -1950,8 +2039,9 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 			return target;
 		return lerp(current, target, maxDistanceVariation / deltaDistance);
 	}
+ */
 
-
+/*
 	vec3 moveSlerp(const vec3 &currentParam, const vec3 &target, float maxAngleVariation) {
         vec3 current = currentParam;
 		//const float EPSILON = 1e-6f;
@@ -1977,7 +2067,8 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 
 		return result;
 	}
-
+ */
+/*
 	quat moveSlerp(const quat &currentParam, const quat &target, float maxAngleVariation) {
         quat current = currentParam;
 
@@ -1995,5 +2086,6 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 
 		return slerp(current, target, maxAngleVariation / deltaAngle);
 	}
+ */
 
 }

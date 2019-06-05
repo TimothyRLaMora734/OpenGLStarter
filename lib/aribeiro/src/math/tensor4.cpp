@@ -5,6 +5,7 @@
 
 namespace aRibeiro{
 
+    /*
 tensor4::tensor4(){
     _11=_12=_13=_14=_21=_22=_23=_24=
     _31=_32=_33=_34=_41=_42=_43=_44= 0;
@@ -105,5 +106,5 @@ bool tensor4::operator!=(const tensor4&v) const {
     return !((*this) == v);
 	//return memcmp(array, v.array, sizeof(float) * 16) != 0;
 }
-
+*/
 }

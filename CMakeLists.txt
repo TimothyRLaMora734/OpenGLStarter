@@ -63,6 +63,23 @@ else()
 	  endif()
 	elseif(APPLE)
 	  set( OS_TARGET mac )
+
+	
+		if( NOT CMAKE_BUILD_TYPE )
+			set( CMAKE_BUILD_TYPE Release CACHE STRING
+						"Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel."
+						FORCE )
+			set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS None Debug Release RelWithDebInfo MinSizeRel)
+		endif()
+
+        if (${CMAKE_BUILD_TYPE} STREQUAL "Release" )
+
+            add_definitions(-O3 -DNDEBUG)
+        endif()
+
+        #--whole-archive -all_load compile hidden constructors...
+        SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -all_load")
+
 	else()
 
       include(CheckIncludeFile)
@@ -103,6 +120,18 @@ endif()
 #
 # Global settings
 #
+if( ${ARCH_TARGET} STREQUAL "x86" OR ${ARCH_TARGET} STREQUAL "x64" )
+    set( ARIBEIRO_SSE2 ON CACHE BOOL
+    "Turn on SSE2 optimizations."
+    )
+
+    if (ARIBEIRO_SSE2)
+        message(STATUS "USING SSE2!!!")
+        add_definitions(-DARIBEIRO_SSE2 -mmmx -msse -msse2 -mfpmath=sse -minline-all-stringops -finline-functions)
+        SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -v")
+    endif()
+endif()
+
 
 message( STATUS "TARGET SYSTEM: " ${OS_TARGET}/${ARCH_TARGET}  )
 
@@ -297,6 +326,8 @@ add_subdirectory( projects/post-processing-power-of-two )
 add_subdirectory( projects/collision )
 add_subdirectory( projects/puc2019 )
 add_subdirectory( projects/raytracer )
+#add_subdirectory( projects/boid_template )
+#add_subdirectory( projects/puc-estudo-dirigido )
 
 #
 # Tools

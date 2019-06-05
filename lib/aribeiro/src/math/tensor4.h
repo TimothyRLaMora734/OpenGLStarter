@@ -4,7 +4,7 @@
 #include <aribeiro/common.h>
 
 namespace aRibeiro {
-
+/*
 class mat4;
 
 /// \brief Tensor with 4x4 components
@@ -163,7 +163,7 @@ class ARIBEIRO_API tensor4{
 	bool operator!=(const tensor4&v) const;
 };
 //------------------------------------------------------------------------------
-
+*/
 }
 
 #endif

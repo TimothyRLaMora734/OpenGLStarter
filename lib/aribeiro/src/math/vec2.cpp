@@ -1,9 +1,16 @@
 #include "vec2.h"
 #include "all_math.h"
-#include <string.h>
 
 namespace aRibeiro{
 
+#if defined(ARIBEIRO_SSE2)
+    
+    const __m128 _vec2_zero_sse = _mm_set1_ps(0.0f);
+    const __m128 _vec2_sign_mask = _mm_set1_ps(-0.f); // -0.f = 1 << 31
+    
+#endif
+    
+    /*
 vec2::vec2(){
     x = y = 0.0f;
 }
@@ -94,4 +101,5 @@ float vec2::operator[](const int v)const {
 	return array[v];
 }
 
+     */
 }

@@ -2,10 +2,23 @@
 #define vec4_h
 
 #include <aribeiro/common.h>
+#include <aribeiro/vec3.h>
+#include <aribeiro/SSE2.h>
+#include <aribeiro/floatOPs.h>
+
 
 namespace aRibeiro{
 
 class vec3;
+    
+#if defined(ARIBEIRO_SSE2)
+    
+    extern const __m128 _vec4_zero_sse;
+    extern const __m128 _vec4_sign_mask; // -0.f = 1 << 31
+    
+#pragma pack(push, 16)
+#endif
+    
 
 /// \brief Homogeneous 3D (vec4)
 ///
@@ -16,16 +29,33 @@ class vec3;
 class ARIBEIRO_API vec4{
     public:
     union {
-        float array[4];///<The 4D low level array representation to pass the vector as pointer parameter
-        struct{ float x,y,z,w; };///<Components X, Y, Z and W to be used by the application
-        struct{ float r,g,b,a; };///<Components R, G, B and a to be used by the application
-    };
+        float array[4] ARIBEIRO_FORCE_SSE2_ALIGN;///<The 4D low level array representation to pass the vector as pointer parameter
+        struct{ float x,y,z,w; } ARIBEIRO_FORCE_SSE2_ALIGN;///<Components X, Y, Z and W to be used by the application
+        struct{ float r,g,b,a; } ARIBEIRO_FORCE_SSE2_ALIGN;///<Components R, G, B and a to be used by the application
+#if defined(ARIBEIRO_SSE2)
+        __m128 array_sse ARIBEIRO_FORCE_SSE2_ALIGN;
+#endif
+    }ARIBEIRO_FORCE_SSE2_ALIGN;
+    
+#if defined(ARIBEIRO_SSE2)
+    //special SSE2 constructor
+    ARIBEIRO_INLINE vec4( const __m128 &v ){
+        array_sse = v;
+    }
+#endif
+    
     /// \brief Construct a ZERO vec4 class
     ///
     /// The ZERO vec4 class have the point information in the origin as a vector (x=0,y=0,z=0,w=0)
     /// \author Alessandro Ribeiro
     ///
-    vec4();
+    ARIBEIRO_INLINE vec4(){
+#if defined(ARIBEIRO_SSE2)
+        array_sse = _vec4_zero_sse;
+#else
+        x = y = z = w = 0.0f;
+#endif
+    }
     /// \brief Constructs a tridimensional Vector with homogeneous component
     ///
     /// Initialize the vec3 components with the same float value
@@ -35,7 +65,13 @@ class ARIBEIRO_API vec4{
     /// \author Alessandro Ribeiro
     /// \param v Value to initialize the components
     ///
-    vec4( const float v );
+    ARIBEIRO_INLINE vec4( const float &v ){
+#if defined(ARIBEIRO_SSE2)
+        array_sse = _mm_set1_ps(v);
+#else
+        x = y = z = w = v;
+#endif
+    }
     /// \brief Constructs a tridimensional Vector with homogeneous component
     ///
     /// Initialize the vec4 components from the parameters
@@ -46,7 +82,17 @@ class ARIBEIRO_API vec4{
     /// \param z Value to assign to the Z component of the vector
     /// \param w Value to assign to the W component of the vector
     ///
-    vec4( const float x, const float y, const float z, const float w );
+    ARIBEIRO_INLINE vec4( const float &x, const float &y, const float &z, const float &w ){
+#if defined(ARIBEIRO_SSE2)
+        array_sse = (__m128){ x, y, z, w };
+#else
+        this->x = x;
+        this->y = y;
+        this->z = z;
+        this->w = w;
+#endif
+    }
+    
     /// \brief Constructs a tridimensional Vector with homogeneous component
     ///
     /// Initialize the vec4 components from a vec3 xyz and an isolated w value
@@ -62,7 +108,16 @@ class ARIBEIRO_API vec4{
     /// \param xyz Vector 3D to assign to the components x, y and Z of the instance respectively
     /// \param w Value to assign to the component w of the instance
     ///
-    vec4( const vec3 &xyz , float w);
+    ARIBEIRO_INLINE vec4( const vec3 &xyz , const float &w){
+#if defined(ARIBEIRO_SSE2)
+        array_sse = (__m128){ xyz.x, xyz.y, xyz.z, w };
+#else
+        x = xyz.x;
+        y = xyz.y;
+        z = xyz.z;
+        this->w = w;
+#endif
+    }
     /// \brief Constructs a tridimensional Vector with homogeneous component
     ///
     /// Initialize the vec4 components from an isolated x value and a vec3 yzw
@@ -74,7 +129,16 @@ class ARIBEIRO_API vec4{
     /// \param x Value to assign to the component x of the instance
     /// \param yzw Vector 3D to assign to the components y, z and w of the instance respectively
     ///
-    vec4( float x, const vec3 &yzw);
+    ARIBEIRO_INLINE vec4( const float &x, const vec3 &yzw){
+#if defined(ARIBEIRO_SSE2)
+        array_sse = (__m128){ x, yzw.x, yzw.y, yzw.z };
+#else
+        this->x = x;
+        y = yzw.x;
+        z = yzw.y;
+        w = yzw.z;
+#endif
+    }
     /// \brief Constructs a tridimensional Vector with homogeneous component
     ///
     /// Initialize the vec4 components from other vec4 instance
@@ -82,7 +146,13 @@ class ARIBEIRO_API vec4{
     /// \author Alessandro Ribeiro
     /// \param v Vector to assign to the instance
     ///
-    vec4( const vec4 &v );
+    ARIBEIRO_INLINE vec4( const vec4 &v ){
+#if defined(ARIBEIRO_SSE2)
+        array_sse = v.array_sse;
+#else
+        *this = v;
+#endif
+    }
     /// \brief Constructs a tridimensional Vector with homogeneous component from the subtraction b-a
     ///
     /// Initialize the vec4 components from two other vectors using the equation: <br />
@@ -94,7 +164,16 @@ class ARIBEIRO_API vec4{
     /// \param a Orign point
     /// \param b Destiny point
     ///
-    vec4( const vec4 &a, const vec4 &b );
+    ARIBEIRO_INLINE vec4( const vec4 &a, const vec4 &b ){
+#if defined(ARIBEIRO_SSE2)
+        array_sse = _mm_sub_ps(a.array_sse, b.array_sse);
+#else
+        x = b.x - a.x;
+        y = b.y - a.y;
+        z = b.z - a.z;
+        w = b.w - a.w;
+#endif
+    }
     /// \brief Binary comparison of vectors
     ///
     /// Compare two vectors using memcmp to see if they are the same.
@@ -103,8 +182,38 @@ class ARIBEIRO_API vec4{
     /// \param v Vector to compare against
     /// \return true if the bits of this is the same of v, otherwise false.
     ///
-    bool operator==(const vec4&v) const ;
-	bool operator!=(const vec4&v) const;
+    ARIBEIRO_INLINE bool operator==(const vec4&v) const {
+#if defined(ARIBEIRO_SSE2)
+        
+        __m128 diff_abs = _mm_sub_ps(array_sse, v.array_sse);
+        //abs
+        diff_abs = _mm_andnot_ps(_vec4_sign_mask, diff_abs);
+        
+        //static const __m128 epsilon = _mm_set1_ps(1e-4f); // -0.f = 1 << 31
+        //_mm_shuffle_ps(mul0, mul0, _MM_SHUFFLE(2, 3, 0, 1));
+        
+        for(int i=0;i<4;i++){
+            if (diff_abs[i] > 1e-4f)
+                return false;
+        }
+        
+        return true;
+        
+#else
+        for(int i=0;i<4;i++){
+            if (absv(array[i]-v.array[i]) > 1e-4f)
+                return false;
+        }
+        return true;
+        //return memcmp(array, v.array, sizeof(float) * 4) == 0;
+#endif
+    }
+    
+    ARIBEIRO_INLINE bool operator!=(const vec4&v) const{
+        return !((*this) == v);
+        //return memcmp(array, v.array, sizeof(float) * 4) != 0;
+    }
+    
     /// \brief Component-wise increment operator overload
     ///
     /// Increment the vector by the components of another vector
@@ -113,7 +222,17 @@ class ARIBEIRO_API vec4{
     /// \param v Vector to increment the current vector instance
     /// \return A reference to the current instance after the increment
     ///
-    vec4& operator+=(const vec4& v);
+    ARIBEIRO_INLINE vec4& operator+=(const vec4& v){
+#if defined(ARIBEIRO_SSE2)
+        array_sse = _mm_add_ps(array_sse, v.array_sse);
+#else
+        x+=v.x;
+        y+=v.y;
+        z+=v.z;
+        w+=v.w;
+#endif
+        return (*this);
+    }
     /// \brief Component-wise decrement operator overload
     ///
     /// Decrement the vector by the components of another vector
@@ -122,7 +241,18 @@ class ARIBEIRO_API vec4{
     /// \param v Vector to decrement the current vector instance
     /// \return A reference to the current instance after the decrement
     ///
-    vec4& operator-=(const vec4& v);
+    ARIBEIRO_INLINE vec4& operator-=(const vec4& v){
+#if defined(ARIBEIRO_SSE2)
+        array_sse = _mm_sub_ps(array_sse, v.array_sse);
+#else
+        x-=v.x;
+        y-=v.y;
+        z-=v.z;
+        w-=v.w;
+#endif
+        return (*this);
+    }
+    
     /// \brief Component-wise minus operator overload
     ///
     /// Negates the vector components with the operator minus
@@ -130,7 +260,13 @@ class ARIBEIRO_API vec4{
     /// \author Alessandro Ribeiro
     /// \return A copy of the current instance after the negation operation
     ///
-    vec4 operator-() const;
+    ARIBEIRO_INLINE vec4 operator-() const{
+#if defined(ARIBEIRO_SSE2)
+        return _mm_xor_ps(_vec4_sign_mask, array_sse);
+#else
+        return vec4(-x,-y,-z,-w);
+#endif
+    }
     /// \brief Component-wise multiply operator overload
     ///
     /// Multiply the vector by the components of another vector
@@ -139,7 +275,18 @@ class ARIBEIRO_API vec4{
     /// \param v Vector to multiply the current vector instance
     /// \return A reference to the current instance after the multiplication
     ///
-    vec4& operator*=(const vec4& v);
+    ARIBEIRO_INLINE vec4& operator*=(const vec4& v){
+#if defined(ARIBEIRO_SSE2)
+        array_sse = _mm_mul_ps(array_sse, v.array_sse);
+#else
+        x*=v.x;
+        y*=v.y;
+        z*=v.z;
+        w*=v.w;
+#endif
+        return (*this);
+
+    }
     /// \brief Component-wise division operator overload
     ///
     /// Divides the vector by the components of another vector
@@ -148,7 +295,18 @@ class ARIBEIRO_API vec4{
     /// \param v Vector to divide the current vector instance
     /// \return A reference to the current instance after the division
     ///
-    vec4& operator/=(const vec4& v);
+    ARIBEIRO_INLINE vec4& operator/=(const vec4& v){
+#if defined(ARIBEIRO_SSE2)
+        array_sse = _mm_div_ps(array_sse, v.array_sse);
+#else
+        x/=v.x;
+        y/=v.y;
+        z/=v.z;
+        w/=v.w;
+#endif
+        return (*this);
+    }
+    
     /// \brief Single value increment operator overload
     ///
     /// Increment the vector components by a single value
@@ -157,7 +315,18 @@ class ARIBEIRO_API vec4{
     /// \param v Value to increment all components of the current vector instance
     /// \return A reference to the current instance after the increment
     ///
-    vec4& operator+=(const float v);
+    ARIBEIRO_INLINE vec4& operator+=(const float &v){
+#if defined(ARIBEIRO_SSE2)
+        array_sse = _mm_add_ps(array_sse, _mm_set1_ps(v));
+#else
+        x+=v;
+        y+=v;
+        z+=v;
+        w+=v;
+#endif
+        return (*this);
+    }
+    
     /// \brief Single value decrement operator overload
     ///
     /// Decrement the vector components by a single value
@@ -166,7 +335,17 @@ class ARIBEIRO_API vec4{
     /// \param v Value to decrement all components of the current vector instance
     /// \return A reference to the current instance after the decrement
     ///
-    vec4& operator-=(const float v);
+    ARIBEIRO_INLINE vec4& operator-=(const float &v){
+#if defined(ARIBEIRO_SSE2)
+        array_sse = _mm_sub_ps(array_sse, _mm_set1_ps(v));
+#else
+        x-=v;
+        y-=v;
+        z-=v;
+        w-=v;
+#endif
+        return (*this);
+    }
     /// \brief Single value multiply operator overload
     ///
     /// Decrement the vector components by a single value
@@ -175,7 +354,17 @@ class ARIBEIRO_API vec4{
     /// \param v Value to decrement all components of the current vector instance
     /// \return A reference to the current instance after the decrement
     ///
-    vec4& operator*=(const float v);
+    ARIBEIRO_INLINE vec4& operator*=(const float &v){
+#if defined(ARIBEIRO_SSE2)
+        array_sse = _mm_mul_ps(array_sse, _mm_set1_ps(v));
+#else
+        x*=v;
+        y*=v;
+        z*=v;
+        w*=v;
+#endif
+        return (*this);
+    }
     /// \brief Single value division operator overload
     ///
     /// Divides the vector components by a single value
@@ -184,17 +373,38 @@ class ARIBEIRO_API vec4{
     /// \param v Value to divide all components of the current vector instance
     /// \return A reference to the current instance after the division
     ///
-    vec4& operator/=(const float v);
+    ARIBEIRO_INLINE vec4& operator/=(const float &v){
+#if defined(ARIBEIRO_SSE2)
+        array_sse = _mm_div_ps(array_sse, _mm_set1_ps(v));
+#else
+        x/=v;
+        y/=v;
+        z/=v;
+        w/=v;
+#endif
+        return (*this);
+    }
     /// \brief Index the components of the vec4 as a C array
     ///
     /// \author Alessandro Ribeiro
     /// \param v The index of the components starting by 0
     /// \return A reference to the element at the index v
     ///
-    float& operator[](const int v);
-	float operator[](const int v)const;
+    ARIBEIRO_INLINE float& operator[](const int v){
+        return array[v];
+    }
+    
+    ARIBEIRO_INLINE float operator[](const int v)const{
+        return array[v];
+    }
 };
+    
+INLINE_OPERATION_IMPLEMENTATION(vec4)
 
+#if defined(ARIBEIRO_SSE2)
+#pragma pack(pop)
+#endif
+    
 }
 
 #endif

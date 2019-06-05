@@ -7,6 +7,8 @@ namespace aRibeiro {
 
 	class Random {
 
+        static bool initialized;
+        
 	public:
 
 		static void setSeed(long int v);
@@ -17,7 +19,7 @@ namespace aRibeiro {
 		static vec3 getVec3();
 		static vec4 getVec4();
 		static mat4 getMat4();
-		static tensor4 getTensor4();
+		//static tensor4 getTensor4();
 		static quat getQuat();
 
 	};

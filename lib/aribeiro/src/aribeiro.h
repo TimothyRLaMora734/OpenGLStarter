@@ -87,6 +87,8 @@
 #include <aribeiro/GLVertexBufferObject.h>
 #include <aribeiro/GLVertexArrayObject.h>
 
+#include <aribeiro/SSE2.h>
+
 
 
 #ifdef _WIN32
