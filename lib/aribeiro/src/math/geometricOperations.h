@@ -639,57 +639,35 @@ namespace aRibeiro {
     ///
     ARIBEIRO_INLINE quat operator^(const quat &a, const quat &b){
 #if defined(ARIBEIRO_SSE2)
-        __m128 t0 = __m128(_mm_shuffle_epi32 ( __m128i(a.array_sse), _MM_SHUFFLE (3, 3, 3, 3)) ); /* 1, 0.5 */
-        __m128 t1 = __m128(_mm_shuffle_epi32 (__m128i(b.array_sse), _MM_SHUFFLE (2, 3, 0, 1))); /* 1, 0.5 */
+        __m128 a0 = _mm_shuffle_ps(a.array_sse, a.array_sse, _MM_SHUFFLE(3,3,3,3));
+        __m128 b0 = _mm_shuffle_ps(b.array_sse, b.array_sse, _MM_SHUFFLE(3,2,1,0));
         
-        __m128 t3 = __m128(_mm_shuffle_epi32 (__m128i(a.array_sse), _MM_SHUFFLE (0, 0, 0, 0))); /* 1, 0.5 */
-        __m128 t4 = __m128(_mm_shuffle_epi32 (__m128i(b.array_sse), _MM_SHUFFLE (1, 0, 3, 2))); /* 1, 0.5 */
+        __m128 a1 = _mm_shuffle_ps(a.array_sse, a.array_sse, _MM_SHUFFLE(0,2,1,0));
+        __m128 b1 = _mm_shuffle_ps(b.array_sse, b.array_sse, _MM_SHUFFLE(0,3,3,3));
         
-        __m128 t5 = __m128(_mm_shuffle_epi32 (__m128i(a.array_sse), _MM_SHUFFLE (1, 1, 1, 1))); /* 1, 0.5 */
-        __m128 t6 = __m128(_mm_shuffle_epi32 (__m128i(b.array_sse), _MM_SHUFFLE (2, 0, 3, 1))); /* 1, 0.5 */
+        __m128 a2 = _mm_shuffle_ps(a.array_sse, a.array_sse, _MM_SHUFFLE(1,0,2,1));
+        __m128 b2 = _mm_shuffle_ps(b.array_sse, b.array_sse, _MM_SHUFFLE(1,1,0,2));
         
-        /* [d,d,d,d]*[z,w,x,y] = [dz,dw,dx,dy] */
-        __m128 m0 = _mm_mul_ps (t0, t1); /* 5/4, 1 */
+        __m128 a3 = _mm_shuffle_ps(a.array_sse, a.array_sse, _MM_SHUFFLE(2,1,0,2));
+        __m128 b3 = _mm_shuffle_ps(b.array_sse, b.array_sse, _MM_SHUFFLE(2,0,2,1));
         
-        /* [a,a,a,a]*[y,x,w,z] = [ay,ax,aw,az]*/
-        __m128 m1 = _mm_mul_ps (t3, t4); /* 5/4, 1 */
+        __m128 signMask0 = (__m128){1.0f,1.0f,1.0f,-1.0f};
         
-        /* [b,b,b,b]*[z,x,w,y] = [bz,bx,bw,by]*/
-        __m128 m2 = _mm_mul_ps (t5, t6); /* 5/4, 1 */
+        __m128 mul0 = _mm_mul_ps(a0, b0);
         
-        /* [c,c,c,c]*[w,z,x,y] = [cw,cz,cx,cy] */
-        __m128 t7 = __m128(_mm_shuffle_epi32 (__m128i(a.array_sse), _MM_SHUFFLE (2, 2, 2, 2))); /* 1, 0.5 */
-        __m128 t8 = __m128(_mm_shuffle_epi32 (__m128i(b.array_sse), _MM_SHUFFLE (3, 2, 0, 1))); /* 1, 0.5 */
+        __m128 mul1 = _mm_mul_ps(a1, b1);
+        mul1 = _mm_mul_ps(mul1, signMask0);
         
-        __m128 m3 = _mm_mul_ps (t7, t8); /* 5/4, 1 */
+        __m128 mul2 = _mm_mul_ps(a2, b2);
+        mul2 = _mm_mul_ps(mul2, signMask0);
         
-        /* 1 */
-        /* [dz,dw,dx,dy]+-[ay,ax,aw,az] = [dz+ay,dw-ax,dx+aw,dy-az] */
-        //__m128 e = _mm_addsub_ps (m0, m1); /* 3, 1 */
-        __m128 e = _mm_add_ps (m0, _mm_mul_ps(m1, (__m128){1.0f,-1.0f,1.0f,-1.0f} ) ); /* 3, 1 */
+        __m128 mul3 = _mm_mul_ps(a3, b3);
         
-        /* 2 */
-        /* [dx+aw,dz+ay,dy-az,dw-ax] */
-        e = __m128(_mm_shuffle_epi32 ( __m128i(e), _MM_SHUFFLE (1, 3, 0, 2))); /* 1, 0.5 */
+        __m128 add0 = _mm_add_ps(mul0, mul1);
+        add0 = _mm_add_ps(add0, mul2);
+        add0 = _mm_sub_ps(add0, mul3);
         
-        /* [dx+aw,dz+ay,dy-az,dw-ax]+-[bz,bx,bw,by] = [dx+aw+bz,dz+ay-bx,dy-az+bw,dw-ax-by]*/
-        //e = _mm_addsub_ps (e, m2); /* 3, 1 */
-        e = _mm_add_ps (e, _mm_mul_ps(m2, (__m128){1.0f,-1.0f,1.0f,-1.0f} ) ); /* 3, 1 */
-        
-        /* 2 */
-        /* [dz+ay-bx,dw-ax-by,dy-az+bw,dx+aw+bz] */
-        e = __m128(_mm_shuffle_epi32 ( __m128i(e), _MM_SHUFFLE (2, 0, 1, 3))); /* 1, 0.5 */
-        
-        /* [dz+ay-bx,dw-ax-by,dy-az+bw,dx+aw+bz]+-[cw,cz,cx,cy]
-         = [dz+ay-bx+cw,dw-ax-by-cz,dy-az+bw+cx,dx+aw+bz-cy] */
-        //e = _mm_addsub_ps (e, m3); /* 3, 1 */
-        e = _mm_add_ps (e, _mm_mul_ps(m3, (__m128){1.0f,-1.0f,1.0f,-1.0f} ) ); /* 3, 1 */
-        
-        /* 2 */
-        /* [dw-ax-by-cz,dz+ay-bx+cw,dy-az+bw+cx,dx+aw+bz-cy] */
-        e = __m128(_mm_shuffle_epi32 ( __m128i(e), _MM_SHUFFLE (2, 3, 1, 0)) ); /* 1, 0.5 */
-        
-        return e;
+        return add0;
 
 #else
         
