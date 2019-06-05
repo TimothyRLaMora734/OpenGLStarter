@@ -3358,6 +3358,104 @@ namespace aRibeiro {
     /// \return The mat4
     ///
     ARIBEIRO_INLINE mat4 toMat4(const quat& q){
+        
+#if defined(ARIBEIRO_SSE2)
+        
+        
+        __m128 x2y2z2 = _mm_mul_ps(q.array_sse, q.array_sse);
+        
+        __m128 op0 = _mm_shuffle_ps(q.array_sse, q.array_sse, _MM_SHUFFLE(0, 1, 0, 0));
+        __m128 op1 = _mm_shuffle_ps(q.array_sse, q.array_sse, _MM_SHUFFLE(0, 2, 2, 1));
+        
+        __m128 xy_xz_yz = _mm_mul_ps(op0, op1);
+        
+        __m128 wx_wy_wz = _mm_mul_ps( _mm_set1_ps(q.array_sse[3]) , q.array_sse);
+        
+        static const __m128 _2 = _mm_set1_ps(2.0f);
+        
+        
+        __m128 m0 =
+        _mm_mul_ps(_2,(__m128){
+           (x2y2z2[1] + x2y2z2[2]),
+           (xy_xz_yz[0] + wx_wy_wz[2]),
+           (xy_xz_yz[1] - wx_wy_wz[1]),
+           0
+        });
+        
+        m0[0] = 1.0f - m0[0];
+        
+        
+        __m128 m1 =
+        _mm_mul_ps(_2,(__m128){
+            (xy_xz_yz[0] - wx_wy_wz[2]),
+            (x2y2z2[0] + x2y2z2[2]),
+            (xy_xz_yz[2] + wx_wy_wz[0]),
+            0
+        });
+        m1[1] = 1.0f - m1[1];
+        
+        __m128 m2 =
+        _mm_mul_ps(_2,(__m128){
+            (xy_xz_yz[1] + wx_wy_wz[1]),
+            (xy_xz_yz[2] - wx_wy_wz[0]),
+            (x2y2z2[0] + x2y2z2[1]),
+            0
+        });
+        
+        m2[2] = 1.0f - m2[2];
+        
+        static const __m128 m3 = (__m128){0,0,0,1.0f};
+        
+        return mat4(m0,m1,m2,m3);
+        
+        
+        /*
+        
+        __m128 elm0 = _mm_shuffle_ps(q.array_sse, q.array_sse, _MM_SHUFFLE(0, 0, 0, 1));
+        __m128 elm1 = _mm_shuffle_ps(q.array_sse, q.array_sse, _MM_SHUFFLE(0, 2, 1, 1));
+        __m128 op0 = _mm_mul_ps(elm0, elm1);
+        elm0 = _mm_shuffle_ps(q.array_sse, q.array_sse, _MM_SHUFFLE(0, 3, 3, 2));
+        elm1 = _mm_shuffle_ps(q.array_sse, q.array_sse, _MM_SHUFFLE(0, 1, 2, 2));
+        __m128 op1 = _mm_mul_ps(elm0, elm1);
+        op1 = _mm_mul_ps((__m128){1.0f,1.0f,-1.0f,0.0f}, op1);
+        
+        __m128 m0_ = _mm_add_ps(op0, op1);
+        m0_ = _mm_mul_ps((__m128){-2.0f,2.0f,2.0f,0.0f}, m0_);
+        m0_[0] += 1.0f;
+        
+        
+        elm0 = _mm_shuffle_ps(q.array_sse, q.array_sse, _MM_SHUFFLE(0, 1, 0, 0));
+        elm1 = _mm_shuffle_ps(q.array_sse, q.array_sse, _MM_SHUFFLE(0, 2, 0, 1));
+        op0 = _mm_mul_ps(elm0, elm1);
+        elm0 = _mm_shuffle_ps(q.array_sse, q.array_sse, _MM_SHUFFLE(0, 3, 2, 3));
+        __m128 elm1_s = _mm_shuffle_ps(q.array_sse, q.array_sse, _MM_SHUFFLE(0, 0, 2, 2));
+        op1 = _mm_mul_ps(elm0, elm1_s);
+        op1 = _mm_mul_ps((__m128){-1.0f,1.0f,1.0f,0.0f}, op1);
+        
+        __m128 m1_ = _mm_add_ps(op0, op1);
+        m1_ = _mm_mul_ps((__m128){2.0f,-2.0f,2.0f,0.0f}, m1_);
+        m1_[1] += 1.0f;
+        
+        
+        elm0 = _mm_shuffle_ps(q.array_sse, q.array_sse, _MM_SHUFFLE(0, 0, 1, 0));
+        //elm1 = _mm_shuffle_ps(q.array_sse, q.array_sse, _MM_SHUFFLE(0, 0, 2, 2));
+        op0 = _mm_mul_ps(elm0, elm1_s);
+        elm0 = _mm_shuffle_ps(q.array_sse, q.array_sse, _MM_SHUFFLE(0, 1, 3, 3));
+        elm1 = _mm_shuffle_ps(q.array_sse, q.array_sse, _MM_SHUFFLE(0, 1, 0, 1));
+        op1 = _mm_mul_ps(elm0, elm1);
+        op1 = _mm_mul_ps((__m128){1.0f,-1.0f,1.0f,0.0f}, op1);
+        
+        __m128 m2_ = _mm_add_ps(op0, op1);
+        m2_ = _mm_mul_ps((__m128){2.0f,2.0f,-2.0f,0.0f}, m2_);
+        m2_[2] += 1.0f;
+        
+        __m128 m3_ = (__m128){0,0,0,1.0f};
+        
+        return mat4(m0_,m1_,m2_,m3_);
+        
+        */
+        
+        /*
         float x2 = q.x * q.x;
         float y2 = q.y * q.y;
         float z2 = q.z * q.z;
@@ -3368,6 +3466,36 @@ namespace aRibeiro {
         float wy = q.w * q.y;
         float wz = q.w * q.z;
         
+        __m128 m0 = (__m128){
+            1.0f - 2.0f * (y2 + z2),
+            2.0f * (xy + wz),
+            2.0f * (xz - wy),
+            0
+        };
+        
+        __m128 m1 = (__m128){
+            2.0f * (xy - wz),
+            1.0f - 2.0f * (x2 + z2),
+            2.0f * (yz + wx),
+            0
+        };
+        
+        __m128 m2 = (__m128){
+            2.0f * (xz + wy),
+            2.0f * (yz - wx),
+            1.0f - 2.0f * (x2 + y2),
+            0
+        };
+        
+        __m128 m3 = (__m128){0,0,0,1.0f};
+        
+        return mat4(m0,m1,m2,m3);
+         
+         */
+        
+#else
+        
+        
         // This calculation would be a lot more complicated for non-unit length quaternions
         // Note: The constructor of Matrix4 expects the Matrix in column-major format like expected by
         //   OpenGL
@@ -3375,6 +3503,7 @@ namespace aRibeiro {
                     2.0f * (xy + wz), 1.0f - 2.0f * (x2 + z2), 2.0f * (yz - wx), 0.0f,
                     2.0f * (xz - wy), 2.0f * (yz + wx), 1.0f - 2.0f * (x2 + y2), 0.0f,
                     0.0f, 0.0f, 0.0f, 1.0f);
+#endif
         
     }
     //------------------------------------------------------------------------------
