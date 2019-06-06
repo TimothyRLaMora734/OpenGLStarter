@@ -265,8 +265,8 @@ public:
 	}
 
 	static Object readFromFile(FileReader *inputFile,
-		std::vector<Pigment> *pigmentListRef,
-		std::vector<Finishing> *finishingListRef ) {
+		std::vector<Pigment, ssealign<Pigment, 16>> *pigmentListRef,
+		std::vector<Finishing, ssealign<Finishing, 16>> *finishingListRef ) {
 		Object result;
 
 		int pigmentIndex = inputFile->readInt();

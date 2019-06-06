@@ -137,9 +137,9 @@ if( ${ARCH_TARGET} STREQUAL "x86" OR ${ARCH_TARGET} STREQUAL "x64" )
         message(STATUS "USING SSE2!!!")
 
 		if(MSVC)
-			message(STATUS "there are issues when using SSE2 with Visual Studio... turning it off...")
+			message(STATUS "NOTICE: You are building the code for Visual Studio... the containers (vector, set, map, etc...) need to be aligned with ssealign<T,16>")
 
-			#add_definitions(-DARIBEIRO_SSE2 /arch:SSE2 )
+			add_definitions(-DARIBEIRO_SSE2 /arch:SSE2 )
 		else()
 			add_definitions(-DARIBEIRO_SSE2 -mmmx -msse -msse2 -mfpmath=sse -minline-all-stringops -finline-functions)
 		endif()

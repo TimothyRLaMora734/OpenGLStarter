@@ -7,6 +7,7 @@ using namespace aRibeiro;
 #include "FileReader.h"
 #include "RaytracerObjects.h"
 
+
 class Raytracer {
 
 	//
@@ -111,15 +112,15 @@ class Raytracer {
 	}
 
 public:
-
+	
 	//
 	// Scene definitions
 	//
 	Camera camera;
-	std::vector<Light> lights;
-	std::vector<Pigment> pigments;
-	std::vector<Finishing> finishing;
-	std::vector<Object> objects;
+	std::vector<Light, ssealign<Light, 16> > lights;
+	std::vector<Pigment, ssealign<Pigment, 16> > pigments;
+	std::vector<Finishing, ssealign<Finishing, 16> > finishing;
+	std::vector<Object, ssealign<Object, 16> > objects;
 	vec3 backgroundColor;
 
 	//
