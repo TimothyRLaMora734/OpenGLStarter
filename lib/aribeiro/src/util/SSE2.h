@@ -2,7 +2,9 @@
 #define SSE2__H
 
 #include <stdlib.h>
-#include <malloc.h>
+#include <stdio.h>
+#include <stddef.h>
+//#include <malloc.h>
 
 
 #if defined(ARIBEIRO_SSE2)
@@ -212,8 +214,8 @@
 	class ssealign {
 	public:
 		typedef T value_type;
-		typedef std::size_t size_type;
-		typedef std::ptrdiff_t difference_type;
+		typedef size_t size_type;
+		typedef ptrdiff_t difference_type;
 
 		typedef T * pointer;
 		typedef const T * const_pointer;
