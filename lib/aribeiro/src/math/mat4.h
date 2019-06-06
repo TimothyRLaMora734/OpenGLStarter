@@ -25,23 +25,23 @@ namespace aRibeiro {
 /// Matrix definition to work with rigid transformations
 /// \author Alessandro Ribeiro
 ///
-class ARIBEIRO_API mat4{
+_SSE2_ALIGN_PRE class ARIBEIRO_API mat4{
     public:
 
-    union {
-        struct{
+	_SSE2_ALIGN_PRE union {
+		_SSE2_ALIGN_PRE struct{
             float _11,_21,_31,_41,
                   _12,_22,_32,_42,
                   _13,_23,_33,_43,
                   _14,_24,_34,_44;
-        }ARIBEIRO_FORCE_SSE2_ALIGN;
-		struct {
+        }_SSE2_ALIGN_POS;
+		_SSE2_ALIGN_PRE struct {
 			float a1, a2, a3, a4,
 				  b1, b2, b3, b4,
 				  c1, c2, c3, c4,
 				  d1, d2, d3, d4;
-		}ARIBEIRO_FORCE_SSE2_ALIGN;
-        float array[16]ARIBEIRO_FORCE_SSE2_ALIGN;
+		}_SSE2_ALIGN_POS;
+		_SSE2_ALIGN_PRE float array[16]_SSE2_ALIGN_POS;
         // column-major (OpenGL like matrix byte order)
         //  x  y  z  w
         //  0  4  8 12
@@ -49,9 +49,9 @@ class ARIBEIRO_API mat4{
         //  2  6 10 14
         //  3  7 11 15
 #if defined(ARIBEIRO_SSE2)
-        __m128 array_sse[4] ARIBEIRO_FORCE_SSE2_ALIGN;
+		_SSE2_ALIGN_PRE __m128 array_sse[4] _SSE2_ALIGN_POS;
 #endif
-    }ARIBEIRO_FORCE_SSE2_ALIGN;
+    }_SSE2_ALIGN_POS;
     
 #if defined(ARIBEIRO_SSE2)
     //special SSE2 constructor
@@ -113,10 +113,10 @@ class ARIBEIRO_API mat4{
          const float &a3,const float &b3,const float &c3,const float &d3,
          const float &a4,const float &b4,const float &c4,const float &d4){
 #if defined(ARIBEIRO_SSE2)
-        array_sse[0] = (__m128){ a1, a2, a3, a4 };//_mm_set_ps(a4, a1, a2, a3);
-        array_sse[1] = (__m128){ b1, b2, b3, b4 };
-        array_sse[2] = (__m128){ c1, c2, c3, c4 };
-        array_sse[3] = (__m128){ d1, d2, d3, d4 };
+        array_sse[0] = _mm_load_(a1, a2, a3, a4);//_mm_set_ps(a4, a1, a2, a3);
+        array_sse[1] = _mm_load_(b1, b2, b3, b4);
+        array_sse[2] = _mm_load_(c1, c2, c3, c4);
+        array_sse[3] = _mm_load_(d1, d2, d3, d4);
 #else
         _11=a1;_12=b1;_13=c1;_14=d1;
         _21=a2;_22=b2;_23=c2;_24=d2;
@@ -330,7 +330,7 @@ class ARIBEIRO_API mat4{
         //_mm_shuffle_ps(mul0, mul0, _MM_SHUFFLE(2, 3, 0, 1));
         for(int j=0;j<4;j++){
             for(int i=0;i<4;i++){
-                if (diff_abs[j][i] > 1e-4f)
+                if (_mm_f32_(diff_abs[j],i) > 1e-4f)
                     return false;
             }
         }

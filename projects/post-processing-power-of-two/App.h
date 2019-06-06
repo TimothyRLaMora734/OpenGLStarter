@@ -213,6 +213,8 @@ public:
             mouseTracker = pos;
         }
     }
+
+	SSE2_CLASS_NEW_OPERATOR
 };
 
 
@@ -293,6 +295,8 @@ public:
 		cursorPos = vec2(x, h - 1 - y);
         currentInterface->setMousePos(cursorPos);
 	}
+
+	SSE2_CLASS_NEW_OPERATOR
 
 };
 

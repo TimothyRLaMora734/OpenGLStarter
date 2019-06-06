@@ -12,7 +12,7 @@ namespace collision {
 	class AABB;
 
 	// this class dont hold the triangle positions, because it is thought to be used within vertex lists...
-	class Triangle {
+	_SSE2_ALIGN_PRE class Triangle {
 
 	public:
 		vec3 a, b, c;

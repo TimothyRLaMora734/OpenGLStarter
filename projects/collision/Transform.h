@@ -228,6 +228,9 @@ public:
 
 	Transform();
 	virtual ~Transform();
+
+	SSE2_CLASS_NEW_OPERATOR
+
 };
 
 

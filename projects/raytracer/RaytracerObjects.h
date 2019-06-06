@@ -312,8 +312,8 @@ public:
 
 	bool raycast(const collision::Ray &ray, float *outT, vec3 *outNormal) {
 		if (objectType == ObjectTypeSphere) {
-			float tAux;
 			vec3 normalAux;
+			float tAux;
 			//if (collision::Ray::raycastSphere(ray, objects[i].sphere, &tAux, &normalAux)) {
 			if (RayCastSphere(ray, sphere, &tAux, &normalAux)) {
 				*outT = tAux;
@@ -322,8 +322,8 @@ public:
 			}
 		}
 		else if (objectType == ObjectTypePlane) {
-			float tAux;
 			vec3 normalAux;
+			float tAux;
 			//if (collision::Ray::raycastPlane(ray, plane, &tAux, &normalAux)) {
 			if (RayCastPlane(ray, plane, &tAux, &normalAux)) {
 				*outT = tAux;

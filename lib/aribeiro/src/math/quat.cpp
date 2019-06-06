@@ -8,7 +8,7 @@ namespace aRibeiro{
     //const __m128 _vec4_zero_sse = _mm_set1_ps(0.0f);
     //const __m128 _vec4_sign_mask = _mm_set1_ps(-0.f); // -0.f = 1 << 31
     
-    const __m128 _quat_conjugate_mask = (__m128){-0.f,-0.f,-0.f,0.f}; // -0.f = 1 << 31
+    const __m128 _quat_conjugate_mask = _mm_load_(-0.f,-0.f,-0.f,0.f); // -0.f = 1 << 31
     
 #endif
     

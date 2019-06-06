@@ -26,7 +26,7 @@ class Frustum;
 /// It can be used to make collision tests
 /// \author Alessandro Ribeiro
 ///
-class ARIBEIRO_API AABB{
+_SSE2_ALIGN_PRE class ARIBEIRO_API AABB{
     public:
     vec3 min_box;///<Store the minimum values of the AABB Box
     vec3 max_box;///<Store the maximum values of the AABB Box

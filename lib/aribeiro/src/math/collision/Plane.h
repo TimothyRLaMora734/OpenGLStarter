@@ -12,7 +12,7 @@ namespace collision {
 	class LineSegment;
 	class AABB;
 
-	class Plane {
+	_SSE2_ALIGN_PRE class Plane {
 	public:
 		vec3 normal;
 		float distance;

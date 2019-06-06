@@ -59,6 +59,8 @@ namespace aRibeiro {
                              vec2 texelNeighbor,
                              vec2 texelMaxUVAccess,
                              vec2 drawQuadMaxUV);
+
+		SSE2_CLASS_NEW_OPERATOR
     };
 
 }

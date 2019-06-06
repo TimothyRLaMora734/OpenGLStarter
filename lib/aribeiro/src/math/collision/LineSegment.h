@@ -15,7 +15,7 @@ namespace collision {
 	class Triangle;
 
 
-	class LineSegment {
+	_SSE2_ALIGN_PRE class LineSegment {
 	public:
 		vec3 a, b;
 

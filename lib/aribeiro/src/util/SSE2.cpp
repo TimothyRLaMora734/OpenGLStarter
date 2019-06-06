@@ -2,7 +2,14 @@
 
 #if defined(ARIBEIRO_SSE2)
 
+#include <stdio.h>
+#include <stdlib.h> // exit
+
 #ifdef _MSC_VER //_WIN32
+
+	#define cpuid(info, x)    __cpuidex(info, x, 0)
+
+
 #else
 void cpuid(int info[4], int InfoType){
     __cpuid_count(InfoType, 0, info[0], info[1], info[2], info[3]);

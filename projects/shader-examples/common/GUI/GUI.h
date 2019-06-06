@@ -46,6 +46,8 @@ public:
 	int getID()const;
 	bool colide(const vec2 &point)const;
 	void render()const;
+
+	SSE2_CLASS_NEW_OPERATOR
 };
 #include <vector>
 class AABBMenuList {

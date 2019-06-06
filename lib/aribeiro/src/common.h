@@ -109,4 +109,7 @@ public:
 	#error This operating system is not supported by the library
 #endif
 
+
+#include <aribeiro/SSE2.h>
+
 #endif

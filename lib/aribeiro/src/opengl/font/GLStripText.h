@@ -11,11 +11,13 @@
 #include <aribeiro/Font.h>
 #include <aribeiro/GLTexture.h>
 #include <aribeiro/GLShaderFont.h>
+#include <aribeiro/SSE2.h>
 
 
 namespace aRibeiro {
 
-	struct StripInfoVertexAttrib {
+	class StripInfoVertexAttrib : public SSE2Object {
+	public:
 		vec4 mColor;
 		vec2 mCoord;
 		vec2 mPos;

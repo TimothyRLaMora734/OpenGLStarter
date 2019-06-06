@@ -45,6 +45,8 @@ public:
         
         OPENGL_CMD(glDisableVertexAttribArray(positionLayout));
     }
+
+	SSE2_CLASS_NEW_OPERATOR
 };
 
 class ComponentLinesVBO: public ComponentLines {

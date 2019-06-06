@@ -31,7 +31,7 @@ public:
 	virtual ~Interface();
 };
 
-class AABBitem {
+class AABBitem : public SSE2Object {
 	GLTexture *img;
 	vec2 position;
 	int ID;

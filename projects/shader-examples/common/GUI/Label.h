@@ -33,6 +33,8 @@ public:
 	virtual void setText(const char*text);
 	virtual void setPosition(const vec2 &p);
 	virtual void setAlign(const bool Vcentered, const bool Hcentered);
+
+	SSE2_CLASS_NEW_OPERATOR
 };
 
 

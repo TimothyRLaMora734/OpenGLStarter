@@ -164,6 +164,7 @@ public:
 
 	void setupShaderParametersAndDraw(GLint ogl_primitive, const VertexAttrib *buffer, int vertexCount);
 
+	SSE2_CLASS_NEW_OPERATOR
 };
 
 #endif

@@ -25,7 +25,7 @@ const char  *SCORE_BRANCH = "Score",
 const char  *VERSION_STRING = "May have some bugs\nBeta (RC 1.0)";
 
 #include <string>
-class ScoreMenu : public Interface {
+class ScoreMenu : public Interface, public SSE2Object {
 	GLTexture *cursor,
 		*backGrnd;
 	GLFont *font;
@@ -294,7 +294,7 @@ public:
 
 
 
-class MainOptions : public GUIGroup {
+class MainOptions : public GUIGroup, public SSE2Object {
 	GLTexture *cursor,
 		*backGrnd;
 	GLFont *font;
@@ -467,7 +467,7 @@ public:
 
 
 
-class MainMenu : public Interface {
+class MainMenu : public Interface, public SSE2Object {
 
 	//ListHelper listCommands;
 
@@ -660,7 +660,7 @@ public:
 
 
 
-class TetrisGame : public Interface {
+class TetrisGame : public Interface, public SSE2Object {
 	AlMultiSource whoosh,
 		plink,
 		crack,
@@ -867,7 +867,7 @@ public:
 };
 
 
-class Game //: public GameAbstraction
+class Game : public SSE2Object //: public GameAbstraction
 {
 	vec2 cursorPos,
 		dimension;

@@ -1,6 +1,9 @@
 #ifndef geometricOperations_h
 #define geometricOperations_h
 
+#include <limits>
+#include <stdio.h> 
+
 #include <aribeiro/common.h>
 #include <aribeiro/floatOPs.h>
 #include <aribeiro/mat4.h>
@@ -73,7 +76,7 @@ namespace aRibeiro {
     ///
     ARIBEIRO_INLINE vec3 toVec3_PerspDiv(const vec4 &v){
 #if defined(ARIBEIRO_SSE2)
-        return _mm_mul_ps(v.array_sse, _mm_set1_ps( 1.0f / v.array_sse[3] ));
+        return _mm_mul_ps(v.array_sse, _mm_set1_ps( 1.0f / _mm_f32_(v.array_sse,3) ));
 #else
         return vec3(v.x, v.y, v.z)*(1.0f / v.w);
 #endif
@@ -91,7 +94,7 @@ namespace aRibeiro {
     ARIBEIRO_INLINE vec4 toVec4(const vec3 &v){
 #if defined(ARIBEIRO_SSE2)
         __m128 result = v.array_sse;
-        result[3] = 0;
+		_mm_f32_(result,3) = 0;
         return result;
 #else
         return vec4(v.x, v.y, v.z, 0);
@@ -109,7 +112,7 @@ namespace aRibeiro {
     ARIBEIRO_INLINE vec4 toPtn4(const vec3 &v){
 #if defined(ARIBEIRO_SSE2)
         __m128 result = v.array_sse;
-        result[3] = 1.0f;
+		_mm_f32_(result,3) = 1.0f;
         return result;
 #else
         return vec4(v.x, v.y, v.z, 1);
@@ -294,7 +297,7 @@ namespace aRibeiro {
         __m128 swp0 = _mm_shuffle_ps(mul0, mul0, _MM_SHUFFLE(0, 0, 0, 1));
         //add0 = [0+1,1+0,2+0,3+3]
         __m128 add0 = _mm_add_ps(mul0, swp0);
-        return add0[0];
+        return _mm_f32_(add0,0);
 #else
         return (a.x * b.x + a.y * b.y);
 #endif
@@ -312,7 +315,7 @@ namespace aRibeiro {
     ///
     ARIBEIRO_INLINE float dot( const vec3& a, const vec3& b ){
 #if defined(ARIBEIRO_SSE2)
-        return dot_sse_3(a.array_sse, b.array_sse)[0];
+        return _mm_f32_(dot_sse_3(a.array_sse, b.array_sse),0);
 #else
         return (a.x * b.x + a.y * b.y + a.z * b.z);
 #endif
@@ -329,7 +332,7 @@ namespace aRibeiro {
     ///
     ARIBEIRO_INLINE float dot( const vec4& a, const vec4& b ){
 #if defined(ARIBEIRO_SSE2)
-        return dot_sse_4(a.array_sse, b.array_sse)[0];
+        return _mm_f32_(dot_sse_4(a.array_sse, b.array_sse),0);
 #else
         return (a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w);
 #endif
@@ -347,7 +350,7 @@ namespace aRibeiro {
     ///
     ARIBEIRO_INLINE float dot(const quat& a, const quat& b){
 #if defined(ARIBEIRO_SSE2)
-        return dot_sse_4(a.array_sse, b.array_sse)[0];
+        return _mm_f32_(dot_sse_4(a.array_sse, b.array_sse),0);
 #else
         return a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w;
 #endif
@@ -389,10 +392,10 @@ namespace aRibeiro {
 #if defined(ARIBEIRO_SSE2)
         __m128 mag2 = dot_sse_3(vec.array_sse, vec.array_sse);
         const float TOLERANCE = 1e-6f;
-        if (fabs(mag2[0]) > TOLERANCE && fabs(mag2[0] - 1.0f) > TOLERANCE)
+        if (fabs(_mm_f32_(mag2,0)) > TOLERANCE && fabs(_mm_f32_(mag2,0) - 1.0f) > TOLERANCE)
         {
             //_mm_rsqrt_ps low precision issues...
-            __m128 magInv = _mm_set1_ps(1.0f/sqrtf(mag2[0]));//_mm_rsqrt_ps( mag2 );
+            __m128 magInv = _mm_set1_ps(1.0f/sqrtf(_mm_f32_(mag2,0)));//_mm_rsqrt_ps( mag2 );
             return _mm_mul_ps( vec.array_sse, magInv );
         }
         return vec;
@@ -422,9 +425,9 @@ namespace aRibeiro {
 #if defined(ARIBEIRO_SSE2)
         __m128 mag2 = dot_sse_4(vec.array_sse, vec.array_sse);
         const float TOLERANCE = 1e-6f;
-        if (fabs(mag2[0]) > TOLERANCE && fabs(mag2[0] - 1.0f) > TOLERANCE){
+        if (fabs(_mm_f32_(mag2,0)) > TOLERANCE && fabs(_mm_f32_(mag2,0) - 1.0f) > TOLERANCE){
             //_mm_rsqrt_ps low precision issues...
-            __m128 magInv = _mm_set1_ps(1.0f/sqrtf(mag2[0]));//_mm_rsqrt_ps( mag2 );
+            __m128 magInv = _mm_set1_ps(1.0f/sqrtf(_mm_f32_(mag2,0)));//_mm_rsqrt_ps( mag2 );
             return _mm_mul_ps( vec.array_sse, magInv );
         }
         return vec;
@@ -651,7 +654,7 @@ namespace aRibeiro {
         __m128 a3 = _mm_shuffle_ps(a.array_sse, a.array_sse, _MM_SHUFFLE(2,1,0,2));
         __m128 b3 = _mm_shuffle_ps(b.array_sse, b.array_sse, _MM_SHUFFLE(2,0,2,1));
         
-        __m128 signMask0 = (__m128){1.0f,1.0f,1.0f,-1.0f};
+        static const __m128 signMask0 = _mm_load_(1.0f,1.0f,1.0f,-1.0f);
         
         __m128 mul0 = _mm_mul_ps(a0, b0);
         
@@ -725,7 +728,7 @@ namespace aRibeiro {
     ARIBEIRO_INLINE vec4 operator*(const quat &a, const vec4 &v){
 #if defined(ARIBEIRO_SSE2)
         quat result = a ^ quat(v.x, v.y, v.z, 0.0f) ^ conjugate(a);
-        result.array_sse[3] = v.w;
+		_mm_f32_(result.array_sse,3) = v.w;
         return result.array_sse;
 #else
         //quat result = mul(a, mul(quat(v.x, v.y, v.z, 0.0f), conjugate(a)));
@@ -875,7 +878,7 @@ namespace aRibeiro {
 #if defined(ARIBEIRO_SSE2)
         __m128 dot0 = dot_sse_3( normalize(a).array_sse, normalize(b).array_sse );
         __m128 cosA = clamp_sse_4(dot0, _mm_set1_ps(-1.0f), _mm_set1_ps(1.0f));
-        return acos(cosA[0]);
+        return acos(_mm_f32_(cosA,0));
 #else
         float cosA = clamp(dot(normalize(a), normalize(b)),-1.0f,1.0f);
         return acos(cosA);
@@ -895,7 +898,7 @@ namespace aRibeiro {
 #if defined(ARIBEIRO_SSE2)
         __m128 dot0 = dot_sse_4( normalize(a).array_sse, normalize(b).array_sse );
         __m128 cosA = clamp_sse_4(dot0, _mm_set1_ps(-1.0f), _mm_set1_ps(1.0f));
-        return acos(cosA[0]) * 2.0f;
+        return acos(_mm_f32_(cosA,0)) * 2.0f;
 #else
         return acos(
                     clamp(dot(normalize(a), normalize(b)),-1.0f,1.0f)
@@ -2117,10 +2120,10 @@ namespace aRibeiro {
     ARIBEIRO_INLINE mat4 extractRotation(const mat4& m){
 #if defined(ARIBEIRO_SSE2)
         mat4 r(m.array_sse[0],m.array_sse[1],m.array_sse[2],m.array_sse[3]);
-        r.array_sse[0][3] = 0;
-        r.array_sse[1][3] = 0;
-        r.array_sse[2][3] = 0;
-        r.array_sse[3][3] = 1;
+		_mm_f32_(r.array_sse[0],3) = 0;
+		_mm_f32_(r.array_sse[1],3) = 0;
+		_mm_f32_(r.array_sse[2],3) = 0;
+		_mm_f32_(r.array_sse[3],3) = 1;
         return r;
 #else
         return mat4(m._11, m._12, m._13, 0,
@@ -2140,7 +2143,7 @@ namespace aRibeiro {
 #if defined(ARIBEIRO_SSE2)
         return m.array_sse[0];
 #else
-        return vec3(m._a1, m._a2, m._a3);
+        return vec3(m.a1, m.a2, m.a3);
 #endif
     }
     /// \brief Extracts the Y axis from a matrix
@@ -2153,7 +2156,7 @@ namespace aRibeiro {
 #if defined(ARIBEIRO_SSE2)
         return m.array_sse[1];
 #else
-        return vec3(m._b1, m._b2, m._b3);
+        return vec3(m.b1, m.b2, m.b3);
 #endif
     }
     /// \brief Extracts the Z axis from a matrix
@@ -2166,7 +2169,7 @@ namespace aRibeiro {
 #if defined(ARIBEIRO_SSE2)
         return m.array_sse[2];
 #else
-        return vec3(m._c1, m._c2, m._c3);
+        return vec3(m.c1, m.c2, m.c3);
 #endif
     }
     /// \brief Extracts the Translation part of the matrix
@@ -2179,7 +2182,7 @@ namespace aRibeiro {
 #if defined(ARIBEIRO_SSE2)
         return m.array_sse[3];
 #else
-        return vec3(m._d1, m._d2, m._d3);
+        return vec3(m.d1, m.d2, m.d3);
 #endif
     }
     /// \brief Computes the transpose matrix
@@ -2588,10 +2591,10 @@ namespace aRibeiro {
     ///
     ARIBEIRO_INLINE mat4 translate(const float &_x_,const float &_y_,const float &_z_){
 #if defined(ARIBEIRO_SSE2)
-        return mat4((__m128){1,0,0,0},
-                    (__m128){0,1,0,0},
-                    (__m128){0,0,1,0},
-                    (__m128){_x_,_y_,_z_,1});
+        return mat4(_mm_load_(1,0,0,0),
+					_mm_load_(0,1,0,0),
+					_mm_load_(0,0,1,0),
+					_mm_load_(_x_,_y_,_z_,1));
 #else
         return mat4(1, 0, 0, _x_,
                     0, 1, 0, _y_,
@@ -2607,11 +2610,12 @@ namespace aRibeiro {
     ///
     ARIBEIRO_INLINE mat4 translate(const vec3 &_v_){
 #if defined(ARIBEIRO_SSE2)
-        mat4 result = mat4((__m128){1,0,0,0},
-                    (__m128){0,1,0,0},
-                    (__m128){0,0,1,0},
+        mat4 result = mat4(
+			_mm_load_(1,0,0,0),
+			_mm_load_(0,1,0,0),
+			_mm_load_(0,0,1,0),
                     _v_.array_sse);
-        result.array_sse[3][3] = 1.0f;
+        _mm_f32_(result.array_sse[3],3) = 1.0f;
         return result;
 #else
         return mat4(1, 0, 0, _v_.x,
@@ -2628,11 +2632,12 @@ namespace aRibeiro {
     ///
     ARIBEIRO_INLINE mat4 translate(const vec4 &_v_){
 #if defined(ARIBEIRO_SSE2)
-        mat4 result = mat4((__m128){1,0,0,0},
-                           (__m128){0,1,0,0},
-                           (__m128){0,0,1,0},
-                           _v_.array_sse);
-        result.array_sse[3][3] = 1.0f;
+        mat4 result = mat4(
+			_mm_load_(1,0,0,0),
+			_mm_load_(0,1,0,0),
+			_mm_load_(0,0,1,0),
+			_v_.array_sse);
+        _mm_f32_(result.array_sse[3],3) = 1.0f;
         return result;
 #else
         return mat4(1, 0, 0, _v_.x,
@@ -2649,10 +2654,11 @@ namespace aRibeiro {
     ///
     ARIBEIRO_INLINE mat4 scale(const float &_x_,const float &_y_,const float &_z_){
 #if defined(ARIBEIRO_SSE2)
-        return mat4((__m128){_x_,0,0,0},
-                    (__m128){0,_y_,0,0},
-                    (__m128){0,0,_z_,0},
-                    (__m128){0,0,0,1});
+        return mat4(
+			_mm_load_(_x_,0,0,0),
+			_mm_load_(0,_y_,0,0),
+			_mm_load_(0,0,_z_,0),
+			_mm_load_(0,0,0,1));
 #else
         return mat4(_x_, 0, 0, 0,
                     0, _y_, 0, 0,
@@ -2668,10 +2674,12 @@ namespace aRibeiro {
     ///
     ARIBEIRO_INLINE mat4 scale(const vec3 &_v_){
 #if defined(ARIBEIRO_SSE2)
-        return mat4((__m128){_v_.x,0,0,0},
-                    (__m128){0,_v_.y,0,0},
-                    (__m128){0,0,_v_.z,0},
-                    (__m128){0,0,0,1});
+        return mat4(
+			_mm_load_(_v_.x,0,0,0),
+			_mm_load_(0,_v_.y,0,0),
+			_mm_load_(0,0,_v_.z,0),
+			_mm_load_(0,0,0,1)
+		);
 #else
         return mat4(_v_.x, 0, 0, 0,
                     0, _v_.y, 0, 0,
@@ -2687,10 +2695,12 @@ namespace aRibeiro {
     ///
     ARIBEIRO_INLINE mat4 scale(const vec4 &_v_){
 #if defined(ARIBEIRO_SSE2)
-        return mat4((__m128){_v_.x,0,0,0},
-                    (__m128){0,_v_.y,0,0},
-                    (__m128){0,0,_v_.z,0},
-                    (__m128){0,0,0,1});
+        return mat4(
+			_mm_load_(_v_.x,0,0,0),
+			_mm_load_(0,_v_.y,0,0),
+			_mm_load_(0,0,_v_.z,0),
+			_mm_load_(0,0,0,1)
+		);
 #else
         return mat4(_v_.x, 0, 0, 0,
                     0, _v_.y, 0, 0,
@@ -3033,10 +3043,11 @@ namespace aRibeiro {
         mat4 m(x.array_sse,
                y.array_sse,
                z.array_sse,
-               (__m128){0,0,0,1});
-        m.array_sse[0][3] = 0;
-        m.array_sse[1][3] = 0;
-        m.array_sse[2][3] = 0;
+			_mm_load_(0,0,0,1)
+		);
+		_mm_f32_(m.array_sse[0],3) = 0;
+		_mm_f32_(m.array_sse[1],3) = 0;
+		_mm_f32_(m.array_sse[2],3) = 0;
         return extractQuat(m);
 #else
         return extractQuat(
@@ -3056,10 +3067,11 @@ namespace aRibeiro {
         mat4 m(x.array_sse,
                y.array_sse,
                z.array_sse,
-               (__m128){0,0,0,1});
-        m.array_sse[0][3] = 0;
-        m.array_sse[1][3] = 0;
-        m.array_sse[2][3] = 0;
+			_mm_load_(0,0,0,1)
+		);
+		_mm_f32_(m.array_sse[0],3) = 0;
+		_mm_f32_(m.array_sse[1],3) = 0;
+		_mm_f32_(m.array_sse[2],3) = 0;
         return extractQuat(m);
 #else
         return extractQuat(
@@ -3195,9 +3207,9 @@ namespace aRibeiro {
         //const float EPSILON = 1e-6f;
         quat result(v.array_sse);
         if (t < EPSILON)
-            result.array_sse[3] = 0.0f;
+            _mm_f32_(result.array_sse,3) = 0.0f;
         else
-            result.array_sse[3] = sqrt(t);
+			_mm_f32_(result.array_sse,3) = sqrt(t);
         return result;
 #else
         vec3 v = normalize(vp);
@@ -3267,7 +3279,7 @@ namespace aRibeiro {
         sinAngle = sin(angle);
         vn *= sinAngle;
         quat result(vn.array_sse);
-        result.array_sse[3] = cos(angle);
+		_mm_f32_(result.array_sse,3) = cos(angle);
         return result;
 #else
         float sinAngle;
@@ -3297,9 +3309,9 @@ namespace aRibeiro {
         
 #if defined(ARIBEIRO_SSE2)
         
-        __m128 rollSinCos = (__m128){sin(roll),cos(roll),0,0};
-        __m128 pitchSinCos = (__m128){sin(pitch),cos(pitch),0,0};
-        __m128 yawSinCos = (__m128){sin(yaw),cos(yaw),0,0};
+        __m128 rollSinCos = _mm_load_(sin(roll),cos(roll),0,0);
+        __m128 pitchSinCos = _mm_load_(sin(pitch),cos(pitch),0,0);
+        __m128 yawSinCos = _mm_load_(sin(yaw),cos(yaw),0,0);
         
         __m128 row0 = _mm_shuffle_ps(rollSinCos, rollSinCos, _MM_SHUFFLE(1,1,1,0));
         __m128 row1 = _mm_shuffle_ps(rollSinCos, rollSinCos, _MM_SHUFFLE(0,0,0,1));
@@ -3315,7 +3327,7 @@ namespace aRibeiro {
         
         __m128 mul1 = _mm_mul_ps(row1, pitch1);
         mul1 = _mm_mul_ps(mul1, yaw1);
-        mul1 = _mm_mul_ps(mul1, (__m128){-1.0f,1.0f,-1.0f,1.0f} );
+        mul1 = _mm_mul_ps(mul1, _mm_load_(-1.0f,1.0f,-1.0f,1.0f) );
         
         return _mm_add_ps(mul0, mul1);
 #else
@@ -3369,42 +3381,42 @@ namespace aRibeiro {
         
         __m128 xy_xz_yz = _mm_mul_ps(op0, op1);
         
-        __m128 wx_wy_wz = _mm_mul_ps( _mm_set1_ps(q.array_sse[3]) , q.array_sse);
+        __m128 wx_wy_wz = _mm_mul_ps( _mm_set1_ps(_mm_f32_(q.array_sse,3)) , q.array_sse);
         
         static const __m128 _2 = _mm_set1_ps(2.0f);
         
         
         __m128 m0 =
-        _mm_mul_ps(_2,(__m128){
-           (x2y2z2[1] + x2y2z2[2]),
-           (xy_xz_yz[0] + wx_wy_wz[2]),
-           (xy_xz_yz[1] - wx_wy_wz[1]),
+        _mm_mul_ps(_2, _mm_load_(
+           ( _mm_f32_(x2y2z2,1) + _mm_f32_(x2y2z2,2)),
+           (_mm_f32_(xy_xz_yz,0) + _mm_f32_(wx_wy_wz,2)),
+           (_mm_f32_(xy_xz_yz,1) - _mm_f32_(wx_wy_wz,1)),
            0
-        });
+        ));
         
-        m0[0] = 1.0f - m0[0];
+		_mm_f32_(m0, 0) = 1.0f - _mm_f32_(m0, 0);
         
         
         __m128 m1 =
-        _mm_mul_ps(_2,(__m128){
-            (xy_xz_yz[0] - wx_wy_wz[2]),
-            (x2y2z2[0] + x2y2z2[2]),
-            (xy_xz_yz[2] + wx_wy_wz[0]),
+        _mm_mul_ps(_2, _mm_load_(
+            (_mm_f32_(xy_xz_yz,0) - _mm_f32_(wx_wy_wz,2)),
+            (_mm_f32_(x2y2z2,0) + _mm_f32_(x2y2z2,2)),
+            (_mm_f32_(xy_xz_yz,2) + _mm_f32_(wx_wy_wz,0)),
             0
-        });
-        m1[1] = 1.0f - m1[1];
+        ));
+		_mm_f32_(m1, 1) = 1.0f - _mm_f32_(m1, 1);
         
         __m128 m2 =
-        _mm_mul_ps(_2,(__m128){
-            (xy_xz_yz[1] + wx_wy_wz[1]),
-            (xy_xz_yz[2] - wx_wy_wz[0]),
-            (x2y2z2[0] + x2y2z2[1]),
+        _mm_mul_ps(_2, _mm_load_(
+            (_mm_f32_(xy_xz_yz,1) + _mm_f32_(wx_wy_wz,1)),
+            (_mm_f32_(xy_xz_yz,2) - _mm_f32_(wx_wy_wz,0)),
+            (_mm_f32_(x2y2z2,0) + _mm_f32_(x2y2z2,1)),
             0
-        });
+        ));
         
-        m2[2] = 1.0f - m2[2];
+		_mm_f32_(m2, 2) = 1.0f - _mm_f32_(m2, 2);
         
-        static const __m128 m3 = (__m128){0,0,0,1.0f};
+        static const __m128 m3 = _mm_load_(0,0,0,1.0f);
         
         return mat4(m0,m1,m2,m3);
         
@@ -3494,6 +3506,16 @@ namespace aRibeiro {
          */
         
 #else
+
+		float x2 = q.x * q.x;
+		float y2 = q.y * q.y;
+		float z2 = q.z * q.z;
+		float xy = q.x * q.y;
+		float xz = q.x * q.z;
+		float yz = q.y * q.z;
+		float wx = q.w * q.x;
+		float wy = q.w * q.y;
+		float wz = q.w * q.z;
         
         
         // This calculation would be a lot more complicated for non-unit length quaternions
@@ -3517,7 +3539,7 @@ namespace aRibeiro {
     ARIBEIRO_INLINE void extractAxisAngle(const quat& q, vec3 *axis, float *angle){
 #if defined(ARIBEIRO_SSE2)
         __m128 dot0 = dot_sse_3(q.array_sse,q.array_sse);
-        __m128 inv_length = _mm_set1_ps(1.0f/sqrtf(dot0[0]));
+        __m128 inv_length = _mm_set1_ps(1.0f/sqrtf(_mm_f32_(dot0,0)));
         __m128 result = _mm_mul_ps(q.array_sse, inv_length);
         axis->array_sse = result;
         *angle = acos(clamp(q.w,-1.0f,1.0f)) * 2.0f;

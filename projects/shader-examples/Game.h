@@ -470,6 +470,9 @@ public:
 		track = false;
 		return true;
 	}
+
+	SSE2_CLASS_NEW_OPERATOR
+
 };
 
 
@@ -593,6 +596,8 @@ public:
 		GUIGroup::mouseUp(btn, pos);
 		return true;
 	}
+
+	SSE2_CLASS_NEW_OPERATOR
 };
 
 class Game {
@@ -725,6 +730,8 @@ public:
 		if (activeInterface != NULL)
 			activeInterface->setMousePos(cursorPos);
 	}
+
+	SSE2_CLASS_NEW_OPERATOR
 };
 
 #endif

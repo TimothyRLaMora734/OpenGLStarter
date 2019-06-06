@@ -24,7 +24,7 @@ using namespace collision;
 
 #include "GameResources.h"
 
-class RenderSystem {
+class RenderSystem:public SSE2Object {
 
 private:
 

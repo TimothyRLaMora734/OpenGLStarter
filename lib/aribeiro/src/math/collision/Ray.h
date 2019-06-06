@@ -13,7 +13,7 @@ namespace collision {
 	class Sphere;
 	class Triangle;
 
-	class Ray {
+	_SSE2_ALIGN_PRE class Ray {
 	public:
 		vec3 origin;
 		vec3 dir;

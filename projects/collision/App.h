@@ -46,6 +46,9 @@ public:
     App(sf::RenderWindow *window, int w, int h);
 	virtual ~App();
 	virtual void draw();
+
+	SSE2_CLASS_NEW_OPERATOR
+
 };
 
 #endif

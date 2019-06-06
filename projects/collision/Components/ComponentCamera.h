@@ -48,6 +48,9 @@ public:
     mat4 viewInv;
     
     void addLinesComponent();
+
+	SSE2_CLASS_NEW_OPERATOR
+
 };
 
 
@@ -75,6 +78,9 @@ public:
     static const ComponentType Type;
     ComponentFps(AppBase *app);
     ~ComponentFps();
+
+	SSE2_CLASS_NEW_OPERATOR
+
 };
 
 

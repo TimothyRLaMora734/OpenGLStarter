@@ -45,7 +45,7 @@ ARIBEIRO_INLINE float clamp(const float &value,const float &min,const float &max
 #if defined(ARIBEIRO_SSE2)
     __m128 maxStep = _mm_max_ss(_mm_set_ss(value), _mm_set_ss(min));
     __m128 minStep = _mm_min_ss(maxStep, _mm_set_ss(max));
-    return minStep[0];
+    return _mm_f32_(minStep,0);
 #else
     return (value < min) ? min : ((value > max) ? max : value);
 #endif
@@ -98,7 +98,7 @@ ARIBEIRO_INLINE float distance(const float &a,const float &b) {
 ///
 ARIBEIRO_INLINE float maximum(const float &a,const float &b){
 #if defined(ARIBEIRO_SSE2)
-    return _mm_max_ss(_mm_set_ss(a),_mm_set_ss(b))[0];
+    return _mm_f32_(_mm_max_ss(_mm_set_ss(a),_mm_set_ss(b)),0);
 #else
     return (a > b) ? a : b;
 #endif
@@ -114,7 +114,7 @@ ARIBEIRO_INLINE float maximum(const float &a,const float &b){
 ///
 ARIBEIRO_INLINE float minimum(const float &a, const float &b){
 #if defined(ARIBEIRO_SSE2)
-    return _mm_min_ss(_mm_set_ss(a),_mm_set_ss(b))[0];
+    return _mm_f32_(_mm_min_ss(_mm_set_ss(a),_mm_set_ss(b)),0);
 #else
     return (a < b) ? a : b;
 #endif

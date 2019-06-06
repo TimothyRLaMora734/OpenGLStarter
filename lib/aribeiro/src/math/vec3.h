@@ -25,16 +25,16 @@ class vec2;
 /// \warning The class is not designed to represent 2D homogeneous space.
 /// \author Alessandro Ribeiro
 ///
-class ARIBEIRO_API vec3{
+_SSE2_ALIGN_PRE class ARIBEIRO_API vec3{
     public:
-    union {
-        float array[3] ARIBEIRO_FORCE_SSE2_ALIGN; ///<The 3D low level array representation to pass the vector as pointer parameter
-        struct{ float x,y,z; } ARIBEIRO_FORCE_SSE2_ALIGN;///<Components X, Y and Z to be used by the application
-        struct{ float r,g,b; } ARIBEIRO_FORCE_SSE2_ALIGN;///<Components R, G and B to be used by the application
+	_SSE2_ALIGN_PRE union {
+		_SSE2_ALIGN_PRE float array[3] _SSE2_ALIGN_POS; ///<The 3D low level array representation to pass the vector as pointer parameter
+		_SSE2_ALIGN_PRE struct{ float x,y,z; } _SSE2_ALIGN_POS;///<Components X, Y and Z to be used by the application
+		_SSE2_ALIGN_PRE struct{ float r,g,b; } _SSE2_ALIGN_POS;///<Components R, G and B to be used by the application
 #if defined(ARIBEIRO_SSE2)
-        __m128 array_sse ARIBEIRO_FORCE_SSE2_ALIGN;
+		_SSE2_ALIGN_PRE __m128 array_sse _SSE2_ALIGN_POS;
 #endif
-    }ARIBEIRO_FORCE_SSE2_ALIGN;
+    }_SSE2_ALIGN_POS;
     
     
 #if defined(ARIBEIRO_SSE2)
@@ -67,7 +67,7 @@ class ARIBEIRO_API vec3{
     ///
     ARIBEIRO_INLINE vec3( const float &v ){
 #if defined(ARIBEIRO_SSE2)
-        array_sse = (__m128){v,v,v,0};
+        array_sse = _mm_load_(v,v,v,0);
 #else
         x = y = z = v;
 #endif   
@@ -83,7 +83,7 @@ class ARIBEIRO_API vec3{
     ///
     ARIBEIRO_INLINE vec3( const float &x, const float &y, const float &z ){
 #if defined(ARIBEIRO_SSE2)
-        array_sse = (__m128){x,y,z,0};
+        array_sse = _mm_load_(x,y,z,0);
 #else
         this->x = x;
         this->y = y;
@@ -103,7 +103,7 @@ class ARIBEIRO_API vec3{
     ///
     ARIBEIRO_INLINE vec3( const vec2 &xy , const float &z){
 #if defined(ARIBEIRO_SSE2)
-        array_sse = (__m128){xy.x,xy.y,z,0};
+        array_sse = _mm_load_(xy.x,xy.y,z,0);
 #else
         x = xy.x;
         y = xy.y;
@@ -123,7 +123,7 @@ class ARIBEIRO_API vec3{
     ///
     ARIBEIRO_INLINE vec3( const float &x, const vec2 &yz){
 #if defined(ARIBEIRO_SSE2)
-        array_sse = (__m128){x,yz.x,yz.y,0};
+        array_sse = _mm_load_(x,yz.x,yz.y,0);
 #else
         this->x = x;
         y = yz.x;
@@ -180,7 +180,7 @@ class ARIBEIRO_API vec3{
         //_mm_shuffle_ps(mul0, mul0, _MM_SHUFFLE(2, 3, 0, 1));
         
         for(int i=0;i<3;i++){
-            if (diff_abs[i] > 1e-4f)
+            if (_mm_f32_(diff_abs,i) > 1e-4f)
                 return false;
         }
         
@@ -277,7 +277,7 @@ class ARIBEIRO_API vec3{
     ///
     ARIBEIRO_INLINE vec3& operator/=(const vec3& v){
 #if defined(ARIBEIRO_SSE2)
-        __m128 param = (__m128){v.x,v.y,v.z,1.0f};
+        __m128 param = _mm_load_(v.x,v.y,v.z,1.0f);
         array_sse = _mm_div_ps(array_sse, param);
 #else
         x/=v.x;
@@ -370,7 +370,7 @@ class ARIBEIRO_API vec3{
     ARIBEIRO_INLINE float operator[](const int v)const{
         return array[v];
     }
-}ARIBEIRO_FORCE_SSE2_ALIGN;
+}_SSE2_ALIGN_POS;
     
 INLINE_OPERATION_IMPLEMENTATION(vec3)
 

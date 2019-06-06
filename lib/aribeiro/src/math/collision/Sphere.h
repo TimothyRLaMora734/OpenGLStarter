@@ -14,7 +14,7 @@ namespace collision {
 	class Frustum;
 	class Triangle;
 
-	class Sphere {
+	_SSE2_ALIGN_PRE class Sphere {
 	public:
 
 		vec3 center;

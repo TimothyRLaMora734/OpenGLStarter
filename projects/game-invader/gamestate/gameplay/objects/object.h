@@ -34,18 +34,47 @@ enum ObjectState{
 };
 const char* objectStateToStr(ObjectState o);
 
-struct Object{
+class Object :public SSE2Object {
+public:
+	Object(){}
+
+	Object(
+		const ObjectType type,
+		const ObjectState action,
+		const vec2 origin,
+		const vec2 toMove,
+		const vec2 position,
+		const AABB aabb,
+		const bool active,
+		const vec2 dimension,
+		const vec2 velocity,
+		const int counter) {
+		this->type = type;
+		this->action = action;
+		this->formation.origin = origin;
+		this->formation.toMove = toMove;
+		this->position = position;
+		this->aabb = aabb;
+		this->active = active;
+		this->dimension = dimension;
+			this->velocity = velocity;
+		this->counter = counter;
+	}
+
+	struct _form {
+		vec2 origin;//pos de entrada
+		vec2 toMove;//pos na formacao de ataque
+	}formation;
+	vec2 position;
+
+	AABB aabb;//Axis-Aligned Bound Box
+	
+	vec2 dimension;
+	vec2 velocity;
+
     ObjectType type;
     ObjectState action;
-    struct _form{
-      vec2 origin;//pos de entrada
-      vec2 toMove;//pos na formacao de ataque
-    }formation;
-    vec2 position;
-    AABB aabb;//Axis-Aligned Bound Box
     bool active;
-    vec2 dimension;
-    vec2 velocity;
     int counter;//usado somente para saber quanto tempo a explos�o tem que ficar aparecendo
 };
 

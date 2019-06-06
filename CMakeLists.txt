@@ -47,8 +47,11 @@ else()
 	#		set( ARCH_TARGET x86 )
 	#		message(STATUS "Force 32 bits compiling...")
 	#	endif()
+		# load all library objects at begining
+		SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} --whole-archive")
+
 	  elseif(MSVC)
-	  foreach(flag
+		foreach(flag
 				CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE
 				CMAKE_CXX_FLAGS_MINSIZEREL CMAKE_CXX_FLAGS_RELWITHDEBINFO
 
@@ -60,6 +63,10 @@ else()
 				SET ( ${flag} "${${flag}}" CACHE STRING "" FORCE)
 			endif()
 		endforeach()
+		
+		# load all library objects at begining
+		SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} /WHOLEARCHIVE:aribeiro")
+
 	  endif()
 	elseif(APPLE)
 	  set( OS_TARGET mac )
@@ -78,8 +85,9 @@ else()
         endif()
 
         #--whole-archive -all_load compile hidden constructors...
+		# load all library objects at begining
         SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -all_load")
-
+		
 	else()
 
       include(CheckIncludeFile)
@@ -127,8 +135,15 @@ if( ${ARCH_TARGET} STREQUAL "x86" OR ${ARCH_TARGET} STREQUAL "x64" )
 
     if (ARIBEIRO_SSE2)
         message(STATUS "USING SSE2!!!")
-        add_definitions(-DARIBEIRO_SSE2 -mmmx -msse -msse2 -mfpmath=sse -minline-all-stringops -finline-functions)
-        SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -v")
+
+		if(MSVC)
+			message(STATUS "there are issues when using SSE2 with Visual Studio... turning it off...")
+
+			#add_definitions(-DARIBEIRO_SSE2 /arch:SSE2 )
+		else()
+			add_definitions(-DARIBEIRO_SSE2 -mmmx -msse -msse2 -mfpmath=sse -minline-all-stringops -finline-functions)
+		endif()
+
     endif()
 endif()
 
@@ -188,6 +203,7 @@ if (${OS_TARGET} STREQUAL "mac")
 	#SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -all_load")
 
 	SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -ObjC")
+	SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -v")
 
 	#flag to fix static linking on macOS
 	#add_definitions(-ObjC)

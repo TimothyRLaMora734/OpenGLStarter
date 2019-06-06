@@ -9,7 +9,7 @@ using namespace aRibeiro;
 //#include "../GLHelper/PixelFont.h"
 
 
-class Label : public InterfaceGuiGroup {
+class Label : public InterfaceGuiGroup, public SSE2Object{
 private:
 	GLFont *font;
 	char* txt;

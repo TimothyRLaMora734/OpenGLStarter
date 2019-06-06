@@ -57,13 +57,14 @@ class Raytracer {
 		vec3 *normalOut,
 		Object **objectOut) {
 
-		float t = FLT_MAX;
 		vec3 normal;
+
+		float t = FLT_MAX;
 		Object *object;
 
 		for (int i = 0; i < objects.size(); i++) {
-			float tAux;
 			vec3 normalAux;
+			float tAux;
 			if (objects[i].raycast(ray, &tAux, &normalAux)) {
 				if (tAux > 0 && tAux < t) {
 					t = tAux;
@@ -86,8 +87,9 @@ class Raytracer {
 	// deve retornar uma cor a partir de um raio
 	//
 	vec3 recursiveRaytracing(const collision::Ray &ray, int max_depth) {
-		float t;
 		vec3 normal;
+		float t;
+		
 		Object *object;
 
         if ( max_depth <= 0 )
@@ -217,6 +219,9 @@ public:
 
 		PNGHelper::writePNG(fileout.c_str(), width, height, 3, (char*)&byteFramebufferRGB[0]);
 	}
+
+
+	SSE2_CLASS_NEW_OPERATOR
 
 };
 

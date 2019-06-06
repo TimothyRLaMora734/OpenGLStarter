@@ -256,18 +256,18 @@ private:
 				vec2 Position = OutOfScreenArray[OoS],
 					dimension = vec2(0.2, 0.2);
 
-				Object obj = {
+				Object obj (
 				  OT_Enemy,//type
 				  OS_GotoFormationOrigin,//action;
-				  {Position,//formation.origin;//posi��o de entrada
-				   pos},//formation.toMove;//posi��o final
+				    Position,//formation.origin;//posi��o de entrada
+				    pos,//formation.toMove;//posi��o final
 				  Position,//position;
 				  AABB(Position - dimension / 2,Position + dimension / 2),//aabb;//Axis-Aligned Bound Box
 				  false,//active;
 				  dimension,//dimension;
 				  enemy_velocity,//velocity
 				  0//int counter
-				};
+				);
 
 				OoS = (OoS + 1) % (OS_GotoOutOfScreen_MAX + 1);
 				enemyList.insert(obj);
@@ -344,18 +344,18 @@ public:
 		vec2 Position = vec2(0, -0.8),
 			dimension = vec2(0.2, 0.2);
 
-		Object aux = {
+		Object aux(
 				OT_SpaceShip,//type
 				OS_Nothing,//action;
-				{vec2(0),//formation.origin;//posi��o de entrada
-				 vec2(0)},//formation.squadForm;//posi��o na forma��o de ataque
+				 vec2(0),//formation.origin;//posi��o de entrada
+				 vec2(0),//formation.squadForm;//posi��o na forma��o de ataque
 				Position,//position;
 				AABB(Position - dimension / 2,Position + dimension / 2),//aabb;//Axis-Aligned Bound Box
 				false,//active;
 				dimension,//dimension;
 				vec2(0),//velocity
 				0//int counter
-		};
+		);
 		defaultSpaceship = aux;
 		for (int i = 0; i < numberOfLifes; i++) {
 			spaceShipList.insert(defaultSpaceship);
@@ -485,18 +485,18 @@ public:
 		invaderref->resources->sndPlayShoot();
 		double shootSpeed = 0.05;
 		vec2 dimension = vec2(0.05, 0.1);
-		Object aux = {
+		Object aux(
 				OT_EnemyShipShoot,//type
 				OS_Nothing,//action;
-				{vec2(0),//formation.origin;//posi��o de entrada
-				 vec2(0)},//formation.squadForm;//posi��o na forma��o de ataque
+				 vec2(0),//formation.origin;//posi��o de entrada
+				 vec2(0),//formation.squadForm;//posi��o na forma��o de ataque
 				position,//position;
 				AABB(position - dimension / 2,position + dimension / 2),//aabb;//Axis-Aligned Bound Box
 				true,//active;
 				dimension,//dimension;
 				vec2(0,-absv(shootSpeed)),//velocity
 				0//int counter
-		};
+		);
 		enemyShootList.insert(aux);
 	}
 	//----------------------------------------------------------------------------
@@ -504,36 +504,36 @@ public:
 		invaderref->resources->sndPlayShoot();
 		double shootSpeed = 0.05;
 		vec2 dimension = vec2(0.05, 0.1);
-		Object aux = {
+		Object aux (
 				OT_SpaceShipShoot,//type
 				OS_Nothing,//action;
-				{vec2(0),//formation.origin;//posi��o de entrada
-				 vec2(0)},//formation.squadForm;//posi��o na forma��o de ataque
+				 vec2(0),//formation.origin;//posi��o de entrada
+				 vec2(0),//formation.squadForm;//posi��o na forma��o de ataque
 				position,//position;
 				AABB(position - dimension / 2,position + dimension / 2),//aabb;//Axis-Aligned Bound Box
 				true,//active;
 				dimension,//dimension;
 				vec2(0,absv(shootSpeed)),//velocity
 				0//int counter
-		};
+		);
 		spaceShipShootList.insert(aux);
 	}
 	//----------------------------------------------------------------------------
 	void xplosion(vec2 position) {
 		invaderref->resources->sndPlayXplode();
 		vec2 dimension = vec2(0.4, 0.4);
-		Object aux = {
+		Object aux(
 			OT_Xplosion,//type
 			OS_Nothing,//action;
-			{vec2(0),//formation.origin;//posi��o de entrada
-			 vec2(0)},//formation.squadForm;//posi��o na forma��o de ataque
+			 vec2(0),//formation.origin;//posi��o de entrada
+			 vec2(0),//formation.squadForm;//posi��o na forma��o de ataque
 			position,//position;
 			AABB(position - dimension / 2,position + dimension / 2),//aabb;//Axis-Aligned Bound Box
 			true,//active;
 			dimension,//dimension;
 			vec2(0),//velocity
 			0//int counter
-		};
+		);
 		xplosionList.insert(aux);
 	}
 	//----------------------------------------------------------------------------

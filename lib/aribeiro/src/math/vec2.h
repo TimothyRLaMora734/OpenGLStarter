@@ -21,15 +21,15 @@ namespace aRibeiro{
 /// It can be used as points or vectors in 2D.
 /// \author Alessandro Ribeiro
 ///
-class ARIBEIRO_API vec2{
+_SSE2_ALIGN_PRE class ARIBEIRO_API vec2{
     public:
-    union {
-      float array[2] ARIBEIRO_FORCE_SSE2_ALIGN;///<The 2D low level array representation to pass the vector as pointer parameter
-      struct{ float x,y; } ARIBEIRO_FORCE_SSE2_ALIGN;///<Components X and Y to be used by the application
+	_SSE2_ALIGN_PRE union {
+	  _SSE2_ALIGN_PRE float array[2] _SSE2_ALIGN_POS;///<The 2D low level array representation to pass the vector as pointer parameter
+	  _SSE2_ALIGN_PRE struct{ float x,y; } _SSE2_ALIGN_POS;///<Components X and Y to be used by the application
 #if defined(ARIBEIRO_SSE2)
-        __m128 array_sse ARIBEIRO_FORCE_SSE2_ALIGN;
+	  _SSE2_ALIGN_PRE __m128 array_sse _SSE2_ALIGN_POS;
 #endif
-    }ARIBEIRO_FORCE_SSE2_ALIGN;
+    }_SSE2_ALIGN_POS;
     
 #if defined(ARIBEIRO_SSE2)
     //special SSE2 constructor
@@ -251,7 +251,7 @@ class ARIBEIRO_API vec2{
         return array[v];
     }
     
-}ARIBEIRO_FORCE_SSE2_ALIGN;
+}_SSE2_ALIGN_POS;
     
 INLINE_OPERATION_IMPLEMENTATION(vec2)
 

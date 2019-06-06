@@ -13,7 +13,7 @@ namespace collision {
 	class Sphere;
 	class AABB;
 
-	class Frustum {
+	_SSE2_ALIGN_PRE class Frustum {
 		void computePlanes(const mat4& clipMatrix);
         
         float minProjections[6];

@@ -26,16 +26,16 @@ class vec3;
 /// It can be used to represent points or vectors in 3D.
 /// \author Alessandro Ribeiro
 ///
-class ARIBEIRO_API vec4{
+_SSE2_ALIGN_PRE class ARIBEIRO_API vec4{
     public:
-    union {
-        float array[4] ARIBEIRO_FORCE_SSE2_ALIGN;///<The 4D low level array representation to pass the vector as pointer parameter
-        struct{ float x,y,z,w; } ARIBEIRO_FORCE_SSE2_ALIGN;///<Components X, Y, Z and W to be used by the application
-        struct{ float r,g,b,a; } ARIBEIRO_FORCE_SSE2_ALIGN;///<Components R, G, B and a to be used by the application
+	_SSE2_ALIGN_PRE union {
+		_SSE2_ALIGN_PRE float array[4] _SSE2_ALIGN_POS;///<The 4D low level array representation to pass the vector as pointer parameter
+		_SSE2_ALIGN_PRE struct{ float x,y,z,w; } _SSE2_ALIGN_POS;///<Components X, Y, Z and W to be used by the application
+		_SSE2_ALIGN_PRE struct{ float r,g,b,a; } _SSE2_ALIGN_POS;///<Components R, G, B and a to be used by the application
 #if defined(ARIBEIRO_SSE2)
-        __m128 array_sse ARIBEIRO_FORCE_SSE2_ALIGN;
+		_SSE2_ALIGN_PRE __m128 array_sse _SSE2_ALIGN_POS;
 #endif
-    }ARIBEIRO_FORCE_SSE2_ALIGN;
+    }_SSE2_ALIGN_POS;
     
 #if defined(ARIBEIRO_SSE2)
     //special SSE2 constructor
@@ -84,7 +84,7 @@ class ARIBEIRO_API vec4{
     ///
     ARIBEIRO_INLINE vec4( const float &x, const float &y, const float &z, const float &w ){
 #if defined(ARIBEIRO_SSE2)
-        array_sse = (__m128){ x, y, z, w };
+        array_sse = _mm_load_( x, y, z, w );
 #else
         this->x = x;
         this->y = y;
@@ -110,7 +110,7 @@ class ARIBEIRO_API vec4{
     ///
     ARIBEIRO_INLINE vec4( const vec3 &xyz , const float &w){
 #if defined(ARIBEIRO_SSE2)
-        array_sse = (__m128){ xyz.x, xyz.y, xyz.z, w };
+        array_sse = _mm_load_( xyz.x, xyz.y, xyz.z, w );
 #else
         x = xyz.x;
         y = xyz.y;
@@ -131,7 +131,7 @@ class ARIBEIRO_API vec4{
     ///
     ARIBEIRO_INLINE vec4( const float &x, const vec3 &yzw){
 #if defined(ARIBEIRO_SSE2)
-        array_sse = (__m128){ x, yzw.x, yzw.y, yzw.z };
+        array_sse = _mm_load_(x, yzw.x, yzw.y, yzw.z );
 #else
         this->x = x;
         y = yzw.x;
@@ -193,7 +193,7 @@ class ARIBEIRO_API vec4{
         //_mm_shuffle_ps(mul0, mul0, _MM_SHUFFLE(2, 3, 0, 1));
         
         for(int i=0;i<4;i++){
-            if (diff_abs[i] > 1e-4f)
+            if ( _mm_f32_(diff_abs,i) > 1e-4f)
                 return false;
         }
         
@@ -397,7 +397,7 @@ class ARIBEIRO_API vec4{
     ARIBEIRO_INLINE float operator[](const int v)const{
         return array[v];
     }
-};
+}_SSE2_ALIGN_POS;
     
 INLINE_OPERATION_IMPLEMENTATION(vec4)
 

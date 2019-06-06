@@ -66,6 +66,8 @@ public:
     static void unsetLayoutPointers(GLint positionLayout) {
         OPENGL_CMD(glDisableVertexAttribArray(positionLayout));
     }
+
+	SSE2_CLASS_NEW_OPERATOR
 };
 
 class ComponentColorMeshVBO: public Component {
@@ -152,6 +154,7 @@ public:
         return new ComponentColorMeshVBO(vertices, indices, color);
     }
     
+	SSE2_CLASS_NEW_OPERATOR
 };
 
 

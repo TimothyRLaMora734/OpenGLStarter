@@ -7,7 +7,7 @@ using namespace aRibeiro;
 
 #include "InterfaceGuiGroup.h"
 
-class Slider : public InterfaceGuiGroup {
+class Slider : public InterfaceGuiGroup, public SSE2Object{
 	vec2 min, max,
 		min2max,
 		unitVecMin2Max,

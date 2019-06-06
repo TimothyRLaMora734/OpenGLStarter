@@ -33,6 +33,9 @@ namespace aRibeiro {
         virtual ~Bloom();
         
         virtual void render(GLPostProcess *postProcess, GLTexture *colorSrc, GLTexture *depthSrc, GLFramebufferObject *dst);
+
+		SSE2_CLASS_NEW_OPERATOR
+
     };
 
 }

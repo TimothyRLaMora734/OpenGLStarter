@@ -625,6 +625,7 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 
 #include <cstdlib>
 
+/*
 	float absv(float a) {
 		return abs(a);
 	}
@@ -644,7 +645,7 @@ TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=v
 			abs(a.w));
 	}
     
-
+	*/
 #else
 
 	//float absv(float a) {

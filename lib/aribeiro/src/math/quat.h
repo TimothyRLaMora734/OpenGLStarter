@@ -23,15 +23,15 @@ namespace aRibeiro {
 /// The quaternion can be seen as a unit axis with an angle in radians.
 /// \author Alessandro Ribeiro
 ///
-class ARIBEIRO_API quat{
+_SSE2_ALIGN_PRE class ARIBEIRO_API quat{
     public:
-    union {
-        float array[4]ARIBEIRO_FORCE_SSE2_ALIGN;///<The 4D low level array representation to pass the vector as pointer parameter
-        struct{ float x,y,z,w; }ARIBEIRO_FORCE_SSE2_ALIGN;///<Components X, Y, Z and W to be used by the application
+	_SSE2_ALIGN_PRE union {
+		_SSE2_ALIGN_PRE float array[4]_SSE2_ALIGN_POS;///<The 4D low level array representation to pass the vector as pointer parameter
+		_SSE2_ALIGN_PRE struct{ float x,y,z,w; }_SSE2_ALIGN_POS;///<Components X, Y, Z and W to be used by the application
 #if defined(ARIBEIRO_SSE2)
-        __m128 array_sse ARIBEIRO_FORCE_SSE2_ALIGN;
+		_SSE2_ALIGN_PRE __m128 array_sse _SSE2_ALIGN_POS;
 #endif
-    }ARIBEIRO_FORCE_SSE2_ALIGN;
+    }_SSE2_ALIGN_POS;
     
 #if defined(ARIBEIRO_SSE2)
     //special SSE2 constructor
@@ -47,7 +47,7 @@ class ARIBEIRO_API quat{
     ///
     ARIBEIRO_INLINE quat(){
 #if defined(ARIBEIRO_SSE2)
-        array_sse = (__m128){0.0f,0.0f,0.0f,1.0f};
+        array_sse = _mm_load_(0.0f,0.0f,0.0f,1.0f);
 #else
         x = y = z = 0.0f;
         w = 1;
@@ -65,7 +65,7 @@ class ARIBEIRO_API quat{
     ///
     ARIBEIRO_INLINE quat( const float x, const float y, const float z, const float w ){
 #if defined(ARIBEIRO_SSE2)
-        array_sse = (__m128){x,y,z,w};
+		array_sse = _mm_load_(x, y, z, w);
 #else
         this->x = x;
         this->y = y;
@@ -106,7 +106,7 @@ class ARIBEIRO_API quat{
         //_mm_shuffle_ps(mul0, mul0, _MM_SHUFFLE(2, 3, 0, 1));
         
         for(int i=0;i<4;i++){
-            if (diff_abs[i] > 1e-4f)
+            if (_mm_f32_(diff_abs,i) > 1e-4f)
                 return false;
         }
         
@@ -143,7 +143,7 @@ class ARIBEIRO_API quat{
     ARIBEIRO_INLINE float& operator[](const int v){
         return array[v];
     }
-} ARIBEIRO_FORCE_SSE2_ALIGN;
+} _SSE2_ALIGN_POS;
 
 #if defined(ARIBEIRO_SSE2)
 #pragma pack(pop)

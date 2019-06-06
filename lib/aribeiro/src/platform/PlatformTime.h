@@ -9,6 +9,8 @@
 #include <windows.h>
 #include <inttypes.h>
 
+#include <time.h>
+
 namespace aRibeiro {
 
 	class w32PerformanceCounter {
