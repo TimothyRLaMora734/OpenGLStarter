@@ -487,6 +487,8 @@ _SSE2_ALIGN_PRE class ARIBEIRO_API mat4{
         return *this;
     }
 
+	SSE2_CLASS_NEW_OPERATOR
+
     static const mat4 IdentityMatrix;///<An static Identity matrix
 };
 

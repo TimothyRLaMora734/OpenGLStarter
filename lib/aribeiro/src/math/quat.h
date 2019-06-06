@@ -143,6 +143,9 @@ _SSE2_ALIGN_PRE class ARIBEIRO_API quat{
     ARIBEIRO_INLINE float& operator[](const int v){
         return array[v];
     }
+
+	SSE2_CLASS_NEW_OPERATOR
+
 } _SSE2_ALIGN_POS;
 
 #if defined(ARIBEIRO_SSE2)

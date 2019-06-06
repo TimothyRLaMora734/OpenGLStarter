@@ -251,6 +251,9 @@ _SSE2_ALIGN_PRE class ARIBEIRO_API vec2{
         return array[v];
     }
     
+
+	SSE2_CLASS_NEW_OPERATOR
+
 }_SSE2_ALIGN_POS;
     
 INLINE_OPERATION_IMPLEMENTATION(vec2)
