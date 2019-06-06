@@ -102,6 +102,10 @@ public:
 
 	}
 
+	virtual ~ShaderMenu(){
+        setNullAndDelete(bolinha);
+	}
+
 	void setLerp1(float v) {
 		RenderSystem *render = RenderSystem::getSingleton();
 		ShaderManager *shaderManager = render->shaderManager;
@@ -325,7 +329,7 @@ public:
 		RenderSystem *render = RenderSystem::getSingleton();
 		ShaderManager *shaderManager = render->shaderManager;
 
-		
+
 		glEnable(GL_DEPTH_TEST);
 
 		render->projection.top = projection_perspective( 45.0f, (float)w / (float)h, 0.01f, 100);
@@ -339,11 +343,11 @@ public:
 		//shaderManager->setupShaderParametersAndDraw();
 
 		if (postProcessingMode) {
-            
+
             shaderManager->framebuffer->enable();
-            
+
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-            
+
 			shaderManager->setActiveShader("GLShaderTextureColor");
 			switch (drawObject) {
 				case 0:
@@ -358,9 +362,9 @@ public:
 			}
 
 			//shaderManager->framebuffer->copyFrameBuffer();
-            
+
             GLFramebufferObject::disable();
-            
+
 			shaderManager->setActiveShader(shaderName);
 
 			glDisable(GL_DEPTH_TEST);
@@ -372,9 +376,9 @@ public:
 
 		}
 		else {
-            
+
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-            
+
 			shaderManager->setActiveShader(shaderName);
 
 			switch (drawObject) {
