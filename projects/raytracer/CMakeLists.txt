@@ -12,7 +12,7 @@ source_group("" FILES ${src})
 set_target_properties(${PROJECT_NAME} PROPERTIES FOLDER "PUC")
 
 target_link_libraries( ${PROJECT_NAME}
-		aribeiro
+		#aribeiro
 		${ARIBEIRO_LIBRARIES} )
 
 #message(STATUS "link: " ${ARIBEIRO_LIBRARIES} )

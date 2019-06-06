@@ -49,6 +49,27 @@ set(ARIBEIRO_LIBRARIES ${ARIBEIRO_LIBRARIES} pthread )
 
 endif()
 
+
+# By default, symbols provided by the sublibs that are not used by mainlib (which is all of them in this case)
+# are not used. This changes that.
+if (WIN32)
+set(ARIBEIRO_LIBRARIES 
+        /WHOLEARCHIVE:aribeiro
+		aribeiro
+        ${ARIBEIRO_LIBRARIES})
+elseif (APPLE)
+set(ARIBEIRO_LIBRARIES 
+        -Wl,-all_load
+		aribeiro
+        ${ARIBEIRO_LIBRARIES})
+else ()
+set(ARIBEIRO_LIBRARIES 
+        -Wl,--whole-archive
+		aribeiro
+        -Wl,--no-whole-archive 
+        ${ARIBEIRO_LIBRARIES})
+endif ()
+
 # export global variables
 set(ARIBEIRO_INCLUDE_DIR ${ARIBEIRO_INCLUDE_DIR} PARENT_SCOPE)
 set(ARIBEIRO_LIBRARIES ${ARIBEIRO_LIBRARIES} PARENT_SCOPE)
@@ -232,6 +253,24 @@ set( SRC
 
 
 #endif()
+
+
+# By default, symbols provided by the sublibs that are not used by mainlib (which is all of them in this case)
+# are not used. This changes that.
+#if (WIN32)
+#    set_target_properties(${PROJECT_NAME} PROPERTIES
+#        LINK_FLAGS "/WHOLEARCHIVE"
+#    )
+#elseif (APPLE)
+#    set_target_properties(${PROJECT_NAME} PROPERTIES
+#        LINK_FLAGS "-Wl,-all_load"
+#    )
+#else ()
+#    set_target_properties(${PROJECT_NAME} PROPERTIES
+#        LINK_FLAGS "-Wl,--whole-archive"
+#    )
+#endif ()
+
 
 add_library( ${PROJECT_NAME} STATIC ${PUBLIC_HEADERS} ${PRIVATE_HEADERS} ${SRC} )
 

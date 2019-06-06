@@ -17,7 +17,7 @@ set_target_properties(${PROJECT_NAME} PROPERTIES FOLDER "PUC")
 
 # Linking libraries
 target_link_libraries(${PROJECT_NAME} 
-	aribeiro
+	#aribeiro
 	${ARIBEIRO_LIBRARIES}
 	sfml-window sfml-graphics	
 )

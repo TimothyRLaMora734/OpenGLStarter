@@ -10,7 +10,7 @@ add_executable( ${PROJECT_NAME} ${SRC} )
 set_target_properties(${PROJECT_NAME} PROPERTIES FOLDER "TESTS")
 
 target_link_libraries( ${PROJECT_NAME}
-		aribeiro
+		#aribeiro
 		${ARIBEIRO_LIBRARIES} )
 
 #message(STATUS "link: " ${ARIBEIRO_LIBRARIES} )

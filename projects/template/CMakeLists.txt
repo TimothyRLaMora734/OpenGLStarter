@@ -12,7 +12,7 @@ add_executable(${PROJECT_NAME} ${SRC})
 #set_target_properties(${PROJECT_NAME} PROPERTIES FOLDER "EXE")
 
 target_link_libraries( ${PROJECT_NAME}
-	aribeiro
+	#aribeiro
 	#sfml-network sfml-graphics sfml-window sfml-system sfml-audio
 	sfml-window sfml-graphics
 	${ARIBEIRO_LIBRARIES} )

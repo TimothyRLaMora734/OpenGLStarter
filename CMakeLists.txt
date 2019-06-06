@@ -48,7 +48,9 @@ else()
 	#		message(STATUS "Force 32 bits compiling...")
 	#	endif()
 		# load all library objects at begining
-		SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} --whole-archive")
+		#SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} --whole-archive")
+		#SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -Wl,--whole-archive ")
+
 
 	  elseif(MSVC)
 		foreach(flag
@@ -65,8 +67,7 @@ else()
 		endforeach()
 
 		# load all library objects at begining
-		SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} /WHOLEARCHIVE:aribeiro")
-		SET(CMAKE_EXE_LINKER_FLAGS_RELEASE  "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /WHOLEARCHIVE:aribeiro")
+		#SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} /WHOLEARCHIVE:aribeiro")
 
 	  endif()
 	elseif(APPLE)
@@ -87,7 +88,7 @@ else()
 
         #--whole-archive -all_load compile hidden constructors...
 		# load all library objects at begining
-        SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -all_load")
+        #SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -all_load")
 
 	else()
 
@@ -127,6 +128,8 @@ else()
       if( ${CMAKE_BUILD_TYPE} STREQUAL "Debug" )
         add_definitions(-fsanitize=address -fno-omit-frame-pointer)
       endif()
+
+	  #SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -Wl,--whole-archive ")
 
 	endif()
 endif()

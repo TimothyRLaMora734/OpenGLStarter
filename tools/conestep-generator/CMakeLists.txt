@@ -31,7 +31,7 @@ set_target_properties(${PROJECT_NAME} PROPERTIES FOLDER "TOOLS")
 
 # Linking libraries
 target_link_libraries( ${PROJECT_NAME} 
-	aribeiro
+	#aribeiro
 	${ARIBEIRO_LIBRARIES} 
 )
 

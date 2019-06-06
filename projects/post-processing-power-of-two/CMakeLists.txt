@@ -24,7 +24,7 @@ add_executable(${PROJECT_NAME} ${all_src})
 set_target_properties(${PROJECT_NAME} PROPERTIES FOLDER "TESTS")
 
 target_link_libraries( ${PROJECT_NAME}
-	aribeiro
+	#aribeiro
 	#sfml-network sfml-graphics sfml-window sfml-system sfml-audio
 	sfml-window sfml-graphics
 	${ARIBEIRO_LIBRARIES} )
