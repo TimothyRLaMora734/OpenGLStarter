@@ -126,7 +126,7 @@ public:
 	//
 	// framebuffer definition
 	//
-	std::vector <vec3, ssealign<Object, 16> > floatFramebufferRGB;
+	std::vector <vec3, ssealign<vec3, 16> > floatFramebufferRGB;
 	int width, height;
 
 
