@@ -23,8 +23,8 @@ public:
 	void setNumberOfLifes(int value);
 	void setScore(int value);
 	void setLevel(int value);
-	void innerDraw(vec2 screensize);
-	void render(float deltaTime, vec2 screensize);
+	void innerDraw(const vec2 &screensize);
+	void render(float deltaTime, const vec2 &screensize);
 };
 
 

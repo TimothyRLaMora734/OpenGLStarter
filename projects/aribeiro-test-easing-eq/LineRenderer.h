@@ -11,7 +11,7 @@ class LineRenderer {
 	
 public:
 
-	std::vector<vec3> data;
+	std::vector<vec3, ssealign<vec3,16> > data;
 
 	LineRenderer(int initialNumberOfVertices):data(initialNumberOfVertices) {
 

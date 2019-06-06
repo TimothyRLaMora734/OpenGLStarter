@@ -92,16 +92,16 @@ public:
 	void drawAABB_Lines(const AABB &aabb, const vec4 &color);
 	void drawAABB_Cube(const AABB &aabb, const vec4 &color);
 
-	void print(GLFont *font, const wchar_t *txt, vec2 position, vec4 color, float alignx, float aligny, float size);
-	void print(GLFont *font, const char *txt, vec2 position, vec4 color, float alignx, float aligny, float size);
+	void print(GLFont *font, const wchar_t *txt, const vec2 &position, const vec4 &color, float alignx, float aligny, float size);
+	void print(GLFont *font, const char *txt, const vec2 &position, const vec4 &color, float alignx, float aligny, float size);
 
-	void print(GLFont *font, const wchar_t *txt, vec2 position, vec4 color);
-	void print(GLFont *font, const char *txt, vec2 position, vec4 color);
+	void print(GLFont *font, const wchar_t *txt, const vec2 &position, const vec4 &color);
+	void print(GLFont *font, const char *txt, const vec2 &position, const vec4 &color);
 
-	void print(GLFont *font, const wchar_t *txt, vec2 position, vec4 color, float size);
-	void print(GLFont *font, const char *txt, vec2 position, vec4 color, float size);
+	void print(GLFont *font, const wchar_t *txt, const vec2 &position, const vec4 &color, float size);
+	void print(GLFont *font, const char *txt, const vec2 &position, const vec4 &color, float size);
 
-	void drawTexture(GLTexture *texture, vec4 color, GLuint oglPrimitive, const vec3 *vertexBuffer, const vec2 *uvBuffer, int count);
+	void drawTexture(GLTexture *texture, const vec4 &color, GLuint oglPrimitive, const vec3 *vertexBuffer, const vec2 *uvBuffer, int count);
 
 	void drawSphere(GLTexture *texture, int divx, int divy, float radius);
 

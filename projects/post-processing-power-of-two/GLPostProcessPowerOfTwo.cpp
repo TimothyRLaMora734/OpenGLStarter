@@ -120,10 +120,11 @@ namespace aRibeiro {
     }
 
 
+
     void GLPostProcessPowerOfTwo::drawQuad(GLPostProcessingPowerOfTwoShader *shader,
-                                           vec2 texelNeighbor,
-                                           vec2 texelMaxUVAccess,
-                                           vec2 drawQuadMaxUV) {
+                                           const vec2 &texelNeighbor,
+                                           const vec2 &texelMaxUVAccess,
+                                           const vec2 &drawQuadMaxUV) {
         const vec2 vpos[] = {
             vec2(-1, -1),
             vec2(1, -1),

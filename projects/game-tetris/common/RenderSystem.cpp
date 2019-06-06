@@ -297,7 +297,7 @@ void RenderSystem::drawTexture(GLTexture *texture, const AABB &aabb) {
 	drawTexture(texture, GL_TRIANGLES, vpos, vuv, 6);
 }
 
-void RenderSystem::drawTexture(GLTexture *texture, vec4 color, GLuint oglPrimitive, const vec3 *vertexBuffer, const vec2 *uvBuffer, int count) {
+void RenderSystem::drawTexture(GLTexture *texture, const vec4 &color, GLuint oglPrimitive, const vec3 *vertexBuffer, const vec2 *uvBuffer, int count) {
 	shader->enable();
 
 	shader->setMatrix(getMVP());
@@ -403,7 +403,7 @@ void RenderSystem::drawColor(GLuint oglPrimitive, const vec3 *vertexBuffer, cons
 }
 
 
-void RenderSystem::print(GLFont *font, const wchar_t *txt, vec2 position, vec4 color, float alignx, float aligny, float size) {
+void RenderSystem::print(GLFont *font, const wchar_t *txt, const vec2 &position, const vec4 &color, float alignx, float aligny, float size) {
 
 	AABB aabb = font->computeBounds(txt);
 
@@ -426,7 +426,7 @@ void RenderSystem::print(GLFont *font, const wchar_t *txt, vec2 position, vec4 c
 
 }
 
-void RenderSystem::print(GLFont *font, const char *txt, vec2 position, vec4 color, float alignx , float aligny, float size) {
+void RenderSystem::print(GLFont *font, const char *txt, const vec2 &position, const vec4 &color, float alignx , float aligny, float size) {
 	std::string text(txt);
 	std::wstring wText(text.begin(), text.end());
 
@@ -435,7 +435,7 @@ void RenderSystem::print(GLFont *font, const char *txt, vec2 position, vec4 colo
 }
 
 
-void RenderSystem::print(GLFont *font, const wchar_t *txt, vec2 position, vec4 color) {
+void RenderSystem::print(GLFont *font, const wchar_t *txt, const vec2 &position, const vec4 &color) {
 
 	GLShaderFont *shaderfont = font->getShader();
 	shaderfont->enable();
@@ -447,7 +447,7 @@ void RenderSystem::print(GLFont *font, const wchar_t *txt, vec2 position, vec4 c
 
 }
 
-void RenderSystem::print(GLFont *font, const char *txt, vec2 position, vec4 color) {
+void RenderSystem::print(GLFont *font, const char *txt, const vec2 &position, const vec4 &color) {
 
 	std::string text(txt);
 	std::wstring wText(text.begin(), text.end());
@@ -456,7 +456,7 @@ void RenderSystem::print(GLFont *font, const char *txt, vec2 position, vec4 colo
 }
 
 
-void RenderSystem::print(GLFont *font, const wchar_t *txt, vec2 position, vec4 color, float size) {
+void RenderSystem::print(GLFont *font, const wchar_t *txt, const vec2 &position, const vec4 &color, float size) {
 
 	GLShaderFont *shaderfont = font->getShader();
 	shaderfont->enable();
@@ -469,7 +469,7 @@ void RenderSystem::print(GLFont *font, const wchar_t *txt, vec2 position, vec4 c
 	font->print(color, txt);
 }
 
-void RenderSystem::print(GLFont *font, const char *txt, vec2 position, vec4 color, float size) {
+void RenderSystem::print(GLFont *font, const char *txt, const vec2 &position, const vec4 &color, float size) {
 	std::string text(txt);
 	std::wstring wText(text.begin(), text.end());
 

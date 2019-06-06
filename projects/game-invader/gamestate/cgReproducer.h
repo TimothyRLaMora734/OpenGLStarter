@@ -37,7 +37,7 @@ class CGReproducer{
       j� pode come�ar o jogo
 
     */
-    void render(float elapsedTime, vec2 screenCenter);
+    void render(float elapsedTime, const vec2 &screenCenter);
 
     bool cgReproducerIsTerminated();
     void printState();

@@ -156,6 +156,7 @@ public:
         render->model.push();
         render->model.top *= rotate(DEG2RAD(148.200241f), 0, 1, 0);
         render->drawSphere(earth, 32, 32, 1.0f);
+		//render->drawAABB_Lines(collision::AABB(vec3(0), vec3(1)), vec4(1.0f));
         render->model.pop();
 
         //render->drawAABB_Lines(AABB(vec3(-1), vec3(1)),vec4(1.0f));

@@ -70,7 +70,7 @@ enum GAMESTATE_STATES_ENUM{
 
 const char* gamestateToStr(GAMESTATE_STATES_ENUM state);
 
-class GameState :public SSE2Object {
+class GameState {
 
 	SpaceInvader *spaceInvader;
 
@@ -143,6 +143,8 @@ class GameState :public SSE2Object {
     void shoot();
     void moveSpaceShip(float velocity);
     void enterPress();
+
+	SSE2_CLASS_NEW_OPERATOR
 };
 
 #endif

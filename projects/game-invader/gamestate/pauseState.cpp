@@ -14,7 +14,7 @@ void PauseState::resizeWindow(int w, int h) {
 void PauseState::printState() {
 	printf("  PAUSE STATE\n");
 }
-void PauseState::render(float elapsedTime, vec2 screencenter) {
+void PauseState::render(float elapsedTime, const vec2 &screencenter) {
 
 	//glDepthMask(GL_FALSE);
 

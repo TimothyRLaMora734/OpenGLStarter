@@ -115,7 +115,7 @@ void drawXYplane(int div) {
 	RenderSystem *render = RenderSystem::getSingleton();
 	ShaderManager *shaderManager = render->shaderManager;
 
-	static std::vector<VertexAttrib> buffer;
+	static std::vector<VertexAttrib, ssealign<VertexAttrib,16> > buffer;
 	buffer.clear();
 
 	const vec3 normal(0, 0, 1);

@@ -33,8 +33,8 @@ namespace collision {
 		//
 		// Point operations
 		//
-		static vec3 closestPointToPlane(vec3 q, const Plane &plane);
-		static float pointDistanceToPlane(vec3 q, const Plane &plane);
+		static vec3 closestPointToPlane(const vec3 &q, const Plane &plane);
+		static float pointDistanceToPlane(const vec3 &q, const Plane &plane);
 
 		static bool raycastPlane(const Ray &r, const Plane &plane, float *outT, vec3 *outNormal);
 		

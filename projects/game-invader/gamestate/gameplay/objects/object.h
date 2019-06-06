@@ -34,7 +34,7 @@ enum ObjectState{
 };
 const char* objectStateToStr(ObjectState o);
 
-class Object :public SSE2Object {
+class Object {
 public:
 	Object(){}
 
@@ -76,6 +76,8 @@ public:
     ObjectState action;
     bool active;
     int counter;//usado somente para saber quanto tempo a explos�o tem que ficar aparecendo
+
+	SSE2_CLASS_NEW_OPERATOR
 };
 
 

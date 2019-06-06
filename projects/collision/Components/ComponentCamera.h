@@ -49,8 +49,7 @@ public:
     
     void addLinesComponent();
 
-	SSE2_CLASS_NEW_OPERATOR
-
+	
 };
 
 
@@ -79,8 +78,7 @@ public:
     ComponentFps(AppBase *app);
     ~ComponentFps();
 
-	SSE2_CLASS_NEW_OPERATOR
-
+	
 };
 
 

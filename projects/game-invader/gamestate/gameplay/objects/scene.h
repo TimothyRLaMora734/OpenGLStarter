@@ -480,7 +480,7 @@ public:
 		return retorno;
 	}
 	//----------------------------------------------------------------------------
-	void enemyShoot(vec2 position) {
+	void enemyShoot(const vec2 &position) {
 		if (getSpaceShipObject() == NULL || !getSpaceShipObject()->active) return;
 		invaderref->resources->sndPlayShoot();
 		double shootSpeed = 0.05;
@@ -500,7 +500,7 @@ public:
 		enemyShootList.insert(aux);
 	}
 	//----------------------------------------------------------------------------
-	void spaceShipShoot(vec2 position) {
+	void spaceShipShoot(const vec2 &position) {
 		invaderref->resources->sndPlayShoot();
 		double shootSpeed = 0.05;
 		vec2 dimension = vec2(0.05, 0.1);
@@ -519,7 +519,7 @@ public:
 		spaceShipShootList.insert(aux);
 	}
 	//----------------------------------------------------------------------------
-	void xplosion(vec2 position) {
+	void xplosion(const vec2 &position) {
 		invaderref->resources->sndPlayXplode();
 		vec2 dimension = vec2(0.4, 0.4);
 		Object aux(

@@ -13,7 +13,7 @@ void CGReproducer::resizeWindow(int w, int h) {
 void CGReproducer::loadAnim() {
 }
 
-void CGReproducer::render(float elapsedTime, vec2 screenCenter) {
+void CGReproducer::render(float elapsedTime, const vec2 &screenCenter) {
 	/*
   glLoadIdentity();
   glPushAttrib(GL_ENABLE_BIT);

@@ -228,7 +228,7 @@ void RenderSystem::drawColor(GLuint oglPrimitive, const vec3 *vertexBuffer, cons
 }
 
 
-void RenderSystem::print(const wchar_t *txt, vec2 position, vec4 color, float alignx, float aligny) {
+void RenderSystem::print(const wchar_t *txt, const vec2 &position, const vec4 &color, float alignx, float aligny) {
 
 	AABB aabb = gameResources->font->computeBounds(txt);
 

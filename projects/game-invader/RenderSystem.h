@@ -24,7 +24,7 @@ using namespace collision;
 
 #include "GameResources.h"
 
-class RenderSystem:public SSE2Object {
+class RenderSystem {
 
 private:
 
@@ -65,8 +65,9 @@ public:
 
 	void drawAABB(const AABB &aabb, const vec4 &color);
 
-	void print(const wchar_t *txt, vec2 position, vec4 color, float alignx = 0.5f, float aligny = 0.5f);
+	void print(const wchar_t *txt, const vec2 &position, const vec4 &color, float alignx = 0.5f, float aligny = 0.5f);
 
+	SSE2_CLASS_NEW_OPERATOR
 };
 
 

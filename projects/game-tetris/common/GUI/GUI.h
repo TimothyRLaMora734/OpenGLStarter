@@ -29,9 +29,11 @@ public:
 	int actionReturn()const;
 	void setActionReturn(const int num);
 	virtual ~Interface();
+
+	SSE2_CLASS_NEW_OPERATOR
 };
 
-class AABBitem : public SSE2Object {
+class AABBitem {
 	GLTexture *img;
 	vec2 position;
 	int ID;
@@ -46,6 +48,8 @@ public:
 	int getID()const;
 	bool colide(const vec2 &point)const;
 	void render()const;
+
+	SSE2_CLASS_NEW_OPERATOR
 };
 #include <vector>
 class AABBMenuList {
@@ -56,7 +60,7 @@ public:
 	AABBMenuList(const char*files[], const char*filesSel[], const int count, const float space);
 	~AABBMenuList();
 	void render()const;
-	void setPosition(vec2 pos, const bool centerBased);
+	void setPosition(const vec2 &pos, const bool centerBased);
 	int colision(const vec2 &p)const;
 	void setSelected(const int s);
 	int getSelected()const;

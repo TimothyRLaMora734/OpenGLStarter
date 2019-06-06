@@ -85,7 +85,7 @@ namespace aRibeiro {
         void setTexture(int texUnit){
             setUniform(uSampler2DTexture, texUnit);
         }
-        void setTextureNeighbor(vec2 neighbor){
+        void setTextureNeighbor(const vec2 &neighbor){
             setUniform(uVec2TextureNeighbor, neighbor);
         }
         void setHorizontal() {

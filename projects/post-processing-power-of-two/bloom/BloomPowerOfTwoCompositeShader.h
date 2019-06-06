@@ -88,11 +88,11 @@ namespace aRibeiro {
             setUniform(uFloatIntensity, v);
         }
         
-        void setTexelNeighbor(vec2 texelNeighbor){
+        void setTexelNeighbor(const vec2 &texelNeighbor){
             
         }
         
-        void setTexelMaxUVAccess(vec2 texelMaxUVAccess){
+        void setTexelMaxUVAccess(const vec2 &texelMaxUVAccess){
             setUniform(uVec2TexelMaxUVAccess, texelMaxUVAccess);
         }
         

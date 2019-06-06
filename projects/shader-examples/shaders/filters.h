@@ -110,7 +110,7 @@ public:
 		setUniform(uSampler2DFramebuffer, textureUnit);
 	}
 
-	void setFramebufferTexelNeighbor(vec2 v) {
+	void setFramebufferTexelNeighbor(const vec2 &v) {
 		setUniform(uVec2FramebufferTexelNeighbor, v);
 	}
 
@@ -247,7 +247,7 @@ public:
 		setUniform(uSampler2DFramebuffer, textureUnit);
 	}
 
-	void setFramebufferTexelNeighbor(vec2 v) {
+	void setFramebufferTexelNeighbor(const vec2 &v) {
 		setUniform(uVec2FramebufferTexelNeighbor, v);
 	}
 

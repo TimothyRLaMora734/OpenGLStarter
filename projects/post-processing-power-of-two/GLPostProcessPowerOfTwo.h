@@ -16,8 +16,8 @@ namespace aRibeiro {
         static const int aVec2Position = 0;
         static const int aVec2UV = 1;
         
-        virtual void setTexelNeighbor(vec2 texelNeighbor) = 0;
-        virtual void setTexelMaxUVAccess(vec2 texelMaxUVAccess) = 0;
+        virtual void setTexelNeighbor(const vec2 &texelNeighbor) = 0;
+        virtual void setTexelMaxUVAccess(const vec2 &texelMaxUVAccess) = 0;
     };
     
     class GLPostProcessPowerOfTwo;
@@ -56,9 +56,9 @@ namespace aRibeiro {
         void endDraw();
         
         static void drawQuad(GLPostProcessingPowerOfTwoShader *shader,
-                             vec2 texelNeighbor,
-                             vec2 texelMaxUVAccess,
-                             vec2 drawQuadMaxUV);
+                             const vec2 &texelNeighbor,
+                             const vec2 &texelMaxUVAccess,
+                             const vec2 &drawQuadMaxUV);
 
 		SSE2_CLASS_NEW_OPERATOR
     };

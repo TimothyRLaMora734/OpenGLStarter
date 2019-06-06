@@ -19,7 +19,7 @@ class PauseState{
     PauseState(SpaceInvader *si);
     void resizeWindow(int w,int h);
     void printState();
-    void render(float deltaTime, vec2 screencenter);
+    void render(float deltaTime, const vec2 &screencenter);
 };
 
 #endif

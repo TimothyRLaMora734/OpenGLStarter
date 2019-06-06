@@ -41,7 +41,7 @@ void PlayState::printState() {
 	scene.printState();
 }
 //------------------------------------------------------------------------------
-void PlayState::render(float deltatime, vec2 screensize) {
+void PlayState::render(float deltatime, const vec2 &screensize) {
 
 	//  postEffectRender.beginRender();
 	glDisable(GL_DEPTH_TEST);

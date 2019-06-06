@@ -63,7 +63,7 @@ public:
 	void resizeWindow(int w, int h);
 	void simulationTick();
 	void printState();
-	void render(float deltatime, vec2 screensize);
+	void render(float deltatime, const vec2 &screensize);
 	/*
 	  reinicia os componentes deste playstate atual
 	*/

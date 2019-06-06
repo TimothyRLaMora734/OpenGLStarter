@@ -7,35 +7,35 @@ using namespace aRibeiro;
 #include "Component.h"
 
 void setTriangle(std::vector<unsigned short> *indices,
-                 std::vector<vec3> *vertices,
-                 std::vector<vec2> *uv = NULL,
-                 std::vector<vec3> *normals = NULL,
-                 std::vector<vec3> *tangents = NULL,
-                 std::vector<vec3> *binormals = NULL);
+                 std::vector<vec3, ssealign<vec3, 16> > *vertices,
+                 std::vector<vec2, ssealign<vec2, 16> > *uv = NULL,
+                 std::vector<vec3, ssealign<vec3, 16> > *normals = NULL,
+                 std::vector<vec3, ssealign<vec3, 16> > *tangents = NULL,
+                 std::vector<vec3, ssealign<vec3, 16> > *binormals = NULL);
 
 void setPlane(const vec3 &dimension,
               std::vector<unsigned short> *indices,
-              std::vector<vec3> *vertices,
-              std::vector<vec2> *uv = NULL,
-              std::vector<vec3> *normals = NULL,
-              std::vector<vec3> *tangents = NULL,
-              std::vector<vec3> *binormals = NULL);
+              std::vector<vec3, ssealign<vec3, 16> > *vertices,
+              std::vector<vec2, ssealign<vec2, 16> > *uv = NULL,
+              std::vector<vec3, ssealign<vec3, 16> > *normals = NULL,
+              std::vector<vec3, ssealign<vec3, 16> > *tangents = NULL,
+              std::vector<vec3, ssealign<vec3, 16> > *binormals = NULL);
 
 void setBox(const vec3 &dimension,
             std::vector<unsigned short> *indices,
-            std::vector<vec3> *vertices,
-            std::vector<vec2> *uv = NULL,
-            std::vector<vec3> *normals = NULL,
-            std::vector<vec3> *tangents = NULL,
-            std::vector<vec3> *binormals = NULL);
+            std::vector<vec3, ssealign<vec3, 16> > *vertices,
+            std::vector<vec2, ssealign<vec2, 16> > *uv = NULL,
+            std::vector<vec3, ssealign<vec3, 16> > *normals = NULL,
+            std::vector<vec3, ssealign<vec3, 16> > *tangents = NULL,
+            std::vector<vec3, ssealign<vec3, 16> > *binormals = NULL);
 
 void setSphere(float radius, int sectorCount, int stackCount,
                std::vector<unsigned short> *indices,
-               std::vector<vec3> *vertices,
-               std::vector<vec2> *uv = NULL,
-               std::vector<vec3> *normals = NULL,
-               std::vector<vec3> *tangents = NULL,
-               std::vector<vec3> *binormals = NULL
+               std::vector<vec3, ssealign<vec3, 16> > *vertices,
+               std::vector<vec2, ssealign<vec2, 16> > *uv = NULL,
+               std::vector<vec3, ssealign<vec3, 16> > *normals = NULL,
+               std::vector<vec3, ssealign<vec3, 16> > *tangents = NULL,
+               std::vector<vec3, ssealign<vec3, 16> > *binormals = NULL
                );
 
 
@@ -46,7 +46,7 @@ public:
     
     static const ComponentType Type;
     
-    std::vector<vec3> vertices;
+    std::vector<vec3, ssealign<vec3, 16> > vertices;
     std::vector<unsigned short> indices;
     vec4 color;
     
@@ -67,7 +67,6 @@ public:
         OPENGL_CMD(glDisableVertexAttribArray(positionLayout));
     }
 
-	SSE2_CLASS_NEW_OPERATOR
 };
 
 class ComponentColorMeshVBO: public Component {
@@ -92,7 +91,7 @@ public:
         index->uploadData((void*)&src->indices[0], src->indices.size()*sizeof(unsigned short));
     }
     
-    ComponentColorMeshVBO(const std::vector<vec3> &vertices,
+    ComponentColorMeshVBO(const std::vector<vec3, ssealign<vec3,16> > &vertices,
                           const std::vector<unsigned short> &indices,
                           const vec4 &color):Component(ComponentTypeColorMeshVBO){
         this->color = color;
@@ -127,34 +126,33 @@ public:
     // Another constructor
     //
     static ComponentColorMeshVBO* createTriangle(const vec4 &color){
-        std::vector<vec3> vertices;
+        std::vector<vec3, ssealign<vec3, 16> > vertices;
         std::vector<unsigned short> indices;
         setTriangle(&indices, &vertices);
         return new ComponentColorMeshVBO(vertices, indices, color);
     }
     
     static ComponentColorMeshVBO* createPlane(const vec4 &color, const vec3 &dimension){
-        std::vector<vec3> vertices;
+        std::vector<vec3, ssealign<vec3, 16> > vertices;
         std::vector<unsigned short> indices;
         setPlane(dimension,&indices, &vertices);
         return new ComponentColorMeshVBO(vertices, indices, color);
     }
     
     static ComponentColorMeshVBO* createBox(const vec4 &color, const vec3 &dimension){
-        std::vector<vec3> vertices;
+        std::vector<vec3, ssealign<vec3, 16> > vertices;
         std::vector<unsigned short> indices;
         setBox(dimension,&indices, &vertices);
         return new ComponentColorMeshVBO(vertices, indices, color);
     }
     
     static ComponentColorMeshVBO* createSphere(const vec4 &color, float radius, int sectorCount, int stackCount){
-        std::vector<vec3> vertices;
+        std::vector<vec3, ssealign<vec3, 16> > vertices;
         std::vector<unsigned short> indices;
         setSphere(radius, sectorCount, stackCount, &indices, &vertices);
         return new ComponentColorMeshVBO(vertices, indices, color);
     }
     
-	SSE2_CLASS_NEW_OPERATOR
 };
 
 

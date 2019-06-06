@@ -128,6 +128,7 @@
 	//
 	// Need to inherits this to objects allocated in the heap, avoiding missaligned data access when using SSE2
 	//
+	/*
 	_SSE2_ALIGN_PRE class SSE2Object {
 
 	public:
@@ -149,6 +150,7 @@
 		}
 
 	} _SSE2_ALIGN_POS;
+	*/
 
 	//
 	// In Visual Studio the function parameter passing cannot be larger than 8 bytes... you cannot pass an object as parameter by value
@@ -198,11 +200,13 @@
 	#endif
 
 
+	/*
 	class SSE2Object {
 
 	public:
 
 	};
+	*/
 
 	#define SSE2_CLASS_NEW_OPERATOR
 

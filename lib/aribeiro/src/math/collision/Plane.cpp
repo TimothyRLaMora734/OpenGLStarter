@@ -48,12 +48,12 @@ namespace collision {
 	 está do plano em relação a sua normal, que em seu sentido positivo,
 	 deixa o numero positivo, e negativo o mesmo.
 */
-	float Plane::pointDistanceToPlane(vec3 q, const Plane &plane) {
+	float Plane::pointDistanceToPlane(const vec3 &q, const Plane &plane) {
 		float t = (dot(plane.normal, q) - plane.distance);// / dot(plane.normal, plane.normal);
 		return t;
 	}
 
-	vec3 Plane::closestPointToPlane(vec3 q, const Plane &plane)
+	vec3 Plane::closestPointToPlane(const vec3 &q, const Plane &plane)
 	{
 		float t = (dot(plane.normal, q) - plane.distance);// / dot(plane.normal, plane.normal);
 		// If the plane equation is known to be normalized

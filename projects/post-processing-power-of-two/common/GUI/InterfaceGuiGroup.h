@@ -51,6 +51,8 @@ public:
 	virtual bool mouseUp(const int ID, const int btn, const vec2 &pos);
 	virtual ~InterfaceGuiGroup();
 	void setFocus(const int ID);
+
+	SSE2_CLASS_NEW_OPERATOR
 };
 
 

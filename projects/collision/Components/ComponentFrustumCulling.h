@@ -60,9 +60,7 @@ public:
 
 	bool isVisibleFromCamera(Component* cameraPerspective);
 
-	SSE2_CLASS_NEW_OPERATOR
-
-//	VoidEvent OnVisibleFromFrustum;
+	//	VoidEvent OnVisibleFromFrustum;
 
 };
 

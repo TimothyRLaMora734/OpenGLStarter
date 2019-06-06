@@ -9,11 +9,11 @@ using namespace aRibeiro;
 
 class PointRenderer {
 
-    std::vector<vec3> triangles;
+    std::vector<vec3, ssealign<vec3, 16> > triangles;
 
 public:
 
-	std::vector<vec3> data;
+	std::vector<vec3, ssealign<vec3, 16> > data;
 
 	PointRenderer(int initialNumberOfVertices) :data(initialNumberOfVertices) {
 

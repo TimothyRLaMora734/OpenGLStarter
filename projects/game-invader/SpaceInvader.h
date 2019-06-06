@@ -26,7 +26,7 @@ using namespace aRibeiro;
 
 class GameState;
 
-class SpaceInvader :public SSE2Object {
+class SpaceInvader {
 public:
 	bool canExitApplication;
 	RenderSystem *render;
@@ -46,6 +46,8 @@ public:
 	void setupViewport(int w, int h);
 	void processInput();
 	void draw();
+
+	SSE2_CLASS_NEW_OPERATOR
 };
 
 

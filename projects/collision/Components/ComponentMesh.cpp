@@ -8,11 +8,11 @@ const ComponentType ComponentColorMeshVBO::Type = ComponentTypeColorMeshVBO;
 
 
 void setTriangle(std::vector<unsigned short> *indices,
-                 std::vector<vec3> *vertices,
-                 std::vector<vec2> *uv,
-                 std::vector<vec3> *normals,
-                 std::vector<vec3> *tangents,
-                 std::vector<vec3> *binormals) {
+                 std::vector<vec3, ssealign<vec3, 16>  > *vertices,
+                 std::vector<vec2, ssealign<vec2, 16>  > *uv,
+                 std::vector<vec3, ssealign<vec3, 16>  > *normals,
+                 std::vector<vec3, ssealign<vec3, 16>  > *tangents,
+                 std::vector<vec3, ssealign<vec3, 16>  > *binormals) {
     vertices->clear();
     vertices->push_back(vec3(-0.5f,0.0f,0.0f));
     vertices->push_back(vec3(0.5f,0.0f,0.0f));
@@ -56,11 +56,11 @@ void setTriangle(std::vector<unsigned short> *indices,
 
 void setPlane(const vec3 &dimension,
               std::vector<unsigned short> *indices,
-              std::vector<vec3> *vertices,
-              std::vector<vec2> *uv,
-              std::vector<vec3> *normals,
-              std::vector<vec3> *tangents,
-              std::vector<vec3> *binormals) {
+              std::vector<vec3, ssealign<vec3, 16>  > *vertices,
+              std::vector<vec2, ssealign<vec2, 16>  > *uv,
+              std::vector<vec3, ssealign<vec3, 16>  > *normals,
+              std::vector<vec3, ssealign<vec3, 16>  > *tangents,
+              std::vector<vec3, ssealign<vec3, 16>  > *binormals) {
     
     vec3 halfDim = dimension * 0.5f;
     
@@ -116,11 +116,11 @@ void setPlane(const vec3 &dimension,
 
 void setBox(const vec3 &dimension,
             std::vector<unsigned short> *indices,
-            std::vector<vec3> *vertices,
-            std::vector<vec2> *uv,
-            std::vector<vec3> *normals,
-            std::vector<vec3> *tangents,
-            std::vector<vec3> *binormals) {
+            std::vector<vec3, ssealign<vec3, 16>  > *vertices,
+            std::vector<vec2, ssealign<vec2, 16>  > *uv,
+            std::vector<vec3, ssealign<vec3, 16>  > *normals,
+            std::vector<vec3, ssealign<vec3, 16>  > *tangents,
+            std::vector<vec3, ssealign<vec3, 16>  > *binormals) {
     vec3 halfDim = dimension * 0.5f;
     //
     // TOP
@@ -230,11 +230,11 @@ void setBox(const vec3 &dimension,
 
 void setSphere(float radius, int sectorCount, int stackCount,
                std::vector<unsigned short> *indices,
-               std::vector<vec3> *vertices,
-               std::vector<vec2> *uv,
-               std::vector<vec3> *normals,
-               std::vector<vec3> *tangents,
-               std::vector<vec3> *binormals
+               std::vector<vec3, ssealign<vec3, 16>  > *vertices,
+               std::vector<vec2, ssealign<vec2, 16>  > *uv,
+               std::vector<vec3, ssealign<vec3, 16>  > *normals,
+               std::vector<vec3, ssealign<vec3, 16>  > *tangents,
+               std::vector<vec3, ssealign<vec3, 16>  > *binormals
                ) {
     
     //clear allbuffers

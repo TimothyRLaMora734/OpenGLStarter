@@ -18,7 +18,7 @@ struct SphereVertexAttrib {
 
 class SphereModel {
 public:
-    std::vector<SphereVertexAttrib> vertices;
+    std::vector<SphereVertexAttrib, ssealign<vec3, 16> > vertices;
     std::vector<unsigned short> indices;
     
     int sectorCount;

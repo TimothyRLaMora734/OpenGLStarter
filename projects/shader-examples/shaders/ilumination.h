@@ -131,7 +131,7 @@ public:
 		setUniform(uSampler2DDiffuse, textureUnit);
 	}
 
-	void setObjectColor(vec3 color) {
+	void setObjectColor(const vec3 &color) {
 		setUniform(uVec3ObjectColor, color);
 	}
 
@@ -297,7 +297,7 @@ public:
 		setUniform(uSampler2DDiffuse, textureUnit);
 	}
 
-	void setObjectColor(vec3 color) {
+	void setObjectColor(const vec3 &color) {
 		setUniform(uVec3ObjectColor, color);
 	}
 

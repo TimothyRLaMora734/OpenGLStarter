@@ -66,6 +66,8 @@ public:
     
     virtual void attachToTransform(Transform *t);
     virtual void detachFromTransform(Transform *t);
+
+	SSE2_CLASS_NEW_OPERATOR
     
     //friend class App;
 };

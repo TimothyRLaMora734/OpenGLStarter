@@ -10,8 +10,7 @@ using namespace aRibeiro;
 class ComponentLines: public Component {
 public:
     static const ComponentType Type;
-    
-    std::vector<vec3> vertices;
+    std::vector<vec3, ssealign<vec3, 16> > vertices;
     vec4 color;
     float width;
     
@@ -46,7 +45,6 @@ public:
         OPENGL_CMD(glDisableVertexAttribArray(positionLayout));
     }
 
-	SSE2_CLASS_NEW_OPERATOR
 };
 
 class ComponentLinesVBO: public ComponentLines {

@@ -10,7 +10,7 @@
 #include <vector>
 #include <map>
 
-struct VertexAttrib {
+_SSE2_ALIGN_PRE struct VertexAttrib {
 	vec3 position;
 	vec2 uv;
 	vec3 normal;

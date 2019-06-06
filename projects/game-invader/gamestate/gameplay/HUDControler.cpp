@@ -33,7 +33,7 @@ void HUDcontroler::setLevel(int value) {
 	level = value;
 }
 //------------------------------------------------------------------------------
-void HUDcontroler::innerDraw(vec2 screensize) {
+void HUDcontroler::innerDraw(const vec2 &screensize) {
 	//static char aux[80];
   //printf("%f\n",screensize.y);
 
@@ -117,7 +117,7 @@ void HUDcontroler::innerDraw(vec2 screensize) {
 					 //*/
 }
 //------------------------------------------------------------------------------
-void HUDcontroler::render(float deltaTime, vec2 screensize) {
+void HUDcontroler::render(float deltaTime,const vec2 &screensize) {
 	/*
 	 esta chamada apenas configura o OpenGL para que ele tenha a tela normalizada
 

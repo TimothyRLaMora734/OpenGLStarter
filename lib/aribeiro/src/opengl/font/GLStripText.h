@@ -16,11 +16,13 @@
 
 namespace aRibeiro {
 
-	class StripInfoVertexAttrib : public SSE2Object {
+	class StripInfoVertexAttrib{
 	public:
 		vec4 mColor;
 		vec2 mCoord;
 		vec2 mPos;
+
+		SSE2_CLASS_NEW_OPERATOR
 	};
 
 	class GLStripText {

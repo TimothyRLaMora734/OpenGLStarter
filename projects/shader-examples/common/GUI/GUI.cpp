@@ -108,7 +108,8 @@ void AABBMenuList::render()const {
 			items[i]->render();
 	}
 }
-void AABBMenuList::setPosition(vec2 pos, const bool centerBased) {
+void AABBMenuList::setPosition(const vec2 &posp, const bool centerBased) {
+	vec2 pos = posp;
 	for (unsigned int i = 0; i < items.size(); i++) {
 		items[i]->setPosition(pos, centerBased);
 		itemsSel[i]->setPosition(pos, centerBased);

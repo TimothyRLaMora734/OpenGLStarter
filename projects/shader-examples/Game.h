@@ -471,8 +471,6 @@ public:
 		return true;
 	}
 
-	SSE2_CLASS_NEW_OPERATOR
-
 };
 
 
@@ -597,7 +595,6 @@ public:
 		return true;
 	}
 
-	SSE2_CLASS_NEW_OPERATOR
 };
 
 class Game {
