@@ -63,7 +63,7 @@ else()
 				SET ( ${flag} "${${flag}}" CACHE STRING "" FORCE)
 			endif()
 		endforeach()
-		
+
 		# load all library objects at begining
 		SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} /WHOLEARCHIVE:aribeiro")
 		SET(CMAKE_EXE_LINKER_FLAGS_RELEASE  "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /WHOLEARCHIVE:aribeiro")
@@ -72,7 +72,7 @@ else()
 	elseif(APPLE)
 	  set( OS_TARGET mac )
 
-	
+
 		if( NOT CMAKE_BUILD_TYPE )
 			set( CMAKE_BUILD_TYPE Release CACHE STRING
 						"Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel."
@@ -88,7 +88,7 @@ else()
         #--whole-archive -all_load compile hidden constructors...
 		# load all library objects at begining
         SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -all_load")
-		
+
 	else()
 
       include(CheckIncludeFile)
@@ -122,6 +122,10 @@ else()
              "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel."
              FORCE )
         set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS None Debug Release RelWithDebInfo MinSizeRel)
+      endif()
+
+      if( ${CMAKE_BUILD_TYPE} STREQUAL "Debug" )
+        add_definitions(-fsanitize=address -fno-omit-frame-pointer)
       endif()
 
 	endif()

@@ -99,7 +99,7 @@
 
 	extern const CheckSSE2 ___CheckSSE2;
 
-	#if _MSC_VER 
+	#if _MSC_VER
 
 	//windows compatible
 	#define _SSE2_ALIGN_PRE _MM_ALIGN16
@@ -115,6 +115,10 @@
 	#else
 
 	#define _SSE2_ALIGN_PRE
+
+	#ifndef _MM_ALIGN16
+        #define _MM_ALIGN16 __attribute__ (( __aligned__ (16)))
+	#endif
 
 	#define _SSE2_ALIGN_POS _MM_ALIGN16
 	#define ARIBEIRO_INLINE inline __attribute__((always_inline))
@@ -162,17 +166,21 @@
 	//  these operators guarantees the 16 byte alignment of the class
 	//
 	#define SSE2_CLASS_NEW_OPERATOR \
-	void* operator new(size_t size) {\
+	ARIBEIRO_INLINE void* operator new(size_t size) {\
 		return _mm_malloc(size, 16);\
 	}\
-	void operator delete(void* p) { \
+	ARIBEIRO_INLINE void operator delete(void* p) { \
 		_mm_free(p);\
 	}\
-	void* operator new[](size_t size) {\
+	ARIBEIRO_INLINE void* operator new[](size_t size) {\
 		return _mm_malloc(size, 16);\
 	}\
-	void operator delete[](void* p) {\
+	ARIBEIRO_INLINE void operator delete[](void* p) {\
 		_mm_free(p);\
+	}\
+	ARIBEIRO_INLINE void* operator new (std::size_t n, void* ptr)\
+	{\
+        return ptr;\
 	}
 
 	/*
@@ -193,7 +201,7 @@
 	#define _SSE2_ALIGN_PRE
 	#define _SSE2_ALIGN_POS
 
-	#if _MSC_VER 
+	#if _MSC_VER
 		#define ARIBEIRO_INLINE __forceinline
 	#else
 		#define ARIBEIRO_INLINE inline __attribute__((always_inline))
@@ -214,7 +222,7 @@
 #endif
 
 
-
+#include <new>
 
 	template <typename T, size_t N = 16>
 	class ssealign {
@@ -265,6 +273,9 @@
 
 		inline void construct(pointer p, const value_type & wert) {
 			new (p) value_type(wert);
+			//if (p == 0)
+                //return;
+            //*p = wert;
 		}
 
 		inline void destroy(pointer p) {
