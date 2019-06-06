@@ -4,6 +4,7 @@
 #include <aribeiro/GLTexture.h>
 #include <glew/glew.h>
 #include <vector>
+#include <aribeiro/SSE2.h>
 
 namespace aRibeiro {
 
@@ -56,6 +57,8 @@ namespace aRibeiro {
 		static int currentDepthBits();
 		static int maxColorAttachments();
 		static int maxDrawBuffers();
+
+		SSE2_CLASS_NEW_OPERATOR
 
 	};
 

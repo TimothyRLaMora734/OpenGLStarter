@@ -2,6 +2,7 @@
 #define transform_stack__H
 
 #include <vector>
+#include <aribeiro/SSE2.h>
 
 namespace aRibeiro {
 
@@ -10,7 +11,7 @@ namespace aRibeiro {
 
 	private:
 
-		std::vector<T> _stack;
+		std::vector<T, ssealign<T,16> > _stack;
 
 		//private copy constructores, to avoid copy...
 		TransformStack(const TransformStack& v) {}

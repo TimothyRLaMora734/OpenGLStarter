@@ -84,7 +84,7 @@ namespace aRibeiro {
 				this->pos = pos;
 			}
 		};
-		std::vector<VertexAttrib> mModelBuffer;
+		std::vector<VertexAttrib, ssealign<VertexAttrib, 16>> mModelBuffer;
 		vec2 putc(wchar_t c, const vec2& p, bool repeatFirstPtn, bool repeatLastPtn, const vec4& color, float basex);
 	};
 

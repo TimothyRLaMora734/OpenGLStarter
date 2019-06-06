@@ -150,7 +150,9 @@
 
 	} _SSE2_ALIGN_POS;
 
-
+	//
+	// In Visual Studio the function parameter passing cannot be larger than 8 bytes... you cannot pass an object as parameter by value
+	//
 	//
 	// Another way to write sse2 compatible classes, is use SSE2_CLASS_NEW_OPERATOR
 	//

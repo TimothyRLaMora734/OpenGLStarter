@@ -25,7 +25,7 @@ namespace aRibeiro {
 
 		GLShaderColor();
 
-		void setColor(vec4 c);
+		void setColor(const vec4 &c);
 		void setMatrix(const mat4 & m);
 	};
 

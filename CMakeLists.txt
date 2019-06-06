@@ -66,6 +66,7 @@ else()
 		
 		# load all library objects at begining
 		SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} /WHOLEARCHIVE:aribeiro")
+		SET(CMAKE_EXE_LINKER_FLAGS_RELEASE  "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /WHOLEARCHIVE:aribeiro")
 
 	  endif()
 	elseif(APPLE)
@@ -139,7 +140,7 @@ if( ${ARCH_TARGET} STREQUAL "x86" OR ${ARCH_TARGET} STREQUAL "x64" )
 		if(MSVC)
 			message(STATUS "NOTICE: You are building the code for Visual Studio... the containers (vector, set, map, etc...) need to be aligned with ssealign<T,16>")
 
-			add_definitions(-DARIBEIRO_SSE2 /arch:SSE2 )
+			add_definitions(-DARIBEIRO_SSE2 /arch:SSE2) # /Gz __stdcall
 		else()
 			add_definitions(-DARIBEIRO_SSE2 -mmmx -msse -msse2 -mfpmath=sse -minline-all-stringops -finline-functions)
 		endif()

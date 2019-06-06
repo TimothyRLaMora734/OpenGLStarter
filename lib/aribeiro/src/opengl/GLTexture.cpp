@@ -214,17 +214,20 @@ namespace aRibeiro {
 		if (channels == 1 && depth == 8) {
 			GLTexture *result = new GLTexture();
 			result->uploadBufferAlpha8(buffer, w, h);
-			setNullAndDelete(buffer);
+			//setNullAndDelete(buffer);
+			PNGHelper::closePNG(buffer);
 			return result;
 		} else if (channels == 3 && depth == 8) {
 			GLTexture *result = new GLTexture();
 			result->uploadBufferRGB_888(buffer, w, h);
-			setNullAndDelete(buffer);
+			//setNullAndDelete(buffer);
+			PNGHelper::closePNG(buffer);
 			return result;
 		} else if(channels == 4 && depth == 8) {
 			GLTexture *result = new GLTexture();
 			result->uploadBufferRGBA_8888(buffer, w, h);
-			setNullAndDelete(buffer);
+			//setNullAndDelete(buffer);
+			PNGHelper::closePNG(buffer);
 			return result;
 		}
 

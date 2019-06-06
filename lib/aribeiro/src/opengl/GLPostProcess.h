@@ -41,6 +41,8 @@ namespace aRibeiro {
         void endDraw();
         
         static void drawQuad(GLPostProcessingShader *shader);
+
+		SSE2_CLASS_NEW_OPERATOR
     };
 
 }

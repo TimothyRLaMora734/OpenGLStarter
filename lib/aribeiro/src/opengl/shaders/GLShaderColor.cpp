@@ -28,7 +28,7 @@ namespace aRibeiro {
 	}
 
 
-	void GLShaderColor::setColor(vec4 c) {
+	void GLShaderColor::setColor(const vec4 &c) {
 		setUniform(color, c);
 	}
 

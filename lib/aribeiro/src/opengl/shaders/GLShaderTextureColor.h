@@ -27,7 +27,7 @@ namespace aRibeiro {
 
 		GLShaderTextureColor();
 
-		void setColor(vec4 c);
+		void setColor(const vec4 &c);
 		void setMatrix(const mat4 & m);
 		void setTexture(int activeTextureUnit);
 
