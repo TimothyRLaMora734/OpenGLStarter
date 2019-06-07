@@ -53,20 +53,25 @@ endif()
 # By default, symbols provided by the sublibs that are not used by mainlib (which is all of them in this case)
 # are not used. This changes that.
 if (MSVC)
-set(ARIBEIRO_LIBRARIES 
+set(ARIBEIRO_LIBRARIES
         -WHOLEARCHIVE:aribeiro
 		aribeiro
         ${ARIBEIRO_LIBRARIES})
 elseif (APPLE)
-set(ARIBEIRO_LIBRARIES 
+set(ARIBEIRO_LIBRARIES
         -Wl,-all_load
 		aribeiro
         ${ARIBEIRO_LIBRARIES})
+elseif (WIN32)
+#MingW...
+set(ARIBEIRO_LIBRARIES
+		aribeiro
+        ${ARIBEIRO_LIBRARIES})
 else ()
-set(ARIBEIRO_LIBRARIES 
+set(ARIBEIRO_LIBRARIES
         -Wl,--whole-archive
 		aribeiro
-        -Wl,--no-whole-archive 
+        -Wl,--no-whole-archive
         ${ARIBEIRO_LIBRARIES})
 endif ()
 
