@@ -181,6 +181,8 @@
 	ARIBEIRO_INLINE void* operator new (std::size_t n, void* ptr)\
 	{\
         return ptr;\
+	}\
+	ARIBEIRO_INLINE void operator delete(void *objectAllocated, void* ptr) {\
 	}
 
 	/*
