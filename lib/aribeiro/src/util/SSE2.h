@@ -270,7 +270,7 @@
 			//return (pointer)_aligned_malloc(n * sizeof(value_type), N);
 #if defined(ARIBEIRO_SSE2)
 			return (pointer)_mm_malloc(n * sizeof(value_type),N);
-#elseif defined(ARIBEIRO_RPI)
+#elif defined(ARIBEIRO_RPI)
             return (pointer)aligned_alloc(N, n * sizeof(value_type));
 #else
 			return (pointer)malloc(n * sizeof(value_type));
@@ -281,7 +281,7 @@
 			//_aligned_free(p);
 #if defined(ARIBEIRO_SSE2)
 			_mm_free(p);
-#elseif defined(ARIBEIRO_RPI)
+#elif defined(ARIBEIRO_RPI)
             free(p);
 #else
 			free(p);

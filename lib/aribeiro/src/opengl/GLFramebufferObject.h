@@ -45,7 +45,7 @@ namespace aRibeiro {
 		// GL_RGBA, etc...
 		// GL_RGBA32F_ARB, GL_RGB32F_ARB, GL_RGBA16F_ARB, GL_RGB16F_ARB
 		//
-		void setSize(int w, int h, GLuint colorFormat = GL_RGBA,
+		void setSize(int w, int h, GLuint colorFormat = GL_RGB,
 			GLuint depthFormat = GL_DEPTH_COMPONENT24,
 			GLuint stencilFormat = GL_STENCIL_INDEX8
 			);
