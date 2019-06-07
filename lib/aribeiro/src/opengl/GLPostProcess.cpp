@@ -112,7 +112,7 @@ namespace aRibeiro {
             vec2(1, 1),
             vec2(0, 1)
         };
-        const uint8_t indices[] = {
+        _SSE2_ALIGN_PRE const uint8_t indices[] _SSE2_ALIGN_POS = {
             0,1,2,
             0,2,3
         };

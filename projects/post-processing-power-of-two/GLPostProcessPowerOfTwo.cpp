@@ -137,7 +137,7 @@ namespace aRibeiro {
             vec2(drawQuadMaxUV.x, drawQuadMaxUV.y),
             vec2(0, drawQuadMaxUV.y)
         };
-        const uint8_t indices[] = {
+        _SSE2_ALIGN_PRE const uint8_t indices[] _SSE2_ALIGN_POS= {
             0,1,2,
             0,2,3
         };
