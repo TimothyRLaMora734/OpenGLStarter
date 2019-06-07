@@ -67,7 +67,13 @@ elseif (WIN32)
 set(ARIBEIRO_LIBRARIES
 		aribeiro
         ${ARIBEIRO_LIBRARIES})
-else ()
+elseif (ARIBEIRO_RPI)
+# raspberry
+set(ARIBEIRO_LIBRARIES
+		aribeiro
+        ${ARIBEIRO_LIBRARIES})
+else()
+#linux
 set(ARIBEIRO_LIBRARIES
         -Wl,--whole-archive
 		aribeiro

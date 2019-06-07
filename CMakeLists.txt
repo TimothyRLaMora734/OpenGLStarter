@@ -137,7 +137,7 @@ else()
         set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS None Debug Release RelWithDebInfo MinSizeRel)
       endif()
 
-      if( ${CMAKE_BUILD_TYPE} STREQUAL "Debug" )
+      if( ${CMAKE_BUILD_TYPE} STREQUAL "Debug" AND NOT ARIBEIRO_RPI )
         add_definitions(-fsanitize=address -fno-omit-frame-pointer)
       endif()
 
