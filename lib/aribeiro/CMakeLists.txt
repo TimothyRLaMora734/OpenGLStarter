@@ -52,9 +52,9 @@ endif()
 
 # By default, symbols provided by the sublibs that are not used by mainlib (which is all of them in this case)
 # are not used. This changes that.
-if (WIN32)
+if (MSVC)
 set(ARIBEIRO_LIBRARIES 
-        /WHOLEARCHIVE:aribeiro
+        -WHOLEARCHIVE:aribeiro
 		aribeiro
         ${ARIBEIRO_LIBRARIES})
 elseif (APPLE)
