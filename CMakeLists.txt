@@ -141,6 +141,11 @@ else()
         add_definitions(-fsanitize=address -fno-omit-frame-pointer)
       endif()
 
+      if (ARIBEIRO_RPI)
+        add_definitions(-fsanitize=address -fno-omit-frame-pointer)
+        SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -fsanitize=address -static-libasan")
+      endif()
+
 	  #SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -Wl,--whole-archive ")
 
 	endif()

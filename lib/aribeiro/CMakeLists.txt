@@ -70,7 +70,10 @@ set(ARIBEIRO_LIBRARIES
 elseif (ARIBEIRO_RPI)
 # raspberry
 set(ARIBEIRO_LIBRARIES
+        -Wl,--whole-archive
 		aribeiro
+		-Wl,--no-whole-archive
+		${GLES_LIBRARY}
         ${ARIBEIRO_LIBRARIES})
 else()
 #linux

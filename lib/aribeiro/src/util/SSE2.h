@@ -200,13 +200,24 @@
 	//
 	// Not SSE Code
 	//
-	#define _SSE2_ALIGN_PRE
-	#define _SSE2_ALIGN_POS
 
-	#if _MSC_VER
-		#define ARIBEIRO_INLINE __forceinline
+	#ifdef ARIBEIRO_RPI
+
+        #define _SSE2_ALIGN_PRE
+        #define _SSE2_ALIGN_POS __attribute__ (( __aligned__ (16)))
+        #define ARIBEIRO_INLINE inline __attribute__((always_inline))
+
 	#else
-		#define ARIBEIRO_INLINE inline __attribute__((always_inline))
+
+        #define _SSE2_ALIGN_PRE
+        #define _SSE2_ALIGN_POS
+
+        #if _MSC_VER
+            #define ARIBEIRO_INLINE __forceinline
+        #else
+            #define ARIBEIRO_INLINE inline __attribute__((always_inline))
+        #endif
+
 	#endif
 
 
@@ -259,6 +270,8 @@
 			//return (pointer)_aligned_malloc(n * sizeof(value_type), N);
 #if defined(ARIBEIRO_SSE2)
 			return (pointer)_mm_malloc(n * sizeof(value_type),N);
+#elseif defined(ARIBEIRO_RPI)
+            return (pointer)aligned_alloc(N, n * sizeof(value_type));
 #else
 			return (pointer)malloc(n * sizeof(value_type));
 #endif
@@ -268,6 +281,8 @@
 			//_aligned_free(p);
 #if defined(ARIBEIRO_SSE2)
 			_mm_free(p);
+#elseif defined(ARIBEIRO_RPI)
+            free(p);
 #else
 			free(p);
 #endif

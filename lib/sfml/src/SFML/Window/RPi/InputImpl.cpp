@@ -209,7 +209,9 @@ public:
     // Disable attributes specified by any combination of Attributes flags
     void disable(unsigned flags)
     {
+    #if NDEBUG
         disable_attributes(flags);
+    #endif
     }
 
     // Disable blocking
