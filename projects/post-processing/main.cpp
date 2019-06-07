@@ -54,6 +54,13 @@ int main(int argc, char* argv[]) {
 	// get fullscreen modes and look the near desktop mode resolution
 	//
 	sf::VideoMode desktopMode = sf::VideoMode(1920, 1080);//sf::VideoMode::getDesktopMode();
+
+	#ifdef ARIBEIRO_RPI
+        //cannot create FBO with the resolution 1920x1080
+        desktopMode.width = 1280;
+        desktopMode.height = 720;
+	#endif
+
 	sf::VideoMode nearDesktopMode;
 	const std::vector<sf::VideoMode> &modes = sf::VideoMode::getFullscreenModes();
 	nearDesktopMode = modes[0];
