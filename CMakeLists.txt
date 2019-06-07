@@ -51,6 +51,18 @@ else()
 		#SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} --whole-archive")
 		#SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -Wl,--whole-archive ")
 
+		if( NOT CMAKE_BUILD_TYPE )
+			set( CMAKE_BUILD_TYPE Release CACHE STRING
+						"Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel."
+						FORCE )
+			set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS None Debug Release RelWithDebInfo MinSizeRel)
+		endif()
+
+        if (${CMAKE_BUILD_TYPE} STREQUAL "Release" )
+
+            add_definitions(-O3 -DNDEBUG)
+        endif()
+
 
 	  elseif(MSVC)
 		foreach(flag
