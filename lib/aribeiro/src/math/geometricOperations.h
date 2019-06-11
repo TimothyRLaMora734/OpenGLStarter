@@ -1114,8 +1114,11 @@ namespace aRibeiro {
     ///
     ARIBEIRO_INLINE float angleBetween(const vec3& a, const vec3& b) {
 #if defined(ARIBEIRO_SSE2)
+        static const __m128 _minus_one = _mm_set1_ps(-1.0f);
+        static const __m128 _one = _mm_set1_ps(1.0f);
+        
         __m128 dot0 = dot_sse_3( normalize(a).array_sse, normalize(b).array_sse );
-        __m128 cosA = clamp_sse_4(dot0, _mm_set1_ps(-1.0f), _mm_set1_ps(1.0f));
+        __m128 cosA = clamp_sse_4(dot0, _minus_one, _one);
         return acos(_mm_f32_(cosA,0));
 #elif defined(ARIBEIRO_NEON)
         static const float32x4_t _minus_one = vset1(-1.0f);
@@ -1141,8 +1144,11 @@ namespace aRibeiro {
     ///
     ARIBEIRO_INLINE float angleBetween(const quat& a, const quat& b){
 #if defined(ARIBEIRO_SSE2)
+        static const __m128 _minus_one = _mm_set1_ps(-1.0f);
+        static const __m128 _one = _mm_set1_ps(1.0f);
+        
         __m128 dot0 = dot_sse_4( normalize(a).array_sse, normalize(b).array_sse );
-        __m128 cosA = clamp_sse_4(dot0, _mm_set1_ps(-1.0f), _mm_set1_ps(1.0f));
+        __m128 cosA = clamp_sse_4(dot0, _minus_one, _one);
         return acos(_mm_f32_(cosA,0)) * 2.0f;
 #elif defined(ARIBEIRO_NEON)
         static const float32x4_t _minus_one = vset1(-1.0f);
@@ -1270,9 +1276,11 @@ namespace aRibeiro {
     ///
     ARIBEIRO_INLINE vec3 reflect( const vec3& a, const vec3& N ){
 #if defined(ARIBEIRO_SSE2)
+        static const __m128 _two = _mm_set1_ps(2.0f);
+        
         __m128 dt = dot_sse_3(a.array_sse, N.array_sse);
         __m128 mul0 = _mm_mul_ps(dt, N.array_sse);
-        __m128 mul1 = _mm_mul_ps(mul0, _mm_set1_ps(2.0f));
+        __m128 mul1 = _mm_mul_ps(mul0, _two);
         return _mm_sub_ps(a.array_sse, mul1);
 #elif defined(ARIBEIRO_NEON)
         static const float32x4_t _two = vset1(2.0f);
@@ -1296,9 +1304,11 @@ namespace aRibeiro {
     ///
     ARIBEIRO_INLINE vec4 reflect( const vec4& a, const vec4& N ){
 #if defined(ARIBEIRO_SSE2)
+        static const __m128 _two = _mm_set1_ps(2.0f);
+        
         __m128 dt = dot_sse_4(a.array_sse, N.array_sse);
         __m128 mul0 = _mm_mul_ps(dt, N.array_sse);
-        __m128 mul1 = _mm_mul_ps(mul0, _mm_set1_ps(2.0f));
+        __m128 mul1 = _mm_mul_ps(mul0, _two);
         return _mm_sub_ps(a.array_sse, mul1);
 #elif defined(ARIBEIRO_NEON)
         static const float32x4_t _two = vset1(2.0f);
@@ -2795,7 +2805,9 @@ namespace aRibeiro {
         //                        + m[0][2] * Inverse[2][0]
         //                        + m[0][3] * Inverse[3][0];
         __m128 Det0 = dot_sse_4(m.array_sse[0], Row2);
-        __m128 Rcp0 = _mm_div_ps(_mm_set1_ps(1.0f), Det0);
+        
+        __m128 Rcp0 = _mm_set1_ps( 1.0f/_mm_f32_( Det0, 0 ) );
+        //__m128 Rcp0 = _mm_div_ps(_mm_set1_ps(1.0f), Det0);
         //__m128 Rcp0 = _mm_rcp_ps(Det0);
 
         //    Inverse /= Determinant;
@@ -3680,10 +3692,12 @@ namespace aRibeiro {
         y = normalize(cross(z, x));
 #if defined(ARIBEIRO_SSE2)
         static const __m128 mask = _mm_load_(1, 1, 1, 0);
+        static const __m128 _w = _mm_load_(0,0,0,1);
+        
         mat4 m(_mm_mul_ps( x.array_sse, mask),
                _mm_mul_ps( y.array_sse, mask),
                _mm_mul_ps( z.array_sse, mask),
-			_mm_load_(0,0,0,1)
+			_w
 		);
 		//_mm_f32_(m.array_sse[0],3) = 0;
 		//_mm_f32_(m.array_sse[1],3) = 0;
@@ -3712,10 +3726,12 @@ namespace aRibeiro {
         y = normalize(cross(z, x));
 #if defined(ARIBEIRO_SSE2)
         static const __m128 mask = _mm_load_(1, 1, 1, 0);
+        static const __m128 _w = _mm_load_(0,0,0,1);
+        
         mat4 m(_mm_mul_ps( x.array_sse, mask),
                _mm_mul_ps( y.array_sse, mask),
                _mm_mul_ps( z.array_sse, mask),
-               _mm_load_(0,0,0,1)
+               _w
                );
         /*
         mat4 m(x.array_sse,
@@ -4009,7 +4025,10 @@ namespace aRibeiro {
 
         __m128 mul1 = _mm_mul_ps(row1, pitch1);
         mul1 = _mm_mul_ps(mul1, yaw1);
-        mul1 = _mm_mul_ps(mul1, _mm_load_(-1.0f,1.0f,-1.0f,1.0f) );
+        
+        static const __m128 _mask = _mm_load_(-1.0f,1.0f,-1.0f,1.0f);
+        
+        mul1 = _mm_mul_ps(mul1, _mask );
 
         return _mm_add_ps(mul0, mul1);
 #elif defined(ARIBEIRO_NEON)
@@ -4089,7 +4108,13 @@ namespace aRibeiro {
 
         __m128 xy_xz_yz = _mm_mul_ps(op0, op1);
 
-        __m128 wx_wy_wz = _mm_mul_ps( _mm_set1_ps(_mm_f32_(q.array_sse,3)) , q.array_sse);
+        __m128 wx_wy_wz = _mm_mul_ps(
+                                     
+                                     _mm_shuffle_ps(q.array_sse, q.array_sse, _MM_SHUFFLE(3,3,3,3))
+                                     
+                                     //_mm_set1_ps(_mm_f32_(q.array_sse,3))
+                                     ,
+                                     q.array_sse);
 
         static const __m128 _2 = _mm_set1_ps(2.0f);
 
