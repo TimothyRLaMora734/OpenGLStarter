@@ -139,6 +139,7 @@ else()
 
       if( ${CMAKE_BUILD_TYPE} STREQUAL "Debug" AND NOT ARIBEIRO_RPI )
         add_definitions(-fsanitize=address -fno-omit-frame-pointer)
+        SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -fsanitize=address -static-libasan")
       endif()
 
       if ( ${CMAKE_BUILD_TYPE} STREQUAL "Debug" AND ARIBEIRO_RPI)
@@ -169,6 +170,17 @@ if( ${ARCH_TARGET} STREQUAL "x86" OR ${ARCH_TARGET} STREQUAL "x64" )
 			add_definitions(-DARIBEIRO_SSE2 -mmmx -msse -msse2 -mfpmath=sse -minline-all-stringops -finline-functions)
 		endif()
 
+    endif()
+endif()
+
+if( ${ARCH_TARGET} STREQUAL "arm32" OR ${ARCH_TARGET} STREQUAL "arm64" )
+    set( ARIBEIRO_NEON ON CACHE BOOL
+    "Turn on NEON optimizations."
+    )
+
+    if (ARIBEIRO_NEON)
+        message(STATUS "USING NEON!!!")
+		add_definitions(-DARIBEIRO_NEON -mfpu=neon -finline-functions)
     endif()
 endif()
 

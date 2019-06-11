@@ -2,7 +2,7 @@
 #define geometricOperations_h
 
 #include <limits>
-#include <stdio.h> 
+#include <stdio.h>
 
 #include <aribeiro/common.h>
 #include <aribeiro/floatOPs.h>
@@ -11,9 +11,9 @@
 #include <aribeiro/SSE2.h>
 
 namespace aRibeiro {
-    
+
 #if defined(ARIBEIRO_SSE2)
-    
+
     ARIBEIRO_INLINE __m128 dot_sse_3(const __m128 &a, const __m128 &b){
         __m128 mul0 = _mm_mul_ps(a, b);
         //swp0 = [1,0,0,3]
@@ -26,7 +26,7 @@ namespace aRibeiro {
         __m128 add1 = _mm_add_ps(add0, swp1 );
         return add1;
     }
-    
+
     ARIBEIRO_INLINE __m128 dot_sse_4(const __m128 &a, const __m128 &b){
         __m128 mul0 = _mm_mul_ps(a, b);
         //swp0 = [1,0,3,2]
@@ -39,15 +39,279 @@ namespace aRibeiro {
         __m128 add1 = _mm_add_ps(add0, swp1);
         return add1;
     }
-    
+
     ARIBEIRO_INLINE __m128 clamp_sse_4(const __m128& value,const __m128& min,const __m128& max ){
         __m128 maxStep = _mm_max_ps(value, min);
         __m128 minStep = _mm_min_ps(maxStep, max);
         return minStep;
     }
+#elif defined(ARIBEIRO_NEON)
+
+
+    ARIBEIRO_INLINE float32x4_t vshuffle_2301(const float32x4_t &a)
+    {
+        return vrev64q_f32(a);
+    }
+
+    ARIBEIRO_INLINE float32x4_t vshuffle_1032(const float32x4_t &a)
+    {
+        return vcombine_f32(vget_high_f32(a), vget_low_f32(a));
+    }
+
+    ARIBEIRO_INLINE float32x4_t vshuffle_0123(const float32x4_t &a)
+    {
+        return vshuffle_2301(vshuffle_1032(a));
+    }
+
+    ARIBEIRO_INLINE float32x4_t vshuffle_0000(const float32x4_t &a)
+    {
+        return vdupq_lane_f32( vget_low_f32(a), 0 ); //a[0]
+    }
+
+    ARIBEIRO_INLINE float32x4_t vshuffle_1111(const float32x4_t &a)
+    {
+        return vdupq_lane_f32( vget_low_f32(a), 1 ); //a[1]
+    }
+
+    ARIBEIRO_INLINE float32x4_t vshuffle_2222(const float32x4_t &a)
+    {
+        return vdupq_lane_f32( vget_high_f32(a), 0 ); //a[2]
+    }
+
+    ARIBEIRO_INLINE float32x4_t vshuffle_3333(const float32x4_t &a)
+    {
+        return vdupq_lane_f32( vget_high_f32(a), 1 ); //a[3]
+    }
+
+    ARIBEIRO_INLINE float32x4_t vshuffle_0210(const float32x4_t &a)
+    {
+        float32x2_t l0 = vget_low_f32(a);
+        float32x2x2_t r = vtrn_f32( vget_high_f32( a ), l0 ) ;
+        return vcombine_f32(l0,r.val[0]);
+    }
+
+    ARIBEIRO_INLINE float32x4_t vshuffle_0333(const float32x4_t &a)
+    {
+        float32x4_t r = vshuffle_3333(a);
+        static const float32x4_t _zero = vset1(0);
+        return vextq_f32( r, _zero , 1);
+    }
+
+    ARIBEIRO_INLINE float32x4_t vshuffle_1021(const float32x4_t &a)
+    {
+        return vcombine_f32( vget_low_f32( vextq_f32(a,a,1) ) , vget_low_f32(a) );
+    }
+
+    ARIBEIRO_INLINE float32x4_t vshuffle_1102(const float32x4_t &a)
+    {
+        float32x2_t l0 = vget_low_f32(a);
+        float32x2x2_t r = vtrn_f32( vget_high_f32( a ), l0 ) ;
+        return vcombine_f32(r.val[0], vdup_lane_f32( l0, 1 )  );
+    }
+
+    ARIBEIRO_INLINE float32x4_t vshuffle_2102(const float32x4_t &a)
+    {
+        float32x4_t r = vshuffle_2222(a);
+        return vextq_f32(r,a,3);
+    }
+
+    ARIBEIRO_INLINE float32x4_t vshuffle_2021(const float32x4_t &a)
+    {
+        float32x4_t _21 = vextq_f32(a,a,1);
+        float32x2x2_t _trn = vtrn_f32( vget_low_f32(a), vget_high_f32( a ) ) ;
+        return vcombine_f32( vget_low_f32(_21) , _trn.val[0]  );
+    }
+
+    ARIBEIRO_INLINE float32x4_t vshuffle_3021(const float32x4_t &a)
+    {
+        float32x2x2_t r = vtrn_f32( vrev64_f32( vget_low_f32(a) ), vget_high_f32(a));
+        return vcombine_f32(r.val[0],r.val[1]);
+    }
+
+    ARIBEIRO_INLINE float32x4_t vshuffle_3102(const float32x4_t &a)
+    {
+        float32x2x2_t r = vtrn_f32(vget_high_f32(a), vget_low_f32(a));
+        return vcombine_f32(r.val[0], vrev64_f32(r.val[1]) );
+    }
+
+    ARIBEIRO_INLINE float32x4_t vshuffle_2000(const float32x4_t &a)
+    {
+        float32x4_t _zero = vdupq_lane_f32( vget_low_f32(a), 0 ) ;
+        float32x4_t _two = vdupq_lane_f32( vget_high_f32(a), 0 ) ;
+        return vextq_f32( _zero, _two, 1 );
+    }
+
+    ARIBEIRO_INLINE float32x4_t vshuffle_2220(const float32x4_t &a)
+    {
+        float32x4_t _zero = vdupq_lane_f32( vget_low_f32(a), 0 ) ;
+        float32x4_t _two = vdupq_lane_f32( vget_high_f32(a), 0 ) ;
+        return vextq_f32( _zero, _two, 3 );
+    }
+
+
+    ARIBEIRO_INLINE float32x4_t vshuffle_1110_test(const float32x4_t &a)
+    {
+        float32x4_t _a = vdupq_lane_f32( vget_low_f32(a), 0 ) ;
+        float32x4_t _b = vdupq_lane_f32( vget_high_f32(a), 1 ) ;
+        return vextq_f32( _a, _b, 3 );
+    }
+
+
+    ARIBEIRO_INLINE float32x4_t vshuffle_1110(const float32x4_t &a)
+    {
+        float32x2_t _a_low = vget_low_f32(a);
+        float32x2_t _b = vdup_lane_f32( _a_low, 1 ) ;
+        return vcombine_f32( _a_low, _b);
+    }
+
+    ARIBEIRO_INLINE float32x4_t vshuffle_0001(const float32x4_t &a)
+    {
+        float32x2_t _a_low = vget_low_f32(a);
+        float32x2_t _b = vdup_lane_f32( _a_low, 0 ) ;
+        return vcombine_f32( vrev64_f32( _a_low ), _b);
+    }
+
+    ARIBEIRO_INLINE float32x4_t vshuffle_1101(const float32x4_t &a)
+    {
+        float32x2_t _a_low = vget_low_f32(a);
+        float32x2_t _b = vdup_lane_f32( _a_low, 1 ) ;
+        return vcombine_f32( vrev64_f32( _a_low ), _b);
+    }
+
+    ARIBEIRO_INLINE float32x4_t vshuffle_0010(const float32x4_t &a)
+    {
+        float32x2_t _a_low = vget_low_f32(a);
+        float32x2_t _b = vdup_lane_f32( _a_low, 0 ) ;
+        return vcombine_f32( _a_low, _b);
+    }
+
+    ARIBEIRO_INLINE float32x4_t vshuffle_1011(const float32x4_t &a)
+    {
+        float32x2_t _a_low = vget_low_f32(a);
+        float32x2_t _b = vdup_lane_f32( _a_low, 1 ) ;
+        return vcombine_f32( _b, _a_low);
+    }
+
+    ARIBEIRO_INLINE float32x4_t vshuffle_0100(const float32x4_t &a)
+    {
+        float32x2_t _a_low = vget_low_f32(a);
+        float32x2_t _b = vdup_lane_f32( _a_low, 0 ) ;
+        return vcombine_f32( _b, vrev64_f32( _a_low ));
+    }
+
+    ARIBEIRO_INLINE float32x4_t vshuffle_0221(const float32x4_t &a)
+    {
+        float32x2_t l0 = vget_low_f32(a);
+        float32x2x2_t r = vtrn_f32( vget_high_f32( a ), l0 ) ;
+        return vcombine_f32( vget_low_f32( vextq_f32(a,a,1) ) ,  r.val[0]);
+    }
+
+
+    ARIBEIRO_INLINE float32x4_t vshuffle_0000(const float32x4_t &a, const float32x4_t &b)
+    {
+        float32x2_t a_ = vdup_lane_f32( vget_low_f32(a), 0 );
+        float32x2_t b_ = vdup_lane_f32( vget_low_f32(b), 0 );
+        return vcombine_f32(a_, b_);
+    }
+
+    ARIBEIRO_INLINE float32x4_t vshuffle_1111(const float32x4_t &a, const float32x4_t &b)
+    {
+        float32x2_t a_ = vdup_lane_f32( vget_low_f32(a), 1 );
+        float32x2_t b_ = vdup_lane_f32( vget_low_f32(b), 1 );
+        return vcombine_f32(a_, b_);
+    }
+
+    ARIBEIRO_INLINE float32x4_t vshuffle_2222(const float32x4_t &a, const float32x4_t &b)
+    {
+        float32x2_t a_ = vdup_lane_f32( vget_high_f32(a), 0 );
+        float32x2_t b_ = vdup_lane_f32( vget_high_f32(b), 0 );
+        return vcombine_f32(a_, b_);
+    }
+
+    ARIBEIRO_INLINE float32x4_t vshuffle_3333(const float32x4_t &a, const float32x4_t &b)
+    {
+        float32x2_t a_ = vdup_lane_f32( vget_high_f32(a), 1 );
+        float32x2_t b_ = vdup_lane_f32( vget_high_f32(b), 1 );
+        return vcombine_f32(a_, b_);
+    }
+
+    ARIBEIRO_INLINE float32x4_t vshuffle_2020(const float32x4_t &a, const float32x4_t &b)
+    {
+        float32x2x2_t a_ = vtrn_f32(vget_low_f32(a), vget_high_f32(a));
+        float32x2x2_t b_ = vtrn_f32(vget_low_f32(b), vget_high_f32(b));
+        return vcombine_f32( a_.val[0], b_.val[0] );
+    }
+
+
+
+
+
+
+
+/*
+
+    ARIBEIRO_INLINE float32x4_t vshuffle_2301(const float32x4_t &a, const float32x4_t &b)
+    {
+        float32x2_t a01 = vrev64_f32(vget_low_f32(a));
+        float32x2_t b23 = vrev64_f32(vget_high_f32(b));
+        return vcombine_f32(a01, b23);
+    }
+
+    ARIBEIRO_INLINE float32x4_t vshuffle_1001(const float32x4_t &a, const float32x4_t &b)
+    {
+        float32x2_t a01 = vrev64_f32(vget_low_f32(a));
+        float32x2_t b10 = vget_low_f32(b);
+        return vcombine_f32(a01, b10);
+    }
+
+    ARIBEIRO_INLINE float32x4_t vshuffle_3001(const float32x4_t &a, const float32x4_t &b)
+    {
+        float32x2_t a01 = vrev64_f32(vget_low_f32(a));
+        float32x2_t b30 = vrev64_f32(vget_low_f32(vextq_f32(b, b, 3)));
+        return vcombine_f32(a01, b30);
+    }
+
+    ARIBEIRO_INLINE float32x4_t vshuffle_0122(const float32x4_t &a)
+    {
+        float32x2_t a22 = vdup_lane_f32(vget_high_f32(a), 0);
+        float32x2_t a01 = vrev64_f32(vget_low_f32(a));
+        return vcombine_f32(a22, a01);
+    }
+
+    ARIBEIRO_INLINE float32x4_t vshuffle_3122(const float32x4_t &a)
+    {
+        float32x2_t a22 = vdup_lane_f32(vget_high_f32(a), 0);
+        float32x2_t a31 = vrev64_f32(vget_low_f32(a));
+        a31[1] = a[3];
+        return vcombine_f32(a22, a31);
+    }
+    */
+
+    ARIBEIRO_INLINE float32x4_t dot_neon_4(const float32x4_t &a, const float32x4_t &b){
+        float32x4_t prod = vmulq_f32(a, b);
+        // sum1 = [ 0+2, 1+3, 2+0, 3+1 ]
+        float32x4_t sum1 = vaddq_f32(prod, vshuffle_2301(prod));
+        // sum2 = [ 0+2 3+1, 1+3  2+0, 2+0 1+3, 3+1 0+2 ]
+        float32x4_t sum2 = vaddq_f32(sum1, vshuffle_0123(sum1));
+
+        return sum2;
+    }
+
+    ARIBEIRO_INLINE float32x4_t dot_neon_3(const float32x4_t &a, const float32x4_t &b){
+        static const float32x4_t _const_n = (float32x4_t){ 1,1,1,0 };
+        return dot_neon_4(vmulq_f32(a,_const_n),b);
+    }
+
+
+    ARIBEIRO_INLINE float32x4_t clamp_neon_4(const float32x4_t& value,const float32x4_t& min,const float32x4_t& max ){
+        float32x4_t maxStep = vmaxq_f32(value, min);
+        float32x4_t minStep = vminq_f32(maxStep, max);
+        return minStep;
+    }
+
 #endif
-    
-    
+
+
     /// \brief Converts a vec4 to a vec3 by discarding the w component of v
     ///
     /// Considering that the parameter is a point (i.e. with w=0) or a vector (i.e. with w=1), it can be converted to a vec3 without the w component.
@@ -59,11 +323,13 @@ namespace aRibeiro {
     ARIBEIRO_INLINE vec3 toVec3(const vec4 &v){
 #if defined(ARIBEIRO_SSE2)
         return v.array_sse;
+#elif defined(ARIBEIRO_NEON)
+        return v.array_neon;
 #else
         return vec3(v.x, v.y, v.z);
 #endif
     }
-    
+
     /// \brief Converts a vec4 to a vec3 dividing the vec4 by the w component
     ///
     /// Considering that the parameter is a projected point (i.e. w indicating the lenght in the projective space), it can be converted to a point (vec3) as the result of the division:
@@ -77,12 +343,14 @@ namespace aRibeiro {
     ARIBEIRO_INLINE vec3 toVec3_PerspDiv(const vec4 &v){
 #if defined(ARIBEIRO_SSE2)
         return _mm_mul_ps(v.array_sse, _mm_set1_ps( 1.0f / _mm_f32_(v.array_sse,3) ));
+#elif defined(ARIBEIRO_NEON)
+        return vmulq_f32( v.array_neon, vset1( 1.0f / v.array_neon[3] ) );
 #else
         return vec3(v.x, v.y, v.z)*(1.0f / v.w);
 #endif
     }
-    
-    
+
+
     /// \brief Converts a vec3 to a vec4 with w = 0
     ///
     /// Considering that the parameter is not a point, it can be converted to a vector with homogeneous componente as zero.
@@ -96,11 +364,14 @@ namespace aRibeiro {
         __m128 result = v.array_sse;
 		_mm_f32_(result,3) = 0;
         return result;
+#elif defined(ARIBEIRO_NEON)
+        static const float32x4_t _const_n = (float32x4_t){ 1,1,1,0 };
+        return vmulq_f32(v.array_neon, _const_n);
 #else
         return vec4(v.x, v.y, v.z, 0);
 #endif
     }
-    
+
     /// \brief Converts a vec3 to a vec4 with w = 1
     ///
     /// Considering that the parameter is a point, it can be converted to a vector with homogeneous componente as one.
@@ -114,11 +385,20 @@ namespace aRibeiro {
         __m128 result = v.array_sse;
 		_mm_f32_(result,3) = 1.0f;
         return result;
+#elif defined(ARIBEIRO_NEON)
+
+        static const float32x4_t _const_n = (float32x4_t){ 1,1,1,0 };
+        static const float32x4_t _const2_n = (float32x4_t){ 0,0,0,1 };
+        return vaddq_f32( vmulq_f32(v.array_neon, _const_n), _const2_n );
+
+        //float32x4_t result = v.array_neon;
+        //result[3] = 1.0f;
+        //return result;
 #else
         return vec4(v.x, v.y, v.z, 1);
 #endif
     }
-    
+
     /// \brief Converts the 1D polar coordinate to a 2D vector
     ///
     /// Uses the pAngle to define the vector in counter-clockwise orientation.
@@ -134,12 +414,12 @@ namespace aRibeiro {
         vec2 vec(0);
         vec.x += pRadius * cosf(DEG2RAD(pAngle));
         vec.y += pRadius * sinf(DEG2RAD(pAngle));
-        
+
         return vec;
     }
-    
-    
-    
+
+
+
     /// \brief Clamp values in a component wise fashion
     ///
     /// For each component of the vector, evaluate:
@@ -158,6 +438,8 @@ namespace aRibeiro {
     ARIBEIRO_INLINE vec2 clamp(const vec2& value,const vec2& min,const vec2& max ){
 #if defined(ARIBEIRO_SSE2)
         return clamp_sse_4(value.array_sse, min.array_sse, max.array_sse);
+#elif defined(ARIBEIRO_NEON)
+        return clamp_neon_4(value.array_neon, min.array_neon, max.array_neon);
 #else
         return vec2(
                     (value.x < min.x) ? min.x : ((value.x > max.x) ? max.x : value.x),
@@ -165,8 +447,8 @@ namespace aRibeiro {
                     );
 #endif
     }
-    
-    
+
+
     /// \brief Clamp values in a component wise fashion
     ///
     /// For each component of the vector, evaluate:
@@ -185,6 +467,8 @@ namespace aRibeiro {
     ARIBEIRO_INLINE vec3 clamp( const vec3& value, const vec3& min,const vec3& max ){
 #if defined(ARIBEIRO_SSE2)
         return clamp_sse_4(value.array_sse, min.array_sse, max.array_sse);
+#elif defined(ARIBEIRO_NEON)
+        return clamp_neon_4(value.array_neon, min.array_neon, max.array_neon);
 #else
         return vec3(
                     (value.x < min.x) ? min.x : ((value.x > max.x) ? max.x : value.x),
@@ -193,8 +477,8 @@ namespace aRibeiro {
                     );
 #endif
     }
-    
-    
+
+
     /// \brief Clamp values in a component wise fashion
     ///
     /// For each component of the vector, evaluate:
@@ -213,6 +497,8 @@ namespace aRibeiro {
     ARIBEIRO_INLINE vec4 clamp( const vec4& value, const vec4& min, const vec4& max ){
 #if defined(ARIBEIRO_SSE2)
         return clamp_sse_4(value.array_sse, min.array_sse, max.array_sse);
+#elif defined(ARIBEIRO_NEON)
+        return clamp_neon_4(value.array_neon, min.array_neon, max.array_neon);
 #else
         return vec4(
                     (value.x < min.x) ? min.x : ((value.x > max.x) ? max.x : value.x),
@@ -222,8 +508,8 @@ namespace aRibeiro {
                     );
 #endif
     }
-    
-    
+
+
     /// \brief Constructs a conjugate quaternion
     ///
     /// The conjugate is (-x,-y,-z,w).
@@ -235,11 +521,14 @@ namespace aRibeiro {
     ARIBEIRO_INLINE quat conjugate(const quat& a){
 #if defined(ARIBEIRO_SSE2)
         return _mm_xor_ps(_quat_conjugate_mask,a.array_sse);
+#elif defined(ARIBEIRO_NEON)
+        static const float32x4_t _const_n = (float32x4_t){-1,-1,-1,1};
+        return vmulq_f32(a.array_neon, _const_n );
 #else
         return quat(-a.x, -a.y, -a.z, a.w);
 #endif
     }
-    
+
     /// \brief Computes the dot product between two vectors
     ///
     /// The dot product is a single value computed from the two vectors.
@@ -298,6 +587,9 @@ namespace aRibeiro {
         //add0 = [0+1,1+0,2+0,3+3]
         __m128 add0 = _mm_add_ps(mul0, swp0);
         return _mm_f32_(add0,0);
+#elif defined(ARIBEIRO_NEON)
+        float32x4_t mul0 = vmulq_f32(a.array_neon, b.array_neon);
+        return mul0[0] + mul0[1];
 #else
         return (a.x * b.x + a.y * b.y);
 #endif
@@ -316,6 +608,8 @@ namespace aRibeiro {
     ARIBEIRO_INLINE float dot( const vec3& a, const vec3& b ){
 #if defined(ARIBEIRO_SSE2)
         return _mm_f32_(dot_sse_3(a.array_sse, b.array_sse),0);
+#elif defined(ARIBEIRO_NEON)
+        return dot_neon_3(a.array_neon, b.array_neon)[0];
 #else
         return (a.x * b.x + a.y * b.y + a.z * b.z);
 #endif
@@ -333,11 +627,13 @@ namespace aRibeiro {
     ARIBEIRO_INLINE float dot( const vec4& a, const vec4& b ){
 #if defined(ARIBEIRO_SSE2)
         return _mm_f32_(dot_sse_4(a.array_sse, b.array_sse),0);
+#elif defined(ARIBEIRO_NEON)
+        return dot_neon_4(a.array_neon, b.array_neon)[0];
 #else
         return (a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w);
 #endif
     }
-    
+
     /// \brief Computes the dot product between two quaternions
     ///
     /// For a more detailed description, see dot( const vec2& a, const vec2& b )
@@ -351,12 +647,14 @@ namespace aRibeiro {
     ARIBEIRO_INLINE float dot(const quat& a, const quat& b){
 #if defined(ARIBEIRO_SSE2)
         return _mm_f32_(dot_sse_4(a.array_sse, b.array_sse),0);
+#elif defined(ARIBEIRO_NEON)
+        return dot_neon_4(a.array_neon, b.array_neon)[0];
 #else
         return a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w;
 #endif
     }
 
-    
+
     /// \brief Normalize a vector
     ///
     /// Returns a unit vector in the same direction of the parameter.
@@ -377,7 +675,7 @@ namespace aRibeiro {
             result = (vec * (1.0f / sqrtf(mag2)));
         return result;
     }
-    
+
     /// \brief Normalize a vector
     ///
     /// Returns a unit vector in the same direction of the parameter.
@@ -391,26 +689,36 @@ namespace aRibeiro {
     ARIBEIRO_INLINE vec3 normalize(const vec3& vec ){
 #if defined(ARIBEIRO_SSE2)
         __m128 mag2 = dot_sse_3(vec.array_sse, vec.array_sse);
-        const float TOLERANCE = 1e-6f;
-        if (fabs(_mm_f32_(mag2,0)) > TOLERANCE && fabs(_mm_f32_(mag2,0) - 1.0f) > TOLERANCE)
+        //const float TOLERANCE = 1e-6f;
+        if (fabs(_mm_f32_(mag2,0)) > EPSILON2 && fabs(_mm_f32_(mag2,0) - 1.0f) > EPSILON2)
         {
             //_mm_rsqrt_ps low precision issues...
             __m128 magInv = _mm_set1_ps(1.0f/sqrtf(_mm_f32_(mag2,0)));//_mm_rsqrt_ps( mag2 );
             return _mm_mul_ps( vec.array_sse, magInv );
         }
         return vec;
+#elif defined(ARIBEIRO_NEON)
+        float32x4_t mag2 = dot_neon_3(vec.array_neon, vec.array_neon);
+        //const float TOLERANCE = 1e-6f;
+        if (fabs(mag2[0]) > EPSILON2 && fabs(mag2[0] - 1.0f) > EPSILON2)
+        {
+            //_mm_rsqrt_ps low precision issues...
+            float32x4_t magInv = vset1(1.0f/sqrtf(mag2[0]));//_mm_rsqrt_ps( mag2 );
+            return vmulq_f32( vec.array_neon, magInv );
+        }
+        return vec;
 #else
         vec3 result = vec;
         if (vec == vec3(0)) return vec;
-        const float TOLERANCE = 1e-6f;
+        //const float TOLERANCE = 1e-6f;
         // Don't normalize if we don't have to
         float mag2 = dot(vec, vec);
-        if (fabs(mag2) > TOLERANCE && fabs(mag2 - 1.0f) > TOLERANCE)
+        if (fabs(mag2) > EPSILON2 && fabs(mag2 - 1.0f) > EPSILON2)
             result = (vec * (1.0f / sqrtf(mag2)));
         return result;
 #endif
     }
-    
+
     /// \brief Normalize a vector
     ///
     /// Returns a unit vector in the same direction of the parameter.
@@ -424,20 +732,30 @@ namespace aRibeiro {
     ARIBEIRO_INLINE vec4 normalize(const vec4& vec ){
 #if defined(ARIBEIRO_SSE2)
         __m128 mag2 = dot_sse_4(vec.array_sse, vec.array_sse);
-        const float TOLERANCE = 1e-6f;
-        if (fabs(_mm_f32_(mag2,0)) > TOLERANCE && fabs(_mm_f32_(mag2,0) - 1.0f) > TOLERANCE){
+        //const float TOLERANCE = 1e-6f;
+        if (fabs(_mm_f32_(mag2,0)) > EPSILON2 && fabs(_mm_f32_(mag2,0) - 1.0f) > EPSILON2){
             //_mm_rsqrt_ps low precision issues...
             __m128 magInv = _mm_set1_ps(1.0f/sqrtf(_mm_f32_(mag2,0)));//_mm_rsqrt_ps( mag2 );
             return _mm_mul_ps( vec.array_sse, magInv );
         }
         return vec;
+#elif defined(ARIBEIRO_NEON)
+        float32x4_t mag2 = dot_neon_4(vec.array_neon, vec.array_neon);
+        //const float TOLERANCE = 1e-6f;
+        if (fabs(mag2[0]) > EPSILON2 && fabs(mag2[0] - 1.0f) > EPSILON2)
+        {
+            //_mm_rsqrt_ps low precision issues...
+            float32x4_t magInv = vset1(1.0f/sqrtf(mag2[0]));//_mm_rsqrt_ps( mag2 );
+            return vmulq_f32( vec.array_neon, magInv );
+        }
+        return vec;
 #else
         vec4 result = vec;
         if (vec == vec4(0)) return vec;
-        const float TOLERANCE = 1e-6f;
+        //const float TOLERANCE = 1e-6f;
         // Don't normalize if we don't have to
         float mag2 = dot(vec, vec);
-        if (fabs(mag2) > TOLERANCE && fabs(mag2 - 1.0f) > TOLERANCE)
+        if (fabs(mag2) > EPSILON2 && fabs(mag2 - 1.0f) > EPSILON2)
             result = (vec * (1.0f / sqrtf(mag2)));
         return result;
 #endif
@@ -450,16 +768,20 @@ namespace aRibeiro {
     ///
     ARIBEIRO_INLINE quat normalize(const quat& q){
         quat result = q;
-        const float TOLERANCE = 1e-6f;
+        //const float TOLERANCE = 1e-6f;
         // Don't normalize if we don't have to
-        
+
         float mag2 = dot(q,q);//q.w * q.w + q.x * q.x + q.y * q.y + q.z * q.z;
-        if (fabs(mag2) > TOLERANCE && fabs(mag2 - 1.0f) > TOLERANCE) {
+        if (fabs(mag2) > EPSILON2 && fabs(mag2 - 1.0f) > EPSILON2) {
 #if defined(ARIBEIRO_SSE2)
             //__m128 magInv = _mm_rsqrt_ps( _mm_set1_ps(mag2) );
             //_mm_rsqrt_ps low precision issues...
             __m128 magInv = _mm_set1_ps(1.0f/sqrtf(mag2));//_mm_rsqrt_ps( mag2 );
             result.array_sse = _mm_mul_ps( q.array_sse, magInv );
+#elif defined(ARIBEIRO_NEON)
+            float32x4_t magInv = vset1(1.0f/sqrtf(mag2));//_mm_rsqrt_ps( mag2 );
+            result.array_neon = vmulq_f32( q.array_neon, magInv );
+
 #else
             float magInv = 1.0f / sqrt(mag2);
             result.w = q.w * magInv;
@@ -468,7 +790,7 @@ namespace aRibeiro {
             result.z = q.z * magInv;
 #endif
         }
-        
+
         /*
          float qmagsq = q.w * q.w + q.x * q.x + q.y * q.y + q.z * q.z;
          if (std::abs(1.0f - qmagsq) < TOLERANCE) {
@@ -485,10 +807,10 @@ namespace aRibeiro {
          result.z = q.z * invMag;
          }
          */
-        
+
         return result;
     }
-    
+
     /// \brief Extracts a quaternion from any matrix that have rotation information
     ///
     /// \author Alessandro Ribeiro
@@ -497,13 +819,13 @@ namespace aRibeiro {
     ///
     ARIBEIRO_INLINE quat extractQuat(const mat4& mp){
         mat4 m = mp;
-        
+
         //normalize rotation part
         m[0] = toVec4(normalize(toVec3(m[0])));
         m[1] = toVec4(normalize(toVec3(m[1])));
         m[2] = toVec4(normalize(toVec3(m[2])));
-        
-        
+
+
         float t = 1.0f + m._11 + m._22 + m._33;
         // large enough
         if (t > 0.001f) {
@@ -538,7 +860,7 @@ namespace aRibeiro {
                         (m._21 - m._12) / s);
         }
     }
-    
+
 
     /// \brief Operator overload to multiply a matrix 4x4 by a vector with 4 components
     ///
@@ -556,31 +878,49 @@ namespace aRibeiro {
     ///
     ARIBEIRO_INLINE vec4 operator*(const mat4 &mat, const vec4 &vec){
     #if defined(ARIBEIRO_SSE2)
-        
+
         __m128 v0 = _mm_shuffle_ps(vec.array_sse, vec.array_sse, _MM_SHUFFLE(0, 0, 0, 0));
         __m128 v1 = _mm_shuffle_ps(vec.array_sse, vec.array_sse, _MM_SHUFFLE(1, 1, 1, 1));
         __m128 v2 = _mm_shuffle_ps(vec.array_sse, vec.array_sse, _MM_SHUFFLE(2, 2, 2, 2));
         __m128 v3 = _mm_shuffle_ps(vec.array_sse, vec.array_sse, _MM_SHUFFLE(3, 3, 3, 3));
-        
+
         __m128 m0 = _mm_mul_ps(mat.array_sse[0], v0);
         __m128 m1 = _mm_mul_ps(mat.array_sse[1], v1);
         __m128 m2 = _mm_mul_ps(mat.array_sse[2], v2);
         __m128 m3 = _mm_mul_ps(mat.array_sse[3], v3);
-        
+
         __m128 a0 = _mm_add_ps(m0, m1);
         __m128 a1 = _mm_add_ps(m2, m3);
         __m128 a2 = _mm_add_ps(a0, a1);
-        
+
         return a2;
+    #elif defined(ARIBEIRO_NEON)
+
+        float32x4_t v0 = vshuffle_0000(vec.array_neon);
+        float32x4_t v1 = vshuffle_1111(vec.array_neon);
+        float32x4_t v2 = vshuffle_2222(vec.array_neon);
+        float32x4_t v3 = vshuffle_3333(vec.array_neon);
+
+        float32x4_t m0 = vmulq_f32(mat.array_neon[0], v0);
+        float32x4_t m1 = vmulq_f32(mat.array_neon[1], v1);
+        float32x4_t m2 = vmulq_f32(mat.array_neon[2], v2);
+        float32x4_t m3 = vmulq_f32(mat.array_neon[3], v3);
+
+        float32x4_t a0 = vaddq_f32(m0, m1);
+        float32x4_t a1 = vaddq_f32(m2, m3);
+        float32x4_t a2 = vaddq_f32(a0, a1);
+
+        return a2;
+
     #else
-        
+
         vec4 result;
         result.x = mat._11*vec.x + mat._12*vec.y + mat._13*vec.z + mat._14*vec.w;
         result.y = mat._21*vec.x + mat._22*vec.y + mat._23*vec.z + mat._24*vec.w;
         result.z = mat._31*vec.x + mat._32*vec.y + mat._33*vec.z + mat._34*vec.w;
         result.w = mat._41*vec.x + mat._42*vec.y + mat._43*vec.z + mat._44*vec.w;
         return result;
-        
+
     #endif
     }
 
@@ -599,29 +939,51 @@ namespace aRibeiro {
     /// \return A vec3 containing xyz from the parameter
     ///
     ARIBEIRO_INLINE vec4 operator*(const vec4 &vec, const mat4 &mat){
-        
+
     #if defined(ARIBEIRO_SSE2)
 
         __m128 m0 = _mm_mul_ps(vec.array_sse, mat.array_sse[0]);
         __m128 m1 = _mm_mul_ps(vec.array_sse, mat.array_sse[1]);
         __m128 m2 = _mm_mul_ps(vec.array_sse, mat.array_sse[2]);
         __m128 m3 = _mm_mul_ps(vec.array_sse, mat.array_sse[3]);
-        
+
         __m128 u0 = _mm_unpacklo_ps(m0, m1);
         __m128 u1 = _mm_unpackhi_ps(m0, m1);
         __m128 a0 = _mm_add_ps(u0, u1);
-        
+
         __m128 u2 = _mm_unpacklo_ps(m2, m3);
         __m128 u3 = _mm_unpackhi_ps(m2, m3);
         __m128 a1 = _mm_add_ps(u2, u3);
-        
+
         __m128 f0 = _mm_movelh_ps(a0, a1);
         __m128 f1 = _mm_movehl_ps(a1, a0);
         __m128 f2 = _mm_add_ps(f0, f1);
-        
+
         return f2;
+    #elif defined(ARIBEIRO_NEON)
+        float32x4_t a = vmulq_f32(vec.array_neon, mat.array_neon[0]);
+        float32x4_t b = vmulq_f32(vec.array_neon, mat.array_neon[1]);
+        float32x4_t c = vmulq_f32(vec.array_neon, mat.array_neon[2]);
+        float32x4_t d = vmulq_f32(vec.array_neon, mat.array_neon[3]);
+
+        //
+        //transpose ops
+        //
+        float32x4x2_t ab = vtrnq_f32(a,b);
+        float32x4x2_t cd = vtrnq_f32(c,d);
+        float32x4_t a_=vcombine_f32(vget_low_f32(ab.val[0]),vget_low_f32(cd.val[0]));
+        float32x4_t b_=vcombine_f32(vget_low_f32(ab.val[1]),vget_low_f32(cd.val[1]));
+        float32x4_t c_=vcombine_f32(vget_high_f32(ab.val[0]),vget_high_f32(cd.val[0]));
+        float32x4_t d_=vcombine_f32(vget_high_f32(ab.val[1]),vget_high_f32(cd.val[1]));
+
+        float32x4_t add0 = vaddq_f32(a_,b_);
+        float32x4_t add1 = vaddq_f32(c_,d_);
+
+        float32x4_t add2 = vaddq_f32(add0,add1);
+
+        return add2;
     #else
-        
+
         vec4 result;
         result.x = mat._11*vec.x + mat._21*vec.y + mat._31*vec.z + mat._41*vec.w;
         result.y = mat._12*vec.x + mat._22*vec.y + mat._32*vec.z + mat._42*vec.w;
@@ -643,44 +1005,78 @@ namespace aRibeiro {
     ARIBEIRO_INLINE quat operator^(const quat &a, const quat &b){
 #if defined(ARIBEIRO_SSE2)
         __m128 a0 = _mm_shuffle_ps(a.array_sse, a.array_sse, _MM_SHUFFLE(3,3,3,3));
-        __m128 b0 = _mm_shuffle_ps(b.array_sse, b.array_sse, _MM_SHUFFLE(3,2,1,0));
-        
+        //__m128 b0 = _mm_shuffle_ps(b.array_sse, b.array_sse, _MM_SHUFFLE(3,2,1,0));
+
         __m128 a1 = _mm_shuffle_ps(a.array_sse, a.array_sse, _MM_SHUFFLE(0,2,1,0));
         __m128 b1 = _mm_shuffle_ps(b.array_sse, b.array_sse, _MM_SHUFFLE(0,3,3,3));
-        
+
         __m128 a2 = _mm_shuffle_ps(a.array_sse, a.array_sse, _MM_SHUFFLE(1,0,2,1));
         __m128 b2 = _mm_shuffle_ps(b.array_sse, b.array_sse, _MM_SHUFFLE(1,1,0,2));
-        
+
         __m128 a3 = _mm_shuffle_ps(a.array_sse, a.array_sse, _MM_SHUFFLE(2,1,0,2));
         __m128 b3 = _mm_shuffle_ps(b.array_sse, b.array_sse, _MM_SHUFFLE(2,0,2,1));
-        
+
         static const __m128 signMask0 = _mm_load_(1.0f,1.0f,1.0f,-1.0f);
-        
-        __m128 mul0 = _mm_mul_ps(a0, b0);
-        
+
+        //__m128 mul0 = _mm_mul_ps(a0, b0);
+        __m128 mul0 = _mm_mul_ps(a0, b.array_sse);
+
         __m128 mul1 = _mm_mul_ps(a1, b1);
         mul1 = _mm_mul_ps(mul1, signMask0);
-        
+
         __m128 mul2 = _mm_mul_ps(a2, b2);
         mul2 = _mm_mul_ps(mul2, signMask0);
-        
+
         __m128 mul3 = _mm_mul_ps(a3, b3);
-        
+
         __m128 add0 = _mm_add_ps(mul0, mul1);
         add0 = _mm_add_ps(add0, mul2);
         add0 = _mm_sub_ps(add0, mul3);
-        
+
+        return add0;
+#elif defined(ARIBEIRO_NEON)
+
+        float32x4_t a0 = vshuffle_3333(a.array_neon);
+        //__m128 b0 = _mm_shuffle_ps(b.array_sse, b.array_sse, _MM_SHUFFLE(3,2,1,0));
+
+        float32x4_t a1 = vshuffle_0210(a.array_neon);
+        float32x4_t b1 = vshuffle_0333(b.array_neon);
+
+        float32x4_t a2 = vshuffle_1021(a.array_neon);
+        float32x4_t b2 = vshuffle_1102(b.array_neon);
+
+        float32x4_t a3 = vshuffle_2102(a.array_neon);
+        float32x4_t b3 = vshuffle_2021(b.array_neon);
+
+        static const float32x4_t signMask0 = (float32x4_t){1.0f,1.0f,1.0f,-1.0f};
+
+        //__m128 mul0 = _mm_mul_ps(a0, b0);
+        float32x4_t mul0 = vmulq_f32(a0, b.array_neon);
+
+        float32x4_t mul1 = vmulq_f32(a1, b1);
+        mul1 = vmulq_f32(mul1, signMask0);
+
+        float32x4_t mul2 = vmulq_f32(a2, b2);
+        mul2 = vmulq_f32(mul2, signMask0);
+
+        float32x4_t mul3 = vmulq_f32(a3, b3);
+
+        float32x4_t add0 = vaddq_f32(mul0, mul1);
+        add0 = vaddq_f32(add0, mul2);
+        add0 = vsubq_f32(add0, mul3);
+
         return add0;
 
+
 #else
-        
+
         return quat(
                     a.w * b.x + a.x * b.w + a.y * b.z - a.z * b.y,
                     a.w * b.y + a.y * b.w + a.z * b.x - a.x * b.z,
                     a.w * b.z + a.z * b.w + a.x * b.y - a.y * b.x,
                     a.w * b.w - a.x * b.x - a.y * b.y - a.z * b.z
                     ) ;
-        
+
 #endif
     }
 
@@ -708,6 +1104,12 @@ namespace aRibeiro {
 #if defined(ARIBEIRO_SSE2)
         quat result = a ^ quat(v.x, v.y, v.z, 0.0f) ^ conjugate(a);
         return result.array_sse;
+#elif defined(ARIBEIRO_NEON)
+
+        static const float32x4_t _const_n = (float32x4_t){ 1,1,1,0 };
+
+        quat result = a ^ quat( vmulq_f32(v.array_neon, _const_n ) ) ^ conjugate(a);
+        return result.array_neon;
 #else
         //quat result = mul(a, mul(quat(v.x, v.y, v.z, 0.0f), conjugate(a)));
         //
@@ -730,6 +1132,21 @@ namespace aRibeiro {
         quat result = a ^ quat(v.x, v.y, v.z, 0.0f) ^ conjugate(a);
 		_mm_f32_(result.array_sse,3) = v.w;
         return result.array_sse;
+#elif defined(ARIBEIRO_NEON)
+
+        static const float32x4_t _const_n = (float32x4_t){ 1,1,1,0 };
+        static const float32x4_t _const2_n = (float32x4_t){ 0,0,0,1 };
+
+        quat result = a ^ quat( vmulq_f32(v.array_neon, _const_n ) ) ^ conjugate(a);
+
+        return vaddq_f32(
+                vmulq_f32(result.array_neon, _const_n),
+                vmulq_f32(v.array_neon, _const2_n)
+        );
+
+		//_mm_f32_(result.array_sse,3) = v.w;
+
+        return result.array_neon;
 #else
         //quat result = mul(a, mul(quat(v.x, v.y, v.z, 0.0f), conjugate(a)));
         //quat result = a * quat(v.x, v.y, v.z, 0.0f) * conjugate(a);
@@ -740,8 +1157,8 @@ namespace aRibeiro {
         return vec4(result.x, result.y, result.z, v.w);
 #endif
     }
-    
-    
+
+
     /// \brief Compute the spherical linear interpolation between 2 quaternions.
     ///
     /// \author Alessandro Ribeiro
@@ -752,10 +1169,10 @@ namespace aRibeiro {
         /*
          if (lerp <= 0.0f) return a;
          if (lerp >= 1.0f) return b;
-         
+
          // calc cosine theta
          float cosom = a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w;
-         
+
          // adjust signs (if necessary)
          quat end = b;
          if (cosom < 0.0f) {
@@ -765,7 +1182,7 @@ namespace aRibeiro {
          end.z = -end.z;
          end.w = -end.w;
          }
-         
+
          // Calculate coefficients
          float sclp, sclq;
          if ((1.0f - cosom) > 0.0001f) { // 0.0001 -> some epsillon
@@ -791,7 +1208,7 @@ namespace aRibeiro {
         //
         if (lerp <= 0.0f) return a;
         if (lerp >= 1.0f) return b;
-        
+
         //float fCos = dot(a, b);
         float fCos = dot(a,b);//a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w;
         quat y2(b); //BUG!!! qua<T> y2;
@@ -801,7 +1218,7 @@ namespace aRibeiro {
             //y2 = quat(-b.x, -b.y, -b.z, -b.w);
             fCos = -fCos;
         }
-        
+
         //if(fCos > 1.0f) // problem
         float k0, k1;
         //const float EPSILON = 1e-6f;
@@ -822,6 +1239,10 @@ namespace aRibeiro {
         __m128 aResult = _mm_mul_ps(a.array_sse, _mm_set1_ps(k0) );
         __m128 y2Result = _mm_mul_ps(y2.array_sse, _mm_set1_ps(k1) );
         return normalize(quat(_mm_add_ps(aResult, y2Result)));
+#elif defined(ARIBEIRO_NEON)
+        float32x4_t aResult = vmulq_f32(a.array_neon, vset1(k0) );
+        float32x4_t y2Result = vmulq_f32(y2.array_neon, vset1(k1) );
+        return normalize(quat(vaddq_f32(aResult, y2Result)));
 #else
         return normalize(quat(
                               k0 * a.x + k1 * y2.x,
@@ -841,7 +1262,7 @@ namespace aRibeiro {
     /// \return The quaternion
     ///
     ARIBEIRO_INLINE vec3 slerp(const vec3& a, const vec3& b, const float &lerp){
-        
+
         //
         // https://github.com/g-truc/glm
         //
@@ -851,21 +1272,21 @@ namespace aRibeiro {
         float Alpha = acos(CosAlpha);
         // get sine of angle between vectors (0 -> 1)
         float SinAlpha = sin(Alpha);
-        
+
         // simply perform linear interpolation if sinAlpha = 0
         if (absv(SinAlpha) < 1e-6f )
             return a + (b - a) * lerp;
-        
+
         // this breaks down when SinAlpha = 0, i.e. Alpha = 0 or pi
         float t1 = sin( (1.0f - lerp) * Alpha ) / SinAlpha;
         float t2 = sin(lerp * Alpha) / SinAlpha;
-        
+
         // interpolate src vectors
         return a * t1 + b * t2;
     }
-    
-    
-    
+
+
+
 
     /// \brief Compute the angle between two vectors
     ///
@@ -879,12 +1300,19 @@ namespace aRibeiro {
         __m128 dot0 = dot_sse_3( normalize(a).array_sse, normalize(b).array_sse );
         __m128 cosA = clamp_sse_4(dot0, _mm_set1_ps(-1.0f), _mm_set1_ps(1.0f));
         return acos(_mm_f32_(cosA,0));
+#elif defined(ARIBEIRO_NEON)
+        static const float32x4_t _minus_one = vset1(-1.0f);
+        static const float32x4_t _one = vset1(1.0f);
+
+        float32x4_t dot0 = dot_neon_3( normalize(a).array_neon, normalize(b).array_neon );
+        float32x4_t cosA = clamp_neon_4(dot0, _minus_one, _one);
+        return acos(cosA[0]);
 #else
         float cosA = clamp(dot(normalize(a), normalize(b)),-1.0f,1.0f);
         return acos(cosA);
 #endif
     }
-    
+
     /// \brief Computes the angle between two quaternions
     ///
     ///
@@ -899,6 +1327,13 @@ namespace aRibeiro {
         __m128 dot0 = dot_sse_4( normalize(a).array_sse, normalize(b).array_sse );
         __m128 cosA = clamp_sse_4(dot0, _mm_set1_ps(-1.0f), _mm_set1_ps(1.0f));
         return acos(_mm_f32_(cosA,0)) * 2.0f;
+#elif defined(ARIBEIRO_NEON)
+        static const float32x4_t _minus_one = vset1(-1.0f);
+        static const float32x4_t _one = vset1(1.0f);
+
+        float32x4_t dot0 = dot_neon_4( normalize(a).array_neon, normalize(b).array_neon );
+        float32x4_t cosA = clamp_neon_4(dot0, _minus_one, _one);
+        return acos(cosA[0]) * 2.0f;
 #else
         return acos(
                     clamp(dot(normalize(a), normalize(b)),-1.0f,1.0f)
@@ -906,11 +1341,11 @@ namespace aRibeiro {
         //return acos( dot(normalize(vec3(a.x, a.y, a.z)), normalize(vec3(b.x, b.y, b.z))) );
 #endif
     }
-    
-    
 
 
-   
+
+
+
 
 
 
@@ -963,13 +1398,22 @@ namespace aRibeiro {
         __m128 mul1 = _mm_mul_ps(swp1, swp2);
         __m128 sub0 = _mm_sub_ps(mul0, mul1);
         return sub0;
+#elif defined(ARIBEIRO_NEON)
+        float32x4_t swp0 = vshuffle_3021(a.array_neon);
+        float32x4_t swp1 = vshuffle_3102(a.array_neon);
+        float32x4_t swp2 = vshuffle_3021(b.array_neon);
+        float32x4_t swp3 = vshuffle_3102(b.array_neon);
+        float32x4_t mul0 = vmulq_f32(swp0, swp3);
+        float32x4_t mul1 = vmulq_f32(swp1, swp2);
+        float32x4_t sub0 = vsubq_f32(mul0, mul1);
+        return sub0;
 #else
         return vec3((a.y * b.z - a.z * b.y),
                     (a.z * b.x - a.x * b.z),
                     (a.x * b.y - a.y * b.x));
 #endif
     }
-    
+
 
     //------------------------------------------------------------------------------
     /// \brief Computes the reflected vector 'a' related to a normal N
@@ -1013,6 +1457,12 @@ namespace aRibeiro {
         __m128 mul0 = _mm_mul_ps(dt, N.array_sse);
         __m128 mul1 = _mm_mul_ps(mul0, _mm_set1_ps(2.0f));
         return _mm_sub_ps(a.array_sse, mul1);
+#elif defined(ARIBEIRO_NEON)
+        static const float32x4_t _two = vset1(2.0f);
+        float32x4_t dt = dot_neon_3(a.array_neon, N.array_neon);
+        float32x4_t mul0 = vmulq_f32(dt, N.array_neon);
+        float32x4_t mul1 = vmulq_f32(mul0, _two);
+        return vsubq_f32(a.array_neon, mul1);
 #else
         return (a - N * (2.0f * dot(a, N)));
 #endif
@@ -1033,6 +1483,12 @@ namespace aRibeiro {
         __m128 mul0 = _mm_mul_ps(dt, N.array_sse);
         __m128 mul1 = _mm_mul_ps(mul0, _mm_set1_ps(2.0f));
         return _mm_sub_ps(a.array_sse, mul1);
+#elif defined(ARIBEIRO_NEON)
+        static const float32x4_t _two = vset1(2.0f);
+        float32x4_t dt = dot_neon_4(a.array_neon, N.array_neon);
+        float32x4_t mul0 = vmulq_f32(dt, N.array_neon);
+        float32x4_t mul1 = vmulq_f32(mul0, _two);
+        return vsubq_f32(a.array_neon, mul1);
 #else
         return (a - N * (2.0f * dot(a, N)));
 #endif
@@ -1055,19 +1511,19 @@ namespace aRibeiro {
     ARIBEIRO_INLINE bool refract(const vec3 &rayDir,const vec3 &normal, const float &ni, const float &nr, vec3 *vOut ){
 
         vec3 L = normalize(-rayDir);
-        
+
         float ni_nr = ni/nr;
         float cos_i = dot( normal, L );
-        
+
         float cos_r = 1.0f - ni_nr*ni_nr*( 1.0f - cos_i*cos_i );
-        
+
         if (cos_r <=0)
             return false;
-        
+
         cos_r = sqrt(cos_r);
-        
+
         vec3 T = (ni_nr*cos_i - cos_r) * normal - ni_nr * L;
-        
+
         *vOut = normalize( T );
         return true;
     }
@@ -1084,7 +1540,7 @@ namespace aRibeiro {
         //return q.w * q.w + q.x * q.x + q.y * q.y + q.z * q.z;
         return dot(q,q);
     }
-    
+
     /// \brief Computes the squared length of a vector
     ///
     /// The squared length of a vector 'a' is:
@@ -1131,9 +1587,9 @@ namespace aRibeiro {
         return dot(a, a);
     }
     //------------------------------------------------------------------------------
-    
-    
-    
+
+
+
     /// \brief Compute the length of the quaternion
     ///
     /// \author Alessandro Ribeiro
@@ -1143,8 +1599,8 @@ namespace aRibeiro {
     ARIBEIRO_INLINE float length(const quat& q){
         return sqrtf(dot(q, q));
     }
-    
-    
+
+
     /// \brief Computes the length of a vector
     ///
     /// The length of a vector 'a' is:
@@ -1364,6 +1820,10 @@ namespace aRibeiro {
         __m128 dot0 = dot_sse_3(a.array_sse,unitV.array_sse);
         __m128 mul0 = _mm_mul_ps(unitV.array_sse, dot0);
         return mul0;
+#elif defined(ARIBEIRO_NEON)
+        float32x4_t dot0 = dot_neon_3(a.array_neon,unitV.array_neon);
+        float32x4_t mul0 = vmulq_f32(unitV.array_neon, dot0);
+        return mul0;
 #else
         return unitV * (dot(a, unitV));//dot(a,unitV) É a projeção de a em unitV
 #endif
@@ -1389,6 +1849,10 @@ namespace aRibeiro {
         __m128 dot0 = dot_sse_4(a.array_sse,unitV.array_sse);
         __m128 mul0 = _mm_mul_ps(unitV.array_sse, dot0);
         return mul0;
+#elif defined(ARIBEIRO_NEON)
+        float32x4_t dot0 = dot_neon_4(a.array_neon,unitV.array_neon);
+        float32x4_t mul0 = vmulq_f32(unitV.array_neon, dot0);
+        return mul0;
 #else
         return unitV * (dot(a, unitV));//dot(a,unitV) É a projeção de a em unitV
 #endif
@@ -1413,7 +1877,7 @@ namespace aRibeiro {
     ARIBEIRO_INLINE vec2 perpendicularComponent(const vec2 &a, const vec2 &unitV){
         return a - unitV * (dot(a, unitV)); //unitV*(dot(a,unitV)) É o componenete paralelo
     }
-    
+
     /// \brief Computes a vector perpendicular to the projection of a vector over a unit vector
     ///
     /// The vector perpendicular to the projection result is a vector normal to the unitV
@@ -1436,11 +1900,16 @@ namespace aRibeiro {
         __m128 mul0 = _mm_mul_ps(unitV.array_sse, dot0);
         __m128 sub = _mm_sub_ps(a.array_sse, mul0);
         return sub;
+#elif defined(ARIBEIRO_NEON)
+        float32x4_t dot0 = dot_neon_3(a.array_neon,unitV.array_neon);
+        float32x4_t mul0 = vmulq_f32(unitV.array_neon, dot0);
+        float32x4_t sub = vsubq_f32(a.array_neon, mul0);
+        return sub;
 #else
         return a - unitV * (dot(a, unitV)); //unitV*(dot(a,unitV)) É o componenete paralelo
 #endif
     }
-    
+
     /// \brief Computes a vector perpendicular to the projection of a vector over a unit vector
     ///
     /// The vector perpendicular to the projection result is a vector normal to the unitV
@@ -1463,11 +1932,16 @@ namespace aRibeiro {
         __m128 mul0 = _mm_mul_ps(unitV.array_sse, dot0);
         __m128 sub = _mm_sub_ps(a.array_sse, mul0);
         return sub;
+#elif defined(ARIBEIRO_NEON)
+        float32x4_t dot0 = dot_neon_4(a.array_neon,unitV.array_neon);
+        float32x4_t mul0 = vmulq_f32(unitV.array_neon, dot0);
+        float32x4_t sub = vsubq_f32(a.array_neon, mul0);
+        return sub;
 #else
         return a - unitV * (dot(a, unitV)); //unitV*(dot(a,unitV)) É o componenete paralelo
 #endif
     }
-    
+
     //------------------------------------------------------------------------------
     /// \brief Computes both: a vector perpendicular and a parallel to the projection of a vector over a unit vector
     ///
@@ -1533,9 +2007,17 @@ namespace aRibeiro {
         __m128 dot0 = dot_sse_3(a.array_sse,unitV.array_sse);
         __m128 mul0 = _mm_mul_ps(unitV.array_sse, dot0);
         __m128 sub = _mm_sub_ps(a.array_sse, mul0);
-        
+
         parallel->array_sse = mul0;
         perpendicular->array_sse = sub;
+#elif defined(ARIBEIRO_NEON)
+        float32x4_t dot0 = dot_neon_3(a.array_neon,unitV.array_neon);
+        float32x4_t mul0 = vmulq_f32(unitV.array_neon, dot0);
+        float32x4_t sub = vsubq_f32(a.array_neon, mul0);
+
+        parallel->array_neon = mul0;
+        perpendicular->array_neon = sub;
+
 #else
         *parallel = unitV * (dot(a, unitV));
         *perpendicular = a - *parallel;
@@ -1574,9 +2056,17 @@ namespace aRibeiro {
         __m128 dot0 = dot_sse_4(a.array_sse,unitV.array_sse);
         __m128 mul0 = _mm_mul_ps(unitV.array_sse, dot0);
         __m128 sub = _mm_sub_ps(a.array_sse, mul0);
-        
+
         parallel->array_sse = mul0;
         perpendicular->array_sse = sub;
+#elif defined(ARIBEIRO_NEON)
+        float32x4_t dot0 = dot_neon_4(a.array_neon,unitV.array_neon);
+        float32x4_t mul0 = vmulq_f32(unitV.array_neon, dot0);
+        float32x4_t sub = vsubq_f32(a.array_neon, mul0);
+
+        parallel->array_neon = mul0;
+        perpendicular->array_neon = sub;
+
 #else
         *parallel = unitV * (dot(a, unitV));
         *perpendicular = a - *parallel;
@@ -1644,7 +2134,7 @@ namespace aRibeiro {
     ARIBEIRO_INLINE float maximum(const vec2 &a){
         return (a.x > a.y) ? (a.x) : (a.y);
     }
-    
+
     /// \brief Return the greater value from the parameter
     ///
     /// \author Alessandro Ribeiro
@@ -1654,7 +2144,7 @@ namespace aRibeiro {
     ARIBEIRO_INLINE float maximum(const vec3 &a){
         return (a.x > a.y) ? ((a.x > a.z) ? (a.x) : (a.z)) : (a.y);
     }
-    
+
     /// \brief Return the greater value from the parameter
     ///
     /// \author Alessandro Ribeiro
@@ -1664,7 +2154,7 @@ namespace aRibeiro {
     ARIBEIRO_INLINE float maximum(const vec4 &a){
         return (a.x > a.y) ? ((a.x > a.z) ? ((a.x > a.w) ? (a.x) : (a.w)) : (a.z)) : (a.y);
     }
-    
+
     /// \brief Return the maximum between the two parameters
     ///
     /// \author Alessandro Ribeiro
@@ -1687,12 +2177,14 @@ namespace aRibeiro {
     ARIBEIRO_INLINE vec2 maximum(const vec2 &a, const vec2 &b){
 #if defined(ARIBEIRO_SSE2)
         return _mm_max_ps(a.array_sse, b.array_sse);
+#elif defined(ARIBEIRO_NEON)
+        return vmaxq_f32(a.array_neon, b.array_neon);
 #else
         return vec2((a.x > b.x) ? a.x : b.x,
                     (a.y > b.y) ? a.y : b.y);
 #endif
     }
-    
+
     /// \brief Component-wise maximum value from two vectors
     ///
     ///  Return the maximum value considering each component of the vector.
@@ -1707,13 +2199,15 @@ namespace aRibeiro {
     ARIBEIRO_INLINE vec3 maximum(const vec3 &a, const vec3 &b){
 #if defined(ARIBEIRO_SSE2)
         return _mm_max_ps(a.array_sse, b.array_sse);
+#elif defined(ARIBEIRO_NEON)
+        return vmaxq_f32(a.array_neon, b.array_neon);
 #else
         return vec3((a.x > b.x) ? a.x : b.x,
                     (a.y > b.y) ? a.y : b.y,
                     (a.z > b.z) ? a.z : b.z);
 #endif
     }
-    
+
     /// \brief Component-wise maximum value from two vectors
     ///
     ///  Return the maximum value considering each component of the vector.
@@ -1728,6 +2222,8 @@ namespace aRibeiro {
     ARIBEIRO_INLINE vec4 maximum(const vec4 &a, const vec4 &b){
 #if defined(ARIBEIRO_SSE2)
         return _mm_max_ps(a.array_sse, b.array_sse);
+#elif defined(ARIBEIRO_NEON)
+        return vmaxq_f32(a.array_neon, b.array_neon);
 #else
         return vec4((a.x > b.x) ? a.x : b.x,
                     (a.y > b.y) ? a.y : b.y,
@@ -1735,7 +2231,7 @@ namespace aRibeiro {
                     (a.w > b.w) ? a.w : b.w);
 #endif
     }
-    
+
     /// \brief Return the smaller value from the parameter
     ///
     /// \author Alessandro Ribeiro
@@ -1745,7 +2241,7 @@ namespace aRibeiro {
     ARIBEIRO_INLINE float minimum(const vec2 &a){
         return (a.x < a.y) ? (a.x) : (a.y);
     }
-    
+
     /// \brief Return the smaller value from the parameter
     ///
     /// \author Alessandro Ribeiro
@@ -1755,7 +2251,7 @@ namespace aRibeiro {
     ARIBEIRO_INLINE float minimum(const vec3 &a){
         return (a.x < a.y) ? ((a.x < a.z) ? (a.x) : (a.z)) : (a.y);
     }
-    
+
     /// \brief Return the smaller value from the parameter
     ///
     /// \author Alessandro Ribeiro
@@ -1787,6 +2283,8 @@ namespace aRibeiro {
     ARIBEIRO_INLINE vec2 minimum(const vec2 &a, const vec2 &b){
 #if defined(ARIBEIRO_SSE2)
         return _mm_min_ps(a.array_sse, b.array_sse);
+#elif defined(ARIBEIRO_NEON)
+        return vminq_f32(a.array_neon, b.array_neon);
 #else
         return vec2((a.x < b.x) ? a.x : b.x,
                     (a.y < b.y) ? a.y : b.y);
@@ -1806,6 +2304,8 @@ namespace aRibeiro {
     ARIBEIRO_INLINE vec3 minimum(const vec3 &a, const vec3 &b){
 #if defined(ARIBEIRO_SSE2)
         return _mm_min_ps(a.array_sse, b.array_sse);
+#elif defined(ARIBEIRO_NEON)
+        return vminq_f32(a.array_neon, b.array_neon);
 #else
         return vec3((a.x < b.x) ? a.x : b.x,
                     (a.y < b.y) ? a.y : b.y,
@@ -1826,6 +2326,8 @@ namespace aRibeiro {
     ARIBEIRO_INLINE vec4 minimum(const vec4 &a, const vec4 &b){
 #if defined(ARIBEIRO_SSE2)
         return _mm_min_ps(a.array_sse, b.array_sse);
+#elif defined(ARIBEIRO_NEON)
+        return vminq_f32(a.array_neon, b.array_neon);
 #else
         return vec4((a.x < b.x) ? a.x : b.x,
                     (a.y < b.y) ? a.y : b.y,
@@ -1833,7 +2335,7 @@ namespace aRibeiro {
                     (a.w < b.w) ? a.w : b.w);
 #endif
     }
-    
+
     //------------------------------------------------------------------------------
     /// \brief Compute the sign of a float
     ///
@@ -1863,12 +2365,14 @@ namespace aRibeiro {
     ARIBEIRO_INLINE vec2 absv(const vec2 &a){
 #if defined(ARIBEIRO_SSE2)
         return _mm_andnot_ps(_vec4_sign_mask, a.array_sse);
+#elif defined(ARIBEIRO_NEON)
+        return vabsq_f32(a.array_neon);
 #else
         return vec2((a.x < 0) ? (-a.x) : (a.x),
                     (a.y < 0) ? (-a.y) : (a.y));
 #endif
     }
-    
+
     /// \brief Compute the absolute value of a vector
     ///
     /// \author Alessandro Ribeiro
@@ -1878,6 +2382,8 @@ namespace aRibeiro {
     ARIBEIRO_INLINE vec3 absv(const vec3 &a){
 #if defined(ARIBEIRO_SSE2)
         return _mm_andnot_ps(_vec4_sign_mask, a.array_sse);
+#elif defined(ARIBEIRO_NEON)
+        return vabsq_f32(a.array_neon);
 #else
         return vec3((a.x < 0) ? (-a.x) : (a.x),
                     (a.y < 0) ? (-a.y) : (a.y),
@@ -1893,6 +2399,8 @@ namespace aRibeiro {
     ARIBEIRO_INLINE vec4 absv(const vec4 &a){
 #if defined(ARIBEIRO_SSE2)
         return _mm_andnot_ps(_vec4_sign_mask, a.array_sse);
+#elif defined(ARIBEIRO_NEON)
+        return vabsq_f32(a.array_neon);
 #else
         return vec4((a.x < 0) ? (-a.x) : (a.x),
                     (a.y < 0) ? (-a.y) : (a.y),
@@ -1914,8 +2422,8 @@ namespace aRibeiro {
     /// \return The interpolation result
     ///
     //ARIBEIRO_API float lerp(const float a,const  float b,const float factor);
-    
-    
+
+
     /// \brief Computes the linear interpolation
     ///
     /// When the fator is between 0 and 1, it returns the convex relation (linear interpolation) between a and b.
@@ -2125,6 +2633,18 @@ namespace aRibeiro {
 		_mm_f32_(r.array_sse[2],3) = 0;
 		_mm_f32_(r.array_sse[3],3) = 1;
         return r;
+#elif defined(ARIBEIRO_NEON)
+
+        static const float32x4_t _valuemask = (float32x4_t){ 1,1,1,0 };
+        static const float32x4_t _one = (float32x4_t){ 0,0,0,1 };
+
+        return mat4(
+            vmulq_f32(m.array_neon[0],_valuemask),
+            vmulq_f32(m.array_neon[1],_valuemask),
+            vmulq_f32(m.array_neon[2],_valuemask),
+            vaddq_f32(vmulq_f32(m.array_neon[3],_valuemask), _one)
+        );
+
 #else
         return mat4(m._11, m._12, m._13, 0,
                     m._21, m._22, m._23, 0,
@@ -2142,6 +2662,8 @@ namespace aRibeiro {
     ARIBEIRO_INLINE vec3 extractXaxis(const mat4& m){
 #if defined(ARIBEIRO_SSE2)
         return m.array_sse[0];
+#elif defined(ARIBEIRO_NEON)
+        return m.array_neon[0];
 #else
         return vec3(m.a1, m.a2, m.a3);
 #endif
@@ -2155,6 +2677,8 @@ namespace aRibeiro {
     ARIBEIRO_INLINE vec3 extractYaxis(const mat4& m){
 #if defined(ARIBEIRO_SSE2)
         return m.array_sse[1];
+#elif defined(ARIBEIRO_NEON)
+        return m.array_neon[1];
 #else
         return vec3(m.b1, m.b2, m.b3);
 #endif
@@ -2168,6 +2692,8 @@ namespace aRibeiro {
     ARIBEIRO_INLINE vec3 extractZaxis(const mat4& m){
 #if defined(ARIBEIRO_SSE2)
         return m.array_sse[2];
+#elif defined(ARIBEIRO_NEON)
+        return m.array_neon[2];
 #else
         return vec3(m.c1, m.c2, m.c3);
 #endif
@@ -2181,6 +2707,8 @@ namespace aRibeiro {
     ARIBEIRO_INLINE vec3 extractTranslation(const mat4& m){
 #if defined(ARIBEIRO_SSE2)
         return m.array_sse[3];
+#elif defined(ARIBEIRO_NEON)
+        return m.array_neon[3];
 #else
         return vec3(m.d1, m.d2, m.d3);
 #endif
@@ -2197,12 +2725,22 @@ namespace aRibeiro {
         __m128 tmp2 = _mm_shuffle_ps(m.array_sse[0], m.array_sse[1], 0xEE);
         __m128 tmp1 = _mm_shuffle_ps(m.array_sse[2], m.array_sse[3], 0x44);
         __m128 tmp3 = _mm_shuffle_ps(m.array_sse[2], m.array_sse[3], 0xEE);
-        
+
         return mat4(
             _mm_shuffle_ps(tmp0, tmp1, 0x88),
             _mm_shuffle_ps(tmp0, tmp1, 0xDD),
             _mm_shuffle_ps(tmp2, tmp3, 0x88),
             _mm_shuffle_ps(tmp2, tmp3, 0xDD));
+#elif defined(ARIBEIRO_NEON)
+
+        float32x4x2_t ab = vtrnq_f32(m.array_neon[0],m.array_neon[1]);
+        float32x4x2_t cd = vtrnq_f32(m.array_neon[2],m.array_neon[3]);
+        float32x4_t a_=vcombine_f32(vget_low_f32(ab.val[0]),vget_low_f32(cd.val[0]));
+        float32x4_t b_=vcombine_f32(vget_low_f32(ab.val[1]),vget_low_f32(cd.val[1]));
+        float32x4_t c_=vcombine_f32(vget_high_f32(ab.val[0]),vget_high_f32(cd.val[0]));
+        float32x4_t d_=vcombine_f32(vget_high_f32(ab.val[1]),vget_high_f32(cd.val[1]));
+
+        return mat4(a_,b_,c_,d_);
 #else
         return mat4(m._11, m._21, m._31, m._41,
                     m._12, m._22, m._32, m._42,
@@ -2218,159 +2756,159 @@ namespace aRibeiro {
     ///
     ARIBEIRO_INLINE mat4 inv(const mat4& m){
 #if defined(ARIBEIRO_SSE2)
-        
+
         __m128 Fac0;
         {
             //    valType SubFactor00 = m[2][2] * m[3][3] - m[3][2] * m[2][3];
             //    valType SubFactor00 = m[2][2] * m[3][3] - m[3][2] * m[2][3];
             //    valType SubFactor06 = m[1][2] * m[3][3] - m[3][2] * m[1][3];
             //    valType SubFactor13 = m[1][2] * m[2][3] - m[2][2] * m[1][3];
-            
+
             __m128 Swp0a = _mm_shuffle_ps(m.array_sse[3], m.array_sse[2], _MM_SHUFFLE(3, 3, 3, 3));
             __m128 Swp0b = _mm_shuffle_ps(m.array_sse[3], m.array_sse[2], _MM_SHUFFLE(2, 2, 2, 2));
-            
+
             __m128 Swp00 = _mm_shuffle_ps(m.array_sse[2], m.array_sse[1], _MM_SHUFFLE(2, 2, 2, 2));
             __m128 Swp01 = _mm_shuffle_ps(Swp0a, Swp0a, _MM_SHUFFLE(2, 0, 0, 0));
             __m128 Swp02 = _mm_shuffle_ps(Swp0b, Swp0b, _MM_SHUFFLE(2, 0, 0, 0));
             __m128 Swp03 = _mm_shuffle_ps(m.array_sse[2], m.array_sse[1], _MM_SHUFFLE(3, 3, 3, 3));
-            
+
             __m128 Mul00 = _mm_mul_ps(Swp00, Swp01);
             __m128 Mul01 = _mm_mul_ps(Swp02, Swp03);
             Fac0 = _mm_sub_ps(Mul00, Mul01);
         }
-        
+
         __m128 Fac1;
         {
             //    valType SubFactor01 = m[2][1] * m[3][3] - m[3][1] * m[2][3];
             //    valType SubFactor01 = m[2][1] * m[3][3] - m[3][1] * m[2][3];
             //    valType SubFactor07 = m[1][1] * m[3][3] - m[3][1] * m[1][3];
             //    valType SubFactor14 = m[1][1] * m[2][3] - m[2][1] * m[1][3];
-            
+
             __m128 Swp0a = _mm_shuffle_ps(m.array_sse[3], m.array_sse[2], _MM_SHUFFLE(3, 3, 3, 3));
             __m128 Swp0b = _mm_shuffle_ps(m.array_sse[3], m.array_sse[2], _MM_SHUFFLE(1, 1, 1, 1));
-            
+
             __m128 Swp00 = _mm_shuffle_ps(m.array_sse[2], m.array_sse[1], _MM_SHUFFLE(1, 1, 1, 1));
             __m128 Swp01 = _mm_shuffle_ps(Swp0a, Swp0a, _MM_SHUFFLE(2, 0, 0, 0));
             __m128 Swp02 = _mm_shuffle_ps(Swp0b, Swp0b, _MM_SHUFFLE(2, 0, 0, 0));
             __m128 Swp03 = _mm_shuffle_ps(m.array_sse[2], m.array_sse[1], _MM_SHUFFLE(3, 3, 3, 3));
-            
+
             __m128 Mul00 = _mm_mul_ps(Swp00, Swp01);
             __m128 Mul01 = _mm_mul_ps(Swp02, Swp03);
             Fac1 = _mm_sub_ps(Mul00, Mul01);
         }
-        
-        
+
+
         __m128 Fac2;
         {
             //    valType SubFactor02 = m[2][1] * m[3][2] - m[3][1] * m[2][2];
             //    valType SubFactor02 = m[2][1] * m[3][2] - m[3][1] * m[2][2];
             //    valType SubFactor08 = m[1][1] * m[3][2] - m[3][1] * m[1][2];
             //    valType SubFactor15 = m[1][1] * m[2][2] - m[2][1] * m[1][2];
-            
+
             __m128 Swp0a = _mm_shuffle_ps(m.array_sse[3], m.array_sse[2], _MM_SHUFFLE(2, 2, 2, 2));
             __m128 Swp0b = _mm_shuffle_ps(m.array_sse[3], m.array_sse[2], _MM_SHUFFLE(1, 1, 1, 1));
-            
+
             __m128 Swp00 = _mm_shuffle_ps(m.array_sse[2], m.array_sse[1], _MM_SHUFFLE(1, 1, 1, 1));
             __m128 Swp01 = _mm_shuffle_ps(Swp0a, Swp0a, _MM_SHUFFLE(2, 0, 0, 0));
             __m128 Swp02 = _mm_shuffle_ps(Swp0b, Swp0b, _MM_SHUFFLE(2, 0, 0, 0));
             __m128 Swp03 = _mm_shuffle_ps(m.array_sse[2], m.array_sse[1], _MM_SHUFFLE(2, 2, 2, 2));
-            
+
             __m128 Mul00 = _mm_mul_ps(Swp00, Swp01);
             __m128 Mul01 = _mm_mul_ps(Swp02, Swp03);
             Fac2 = _mm_sub_ps(Mul00, Mul01);
         }
-        
+
         __m128 Fac3;
         {
             //    valType SubFactor03 = m[2][0] * m[3][3] - m[3][0] * m[2][3];
             //    valType SubFactor03 = m[2][0] * m[3][3] - m[3][0] * m[2][3];
             //    valType SubFactor09 = m[1][0] * m[3][3] - m[3][0] * m[1][3];
             //    valType SubFactor16 = m[1][0] * m[2][3] - m[2][0] * m[1][3];
-            
+
             __m128 Swp0a = _mm_shuffle_ps(m.array_sse[3], m.array_sse[2], _MM_SHUFFLE(3, 3, 3, 3));
             __m128 Swp0b = _mm_shuffle_ps(m.array_sse[3], m.array_sse[2], _MM_SHUFFLE(0, 0, 0, 0));
-            
+
             __m128 Swp00 = _mm_shuffle_ps(m.array_sse[2], m.array_sse[1], _MM_SHUFFLE(0, 0, 0, 0));
             __m128 Swp01 = _mm_shuffle_ps(Swp0a, Swp0a, _MM_SHUFFLE(2, 0, 0, 0));
             __m128 Swp02 = _mm_shuffle_ps(Swp0b, Swp0b, _MM_SHUFFLE(2, 0, 0, 0));
             __m128 Swp03 = _mm_shuffle_ps(m.array_sse[2], m.array_sse[1], _MM_SHUFFLE(3, 3, 3, 3));
-            
+
             __m128 Mul00 = _mm_mul_ps(Swp00, Swp01);
             __m128 Mul01 = _mm_mul_ps(Swp02, Swp03);
             Fac3 = _mm_sub_ps(Mul00, Mul01);
         }
-        
+
         __m128 Fac4;
         {
             //    valType SubFactor04 = m[2][0] * m[3][2] - m[3][0] * m[2][2];
             //    valType SubFactor04 = m[2][0] * m[3][2] - m[3][0] * m[2][2];
             //    valType SubFactor10 = m[1][0] * m[3][2] - m[3][0] * m[1][2];
             //    valType SubFactor17 = m[1][0] * m[2][2] - m[2][0] * m[1][2];
-            
+
             __m128 Swp0a = _mm_shuffle_ps(m.array_sse[3], m.array_sse[2], _MM_SHUFFLE(2, 2, 2, 2));
             __m128 Swp0b = _mm_shuffle_ps(m.array_sse[3], m.array_sse[2], _MM_SHUFFLE(0, 0, 0, 0));
-            
+
             __m128 Swp00 = _mm_shuffle_ps(m.array_sse[2], m.array_sse[1], _MM_SHUFFLE(0, 0, 0, 0));
             __m128 Swp01 = _mm_shuffle_ps(Swp0a, Swp0a, _MM_SHUFFLE(2, 0, 0, 0));
             __m128 Swp02 = _mm_shuffle_ps(Swp0b, Swp0b, _MM_SHUFFLE(2, 0, 0, 0));
             __m128 Swp03 = _mm_shuffle_ps(m.array_sse[2], m.array_sse[1], _MM_SHUFFLE(2, 2, 2, 2));
-            
+
             __m128 Mul00 = _mm_mul_ps(Swp00, Swp01);
             __m128 Mul01 = _mm_mul_ps(Swp02, Swp03);
             Fac4 = _mm_sub_ps(Mul00, Mul01);
         }
-        
+
         __m128 Fac5;
         {
             //    valType SubFactor05 = m[2][0] * m[3][1] - m[3][0] * m[2][1];
             //    valType SubFactor05 = m[2][0] * m[3][1] - m[3][0] * m[2][1];
             //    valType SubFactor12 = m[1][0] * m[3][1] - m[3][0] * m[1][1];
             //    valType SubFactor18 = m[1][0] * m[2][1] - m[2][0] * m[1][1];
-            
+
             __m128 Swp0a = _mm_shuffle_ps(m.array_sse[3], m.array_sse[2], _MM_SHUFFLE(1, 1, 1, 1));
             __m128 Swp0b = _mm_shuffle_ps(m.array_sse[3], m.array_sse[2], _MM_SHUFFLE(0, 0, 0, 0));
-            
+
             __m128 Swp00 = _mm_shuffle_ps(m.array_sse[2], m.array_sse[1], _MM_SHUFFLE(0, 0, 0, 0));
             __m128 Swp01 = _mm_shuffle_ps(Swp0a, Swp0a, _MM_SHUFFLE(2, 0, 0, 0));
             __m128 Swp02 = _mm_shuffle_ps(Swp0b, Swp0b, _MM_SHUFFLE(2, 0, 0, 0));
             __m128 Swp03 = _mm_shuffle_ps(m.array_sse[2], m.array_sse[1], _MM_SHUFFLE(1, 1, 1, 1));
-            
+
             __m128 Mul00 = _mm_mul_ps(Swp00, Swp01);
             __m128 Mul01 = _mm_mul_ps(Swp02, Swp03);
             Fac5 = _mm_sub_ps(Mul00, Mul01);
         }
-        
+
         __m128 SignA = _mm_set_ps( 1.0f,-1.0f, 1.0f,-1.0f);
         __m128 SignB = _mm_set_ps(-1.0f, 1.0f,-1.0f, 1.0f);
-        
+
         // m[1][0]
         // m[0][0]
         // m[0][0]
         // m[0][0]
         __m128 Temp0 = _mm_shuffle_ps(m.array_sse[1], m.array_sse[0], _MM_SHUFFLE(0, 0, 0, 0));
         __m128 Vec0 = _mm_shuffle_ps(Temp0, Temp0, _MM_SHUFFLE(2, 2, 2, 0));
-        
+
         // m[1][1]
         // m[0][1]
         // m[0][1]
         // m[0][1]
         __m128 Temp1 = _mm_shuffle_ps(m.array_sse[1], m.array_sse[0], _MM_SHUFFLE(1, 1, 1, 1));
         __m128 Vec1 = _mm_shuffle_ps(Temp1, Temp1, _MM_SHUFFLE(2, 2, 2, 0));
-        
+
         // m[1][2]
         // m[0][2]
         // m[0][2]
         // m[0][2]
         __m128 Temp2 = _mm_shuffle_ps(m.array_sse[1], m.array_sse[0], _MM_SHUFFLE(2, 2, 2, 2));
         __m128 Vec2 = _mm_shuffle_ps(Temp2, Temp2, _MM_SHUFFLE(2, 2, 2, 0));
-        
+
         // m[1][3]
         // m[0][3]
         // m[0][3]
         // m[0][3]
         __m128 Temp3 = _mm_shuffle_ps(m.array_sse[1], m.array_sse[0], _MM_SHUFFLE(3, 3, 3, 3));
         __m128 Vec3 = _mm_shuffle_ps(Temp3, Temp3, _MM_SHUFFLE(2, 2, 2, 0));
-        
+
         // col0
         // + (Vec1[0] * Fac0[0] - Vec2[0] * Fac1[0] + Vec3[0] * Fac2[0]),
         // - (Vec1[1] * Fac0[1] - Vec2[1] * Fac1[1] + Vec3[1] * Fac2[1]),
@@ -2382,7 +2920,7 @@ namespace aRibeiro {
         __m128 Sub00 = _mm_sub_ps(Mul00, Mul01);
         __m128 Add00 = _mm_add_ps(Sub00, Mul02);
         __m128 Inv0 = _mm_mul_ps(SignB, Add00);
-        
+
         // col1
         // - (Vec0[0] * Fac0[0] - Vec2[0] * Fac3[0] + Vec3[0] * Fac4[0]),
         // + (Vec0[0] * Fac0[1] - Vec2[1] * Fac3[1] + Vec3[1] * Fac4[1]),
@@ -2394,7 +2932,7 @@ namespace aRibeiro {
         __m128 Sub01 = _mm_sub_ps(Mul03, Mul04);
         __m128 Add01 = _mm_add_ps(Sub01, Mul05);
         __m128 Inv1 = _mm_mul_ps(SignA, Add01);
-        
+
         // col2
         // + (Vec0[0] * Fac1[0] - Vec1[0] * Fac3[0] + Vec3[0] * Fac5[0]),
         // - (Vec0[0] * Fac1[1] - Vec1[1] * Fac3[1] + Vec3[1] * Fac5[1]),
@@ -2406,7 +2944,7 @@ namespace aRibeiro {
         __m128 Sub02 = _mm_sub_ps(Mul06, Mul07);
         __m128 Add02 = _mm_add_ps(Sub02, Mul08);
         __m128 Inv2 = _mm_mul_ps(SignB, Add02);
-        
+
         // col3
         // - (Vec1[0] * Fac2[0] - Vec1[0] * Fac4[0] + Vec2[0] * Fac5[0]),
         // + (Vec1[0] * Fac2[1] - Vec1[1] * Fac4[1] + Vec2[1] * Fac5[1]),
@@ -2418,11 +2956,11 @@ namespace aRibeiro {
         __m128 Sub03 = _mm_sub_ps(Mul09, Mul10);
         __m128 Add03 = _mm_add_ps(Sub03, Mul11);
         __m128 Inv3 = _mm_mul_ps(SignA, Add03);
-        
+
         __m128 Row0 = _mm_shuffle_ps(Inv0, Inv1, _MM_SHUFFLE(0, 0, 0, 0));
         __m128 Row1 = _mm_shuffle_ps(Inv2, Inv3, _MM_SHUFFLE(0, 0, 0, 0));
         __m128 Row2 = _mm_shuffle_ps(Row0, Row1, _MM_SHUFFLE(2, 0, 2, 0));
-        
+
         //    valType Determinant = m[0][0] * Inverse[0][0]
         //                        + m[0][1] * Inverse[1][0]
         //                        + m[0][2] * Inverse[2][0]
@@ -2430,16 +2968,236 @@ namespace aRibeiro {
         __m128 Det0 = dot_sse_4(m.array_sse[0], Row2);
         __m128 Rcp0 = _mm_div_ps(_mm_set1_ps(1.0f), Det0);
         //__m128 Rcp0 = _mm_rcp_ps(Det0);
-        
+
         //    Inverse /= Determinant;
         return mat4(_mm_mul_ps(Inv0, Rcp0),
                     _mm_mul_ps(Inv1, Rcp0),
                     _mm_mul_ps(Inv2, Rcp0),
                     _mm_mul_ps(Inv3, Rcp0));
-        
+
+#elif defined(ARIBEIRO_NEON)
+
+        float32x4_t Fac0;
+        {
+            //    valType SubFactor00 = m[2][2] * m[3][3] - m[3][2] * m[2][3];
+            //    valType SubFactor00 = m[2][2] * m[3][3] - m[3][2] * m[2][3];
+            //    valType SubFactor06 = m[1][2] * m[3][3] - m[3][2] * m[1][3];
+            //    valType SubFactor13 = m[1][2] * m[2][3] - m[2][2] * m[1][3];
+
+            float32x4_t Swp0a = vshuffle_3333( m.array_neon[3], m.array_neon[2] );
+            float32x4_t Swp0b = vshuffle_2222( m.array_neon[3], m.array_neon[2] );
+
+            float32x4_t Swp00 = vshuffle_2222( m.array_neon[2], m.array_neon[1] );
+            float32x4_t Swp01 = vshuffle_2000( Swp0a );
+            float32x4_t Swp02 = vshuffle_2000( Swp0b );
+            float32x4_t Swp03 = vshuffle_3333( m.array_neon[2], m.array_neon[1] );
+
+            float32x4_t Mul00 = vmulq_f32(Swp00, Swp01);
+            float32x4_t Mul01 = vmulq_f32(Swp02, Swp03);
+            Fac0 = vsubq_f32(Mul00, Mul01);
+        }
+
+        float32x4_t Fac1;
+        {
+            //    valType SubFactor01 = m[2][1] * m[3][3] - m[3][1] * m[2][3];
+            //    valType SubFactor01 = m[2][1] * m[3][3] - m[3][1] * m[2][3];
+            //    valType SubFactor07 = m[1][1] * m[3][3] - m[3][1] * m[1][3];
+            //    valType SubFactor14 = m[1][1] * m[2][3] - m[2][1] * m[1][3];
+
+            float32x4_t Swp0a = vshuffle_3333( m.array_neon[3], m.array_neon[2] );
+            float32x4_t Swp0b = vshuffle_1111( m.array_neon[3], m.array_neon[2] );
+
+            float32x4_t Swp00 = vshuffle_1111( m.array_neon[2], m.array_neon[1] );
+            float32x4_t Swp01 = vshuffle_2000(Swp0a);
+            float32x4_t Swp02 = vshuffle_2000(Swp0b);
+            float32x4_t Swp03 = vshuffle_3333(m.array_neon[2], m.array_neon[1] );
+
+            float32x4_t Mul00 = vmulq_f32(Swp00, Swp01);
+            float32x4_t Mul01 = vmulq_f32(Swp02, Swp03);
+            Fac1 = vsubq_f32(Mul00, Mul01);
+        }
+
+
+        float32x4_t Fac2;
+        {
+            //    valType SubFactor02 = m[2][1] * m[3][2] - m[3][1] * m[2][2];
+            //    valType SubFactor02 = m[2][1] * m[3][2] - m[3][1] * m[2][2];
+            //    valType SubFactor08 = m[1][1] * m[3][2] - m[3][1] * m[1][2];
+            //    valType SubFactor15 = m[1][1] * m[2][2] - m[2][1] * m[1][2];
+
+            float32x4_t Swp0a = vshuffle_2222(m.array_neon[3], m.array_neon[2]);
+            float32x4_t Swp0b = vshuffle_1111(m.array_neon[3], m.array_neon[2]);
+
+            float32x4_t Swp00 = vshuffle_1111(m.array_neon[2], m.array_neon[1]);
+            float32x4_t Swp01 = vshuffle_2000(Swp0a);
+            float32x4_t Swp02 = vshuffle_2000(Swp0b);
+            float32x4_t Swp03 = vshuffle_2222(m.array_neon[2], m.array_neon[1]);
+
+            float32x4_t Mul00 = vmulq_f32(Swp00, Swp01);
+            float32x4_t Mul01 = vmulq_f32(Swp02, Swp03);
+            Fac2 = vsubq_f32(Mul00, Mul01);
+        }
+
+        float32x4_t Fac3;
+        {
+            //    valType SubFactor03 = m[2][0] * m[3][3] - m[3][0] * m[2][3];
+            //    valType SubFactor03 = m[2][0] * m[3][3] - m[3][0] * m[2][3];
+            //    valType SubFactor09 = m[1][0] * m[3][3] - m[3][0] * m[1][3];
+            //    valType SubFactor16 = m[1][0] * m[2][3] - m[2][0] * m[1][3];
+
+            float32x4_t Swp0a = vshuffle_3333(m.array_neon[3], m.array_neon[2]);
+            float32x4_t Swp0b = vshuffle_0000(m.array_neon[3], m.array_neon[2]);
+
+            float32x4_t Swp00 = vshuffle_0000(m.array_neon[2], m.array_neon[1]);
+            float32x4_t Swp01 = vshuffle_2000(Swp0a);
+            float32x4_t Swp02 = vshuffle_2000(Swp0b);
+            float32x4_t Swp03 = vshuffle_3333(m.array_neon[2], m.array_neon[1]);
+
+            float32x4_t Mul00 = vmulq_f32(Swp00, Swp01);
+            float32x4_t Mul01 = vmulq_f32(Swp02, Swp03);
+            Fac3 = vsubq_f32(Mul00, Mul01);
+        }
+
+        float32x4_t Fac4;
+        {
+            //    valType SubFactor04 = m[2][0] * m[3][2] - m[3][0] * m[2][2];
+            //    valType SubFactor04 = m[2][0] * m[3][2] - m[3][0] * m[2][2];
+            //    valType SubFactor10 = m[1][0] * m[3][2] - m[3][0] * m[1][2];
+            //    valType SubFactor17 = m[1][0] * m[2][2] - m[2][0] * m[1][2];
+
+            float32x4_t Swp0a = vshuffle_2222(m.array_neon[3], m.array_neon[2]);
+            float32x4_t Swp0b = vshuffle_0000(m.array_neon[3], m.array_neon[2]);
+
+            float32x4_t Swp00 = vshuffle_0000(m.array_neon[2], m.array_neon[1]);
+            float32x4_t Swp01 = vshuffle_2000(Swp0a);
+            float32x4_t Swp02 = vshuffle_2000(Swp0b);
+            float32x4_t Swp03 = vshuffle_2222(m.array_neon[2], m.array_neon[1]);
+
+            float32x4_t Mul00 = vmulq_f32(Swp00, Swp01);
+            float32x4_t Mul01 = vmulq_f32(Swp02, Swp03);
+            Fac4 = vsubq_f32(Mul00, Mul01);
+        }
+
+        float32x4_t Fac5;
+        {
+            //    valType SubFactor05 = m[2][0] * m[3][1] - m[3][0] * m[2][1];
+            //    valType SubFactor05 = m[2][0] * m[3][1] - m[3][0] * m[2][1];
+            //    valType SubFactor12 = m[1][0] * m[3][1] - m[3][0] * m[1][1];
+            //    valType SubFactor18 = m[1][0] * m[2][1] - m[2][0] * m[1][1];
+
+            float32x4_t Swp0a = vshuffle_1111(m.array_neon[3], m.array_neon[2]);
+            float32x4_t Swp0b = vshuffle_0000(m.array_neon[3], m.array_neon[2]);
+
+            float32x4_t Swp00 = vshuffle_0000(m.array_neon[2], m.array_neon[1]);
+            float32x4_t Swp01 = vshuffle_2000(Swp0a);
+            float32x4_t Swp02 = vshuffle_2000(Swp0b);
+            float32x4_t Swp03 = vshuffle_1111(m.array_neon[2], m.array_neon[1]);
+
+            float32x4_t Mul00 = vmulq_f32(Swp00, Swp01);
+            float32x4_t Mul01 = vmulq_f32(Swp02, Swp03);
+            Fac5 = vsubq_f32(Mul00, Mul01);
+        }
+
+        static const float32x4_t SignA = (float32x4_t){ 1.0f,-1.0f, 1.0f,-1.0f };
+        static const float32x4_t SignB = (float32x4_t){ -1.0f, 1.0f,-1.0f, 1.0f };
+
+        // m[1][0]
+        // m[0][0]
+        // m[0][0]
+        // m[0][0]
+        float32x4_t Temp0 = vshuffle_0000(m.array_neon[1], m.array_neon[0]);
+        float32x4_t Vec0 = vshuffle_2220(Temp0);
+
+        // m[1][1]
+        // m[0][1]
+        // m[0][1]
+        // m[0][1]
+        float32x4_t Temp1 = vshuffle_1111(m.array_neon[1], m.array_neon[0]);
+        float32x4_t Vec1 = vshuffle_2220(Temp1);
+
+        // m[1][2]
+        // m[0][2]
+        // m[0][2]
+        // m[0][2]
+        float32x4_t Temp2 = vshuffle_2222(m.array_neon[1], m.array_neon[0]);
+        float32x4_t Vec2 = vshuffle_2220(Temp2);
+
+        // m[1][3]
+        // m[0][3]
+        // m[0][3]
+        // m[0][3]
+        float32x4_t Temp3 = vshuffle_3333(m.array_neon[1], m.array_neon[0]);
+        float32x4_t Vec3 = vshuffle_2220(Temp3);
+
+        // col0
+        // + (Vec1[0] * Fac0[0] - Vec2[0] * Fac1[0] + Vec3[0] * Fac2[0]),
+        // - (Vec1[1] * Fac0[1] - Vec2[1] * Fac1[1] + Vec3[1] * Fac2[1]),
+        // + (Vec1[2] * Fac0[2] - Vec2[2] * Fac1[2] + Vec3[2] * Fac2[2]),
+        // - (Vec1[3] * Fac0[3] - Vec2[3] * Fac1[3] + Vec3[3] * Fac2[3]),
+        float32x4_t Mul00 = vmulq_f32(Vec1, Fac0);
+        float32x4_t Mul01 = vmulq_f32(Vec2, Fac1);
+        float32x4_t Mul02 = vmulq_f32(Vec3, Fac2);
+        float32x4_t Sub00 = vsubq_f32(Mul00, Mul01);
+        float32x4_t Add00 = vaddq_f32(Sub00, Mul02);
+        float32x4_t Inv0 = vmulq_f32(SignB, Add00);
+
+        // col1
+        // - (Vec0[0] * Fac0[0] - Vec2[0] * Fac3[0] + Vec3[0] * Fac4[0]),
+        // + (Vec0[0] * Fac0[1] - Vec2[1] * Fac3[1] + Vec3[1] * Fac4[1]),
+        // - (Vec0[0] * Fac0[2] - Vec2[2] * Fac3[2] + Vec3[2] * Fac4[2]),
+        // + (Vec0[0] * Fac0[3] - Vec2[3] * Fac3[3] + Vec3[3] * Fac4[3]),
+        float32x4_t Mul03 = vmulq_f32(Vec0, Fac0);
+        float32x4_t Mul04 = vmulq_f32(Vec2, Fac3);
+        float32x4_t Mul05 = vmulq_f32(Vec3, Fac4);
+        float32x4_t Sub01 = vsubq_f32(Mul03, Mul04);
+        float32x4_t Add01 = vaddq_f32(Sub01, Mul05);
+        float32x4_t Inv1 = vmulq_f32(SignA, Add01);
+
+        // col2
+        // + (Vec0[0] * Fac1[0] - Vec1[0] * Fac3[0] + Vec3[0] * Fac5[0]),
+        // - (Vec0[0] * Fac1[1] - Vec1[1] * Fac3[1] + Vec3[1] * Fac5[1]),
+        // + (Vec0[0] * Fac1[2] - Vec1[2] * Fac3[2] + Vec3[2] * Fac5[2]),
+        // - (Vec0[0] * Fac1[3] - Vec1[3] * Fac3[3] + Vec3[3] * Fac5[3]),
+        float32x4_t Mul06 = vmulq_f32(Vec0, Fac1);
+        float32x4_t Mul07 = vmulq_f32(Vec1, Fac3);
+        float32x4_t Mul08 = vmulq_f32(Vec3, Fac5);
+        float32x4_t Sub02 = vsubq_f32(Mul06, Mul07);
+        float32x4_t Add02 = vaddq_f32(Sub02, Mul08);
+        float32x4_t Inv2 = vmulq_f32(SignB, Add02);
+
+        // col3
+        // - (Vec1[0] * Fac2[0] - Vec1[0] * Fac4[0] + Vec2[0] * Fac5[0]),
+        // + (Vec1[0] * Fac2[1] - Vec1[1] * Fac4[1] + Vec2[1] * Fac5[1]),
+        // - (Vec1[0] * Fac2[2] - Vec1[2] * Fac4[2] + Vec2[2] * Fac5[2]),
+        // + (Vec1[0] * Fac2[3] - Vec1[3] * Fac4[3] + Vec2[3] * Fac5[3]));
+        float32x4_t Mul09 = vmulq_f32(Vec0, Fac2);
+        float32x4_t Mul10 = vmulq_f32(Vec1, Fac4);
+        float32x4_t Mul11 = vmulq_f32(Vec2, Fac5);
+        float32x4_t Sub03 = vsubq_f32(Mul09, Mul10);
+        float32x4_t Add03 = vaddq_f32(Sub03, Mul11);
+        float32x4_t Inv3 = vmulq_f32(SignA, Add03);
+
+        float32x4_t Row0 = vshuffle_0000(Inv0, Inv1);
+        float32x4_t Row1 = vshuffle_0000(Inv2, Inv3);
+        float32x4_t Row2 = vshuffle_2020(Row0, Row1);
+
+        //    valType Determinant = m[0][0] * Inverse[0][0]
+        //                        + m[0][1] * Inverse[1][0]
+        //                        + m[0][2] * Inverse[2][0]
+        //                        + m[0][3] * Inverse[3][0];
+        float32x4_t Det0 = dot_neon_4(m.array_neon[0], Row2);
+        float32x4_t Rcp0 = vset1(1.0f/Det0[0]);//_mm_div_ps(_mm_set1_ps(1.0f), Det0);
+        //__m128 Rcp0 = _mm_rcp_ps(Det0);
+
+        //    Inverse /= Determinant;
+        return mat4(vmulq_f32(Inv0, Rcp0),
+                    vmulq_f32(Inv1, Rcp0),
+                    vmulq_f32(Inv2, Rcp0),
+                    vmulq_f32(Inv3, Rcp0));
+
 #else
-        
-        
+
+
         #define mkIndex(y, x) ((y)*4+(x))
         float determinant =
         (m.array[mkIndex(0, 0)] * m.array[mkIndex(1, 1)] * m.array[mkIndex(2, 2)] * m.array[mkIndex(3, 3)]) +
@@ -2595,6 +3353,12 @@ namespace aRibeiro {
 					_mm_load_(0,1,0,0),
 					_mm_load_(0,0,1,0),
 					_mm_load_(_x_,_y_,_z_,1));
+#elif defined(ARIBEIRO_NEON)
+        return mat4((float32x4_t){1,0,0,0},
+					(float32x4_t){0,1,0,0},
+					(float32x4_t){0,0,1,0},
+					(float32x4_t){_x_,_y_,_z_,1});
+
 #else
         return mat4(1, 0, 0, _x_,
                     0, 1, 0, _y_,
@@ -2617,6 +3381,14 @@ namespace aRibeiro {
                     _v_.array_sse);
         _mm_f32_(result.array_sse[3],3) = 1.0f;
         return result;
+#elif defined(ARIBEIRO_NEON)
+        return mat4((float32x4_t){1,0,0,0},
+					(float32x4_t){0,1,0,0},
+					(float32x4_t){0,0,1,0},
+
+					vaddq_f32( vmulq_f32(_v_.array_neon, (float32x4_t){1,1,1,0}), (float32x4_t){0,0,0,1})
+
+					);
 #else
         return mat4(1, 0, 0, _v_.x,
                     0, 1, 0, _v_.y,
@@ -2639,6 +3411,14 @@ namespace aRibeiro {
 			_v_.array_sse);
         _mm_f32_(result.array_sse[3],3) = 1.0f;
         return result;
+#elif defined(ARIBEIRO_NEON)
+        return mat4((float32x4_t){1,0,0,0},
+					(float32x4_t){0,1,0,0},
+					(float32x4_t){0,0,1,0},
+
+					vaddq_f32( vmulq_f32(_v_.array_neon, (float32x4_t){1,1,1,0}), (float32x4_t){0,0,0,1})
+
+					);
 #else
         return mat4(1, 0, 0, _v_.x,
                     0, 1, 0, _v_.y,
@@ -2659,6 +3439,12 @@ namespace aRibeiro {
 			_mm_load_(0,_y_,0,0),
 			_mm_load_(0,0,_z_,0),
 			_mm_load_(0,0,0,1));
+#elif defined(ARIBEIRO_NEON)
+        return mat4((float32x4_t){_x_,0,0,0},
+					(float32x4_t){0,_y_,0,0},
+					(float32x4_t){0,0,_z_,0},
+                    (float32x4_t){0,0,0,1}
+					);
 #else
         return mat4(_x_, 0, 0, 0,
                     0, _y_, 0, 0,
@@ -2680,6 +3466,12 @@ namespace aRibeiro {
 			_mm_load_(0,0,_v_.z,0),
 			_mm_load_(0,0,0,1)
 		);
+#elif defined(ARIBEIRO_NEON)
+        return mat4((float32x4_t){_v_.x,0,0,0},
+					(float32x4_t){0,_v_.y,0,0},
+					(float32x4_t){0,0,_v_.z,0},
+                    (float32x4_t){0,0,0,1}
+					);
 #else
         return mat4(_v_.x, 0, 0, 0,
                     0, _v_.y, 0, 0,
@@ -2701,6 +3493,12 @@ namespace aRibeiro {
 			_mm_load_(0,0,_v_.z,0),
 			_mm_load_(0,0,0,1)
 		);
+#elif defined(ARIBEIRO_NEON)
+        return mat4((float32x4_t){_v_.x,0,0,0},
+					(float32x4_t){0,_v_.y,0,0},
+					(float32x4_t){0,0,_v_.z,0},
+                    (float32x4_t){0,0,0,1}
+					);
 #else
         return mat4(_v_.x, 0, 0, 0,
                     0, _v_.y, 0, 0,
@@ -2784,9 +3582,9 @@ namespace aRibeiro {
         // https://www.learnopencv.com/rotation-matrix-to-euler-angles/
         //
         float sy = sqrt(m._11 * m._11 + m._21 * m._21);
-        
+
         bool singular = sy < 1e-6f; // If
-        
+
         float x, y, z;
         if (!singular)
         {
@@ -2800,7 +3598,7 @@ namespace aRibeiro {
             y = atan2(-m._31, sy);
             z = 0;
         }
-        
+
         *roll = x;
         *pitch = y;
         *yaw = z;
@@ -2846,7 +3644,7 @@ namespace aRibeiro {
                      y*x*(1 - c) + z * s, y*y*(1 - c) + c, y*z*(1 - c) - x * s, 0,
                      x*z*(1 - c) - y * s, y*z*(1 - c) + x * s, z*z*(1 - c) + c, 0,
                      0, 0, 0, 1);
-        
+
         //transposto -- rota�o em sentido hor�io
         //  return  mat4(x*x*(1-c)+c  ,  y*x*(1-c)+z*s  ,  x*z*(1-c)-y*s,   0  ,
         //               x*y*(1-c)-z*s,  y*y*(1-c)+c    ,  y*z*(1-c)+x*s,   0  ,
@@ -2896,7 +3694,7 @@ namespace aRibeiro {
     /// \return A 4x4 matrix
     ///
     ARIBEIRO_INLINE mat4 projection_perspective(const float &FovY,const float &aspectX, const float &near_, const float &far_){
-        
+
         //   f=cotangent(CampoDeVisao/2)
         //matriz:
         //
@@ -2904,7 +3702,7 @@ namespace aRibeiro {
         //0         f      0                           0
         //0         0    (zfar+znear)/(znear-zfar)    (2*zfar*znear)/(znear-zfar)
         //0         0     -1                           0
-        
+
         if ((aspectX == 0.0f) || (near_ - far_) == 0) {
             return mat4::IdentityMatrix;
         }
@@ -2916,8 +3714,8 @@ namespace aRibeiro {
                     0, 0, (near_ + far_) / (near_ - far_), (2.0f*near_*far_) / (near_ - far_),
                     0, 0, -1, 0);
     }
-    
-    
+
+
     ARIBEIRO_INLINE mat4 projection_perspectiveLH(const float &FovY,const float &aspectX, const float &near_, const float &far_){
         //f=cotangent(CampoDeVisao/2)
         //matriz:
@@ -3049,6 +3847,13 @@ namespace aRibeiro {
 		_mm_f32_(m.array_sse[1],3) = 0;
 		_mm_f32_(m.array_sse[2],3) = 0;
         return extractQuat(m);
+#elif defined(ARIBEIRO_NEON)
+        mat4 m(vmulq_f32( x.array_neon, (float32x4_t){1,1,1,0}),
+               vmulq_f32( y.array_neon, (float32x4_t){1,1,1,0}),
+               vmulq_f32( x.array_neon, (float32x4_t){1,1,1,0}),
+			(float32x4_t){0,0,0,1}
+		);
+        return extractQuat(m);
 #else
         return extractQuat(
                            mat4(x.x, y.x, z.x, 0,
@@ -3073,6 +3878,14 @@ namespace aRibeiro {
 		_mm_f32_(m.array_sse[1],3) = 0;
 		_mm_f32_(m.array_sse[2],3) = 0;
         return extractQuat(m);
+#elif defined(ARIBEIRO_NEON)
+        mat4 m(vmulq_f32( x.array_neon, (float32x4_t){1,1,1,0}),
+               vmulq_f32( y.array_neon, (float32x4_t){1,1,1,0}),
+               vmulq_f32( x.array_neon, (float32x4_t){1,1,1,0}),
+			(float32x4_t){0,0,0,1}
+		);
+        return extractQuat(m);
+
 #else
         return extractQuat(
                            mat4(x.x, y.x, z.x, 0,
@@ -3116,13 +3929,13 @@ namespace aRibeiro {
                    int viewportX, int viewportY,int viewportW, int viewportH,
                                    vec3 *worldPtn){
         mat4 modelViewProjection_inverse = projectionMatrix * modelViewMatrix;//pre_multiplyed ogl Like
-        
+
         modelViewProjection_inverse = inv(modelViewProjection_inverse);
-        
+
         if ( modelViewProjection_inverse.array[0] == std::numeric_limits<float>::quiet_NaN()) {
             return false;
         }
-        
+
         //if (!inverse_alternative(modelViewProjection_inverse, &modelViewProjection_inverse))
         //return false;
         /* Map x and y from window coordinates */
@@ -3211,6 +4024,16 @@ namespace aRibeiro {
         else
 			_mm_f32_(result.array_sse,3) = sqrt(t);
         return result;
+#elif defined(ARIBEIRO_NEON)
+        vec3 v = normalize(vp);
+        float t = 1.0f - dot(v,v);
+        //const float EPSILON = 1e-6f;
+        quat result(v.array_neon);
+        if (t < EPSILON)
+            result.array_neon[3] = 0.0f;
+        else
+			result.array_neon[3] = sqrt(t);
+        return result;
 #else
         vec3 v = normalize(vp);
         float t = 1.0f - (v.x*v.x) - (v.y*v.y) - (v.z*v.z);
@@ -3222,11 +4045,11 @@ namespace aRibeiro {
 #endif
     }
     //------------------------------------------------------------------------------
-    
+
     //------------------------------------------------------------------------------
-    
+
     //------------------------------------------------------------------------------
-    
+
     //------------------------------------------------------------------------------
     //------------------------------------------------------------------------------
 
@@ -3281,6 +4104,15 @@ namespace aRibeiro {
         quat result(vn.array_sse);
 		_mm_f32_(result.array_sse,3) = cos(angle);
         return result;
+#elif defined(ARIBEIRO_NEON)
+        float sinAngle;
+        float angle = angle_rad * 0.5f;
+        vec3 vn = normalize(axis);
+        sinAngle = sin(angle);
+        vn *= sinAngle;
+        quat result(vn.array_neon);
+		result.array_neon[3] = cos(angle);
+        return result;
 #else
         float sinAngle;
         float angle = angle_rad * 0.5f;
@@ -3302,46 +4134,72 @@ namespace aRibeiro {
     /// \return The quat
     ///
     ARIBEIRO_INLINE quat quatFromEuler(float roll, float pitch, float yaw){
-        
+
         pitch *= 0.5f;
         yaw *= 0.5f;
         roll *= 0.5f;
-        
+
 #if defined(ARIBEIRO_SSE2)
-        
+
         __m128 rollSinCos = _mm_load_(sin(roll),cos(roll),0,0);
         __m128 pitchSinCos = _mm_load_(sin(pitch),cos(pitch),0,0);
         __m128 yawSinCos = _mm_load_(sin(yaw),cos(yaw),0,0);
-        
+
         __m128 row0 = _mm_shuffle_ps(rollSinCos, rollSinCos, _MM_SHUFFLE(1,1,1,0));
         __m128 row1 = _mm_shuffle_ps(rollSinCos, rollSinCos, _MM_SHUFFLE(0,0,0,1));
-        
+
         __m128 pitch0 = _mm_shuffle_ps(pitchSinCos, pitchSinCos, _MM_SHUFFLE(1,1,0,1));
         __m128 pitch1 = _mm_shuffle_ps(pitchSinCos, pitchSinCos, _MM_SHUFFLE(0,0,1,0));
-        
+
         __m128 yaw0 = _mm_shuffle_ps(yawSinCos, yawSinCos, _MM_SHUFFLE(1,0,1,1));
         __m128 yaw1 = _mm_shuffle_ps(yawSinCos, yawSinCos, _MM_SHUFFLE(0,1,0,0));
-        
+
         __m128 mul0 = _mm_mul_ps(row0, pitch0);
         mul0 = _mm_mul_ps(mul0, yaw0);
-        
+
         __m128 mul1 = _mm_mul_ps(row1, pitch1);
         mul1 = _mm_mul_ps(mul1, yaw1);
         mul1 = _mm_mul_ps(mul1, _mm_load_(-1.0f,1.0f,-1.0f,1.0f) );
-        
+
         return _mm_add_ps(mul0, mul1);
+#elif defined(ARIBEIRO_NEON)
+
+
+        float32x4_t rollSinCos = (float32x4_t){(float)sin(roll),(float)cos(roll),0,0};
+        float32x4_t pitchSinCos = (float32x4_t){(float)sin(pitch),(float)cos(pitch),0,0};
+        float32x4_t yawSinCos = (float32x4_t){(float)sin(yaw),(float)cos(yaw),0,0};
+
+        float32x4_t row0 = vshuffle_1110(rollSinCos);
+        float32x4_t row1 = vshuffle_0001(rollSinCos);
+
+        float32x4_t pitch0 = vshuffle_1101(pitchSinCos);
+        float32x4_t pitch1 = vshuffle_0010(pitchSinCos);
+
+        float32x4_t yaw0 = vshuffle_1011(yawSinCos);
+        float32x4_t yaw1 = vshuffle_0100(yawSinCos);
+
+        float32x4_t mul0 = vmulq_f32(row0, pitch0);
+        mul0 = vmulq_f32(mul0, yaw0);
+
+        float32x4_t mul1 = vmulq_f32(row1, pitch1);
+        mul1 = vmulq_f32(mul1, yaw1);
+        mul1 = vmulq_f32(mul1, (float32x4_t){-1.0f,1.0f,-1.0f,1.0f} );
+
+        return vaddq_f32(mul0, mul1);
+
+
 #else
-        
+
         float sinPitch = sin(pitch);
         float cosPitch = cos(pitch);
         float sinYaw = sin(yaw);
         float cosYaw = cos(yaw);
         float sinRoll = sin(roll);
         float cosRoll = cos(roll);
-        
+
         float cosPitchCosYaw = cosPitch * cosYaw;
         float sinPitchSinYaw = sinPitch * sinYaw;
-        
+
         return quat(
                     sinRoll * cosPitchCosYaw - cosRoll * sinPitchSinYaw,
                     cosRoll * sinPitch * cosYaw + sinRoll * cosPitch * sinYaw,
@@ -3349,19 +4207,19 @@ namespace aRibeiro {
                     cosRoll * cosPitchCosYaw + sinRoll * sinPitchSinYaw
                     );
 #endif
-        
+
         /*
          return
          quatFromAxisAngle(vec3(0.0, 0.0, 1.0), yaw) *
          quatFromAxisAngle(vec3(0.0, 1.0, 0.0), pitch) *
          quatFromAxisAngle(vec3(1.0, 0.0, 0.0), roll);
          */
-        
+
     }
     //------------------------------------------------------------------------------
-    
+
     //------------------------------------------------------------------------------
-    
+
     //------------------------------------------------------------------------------
     /// \brief Construct a 4x4 transformation matrix from a quaternion
     ///
@@ -3370,22 +4228,22 @@ namespace aRibeiro {
     /// \return The mat4
     ///
     ARIBEIRO_INLINE mat4 toMat4(const quat& q){
-        
+
 #if defined(ARIBEIRO_SSE2)
-        
-        
+
+
         __m128 x2y2z2 = _mm_mul_ps(q.array_sse, q.array_sse);
-        
+
         __m128 op0 = _mm_shuffle_ps(q.array_sse, q.array_sse, _MM_SHUFFLE(0, 1, 0, 0));
         __m128 op1 = _mm_shuffle_ps(q.array_sse, q.array_sse, _MM_SHUFFLE(0, 2, 2, 1));
-        
+
         __m128 xy_xz_yz = _mm_mul_ps(op0, op1);
-        
+
         __m128 wx_wy_wz = _mm_mul_ps( _mm_set1_ps(_mm_f32_(q.array_sse,3)) , q.array_sse);
-        
+
         static const __m128 _2 = _mm_set1_ps(2.0f);
-        
-        
+
+
         __m128 m0 =
         _mm_mul_ps(_2, _mm_load_(
            ( _mm_f32_(x2y2z2,1) + _mm_f32_(x2y2z2,2)),
@@ -3393,10 +4251,10 @@ namespace aRibeiro {
            (_mm_f32_(xy_xz_yz,1) - _mm_f32_(wx_wy_wz,1)),
            0
         ));
-        
+
 		_mm_f32_(m0, 0) = 1.0f - _mm_f32_(m0, 0);
-        
-        
+
+
         __m128 m1 =
         _mm_mul_ps(_2, _mm_load_(
             (_mm_f32_(xy_xz_yz,0) - _mm_f32_(wx_wy_wz,2)),
@@ -3405,7 +4263,7 @@ namespace aRibeiro {
             0
         ));
 		_mm_f32_(m1, 1) = 1.0f - _mm_f32_(m1, 1);
-        
+
         __m128 m2 =
         _mm_mul_ps(_2, _mm_load_(
             (_mm_f32_(xy_xz_yz,1) + _mm_f32_(wx_wy_wz,1)),
@@ -3413,16 +4271,16 @@ namespace aRibeiro {
             (_mm_f32_(x2y2z2,0) + _mm_f32_(x2y2z2,1)),
             0
         ));
-        
+
 		_mm_f32_(m2, 2) = 1.0f - _mm_f32_(m2, 2);
-        
+
         static const __m128 m3 = _mm_load_(0,0,0,1.0f);
-        
+
         return mat4(m0,m1,m2,m3);
-        
-        
+
+
         /*
-        
+
         __m128 elm0 = _mm_shuffle_ps(q.array_sse, q.array_sse, _MM_SHUFFLE(0, 0, 0, 1));
         __m128 elm1 = _mm_shuffle_ps(q.array_sse, q.array_sse, _MM_SHUFFLE(0, 2, 1, 1));
         __m128 op0 = _mm_mul_ps(elm0, elm1);
@@ -3430,12 +4288,12 @@ namespace aRibeiro {
         elm1 = _mm_shuffle_ps(q.array_sse, q.array_sse, _MM_SHUFFLE(0, 1, 2, 2));
         __m128 op1 = _mm_mul_ps(elm0, elm1);
         op1 = _mm_mul_ps((__m128){1.0f,1.0f,-1.0f,0.0f}, op1);
-        
+
         __m128 m0_ = _mm_add_ps(op0, op1);
         m0_ = _mm_mul_ps((__m128){-2.0f,2.0f,2.0f,0.0f}, m0_);
         m0_[0] += 1.0f;
-        
-        
+
+
         elm0 = _mm_shuffle_ps(q.array_sse, q.array_sse, _MM_SHUFFLE(0, 1, 0, 0));
         elm1 = _mm_shuffle_ps(q.array_sse, q.array_sse, _MM_SHUFFLE(0, 2, 0, 1));
         op0 = _mm_mul_ps(elm0, elm1);
@@ -3443,12 +4301,12 @@ namespace aRibeiro {
         __m128 elm1_s = _mm_shuffle_ps(q.array_sse, q.array_sse, _MM_SHUFFLE(0, 0, 2, 2));
         op1 = _mm_mul_ps(elm0, elm1_s);
         op1 = _mm_mul_ps((__m128){-1.0f,1.0f,1.0f,0.0f}, op1);
-        
+
         __m128 m1_ = _mm_add_ps(op0, op1);
         m1_ = _mm_mul_ps((__m128){2.0f,-2.0f,2.0f,0.0f}, m1_);
         m1_[1] += 1.0f;
-        
-        
+
+
         elm0 = _mm_shuffle_ps(q.array_sse, q.array_sse, _MM_SHUFFLE(0, 0, 1, 0));
         //elm1 = _mm_shuffle_ps(q.array_sse, q.array_sse, _MM_SHUFFLE(0, 0, 2, 2));
         op0 = _mm_mul_ps(elm0, elm1_s);
@@ -3456,17 +4314,17 @@ namespace aRibeiro {
         elm1 = _mm_shuffle_ps(q.array_sse, q.array_sse, _MM_SHUFFLE(0, 1, 0, 1));
         op1 = _mm_mul_ps(elm0, elm1);
         op1 = _mm_mul_ps((__m128){1.0f,-1.0f,1.0f,0.0f}, op1);
-        
+
         __m128 m2_ = _mm_add_ps(op0, op1);
         m2_ = _mm_mul_ps((__m128){2.0f,2.0f,-2.0f,0.0f}, m2_);
         m2_[2] += 1.0f;
-        
+
         __m128 m3_ = (__m128){0,0,0,1.0f};
-        
+
         return mat4(m0_,m1_,m2_,m3_);
-        
+
         */
-        
+
         /*
         float x2 = q.x * q.x;
         float y2 = q.y * q.y;
@@ -3477,34 +4335,80 @@ namespace aRibeiro {
         float wx = q.w * q.x;
         float wy = q.w * q.y;
         float wz = q.w * q.z;
-        
+
         __m128 m0 = (__m128){
             1.0f - 2.0f * (y2 + z2),
             2.0f * (xy + wz),
             2.0f * (xz - wy),
             0
         };
-        
+
         __m128 m1 = (__m128){
             2.0f * (xy - wz),
             1.0f - 2.0f * (x2 + z2),
             2.0f * (yz + wx),
             0
         };
-        
+
         __m128 m2 = (__m128){
             2.0f * (xz + wy),
             2.0f * (yz - wx),
             1.0f - 2.0f * (x2 + y2),
             0
         };
-        
+
         __m128 m3 = (__m128){0,0,0,1.0f};
-        
+
         return mat4(m0,m1,m2,m3);
-         
+
          */
-        
+#elif defined(ARIBEIRO_NEON)
+
+        float32x4_t x2y2z2 = vmulq_f32(q.array_neon, q.array_neon);
+
+        float32x4_t op0 = vshuffle_0100(q.array_neon);
+        float32x4_t op1 = vshuffle_0221(q.array_neon);
+
+        float32x4_t xy_xz_yz = vmulq_f32(op0, op1);
+        float32x4_t wx_wy_wz = vmulq_f32( vshuffle_3333(q.array_neon) , q.array_neon);
+
+        static const float32x4_t _2 = vset1(2.0f);
+
+
+        float32x4_t m0 =
+        vmulq_f32(_2, (float32x4_t){
+           ( x2y2z2[1] + x2y2z2[2]  ),
+           ( xy_xz_yz[0] + wx_wy_wz[2]),
+           ( xy_xz_yz[1] - wx_wy_wz[1]),
+           0
+        });
+
+		m0[0] = 1.0f - m0[0];
+
+
+        float32x4_t m1 =
+        vmulq_f32(_2, (float32x4_t){
+            (xy_xz_yz[0] - wx_wy_wz[2]),
+            (x2y2z2[0] + x2y2z2[2]),
+            (xy_xz_yz[2] + wx_wy_wz[0]),
+            0
+        });
+		m1[1] = 1.0f - m1[1];
+
+        float32x4_t m2 =
+        vmulq_f32(_2, (float32x4_t){
+            (xy_xz_yz[1] + wx_wy_wz[1]),
+            (xy_xz_yz[2] - wx_wy_wz[0]),
+            (x2y2z2[0] + x2y2z2[1]),
+            0
+        });
+
+		m2[2] = 1.0f - m2[2];
+
+        static const float32x4_t m3 = (float32x4_t){0,0,0,1.0f};
+
+        return mat4(m0,m1,m2,m3);
+
 #else
 
 		float x2 = q.x * q.x;
@@ -3516,8 +4420,8 @@ namespace aRibeiro {
 		float wx = q.w * q.x;
 		float wy = q.w * q.y;
 		float wz = q.w * q.z;
-        
-        
+
+
         // This calculation would be a lot more complicated for non-unit length quaternions
         // Note: The constructor of Matrix4 expects the Matrix in column-major format like expected by
         //   OpenGL
@@ -3526,7 +4430,7 @@ namespace aRibeiro {
                     2.0f * (xz - wy), 2.0f * (yz + wx), 1.0f - 2.0f * (x2 + y2), 0.0f,
                     0.0f, 0.0f, 0.0f, 1.0f);
 #endif
-        
+
     }
     //------------------------------------------------------------------------------
     /// \brief Convert the quaternion to an axis angle representation. Notice: Not tested
@@ -3542,6 +4446,12 @@ namespace aRibeiro {
         __m128 inv_length = _mm_set1_ps(1.0f/sqrtf(_mm_f32_(dot0,0)));
         __m128 result = _mm_mul_ps(q.array_sse, inv_length);
         axis->array_sse = result;
+        *angle = acos(clamp(q.w,-1.0f,1.0f)) * 2.0f;
+#elif defined(ARIBEIRO_NEON)
+        float32x4_t dot0 = dot_neon_3(q.array_neon,q.array_neon);
+        float32x4_t inv_length = vset1(1.0f/sqrtf(dot0[0]));
+        float32x4_t result = vmulq_f32(q.array_neon, inv_length);
+        axis->array_neon = result;
         *angle = acos(clamp(q.w,-1.0f,1.0f)) * 2.0f;
 #else
         float scale = sqrt(q.x * q.x + q.y * q.y + q.z * q.z);
@@ -3655,37 +4565,37 @@ namespace aRibeiro {
         vec3 current = currentParam;
         vec3 target = targetParam;
         //const float EPSILON = 1e-6f;
-        
+
         float lengthCurrent = length(current);
         float lengthTarget = length(target);
-        
+
         //trying to interpolate from zero vector
         if (lengthCurrent < EPSILON2)
             return targetParam;
         //trying to interpolate to zero vector
         if (lengthTarget < EPSILON2)
             return currentParam;
-            
+
         current *= (1.0f/lengthCurrent);
         target *= (1.0f/lengthTarget);
-        
+
         //float deltaAngle = angleBetween(current, target);
         float deltaAngle = acos(clamp(dot(current,target),-1.0f,1.0f));
         if (deltaAngle < maxAngleVariation + EPSILON)
             return target;
-        
+
         // 180º case interpolation -- force one orientation based on eulerAngle
         if (deltaAngle >= PI - EPSILON){
             static const quat fixedRotation = quatFromEuler(DEG2RAD(0.5f),DEG2RAD(0.5f),DEG2RAD(0.5f));
             current = fixedRotation * current;
             deltaAngle = angleBetween(current, target);
         }
-        
+
         float lrpFactor = maxAngleVariation / deltaAngle;
         vec3 result = slerp(current, target, lrpFactor);
-        
+
         result = normalize(result) * lerp(lengthCurrent, lengthTarget, lrpFactor);
-        
+
         return result;
     }
 
@@ -3700,19 +4610,19 @@ namespace aRibeiro {
 	///
     ARIBEIRO_INLINE quat moveSlerp(const quat &currentParam, const quat &target, const float &maxAngleVariation){
         quat current = currentParam;
-        
+
         //const float EPSILON = 1e-6f;
         float deltaAngle = angleBetween(current, target);
         if (deltaAngle < maxAngleVariation + EPSILON)
             return target;
-        
+
         // 180º case interpolation -- force one orientation based on eulerAngle
         if (deltaAngle >= PI - EPSILON){
             static const quat fixedRotation = quatFromEuler(DEG2RAD(0.5f),DEG2RAD(0.5f),DEG2RAD(0.5f));
             current = fixedRotation * current;
             deltaAngle = angleBetween(current, target);
         }
-        
+
         return slerp(current, target, maxAngleVariation / deltaAngle);
     }
 
@@ -3720,3 +4630,4 @@ namespace aRibeiro {
 
 
 #endif
+;

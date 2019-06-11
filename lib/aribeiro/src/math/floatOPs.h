@@ -7,12 +7,30 @@
 
 namespace aRibeiro {
 
+
+#if defined(ARIBEIRO_NEON)
+
+    ARIBEIRO_INLINE float32x4_t vdivq_f32(const float32x4_t &a, const float32x4_t &b)
+    {
+        float32x4_t recip0 = vrecpeq_f32(b);
+        float32x4_t recip1 = vmulq_f32(recip0, vrecpsq_f32(recip0, b));
+        return vmulq_f32(a, recip1);
+    }
+
+    ARIBEIRO_INLINE float32x4_t vset1(const float32_t &a)
+    {
+        return vdupq_n_f32(a);
+    }
+
+#endif
+
+
 const float _float_bitsign = -.0f; // -0.f = 1 << 31
 const uint32_t _float_bitsign_uint32_t = (*(uint32_t*)(&_float_bitsign));
-    
+
 const float _float_one = 1.0f;
 const uint32_t _float_one_uint32_t = (*(uint32_t*)(&_float_one));
-    
+
 /// \brief Compute the absolute value of a number
 ///
 /// \author Alessandro Ribeiro
@@ -171,8 +189,8 @@ ARIBEIRO_INLINE float move(const float &current, const float &target, const floa
     return lerp(current, target, maxDistanceVariation / deltaDistance);
 }
 
-    
-    
+
+
 #define INLINE_OPERATION_IMPLEMENTATION(TTYPE)\
 static ARIBEIRO_INLINE TTYPE operator/( const TTYPE& vecA, const TTYPE& vecB ){ return (TTYPE(vecA)/=vecB); } \
 static ARIBEIRO_INLINE TTYPE operator/( const TTYPE& vec , const float value ){ return (TTYPE(vec)/=value); } \
@@ -186,9 +204,9 @@ static ARIBEIRO_INLINE TTYPE operator+( const float value, const TTYPE& vec  ){ 
 static ARIBEIRO_INLINE TTYPE operator-( const TTYPE& vecA, const TTYPE& vecB ){ return (TTYPE(vecA)-=vecB); } \
 static ARIBEIRO_INLINE TTYPE operator-( const TTYPE& vec , const float value ){ return (TTYPE(vec)-=value); } \
 static ARIBEIRO_INLINE TTYPE operator-( const float value, const TTYPE& vec  ){ return (TTYPE(value)-=vec); }
-    
-    
+
+
 }
-    
+
 #endif
 

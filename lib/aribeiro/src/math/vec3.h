@@ -9,7 +9,7 @@
 namespace aRibeiro{
 
 class vec2;
-    
+
 #if defined(ARIBEIRO_SSE2)
 
     extern const __m128 _vec3_zero_sse;
@@ -17,7 +17,7 @@ class vec2;
 
 #pragma pack(push, 16)
 #endif
-    
+
 /// \brief Vector 3D (vec3)
 ///
 /// Stores three components(x,y,z) to represent a tridimensional vector. <br/>
@@ -34,16 +34,28 @@ _SSE2_ALIGN_PRE class ARIBEIRO_API vec3{
 #if defined(ARIBEIRO_SSE2)
 		_SSE2_ALIGN_PRE __m128 array_sse _SSE2_ALIGN_POS;
 #endif
+
+#if defined(ARIBEIRO_NEON)
+		_SSE2_ALIGN_PRE float32x4_t array_neon _SSE2_ALIGN_POS;
+#endif
+
     }_SSE2_ALIGN_POS;
-    
-    
+
+
 #if defined(ARIBEIRO_SSE2)
     //special SSE2 constructor
     ARIBEIRO_INLINE vec3( const __m128 &v ){
         array_sse = v;
     }
 #endif
-    
+
+#if defined(ARIBEIRO_NEON)
+    ARIBEIRO_INLINE vec3( const float32x4_t &v ){
+        array_neon = v;
+    }
+#endif
+
+
     /// \brief Construct a ZERO vec3 class
     ///
     /// The ZERO vec3 class have the point information in the origin (x=0,y=0,z=0)
@@ -52,6 +64,8 @@ _SSE2_ALIGN_PRE class ARIBEIRO_API vec3{
     ARIBEIRO_INLINE vec3() {
 #if defined(ARIBEIRO_SSE2)
         array_sse = _vec3_zero_sse;
+#elif defined(ARIBEIRO_NEON)
+        array_neon = (float32x4_t){0,0,0,0};
 #else
         x = y = z = 0.0f;
 #endif
@@ -68,9 +82,11 @@ _SSE2_ALIGN_PRE class ARIBEIRO_API vec3{
     ARIBEIRO_INLINE vec3( const float &v ){
 #if defined(ARIBEIRO_SSE2)
         array_sse = _mm_load_(v,v,v,0);
+#elif defined(ARIBEIRO_NEON)
+        array_neon = (float32x4_t){v,v,v,0};
 #else
         x = y = z = v;
-#endif   
+#endif
     }
     /// \brief Constructs a tridimensional Vector
     ///
@@ -84,6 +100,8 @@ _SSE2_ALIGN_PRE class ARIBEIRO_API vec3{
     ARIBEIRO_INLINE vec3( const float &x, const float &y, const float &z ){
 #if defined(ARIBEIRO_SSE2)
         array_sse = _mm_load_(x,y,z,0);
+#elif defined(ARIBEIRO_NEON)
+        array_neon = (float32x4_t){x,y,z,0};
 #else
         this->x = x;
         this->y = y;
@@ -104,6 +122,8 @@ _SSE2_ALIGN_PRE class ARIBEIRO_API vec3{
     ARIBEIRO_INLINE vec3( const vec2 &xy , const float &z){
 #if defined(ARIBEIRO_SSE2)
         array_sse = _mm_load_(xy.x,xy.y,z,0);
+#elif defined(ARIBEIRO_NEON)
+        array_neon = (float32x4_t){xy.x,xy.y,z,0};
 #else
         x = xy.x;
         y = xy.y;
@@ -124,6 +144,8 @@ _SSE2_ALIGN_PRE class ARIBEIRO_API vec3{
     ARIBEIRO_INLINE vec3( const float &x, const vec2 &yz){
 #if defined(ARIBEIRO_SSE2)
         array_sse = _mm_load_(x,yz.x,yz.y,0);
+#elif defined(ARIBEIRO_NEON)
+        array_neon = (float32x4_t){x,yz.x,yz.y,0};
 #else
         this->x = x;
         y = yz.x;
@@ -140,6 +162,8 @@ _SSE2_ALIGN_PRE class ARIBEIRO_API vec3{
     ARIBEIRO_INLINE vec3( const vec3 &v ){
 #if defined(ARIBEIRO_SSE2)
         array_sse = v.array_sse;
+#elif defined(ARIBEIRO_NEON)
+        array_neon = v.array_neon;
 #else
         *this = v;
 #endif
@@ -155,7 +179,9 @@ _SSE2_ALIGN_PRE class ARIBEIRO_API vec3{
     ///
     ARIBEIRO_INLINE vec3( const vec3 &a, const vec3 &b ){
 #if defined(ARIBEIRO_SSE2)
-        array_sse = _mm_sub_ps(a.array_sse, b.array_sse);
+        array_sse = _mm_sub_ps(b.array_sse, a.array_sse);
+#elif defined(ARIBEIRO_NEON)
+        array_neon = vsubq_f32(b.array_neon, a.array_neon);
 #else
         x = b.x - a.x;
         y = b.y - a.y;
@@ -175,16 +201,32 @@ _SSE2_ALIGN_PRE class ARIBEIRO_API vec3{
         __m128 diff_abs = _mm_sub_ps(array_sse, v.array_sse);
         //abs
         diff_abs = _mm_andnot_ps(_vec3_sign_mask, diff_abs);
-        
+
         //static const __m128 epsilon = _mm_set1_ps(1e-4f); // -0.f = 1 << 31
         //_mm_shuffle_ps(mul0, mul0, _MM_SHUFFLE(2, 3, 0, 1));
-        
+
         for(int i=0;i<3;i++){
             if (_mm_f32_(diff_abs,i) > 1e-4f)
                 return false;
         }
-        
+
         return true;
+#elif defined(ARIBEIRO_NEON)
+
+        float32x4_t diff_abs = vsubq_f32(array_neon, v.array_neon);
+        //abs
+        diff_abs = vabsq_f32(diff_abs);
+
+        //static const __m128 epsilon = _mm_set1_ps(1e-4f); // -0.f = 1 << 31
+        //_mm_shuffle_ps(mul0, mul0, _MM_SHUFFLE(2, 3, 0, 1));
+
+        for(int i=0;i<3;i++){
+            if (diff_abs[i] > 1e-4f)
+                return false;
+        }
+
+        return true;
+
 #else
         for(int i=0;i<3;i++){
             if (absv(array[i]-v.array[i]) > 1e-4f)
@@ -194,7 +236,7 @@ _SSE2_ALIGN_PRE class ARIBEIRO_API vec3{
         //return memcmp(array, v.array, sizeof(float) * 3) == 0;
 #endif
     }
-    
+
     ARIBEIRO_INLINE bool operator!=(const vec3&v) const{
         return !((*this) == v);
         //return memcmp(array, v.array, sizeof(float) * 3) != 0;
@@ -210,6 +252,8 @@ _SSE2_ALIGN_PRE class ARIBEIRO_API vec3{
     ARIBEIRO_INLINE vec3& operator+=(const vec3& v){
 #if defined(ARIBEIRO_SSE2)
         array_sse = _mm_add_ps(array_sse, v.array_sse);
+#elif defined(ARIBEIRO_NEON)
+        array_neon = vaddq_f32(array_neon, v.array_neon);
 #else
         x+=v.x;
         y+=v.y;
@@ -228,6 +272,8 @@ _SSE2_ALIGN_PRE class ARIBEIRO_API vec3{
     ARIBEIRO_INLINE vec3& operator-=(const vec3& v){
 #if defined(ARIBEIRO_SSE2)
         array_sse = _mm_sub_ps(array_sse, v.array_sse);
+#elif defined(ARIBEIRO_NEON)
+        array_neon = vsubq_f32(array_neon, v.array_neon);
 #else
         x-=v.x;
         y-=v.y;
@@ -245,6 +291,9 @@ _SSE2_ALIGN_PRE class ARIBEIRO_API vec3{
     ARIBEIRO_INLINE vec3 operator-() const{
 #if defined(ARIBEIRO_SSE2)
         return _mm_xor_ps(_vec3_sign_mask, array_sse);
+#elif defined(ARIBEIRO_NEON)
+        static const float32x4_t minus_one = (float32x4_t){-1.0f,-1.0f,-1.0f,0.0f};
+        return vmulq_f32(minus_one, array_neon);
 #else
         return vec3(-x,-y,-z);
 #endif
@@ -260,6 +309,8 @@ _SSE2_ALIGN_PRE class ARIBEIRO_API vec3{
     ARIBEIRO_INLINE vec3& operator*=(const vec3& v){
 #if defined(ARIBEIRO_SSE2)
         array_sse = _mm_mul_ps(array_sse, v.array_sse);
+#elif defined(ARIBEIRO_NEON)
+        array_neon = vmulq_f32(array_neon, v.array_neon);
 #else
         x*=v.x;
         y*=v.y;
@@ -279,6 +330,8 @@ _SSE2_ALIGN_PRE class ARIBEIRO_API vec3{
 #if defined(ARIBEIRO_SSE2)
         __m128 param = _mm_load_(v.x,v.y,v.z,1.0f);
         array_sse = _mm_div_ps(array_sse, param);
+#elif defined(ARIBEIRO_NEON)
+        array_neon = vdivq_f32(array_neon, v.array_neon);
 #else
         x/=v.x;
         y/=v.y;
@@ -297,6 +350,8 @@ _SSE2_ALIGN_PRE class ARIBEIRO_API vec3{
     ARIBEIRO_INLINE vec3& operator+=(const float &v){
 #if defined(ARIBEIRO_SSE2)
         array_sse = _mm_add_ps(array_sse, _mm_set1_ps(v));
+#elif defined(ARIBEIRO_NEON)
+        array_neon = vaddq_f32(array_neon, vset1(v));
 #else
         x+=v;
         y+=v;
@@ -315,6 +370,8 @@ _SSE2_ALIGN_PRE class ARIBEIRO_API vec3{
     ARIBEIRO_INLINE vec3& operator-=(const float &v){
 #if defined(ARIBEIRO_SSE2)
         array_sse = _mm_sub_ps(array_sse, _mm_set1_ps(v));
+#elif defined(ARIBEIRO_NEON)
+        array_neon = vsubq_f32(array_neon, vset1(v));
 #else
         x-=v;
         y-=v;
@@ -333,6 +390,8 @@ _SSE2_ALIGN_PRE class ARIBEIRO_API vec3{
     ARIBEIRO_INLINE vec3& operator*=(const float &v){
 #if defined(ARIBEIRO_SSE2)
         array_sse = _mm_mul_ps(array_sse, _mm_set1_ps(v));
+#elif defined(ARIBEIRO_NEON)
+        array_neon = vmulq_f32(array_neon, vset1(v));
 #else
         x*=v;
         y*=v;
@@ -351,6 +410,8 @@ _SSE2_ALIGN_PRE class ARIBEIRO_API vec3{
     ARIBEIRO_INLINE vec3& operator/=(const float &v){
 #if defined(ARIBEIRO_SSE2)
         array_sse = _mm_div_ps(array_sse, _mm_set1_ps(v));
+#elif defined(ARIBEIRO_NEON)
+        array_neon = vmulq_f32(array_neon, vset1( 1.0f / v ));
 #else
         x/=v;
         y/=v;
@@ -374,13 +435,13 @@ _SSE2_ALIGN_PRE class ARIBEIRO_API vec3{
 	SSE2_CLASS_NEW_OPERATOR
 
 }_SSE2_ALIGN_POS;
-    
+
 INLINE_OPERATION_IMPLEMENTATION(vec3)
 
 #if defined(ARIBEIRO_SSE2)
 #pragma pack(pop)
 #endif
-    
+
 }
 
 #endif

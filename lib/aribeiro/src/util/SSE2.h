@@ -195,6 +195,16 @@
 
 	*/
 
+#elif defined(ARIBEIRO_NEON)
+
+    #include <arm_neon.h>
+
+    #define _SSE2_ALIGN_PRE
+    #define _SSE2_ALIGN_POS __attribute__ (( __aligned__ (16)))
+    #define ARIBEIRO_INLINE inline __attribute__((always_inline))
+
+    #define SSE2_CLASS_NEW_OPERATOR
+
 #else
 
 	//

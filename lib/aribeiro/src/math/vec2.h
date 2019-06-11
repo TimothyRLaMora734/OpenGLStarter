@@ -6,12 +6,12 @@
 #include <aribeiro/floatOPs.h>
 
 namespace aRibeiro{
-    
+
 #if defined(ARIBEIRO_SSE2)
-    
+
     extern const __m128 _vec2_zero_sse;
     extern const __m128 _vec2_sign_mask; // -0.f = 1 << 31
-    
+
 #pragma pack(push, 16)
 #endif
 
@@ -29,15 +29,26 @@ _SSE2_ALIGN_PRE class ARIBEIRO_API vec2{
 #if defined(ARIBEIRO_SSE2)
 	  _SSE2_ALIGN_PRE __m128 array_sse _SSE2_ALIGN_POS;
 #endif
+
+#if defined(ARIBEIRO_NEON)
+		_SSE2_ALIGN_PRE float32x4_t array_neon _SSE2_ALIGN_POS;
+#endif
+
     }_SSE2_ALIGN_POS;
-    
+
 #if defined(ARIBEIRO_SSE2)
     //special SSE2 constructor
     ARIBEIRO_INLINE vec2( const __m128 &v ){
         array_sse = v;
     }
 #endif
-    
+
+#if defined(ARIBEIRO_NEON)
+    ARIBEIRO_INLINE vec2( const float32x4_t &v ){
+        array_neon = v;
+    }
+#endif
+
     /// \brief Construct a ZERO vec2 class
     ///
     /// The ZERO vec2 class have the point information in the origin (x=0,y=0)
@@ -250,18 +261,18 @@ _SSE2_ALIGN_PRE class ARIBEIRO_API vec2{
     ARIBEIRO_INLINE float operator[](const int v)const{
         return array[v];
     }
-    
+
 
 	SSE2_CLASS_NEW_OPERATOR
 
 }_SSE2_ALIGN_POS;
-    
+
 INLINE_OPERATION_IMPLEMENTATION(vec2)
 
 #if defined(ARIBEIRO_SSE2)
 #pragma pack(pop)
 #endif
-    
+
 }
 
 #endif
