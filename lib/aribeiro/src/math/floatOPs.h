@@ -22,6 +22,206 @@ namespace aRibeiro {
         return vdupq_n_f32(a);
     }
 
+
+
+
+    ARIBEIRO_INLINE float32x4_t vshuffle_2301(const float32x4_t &a)
+    {
+        return vrev64q_f32(a);
+    }
+
+    ARIBEIRO_INLINE float32x4_t vshuffle_1032(const float32x4_t &a)
+    {
+        return vcombine_f32(vget_high_f32(a), vget_low_f32(a));
+    }
+
+    ARIBEIRO_INLINE float32x4_t vshuffle_0123(const float32x4_t &a)
+    {
+        return vshuffle_2301(vshuffle_1032(a));
+    }
+
+    ARIBEIRO_INLINE float32x4_t vshuffle_0000(const float32x4_t &a)
+    {
+        return vdupq_lane_f32( vget_low_f32(a), 0 ); //a[0]
+    }
+
+    ARIBEIRO_INLINE float32x4_t vshuffle_1111(const float32x4_t &a)
+    {
+        return vdupq_lane_f32( vget_low_f32(a), 1 ); //a[1]
+    }
+
+    ARIBEIRO_INLINE float32x4_t vshuffle_2222(const float32x4_t &a)
+    {
+        return vdupq_lane_f32( vget_high_f32(a), 0 ); //a[2]
+    }
+
+    ARIBEIRO_INLINE float32x4_t vshuffle_3333(const float32x4_t &a)
+    {
+        return vdupq_lane_f32( vget_high_f32(a), 1 ); //a[3]
+    }
+
+    ARIBEIRO_INLINE float32x4_t vshuffle_0210(const float32x4_t &a)
+    {
+        float32x2_t l0 = vget_low_f32(a);
+        float32x2x2_t r = vtrn_f32( vget_high_f32( a ), l0 ) ;
+        return vcombine_f32(l0,r.val[0]);
+    }
+
+    ARIBEIRO_INLINE float32x4_t vshuffle_0333(const float32x4_t &a)
+    {
+        float32x4_t r = vshuffle_3333(a);
+        static const float32x4_t _zero = vset1(0);
+        return vextq_f32( r, _zero , 1);
+    }
+
+    ARIBEIRO_INLINE float32x4_t vshuffle_1021(const float32x4_t &a)
+    {
+        return vcombine_f32( vget_low_f32( vextq_f32(a,a,1) ) , vget_low_f32(a) );
+    }
+
+    ARIBEIRO_INLINE float32x4_t vshuffle_1102(const float32x4_t &a)
+    {
+        float32x2_t l0 = vget_low_f32(a);
+        float32x2x2_t r = vtrn_f32( vget_high_f32( a ), l0 ) ;
+        return vcombine_f32(r.val[0], vdup_lane_f32( l0, 1 )  );
+    }
+
+    ARIBEIRO_INLINE float32x4_t vshuffle_2102(const float32x4_t &a)
+    {
+        float32x4_t r = vshuffle_2222(a);
+        return vextq_f32(r,a,3);
+    }
+
+    ARIBEIRO_INLINE float32x4_t vshuffle_2021(const float32x4_t &a)
+    {
+        float32x4_t _21 = vextq_f32(a,a,1);
+        float32x2x2_t _trn = vtrn_f32( vget_low_f32(a), vget_high_f32( a ) ) ;
+        return vcombine_f32( vget_low_f32(_21) , _trn.val[0]  );
+    }
+
+    ARIBEIRO_INLINE float32x4_t vshuffle_3021(const float32x4_t &a)
+    {
+        float32x2x2_t r = vtrn_f32( vrev64_f32( vget_low_f32(a) ), vget_high_f32(a));
+        return vcombine_f32(r.val[0],r.val[1]);
+    }
+
+    ARIBEIRO_INLINE float32x4_t vshuffle_3102(const float32x4_t &a)
+    {
+        float32x2x2_t r = vtrn_f32(vget_high_f32(a), vget_low_f32(a));
+        return vcombine_f32(r.val[0], vrev64_f32(r.val[1]) );
+    }
+
+    ARIBEIRO_INLINE float32x4_t vshuffle_2000(const float32x4_t &a)
+    {
+        float32x4_t _zero = vdupq_lane_f32( vget_low_f32(a), 0 ) ;
+        float32x4_t _two = vdupq_lane_f32( vget_high_f32(a), 0 ) ;
+        return vextq_f32( _zero, _two, 1 );
+    }
+
+    ARIBEIRO_INLINE float32x4_t vshuffle_2220(const float32x4_t &a)
+    {
+        float32x4_t _zero = vdupq_lane_f32( vget_low_f32(a), 0 ) ;
+        float32x4_t _two = vdupq_lane_f32( vget_high_f32(a), 0 ) ;
+        return vextq_f32( _zero, _two, 3 );
+    }
+
+
+    ARIBEIRO_INLINE float32x4_t vshuffle_1110_test(const float32x4_t &a)
+    {
+        float32x4_t _a = vdupq_lane_f32( vget_low_f32(a), 0 ) ;
+        float32x4_t _b = vdupq_lane_f32( vget_high_f32(a), 1 ) ;
+        return vextq_f32( _a, _b, 3 );
+    }
+
+
+    ARIBEIRO_INLINE float32x4_t vshuffle_1110(const float32x4_t &a)
+    {
+        float32x2_t _a_low = vget_low_f32(a);
+        float32x2_t _b = vdup_lane_f32( _a_low, 1 ) ;
+        return vcombine_f32( _a_low, _b);
+    }
+
+    ARIBEIRO_INLINE float32x4_t vshuffle_0001(const float32x4_t &a)
+    {
+        float32x2_t _a_low = vget_low_f32(a);
+        float32x2_t _b = vdup_lane_f32( _a_low, 0 ) ;
+        return vcombine_f32( vrev64_f32( _a_low ), _b);
+    }
+
+    ARIBEIRO_INLINE float32x4_t vshuffle_1101(const float32x4_t &a)
+    {
+        float32x2_t _a_low = vget_low_f32(a);
+        float32x2_t _b = vdup_lane_f32( _a_low, 1 ) ;
+        return vcombine_f32( vrev64_f32( _a_low ), _b);
+    }
+
+    ARIBEIRO_INLINE float32x4_t vshuffle_0010(const float32x4_t &a)
+    {
+        float32x2_t _a_low = vget_low_f32(a);
+        float32x2_t _b = vdup_lane_f32( _a_low, 0 ) ;
+        return vcombine_f32( _a_low, _b);
+    }
+
+    ARIBEIRO_INLINE float32x4_t vshuffle_1011(const float32x4_t &a)
+    {
+        float32x2_t _a_low = vget_low_f32(a);
+        float32x2_t _b = vdup_lane_f32( _a_low, 1 ) ;
+        return vcombine_f32( _b, _a_low);
+    }
+
+    ARIBEIRO_INLINE float32x4_t vshuffle_0100(const float32x4_t &a)
+    {
+        float32x2_t _a_low = vget_low_f32(a);
+        float32x2_t _b = vdup_lane_f32( _a_low, 0 ) ;
+        return vcombine_f32( _b, vrev64_f32( _a_low ));
+    }
+
+    ARIBEIRO_INLINE float32x4_t vshuffle_0221(const float32x4_t &a)
+    {
+        float32x2_t l0 = vget_low_f32(a);
+        float32x2x2_t r = vtrn_f32( vget_high_f32( a ), l0 ) ;
+        return vcombine_f32( vget_low_f32( vextq_f32(a,a,1) ) ,  r.val[0]);
+    }
+
+
+    ARIBEIRO_INLINE float32x4_t vshuffle_0000(const float32x4_t &a, const float32x4_t &b)
+    {
+        float32x2_t a_ = vdup_lane_f32( vget_low_f32(a), 0 );
+        float32x2_t b_ = vdup_lane_f32( vget_low_f32(b), 0 );
+        return vcombine_f32(a_, b_);
+    }
+
+    ARIBEIRO_INLINE float32x4_t vshuffle_1111(const float32x4_t &a, const float32x4_t &b)
+    {
+        float32x2_t a_ = vdup_lane_f32( vget_low_f32(a), 1 );
+        float32x2_t b_ = vdup_lane_f32( vget_low_f32(b), 1 );
+        return vcombine_f32(a_, b_);
+    }
+
+    ARIBEIRO_INLINE float32x4_t vshuffle_2222(const float32x4_t &a, const float32x4_t &b)
+    {
+        float32x2_t a_ = vdup_lane_f32( vget_high_f32(a), 0 );
+        float32x2_t b_ = vdup_lane_f32( vget_high_f32(b), 0 );
+        return vcombine_f32(a_, b_);
+    }
+
+    ARIBEIRO_INLINE float32x4_t vshuffle_3333(const float32x4_t &a, const float32x4_t &b)
+    {
+        float32x2_t a_ = vdup_lane_f32( vget_high_f32(a), 1 );
+        float32x2_t b_ = vdup_lane_f32( vget_high_f32(b), 1 );
+        return vcombine_f32(a_, b_);
+    }
+
+    ARIBEIRO_INLINE float32x4_t vshuffle_2020(const float32x4_t &a, const float32x4_t &b)
+    {
+        float32x2x2_t a_ = vtrn_f32(vget_low_f32(a), vget_high_f32(a));
+        float32x2x2_t b_ = vtrn_f32(vget_low_f32(b), vget_high_f32(b));
+        return vcombine_f32( a_.val[0], b_.val[0] );
+    }
+
+
+
+
 #endif
 
 

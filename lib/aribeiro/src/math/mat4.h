@@ -90,6 +90,11 @@ _SSE2_ALIGN_PRE class ARIBEIRO_API mat4{
         array_sse[1] = _vec4_zero_sse;
         array_sse[2] = _vec4_zero_sse;
         array_sse[3] = _vec4_zero_sse;
+#elif defined(ARIBEIRO_NEON)
+        array_neon[0] = (float32x4_t){0,0,0,0};
+        array_neon[1] = (float32x4_t){0,0,0,0};
+        array_neon[2] = (float32x4_t){0,0,0,0};
+        array_neon[3] = (float32x4_t){0,0,0,0};
 #else
         _11=_12=_13=_14=_21=_22=_23=_24=
         _31=_32=_33=_34=_41=_42=_43=_44= 0;
@@ -110,6 +115,11 @@ _SSE2_ALIGN_PRE class ARIBEIRO_API mat4{
         array_sse[1] = array_sse[0];
         array_sse[2] = array_sse[0];
         array_sse[3] = array_sse[0];
+#elif defined(ARIBEIRO_NEON)
+        array_neon[0] = vset1(value);
+        array_neon[1] = array_neon[0];
+        array_neon[2] = array_neon[0];
+        array_neon[3] = array_neon[0];
 #else
         _11=_12=_13=_14=_21=_22=_23=_24=
         _31=_32=_33=_34=_41=_42=_43=_44= value;
@@ -132,6 +142,11 @@ _SSE2_ALIGN_PRE class ARIBEIRO_API mat4{
         array_sse[1] = _mm_load_(b1, b2, b3, b4);
         array_sse[2] = _mm_load_(c1, c2, c3, c4);
         array_sse[3] = _mm_load_(d1, d2, d3, d4);
+#elif defined(ARIBEIRO_NEON)
+        array_neon[0] = (float32x4_t){a1, a2, a3, a4};//_mm_set_ps(a4, a1, a2, a3);
+        array_neon[1] = (float32x4_t){b1, b2, b3, b4};
+        array_neon[2] = (float32x4_t){c1, c2, c3, c4};
+        array_neon[3] = (float32x4_t){d1, d2, d3, d4};
 #else
         _11=a1;_12=b1;_13=c1;_14=d1;
         _21=a2;_22=b2;_23=c2;_24=d2;
@@ -153,6 +168,11 @@ _SSE2_ALIGN_PRE class ARIBEIRO_API mat4{
         array_sse[1] = m.array_sse[1];
         array_sse[2] = m.array_sse[2];
         array_sse[3] = m.array_sse[3];
+#elif defined(ARIBEIRO_NEON)
+        array_neon[0] = m.array_neon[0];
+        array_neon[1] = m.array_neon[1];
+        array_neon[2] = m.array_neon[2];
+        array_neon[3] = m.array_neon[3];
 #else
         *this = m;
 #endif
@@ -248,6 +268,87 @@ _SSE2_ALIGN_PRE class ARIBEIRO_API mat4{
         array_sse[1] = array_sse_result[1];
         array_sse[2] = array_sse_result[2];
         array_sse[3] = array_sse_result[3];
+
+#elif defined(ARIBEIRO_NEON)
+
+        float32x4_t array_neon_result[4];
+        {
+            float32x4_t e0 = vshuffle_0000(M.array_neon[0]);
+            float32x4_t e1 = vshuffle_1111(M.array_neon[0]);
+            float32x4_t e2 = vshuffle_2222(M.array_neon[0]);
+            float32x4_t e3 = vshuffle_3333(M.array_neon[0]);
+
+            float32x4_t m0 = vmulq_f32(array_neon[0], e0);
+            float32x4_t m1 = vmulq_f32(array_neon[1], e1);
+            float32x4_t m2 = vmulq_f32(array_neon[2], e2);
+            float32x4_t m3 = vmulq_f32(array_neon[3], e3);
+
+            float32x4_t a0 = vaddq_f32(m0, m1);
+            float32x4_t a1 = vaddq_f32(m2, m3);
+            float32x4_t a2 = vaddq_f32(a0, a1);
+
+            array_neon_result[0] = a2;
+        }
+
+        {
+            float32x4_t e0 = vshuffle_0000(M.array_neon[1]);
+            float32x4_t e1 = vshuffle_1111(M.array_neon[1]);
+            float32x4_t e2 = vshuffle_2222(M.array_neon[1]);
+            float32x4_t e3 = vshuffle_3333(M.array_neon[1]);
+
+            float32x4_t m0 = vmulq_f32(array_neon[0], e0);
+            float32x4_t m1 = vmulq_f32(array_neon[1], e1);
+            float32x4_t m2 = vmulq_f32(array_neon[2], e2);
+            float32x4_t m3 = vmulq_f32(array_neon[3], e3);
+
+            float32x4_t a0 = vaddq_f32(m0, m1);
+            float32x4_t a1 = vaddq_f32(m2, m3);
+            float32x4_t a2 = vaddq_f32(a0, a1);
+
+            array_neon_result[1] = a2;
+        }
+
+        {
+            float32x4_t e0 = vshuffle_0000(M.array_neon[2]);
+            float32x4_t e1 = vshuffle_1111(M.array_neon[2]);
+            float32x4_t e2 = vshuffle_2222(M.array_neon[2]);
+            float32x4_t e3 = vshuffle_3333(M.array_neon[2]);
+
+            float32x4_t m0 = vmulq_f32(array_neon[0], e0);
+            float32x4_t m1 = vmulq_f32(array_neon[1], e1);
+            float32x4_t m2 = vmulq_f32(array_neon[2], e2);
+            float32x4_t m3 = vmulq_f32(array_neon[3], e3);
+
+            float32x4_t a0 = vaddq_f32(m0, m1);
+            float32x4_t a1 = vaddq_f32(m2, m3);
+            float32x4_t a2 = vaddq_f32(a0, a1);
+
+            array_neon_result[2] = a2;
+        }
+
+        {
+            //(float32x4_t&)_mm_shuffle_epi32(float32x4_ti&)in2[0], _MM_SHUFFLE(3, 3, 3, 3))
+            float32x4_t e0 = vshuffle_0000(M.array_neon[3]);
+            float32x4_t e1 = vshuffle_1111(M.array_neon[3]);
+            float32x4_t e2 = vshuffle_2222(M.array_neon[3]);
+            float32x4_t e3 = vshuffle_3333(M.array_neon[3]);
+
+            float32x4_t m0 = vmulq_f32(array_neon[0], e0);
+            float32x4_t m1 = vmulq_f32(array_neon[1], e1);
+            float32x4_t m2 = vmulq_f32(array_neon[2], e2);
+            float32x4_t m3 = vmulq_f32(array_neon[3], e3);
+
+            float32x4_t a0 = vaddq_f32(m0, m1);
+            float32x4_t a1 = vaddq_f32(m2, m3);
+            float32x4_t a2 = vaddq_f32(a0, a1);
+
+            array_neon_result[3] = a2;
+        }
+
+        array_neon[0] = array_neon_result[0];
+        array_neon[1] = array_neon_result[1];
+        array_neon[2] = array_neon_result[2];
+        array_neon[3] = array_neon_result[3];
 
 #else
 
@@ -352,6 +453,33 @@ _SSE2_ALIGN_PRE class ARIBEIRO_API mat4{
 
         return true;
 
+#elif defined(ARIBEIRO_NEON)
+
+
+        float32x4_t diff_abs[4];
+        diff_abs[0] = vsubq_f32(array_neon[0], v.array_neon[0]);
+        diff_abs[0] = vabsq_f32(diff_abs[0]); //abs
+
+        diff_abs[1] = vsubq_f32(array_neon[1], v.array_neon[1]);
+        diff_abs[1] = vabsq_f32(diff_abs[1]); //abs
+
+        diff_abs[2] = vsubq_f32(array_neon[2], v.array_neon[2]);
+        diff_abs[2] = vabsq_f32(diff_abs[2]); //abs
+
+        diff_abs[3] = vsubq_f32(array_neon[3], v.array_neon[3]);
+        diff_abs[3] = vabsq_f32(diff_abs[3]); //abs
+
+        //static const __m128 epsilon = _mm_set1_ps(1e-4f); // -0.f = 1 << 31
+        //_mm_shuffle_ps(mul0, mul0, _MM_SHUFFLE(2, 3, 0, 1));
+        for(int j=0;j<4;j++){
+            for(int i=0;i<4;i++){
+                if (diff_abs[j][i] > 1e-4f)
+                    return false;
+            }
+        }
+
+        return true;
+
 #else
 
         for(int i=0;i<16;i++){
@@ -373,6 +501,15 @@ _SSE2_ALIGN_PRE class ARIBEIRO_API mat4{
         array_sse[1] = _mm_add_ps(array_sse[1], v.array_sse[1]);
         array_sse[2] = _mm_add_ps(array_sse[2], v.array_sse[2]);
         array_sse[3] = _mm_add_ps(array_sse[3], v.array_sse[3]);
+
+
+#elif defined(ARIBEIRO_NEON)
+
+        array_neon[0] = vaddq_f32(array_neon[0], v.array_neon[0]);
+        array_neon[1] = vaddq_f32(array_neon[1], v.array_neon[1]);
+        array_neon[2] = vaddq_f32(array_neon[2], v.array_neon[2]);
+        array_neon[3] = vaddq_f32(array_neon[3], v.array_neon[3]);
+
 #else
         _11+=v._11;_12+=v._12;_13+=v._13;_14+=v._14;
         _21+=v._21;_22+=v._22;_23+=v._23;_24+=v._24;
@@ -387,6 +524,15 @@ _SSE2_ALIGN_PRE class ARIBEIRO_API mat4{
         array_sse[1] = _mm_sub_ps(array_sse[1], v.array_sse[1]);
         array_sse[2] = _mm_sub_ps(array_sse[2], v.array_sse[2]);
         array_sse[3] = _mm_sub_ps(array_sse[3], v.array_sse[3]);
+
+
+#elif defined(ARIBEIRO_NEON)
+
+        array_neon[0] = vsubq_f32(array_neon[0], v.array_neon[0]);
+        array_neon[1] = vsubq_f32(array_neon[1], v.array_neon[1]);
+        array_neon[2] = vsubq_f32(array_neon[2], v.array_neon[2]);
+        array_neon[3] = vsubq_f32(array_neon[3], v.array_neon[3]);
+
 #else
         _11-=v._11;_12-=v._12;_13-=v._13;_14-=v._14;
         _21-=v._21;_22-=v._22;_23-=v._23;_24-=v._24;
@@ -405,6 +551,18 @@ _SSE2_ALIGN_PRE class ARIBEIRO_API mat4{
         result.array_sse[3] = _mm_xor_ps(_vec4_sign_mask, array_sse[3]);
 
         return result;
+
+#elif defined(ARIBEIRO_NEON)
+
+        static const float32x4_t neg = vset1(-1.0f);
+
+        return mat4(
+            vmulq_f32(array_neon[0], neg),
+            vmulq_f32(array_neon[1], neg),
+            vmulq_f32(array_neon[2], neg),
+            vmulq_f32(array_neon[3], neg)
+        );
+
 #else
         return mat4(-_11,-_21,-_31,-_41,
                     -_12,-_22,-_32,-_42,
@@ -442,6 +600,15 @@ _SSE2_ALIGN_PRE class ARIBEIRO_API mat4{
         array_sse[2] = _mm_add_ps(array_sse[2], tmp);
         array_sse[3] = _mm_add_ps(array_sse[3], tmp);
 
+#elif defined(ARIBEIRO_NEON)
+
+        float32x4_t tmp = vset1(v);
+
+        array_neon[0] = vaddq_f32(array_neon[0], tmp);
+        array_neon[1] = vaddq_f32(array_neon[1], tmp);
+        array_neon[2] = vaddq_f32(array_neon[2], tmp);
+        array_neon[3] = vaddq_f32(array_neon[3], tmp);
+
 #else
         _11+=v;_12+=v;_13+=v;_14+=v;
         _21+=v;_22+=v;_23+=v;_24+=v;
@@ -458,6 +625,15 @@ _SSE2_ALIGN_PRE class ARIBEIRO_API mat4{
         array_sse[1] = _mm_sub_ps(array_sse[1], tmp);
         array_sse[2] = _mm_sub_ps(array_sse[2], tmp);
         array_sse[3] = _mm_sub_ps(array_sse[3], tmp);
+
+#elif defined(ARIBEIRO_NEON)
+
+        float32x4_t tmp = vset1(v);
+
+        array_neon[0] = vsubq_f32(array_neon[0], tmp);
+        array_neon[1] = vsubq_f32(array_neon[1], tmp);
+        array_neon[2] = vsubq_f32(array_neon[2], tmp);
+        array_neon[3] = vsubq_f32(array_neon[3], tmp);
 
 #else
         _11-=v;_12-=v;_13-=v;_14-=v;
@@ -476,6 +652,15 @@ _SSE2_ALIGN_PRE class ARIBEIRO_API mat4{
         array_sse[2] = _mm_mul_ps(array_sse[2], tmp);
         array_sse[3] = _mm_mul_ps(array_sse[3], tmp);
 
+#elif defined(ARIBEIRO_NEON)
+
+        float32x4_t tmp = vset1(v);
+
+        array_neon[0] = vmulq_f32(array_neon[0], tmp);
+        array_neon[1] = vmulq_f32(array_neon[1], tmp);
+        array_neon[2] = vmulq_f32(array_neon[2], tmp);
+        array_neon[3] = vmulq_f32(array_neon[3], tmp);
+
 #else
         _11*=v;_12*=v;_13*=v;_14*=v;
         _21*=v;_22*=v;_23*=v;_24*=v;
@@ -492,6 +677,15 @@ _SSE2_ALIGN_PRE class ARIBEIRO_API mat4{
         array_sse[1] = _mm_div_ps(array_sse[1], tmp);
         array_sse[2] = _mm_div_ps(array_sse[2], tmp);
         array_sse[3] = _mm_div_ps(array_sse[3], tmp);
+
+#elif defined(ARIBEIRO_NEON)
+
+        float32x4_t tmp = vset1(1.0f/v);
+
+        array_neon[0] = vmulq_f32(array_neon[0], tmp);
+        array_neon[1] = vmulq_f32(array_neon[1], tmp);
+        array_neon[2] = vmulq_f32(array_neon[2], tmp);
+        array_neon[3] = vmulq_f32(array_neon[3], tmp);
 
 #else
         _11/=v;_12/=v;_13/=v;_14/=v;
