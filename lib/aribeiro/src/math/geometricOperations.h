@@ -164,9 +164,10 @@ namespace aRibeiro {
     ///
     ARIBEIRO_INLINE vec4 toVec4(const vec3 &v){
 #if defined(ARIBEIRO_SSE2)
-        __m128 result = v.array_sse;
-		_mm_f32_(result,3) = 0;
-        return result;
+        static const __m128 _const_n = _mm_load_( 1,1,1,0 );
+        //__m128 result = v.array_sse;
+		//_mm_f32_(result,3) = 0;
+        return _mm_mul_ps(v.array_sse, _const_n);
 #elif defined(ARIBEIRO_NEON)
         static const float32x4_t _const_n = (float32x4_t){ 1,1,1,0 };
         return vmulq_f32(v.array_neon, _const_n);
@@ -185,9 +186,12 @@ namespace aRibeiro {
     ///
     ARIBEIRO_INLINE vec4 toPtn4(const vec3 &v){
 #if defined(ARIBEIRO_SSE2)
-        __m128 result = v.array_sse;
-		_mm_f32_(result,3) = 1.0f;
-        return result;
+        static const __m128 _const_n = _mm_load_( 1,1,1,0 );
+        static const __m128 _const2_n = _mm_load_( 0,0,0,1 );
+        return _mm_add_ps( _mm_mul_ps(v.array_sse, _const_n), _const2_n );
+        //__m128 result = v.array_sse;
+		//_mm_f32_(result,3) = 1.0f;
+        //return result;
 #elif defined(ARIBEIRO_NEON)
 
         static const float32x4_t _const_n = (float32x4_t){ 1,1,1,0 };
@@ -905,7 +909,8 @@ namespace aRibeiro {
     ///
     ARIBEIRO_INLINE vec3 operator*(const quat &a, const vec3 &v){
 #if defined(ARIBEIRO_SSE2)
-        quat result = a ^ quat(v.x, v.y, v.z, 0.0f) ^ conjugate(a);
+        static const __m128 _const_n = _mm_load_( 1,1,1,0 );
+        quat result = a ^ quat( _mm_mul_ps( v.array_sse, _const_n) ) ^ conjugate(a);
         return result.array_sse;
 #elif defined(ARIBEIRO_NEON)
 
@@ -932,9 +937,18 @@ namespace aRibeiro {
     ///
     ARIBEIRO_INLINE vec4 operator*(const quat &a, const vec4 &v){
 #if defined(ARIBEIRO_SSE2)
-        quat result = a ^ quat(v.x, v.y, v.z, 0.0f) ^ conjugate(a);
-		_mm_f32_(result.array_sse,3) = v.w;
-        return result.array_sse;
+        static const __m128 _const_n = _mm_load_( 1,1,1,0 );
+        static const __m128 _const2_n = _mm_load_( 0,0,0,1 );
+        
+        quat result = a ^ quat( _mm_mul_ps( v.array_sse, _const_n) ) ^ conjugate(a);
+        
+        return _mm_add_ps(
+          _mm_mul_ps(result.array_sse, _const_n),
+          _mm_mul_ps(v.array_sse, _const2_n)
+        );
+        
+		//_mm_f32_(result.array_sse,3) = v.w;
+        //return result.array_sse;
 #elif defined(ARIBEIRO_NEON)
 
         static const float32x4_t _const_n = (float32x4_t){ 1,1,1,0 };
@@ -2430,12 +2444,24 @@ namespace aRibeiro {
     ///
     ARIBEIRO_INLINE mat4 extractRotation(const mat4& m){
 #if defined(ARIBEIRO_SSE2)
+        static const __m128 _valuemask = _mm_load_( 1,1,1,0 );
+        static const __m128 _one = _mm_load_( 0,0,0,1 );
+        
+        return mat4(
+                    _mm_mul_ps(m.array_sse[0], _valuemask),
+                    _mm_mul_ps(m.array_sse[1], _valuemask),
+                    _mm_mul_ps(m.array_sse[2], _valuemask),
+                    _mm_add_ps( _mm_mul_ps(m.array_sse[3], _valuemask), _one)
+        );
+        
+        /*
         mat4 r(m.array_sse[0],m.array_sse[1],m.array_sse[2],m.array_sse[3]);
 		_mm_f32_(r.array_sse[0],3) = 0;
 		_mm_f32_(r.array_sse[1],3) = 0;
 		_mm_f32_(r.array_sse[2],3) = 0;
 		_mm_f32_(r.array_sse[3],3) = 1;
         return r;
+        */
 #elif defined(ARIBEIRO_NEON)
 
         static const float32x4_t _valuemask = (float32x4_t){ 1,1,1,0 };
@@ -3207,6 +3233,17 @@ namespace aRibeiro {
     ///
     ARIBEIRO_INLINE mat4 translate(const vec4 &_v_){
 #if defined(ARIBEIRO_SSE2)
+        
+        return mat4(
+                    _mm_load_(1,0,0,0),
+                    _mm_load_(0,1,0,0),
+                    _mm_load_(0,0,1,0),
+                    _mm_add_ps(
+                               _mm_mul_ps( _v_.array_sse, _mm_load_(1,1,1,0) ),
+                               _mm_load_(0,0,0,1)
+                    )
+                );
+        /*
         mat4 result = mat4(
 			_mm_load_(1,0,0,0),
 			_mm_load_(0,1,0,0),
@@ -3214,6 +3251,7 @@ namespace aRibeiro {
 			_v_.array_sse);
         _mm_f32_(result.array_sse[3],3) = 1.0f;
         return result;
+         */
 #elif defined(ARIBEIRO_NEON)
         return mat4((float32x4_t){1,0,0,0},
 					(float32x4_t){0,1,0,0},
@@ -3641,14 +3679,15 @@ namespace aRibeiro {
         x = normalize(cross(up, z));
         y = normalize(cross(z, x));
 #if defined(ARIBEIRO_SSE2)
-        mat4 m(x.array_sse,
-               y.array_sse,
-               z.array_sse,
+        static const __m128 mask = _mm_load_(1, 1, 1, 0);
+        mat4 m(_mm_mul_ps( x.array_sse, mask),
+               _mm_mul_ps( y.array_sse, mask),
+               _mm_mul_ps( z.array_sse, mask),
 			_mm_load_(0,0,0,1)
 		);
-		_mm_f32_(m.array_sse[0],3) = 0;
-		_mm_f32_(m.array_sse[1],3) = 0;
-		_mm_f32_(m.array_sse[2],3) = 0;
+		//_mm_f32_(m.array_sse[0],3) = 0;
+		//_mm_f32_(m.array_sse[1],3) = 0;
+		//_mm_f32_(m.array_sse[2],3) = 0;
         return extractQuat(m);
 #elif defined(ARIBEIRO_NEON)
         mat4 m(vmulq_f32( x.array_neon, (float32x4_t){1,1,1,0}),
@@ -3672,6 +3711,13 @@ namespace aRibeiro {
         x = normalize(cross(up, z));
         y = normalize(cross(z, x));
 #if defined(ARIBEIRO_SSE2)
+        static const __m128 mask = _mm_load_(1, 1, 1, 0);
+        mat4 m(_mm_mul_ps( x.array_sse, mask),
+               _mm_mul_ps( y.array_sse, mask),
+               _mm_mul_ps( z.array_sse, mask),
+               _mm_load_(0,0,0,1)
+               );
+        /*
         mat4 m(x.array_sse,
                y.array_sse,
                z.array_sse,
@@ -3680,6 +3726,7 @@ namespace aRibeiro {
 		_mm_f32_(m.array_sse[0],3) = 0;
 		_mm_f32_(m.array_sse[1],3) = 0;
 		_mm_f32_(m.array_sse[2],3) = 0;
+         */
         return extractQuat(m);
 #elif defined(ARIBEIRO_NEON)
         mat4 m(vmulq_f32( x.array_neon, (float32x4_t){1,1,1,0}),
@@ -4433,4 +4480,3 @@ namespace aRibeiro {
 
 
 #endif
-;
