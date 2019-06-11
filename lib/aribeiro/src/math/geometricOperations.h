@@ -2717,8 +2717,8 @@ namespace aRibeiro {
             Fac5 = _mm_sub_ps(Mul00, Mul01);
         }
 
-        __m128 SignA = _mm_set_ps( 1.0f,-1.0f, 1.0f,-1.0f);
-        __m128 SignB = _mm_set_ps(-1.0f, 1.0f,-1.0f, 1.0f);
+        static const __m128 SignA = _mm_set_ps( 1.0f,-1.0f, 1.0f,-1.0f);
+        static const __m128 SignB = _mm_set_ps(-1.0f, 1.0f,-1.0f, 1.0f);
 
         // m[1][0]
         // m[0][0]
