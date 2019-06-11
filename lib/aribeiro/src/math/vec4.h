@@ -225,7 +225,7 @@ _SSE2_ALIGN_PRE class ARIBEIRO_API vec4{
         return true;
 #elif defined(ARIBEIRO_NEON)
 
-        float32x4_t diff_abs = vmulq_f32(array_neon, v.array_neon);
+        float32x4_t diff_abs = vsubq_f32(array_neon, v.array_neon);
         //abs
         diff_abs = vabsq_f32(diff_abs);
 
