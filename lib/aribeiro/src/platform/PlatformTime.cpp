@@ -132,13 +132,13 @@ namespace aRibeiro {
 
 		struct timespec res;
 		clock_gettime(CLOCK_MONOTONIC, &res);
-		return (res.tv_sec * 1000000 + (res.tv_nsec / 1000) % 1000000 );
+		return ( ((uint64_t)res.tv_sec) * 1000000ULL + ( ((uint64_t)res.tv_nsec) / 1000ULL ) % 1000000ULL );
 
 #endif
 	}
 
 	UnixMicroCounter::UnixMicroCounter() {
-		
+
 #if __APPLE__
 		mach_timebase_info(&info);
 #endif

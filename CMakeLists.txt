@@ -117,10 +117,22 @@ else()
       #CHECK_INCLUDE_FILE(/opt/vc/include/bcm_host.h BCMHOST)
       #message(STATUS "BCMHOST ${BCMHOST}" )
 
+      if(EXISTS "/opt/vc/include/bcm_host.h")
+            MESSAGE(STATUS "bcm_host.h found")
+            set(BCMHOST true)
+      endif()
+
       if( NOT ARIBEIRO_RPI )
-        set( ARIBEIRO_RPI false CACHE BOOL
-             "Set this if you are buinding for Raspberry PI"
-             FORCE )
+
+	if (BCMHOST)
+        	set( ARIBEIRO_RPI true CACHE BOOL
+	             "Set this if you are buinding for Raspberry PI"
+        	     )
+	else()
+        	set( ARIBEIRO_RPI false CACHE BOOL
+	             "Set this if you are buinding for Raspberry PI"
+        	     )
+	endif()
       endif()
 
       message(STATUS "********************************")
@@ -381,6 +393,10 @@ add_subdirectory( projects/puc2019 )
 add_subdirectory( projects/raytracer )
 #add_subdirectory( projects/boid_template )
 #add_subdirectory( projects/puc-estudo-dirigido )
+
+if (ARIBEIRO_RPI)
+	add_subdirectory( projects/rpi-openmax )
+endif()
 
 #
 # Tools
