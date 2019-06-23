@@ -435,10 +435,10 @@ void* Device::getBufferPointer(const v4l2_buffer &bufferinfo) {
 
 void Device::queueBuffer(int bufferindex, v4l2_buffer *bufferinfo) {
     //v4l2_buffer bufferinfo;
-    memset(bufferinfo, 0, sizeof(v4l2_buffer));
+    //memset(bufferinfo, 0, sizeof(v4l2_buffer));
 
-    bufferinfo->type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-    bufferinfo->memory = V4L2_MEMORY_MMAP;
+    //bufferinfo->type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+    //bufferinfo->memory = V4L2_MEMORY_MMAP;
     bufferinfo->index = bufferindex;
 
     if(ioctl(fd, VIDIOC_QBUF, bufferinfo) < 0){

@@ -34,7 +34,11 @@ public:
 
     PlatformTime time;
 
+    int stdout_fd;
+
     BroadcomVideoEncode(OMX_U32 width, OMX_U32 height, OMX_U32 framerate, OMX_U32 bitrate):OMXComponentBase() {
+
+        stdout_fd = fileno(stdout);
 
         this->width = width;
         this->height = height;
@@ -44,7 +48,7 @@ public:
 
         encoder = OMX::createHandle("OMX.broadcom.video_encode",this);
 
-        printf("\nBroadcomVideoEncode\n\n");
+        fprintf(stderr,"\nBroadcomVideoEncode\n\n");
 
         //input port
         OMX::printPort(encoder,200);
@@ -88,7 +92,7 @@ public:
 
         OMX::setState(encoder, OMX_StateExecuting);
 
-        printf("\nAfter Initialization\n\n");
+        fprintf(stderr,"\nAfter Initialization\n\n");
         OMX::printPort(encoder,200);
         OMX::printPort(encoder,201);
 
@@ -135,17 +139,14 @@ public:
         inputBuffer->nOffset = 0;
         inputBuffer->nFilledLen = sizeYUV;
 
-        printf("postYUV filledLength: %i \n",inputBuffer->nFilledLen);
+        //fprintf(stderr,"postYUV filledLength: %i \n",inputBuffer->nFilledLen);
         //if EOF
         //inputBuffer->nFlags = OMX_BUFFERFLAG_EOS;
-
-        OMX::postEmptyThisBuffer(encoder, inputBuffer);
-
 
         //uint64_t timestamp = (uint64_t)inputBuffer->nTimeStamp.nHighPart;
         //timestamp = timestamp << 32;
         //timestamp |= (uint64_t)inputBuffer->nTimeStamp.nLowPart;
-        static uint64_t timestamp = 0;
+        static uint64_t timestamp = -time.deltaTimeMicro;
         //((uint32_t*)&timestamp)[0] = inputBuffer->nTimeStamp.nLowPart;
         //((uint32_t*)&timestamp)[1] = inputBuffer->nTimeStamp.nHighPart;
 
@@ -154,12 +155,13 @@ public:
         inputBuffer->nTimeStamp.nLowPart = ((uint32_t*)&timestamp)[0];
         inputBuffer->nTimeStamp.nHighPart = ((uint32_t*)&timestamp)[1];
 
-        printf("time: %llu\n", timestamp);
-        printf("  low: %u\n", inputBuffer->nTimeStamp.nLowPart);
-        printf("  high: %u\n", inputBuffer->nTimeStamp.nHighPart);
+        //fprintf(stderr,"time: %llu\n", timestamp);
+        //fprintf(stderr,"  low: %u\n", inputBuffer->nTimeStamp.nLowPart);
+        //fprintf(stderr,"  high: %u\n", inputBuffer->nTimeStamp.nHighPart);
 
         //inputBuffer->nTimeStamp;
 
+        OMX::postEmptyThisBuffer(encoder, inputBuffer);
 
     }
 
@@ -193,7 +195,7 @@ public:
 
     // OMX callbacks
     OMX_ERRORTYPE emptyBufferDone(OMX_HANDLETYPE hComponent,OMX_PTR pAppData,OMX_BUFFERHEADERTYPE* pBuffer){
-        printf("[BroadcomVideoEncode] emptyBufferDone\n");
+        //fprintf(stderr,"[BroadcomVideoEncode] emptyBufferDone\n");
         canFillInputBuffer = true;
         return OMX_ErrorNone;
     }
@@ -202,17 +204,18 @@ public:
     OMX_ERRORTYPE fillBufferDone(OMX_HANDLETYPE hComponent,OMX_PTR pAppData,OMX_BUFFERHEADERTYPE* pBuffer){
 
         if(pBuffer->nFlags & OMX_BUFFERFLAG_ENDOFFRAME) {
-            printf("encoding frameout...\n");
+            //fprintf(stderr,"encoding frameout...\n");
             //frame_out++;
         }
 
         // Flush buffer to output file
         //fwrite(pBuffer->pBuffer + pBuffer->nOffset, 1, pBuffer->nFilledLen, stdout);
+        write(stdout_fd, pBuffer->pBuffer + pBuffer->nOffset, pBuffer->nFilledLen);
 
         needOutBuffer = true;
         //OMX::postFillThisBuffer(encoder, outputBuffer);
 
-        printf("[BroadcomVideoEncode] fillBufferDone\n");
+        //fprintf(stderr,"[BroadcomVideoEncode] fillBufferDone\n");
         return OMX_ErrorNone;
     }
 

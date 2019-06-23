@@ -22,7 +22,7 @@ void OMX::init() {
         fprintf(stderr,"OMX initalization failed: %s", OMX::getError(error) );
         exit(-1);
     }
-    printf("OMX::init OK\n");
+    fprintf(stderr,"OMX::init OK\n");
 }
 
 OMX::~OMX(){
@@ -69,7 +69,7 @@ OMX_HANDLETYPE OMX::createHandle( const char *name, OMXComponentBase *componentB
     for(int i = 0; i < 4; i++) {
         if(OMX_GetParameter(handleOut, types[i], &ports) == OMX_ErrorNone) {
             for(OMX_U32 portIndex = ports.nStartPortNumber; portIndex < ports.nStartPortNumber + ports.nPorts; portIndex++) {
-                printf("  [ %s ] Port off %i from %s\n", typeNames[i],  portIndex , name );
+                fprintf(stderr,"  [ %s ] Port off %i from %s\n", typeNames[i],  portIndex , name );
                 OMX::setEnablePort(handleOut, portIndex, OMX_FALSE);
             }
         } else {
@@ -256,11 +256,11 @@ void OMX::postFillThisBuffer(OMX_HANDLETYPE handle, OMX_BUFFERHEADERTYPE *buffer
 
 //print routines
 void OMX::printEvent(OMX_HANDLETYPE handle, OMX_EVENTTYPE event, OMX_U32 data1, OMX_U32 data2) {
-    printf("Event 0x%08x %s, handle:0x%08x, data1:0x%08x, data2:0x%08x\n", event, OMX::getEvent(event) , handle, data1, data2);
+    fprintf(stderr,"Event 0x%08x %s, handle:0x%08x, data1:0x%08x, data2:0x%08x\n", event, OMX::getEvent(event) , handle, data1, data2);
 }
 
 void OMX::printPortDefinition(OMX_PARAM_PORTDEFINITIONTYPE &portdef) {
-    printf("Port %d is %s, %s, nBufferCountActual:%d nBufferCountMin:%d, nBufferSize:%d, bPopulated:%d, nBufferAlignment:%d\n",
+    fprintf(stderr,"Port %d is %s, %s, nBufferCountActual:%d nBufferCountMin:%d, nBufferSize:%d, bPopulated:%d, nBufferAlignment:%d\n",
         portdef.nPortIndex,
         (portdef.eDir ==  OMX_DirInput ? "input" : "output"),
         (portdef.bEnabled == OMX_TRUE ? "enabled" : "disabled"),
@@ -275,7 +275,7 @@ void OMX::printPortDefinition(OMX_PARAM_PORTDEFINITIONTYPE &portdef) {
     OMX_AUDIO_PORTDEFINITIONTYPE &audiodef = portdef.format.audio;
     switch(portdef.eDomain) {
         case OMX_PortDomainVideo:
-            printf("  Video:\n"
+            fprintf(stderr,"  Video:\n"
                 "    Resolution ( %d, %d ) Stride: %d  SliceHeight: %d\n"
                 "    Bitrate: %d  Framerate: %.02f  ErrorConcealment: %s\n"
                 "    Codec: %s  Color: %s\n",
@@ -290,7 +290,7 @@ void OMX::printPortDefinition(OMX_PARAM_PORTDEFINITIONTYPE &portdef) {
                 OMX::getColorFormat(viddef.eColorFormat));
             break;
         case OMX_PortDomainImage:
-            printf("  Image:\n"
+            fprintf(stderr,"  Image:\n"
                 "    Resolution( %d, %d )  Stride: %d  SliceHeight: %d\n"
                 "    ErrorConcealment: %s  Codec: %s  Color: %s\n",
                 imgdef.nFrameWidth,
@@ -302,7 +302,7 @@ void OMX::printPortDefinition(OMX_PARAM_PORTDEFINITIONTYPE &portdef) {
                 OMX::getColorFormat(imgdef.eColorFormat));
             break;
         case OMX_PortDomainAudio:
-            printf("  Audio:\n"
+            fprintf(stderr,"  Audio:\n"
                 "    MIMEType: %s\n"
                 "    ErrorConcealment: %s\n"
                 "    Codec: %s\n",
@@ -372,26 +372,26 @@ std::vector<OMX_AUDIO_PARAM_PORTFORMATTYPE> OMX::portGetAudioSupportedFormats(OM
 void OMX::printPortSupportedFormats(OMX_HANDLETYPE handle, OMX_U32 portIndex) {
     std::vector<OMX_VIDEO_PARAM_PORTFORMATTYPE> videoSupportedFormats = portGetVideoSupportedFormats(handle, portIndex);
     if (videoSupportedFormats.size() > 0) {
-        printf("  Supported video formats:\n");
+        fprintf(stderr,"  Supported video formats:\n");
         for(int i=0; i<videoSupportedFormats.size();i++){
             OMX_VIDEO_PARAM_PORTFORMATTYPE &portformat = videoSupportedFormats[i];
-            printf("    %s, compression: %s\n", OMX::getColorFormat(portformat.eColorFormat), OMX::getVideoCoding(portformat.eCompressionFormat));
+            fprintf(stderr,"    %s, compression: %s\n", OMX::getColorFormat(portformat.eColorFormat), OMX::getVideoCoding(portformat.eCompressionFormat));
         }
     }
     std::vector<OMX_IMAGE_PARAM_PORTFORMATTYPE> imageSupportedFormats = portGetImageSupportedFormats(handle, portIndex);
     if (imageSupportedFormats.size() > 0) {
-        printf("  Supported image formats:\n");
+        fprintf(stderr,"  Supported image formats:\n");
         for(int i=0; i<imageSupportedFormats.size();i++){
             OMX_IMAGE_PARAM_PORTFORMATTYPE &portformat = imageSupportedFormats[i];
-            printf("    %s, compression: %s\n", OMX::getColorFormat(portformat.eColorFormat), OMX::getImageCoding(portformat.eCompressionFormat));
+            fprintf(stderr,"    %s, compression: %s\n", OMX::getColorFormat(portformat.eColorFormat), OMX::getImageCoding(portformat.eCompressionFormat));
         }
     }
     std::vector<OMX_AUDIO_PARAM_PORTFORMATTYPE> audioSupportedFormats = portGetAudioSupportedFormats(handle, portIndex);
     if (audioSupportedFormats.size() > 0) {
-        printf("  Supported audio formats:\n");
+        fprintf(stderr,"  Supported audio formats:\n");
         for(int i=0; i<audioSupportedFormats.size();i++){
             OMX_AUDIO_PARAM_PORTFORMATTYPE &portformat = audioSupportedFormats[i];
-            printf("    %s\n", OMX::getAudioCoding(portformat.eEncoding));
+            fprintf(stderr,"    %s\n", OMX::getAudioCoding(portformat.eEncoding));
         }
     }
 }

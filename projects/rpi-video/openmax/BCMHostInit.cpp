@@ -18,5 +18,5 @@ void BMCHost::init(){
         return;
     initialized = true;
     bcm_host_init();
-    printf("BMCHost::init OK\n");
+    fprintf(stderr,"BMCHost::init OK\n");
 }

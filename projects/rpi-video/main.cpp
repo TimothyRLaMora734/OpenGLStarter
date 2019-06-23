@@ -25,8 +25,12 @@ void signal_handler(int signal) {
 //
 // cvlc v4l2:///dev/video0:chroma=h264:width=320:height=240 --demux h264
 //
+// mkfifo h264.fifo
+// ./rpi-video > h264.fifo & omxplayer --adev hdmi h264.fifo --video_queue 1 --threshold 1
+//
 int main(int argc, char* argv[]) {
 	PlatformPath::setWorkingPath(PlatformPath::getExecutablePath(argv[0]));
+//*
     signal(SIGINT,  signal_handler);
     signal(SIGTERM, signal_handler);
     signal(SIGQUIT, signal_handler);
@@ -52,7 +56,7 @@ int main(int argc, char* argv[]) {
     }
 
     v4l2_frmsizeenum res;
-    if (!device.queryNearResolutionForFormat(formatDescription, 320, 240, &res)){
+    if (!device.queryNearResolutionForFormat(formatDescription, 1280, 720, &res)){
         fprintf(stderr,"could not query resolution.\n");
         exit(-1);
     }
@@ -112,7 +116,7 @@ int main(int argc, char* argv[]) {
     signal(SIGTERM, SIG_DFL);
     signal(SIGQUIT, SIG_DFL);
 
-/*
+/*/
     signal(SIGINT,  signal_handler);
     signal(SIGTERM, signal_handler);
     signal(SIGQUIT, signal_handler);
@@ -121,10 +125,13 @@ int main(int argc, char* argv[]) {
 
 
     while (!exit_requested) {
-        fgetc(stdin);
+
         encoder.postYUV(NULL,0);
 
         encoder.makeOutBufferAvailable();
+
+        PlatformSleep::sleepMillis(40);
+
     }
 
 
@@ -132,6 +139,6 @@ int main(int argc, char* argv[]) {
     signal(SIGTERM, SIG_DFL);
     signal(SIGQUIT, SIG_DFL);
 
-*/
+//*/
 	return 0;
 }
