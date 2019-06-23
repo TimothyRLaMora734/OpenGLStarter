@@ -435,7 +435,7 @@ void* Device::getBufferPointer(const v4l2_buffer &bufferinfo) {
 
 void Device::queueBuffer(int bufferindex, v4l2_buffer *bufferinfo) {
     //v4l2_buffer bufferinfo;
-    //memset(&bufferinfo, 0, sizeof(bufferinfo));
+    memset(bufferinfo, 0, sizeof(v4l2_buffer));
 
     bufferinfo->type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
     bufferinfo->memory = V4L2_MEMORY_MMAP;
@@ -447,13 +447,13 @@ void Device::queueBuffer(int bufferindex, v4l2_buffer *bufferinfo) {
     }
 }
 
-void Device::dequeueBuffer(int bufferindex, v4l2_buffer *bufferinfo){
+void Device::dequeueBuffer(v4l2_buffer *bufferinfo){
     //v4l2_buffer bufferinfo;
-    //memset(&bufferinfo, 0, sizeof(bufferinfo));
+    memset(bufferinfo, 0, sizeof(v4l2_buffer));
 
-    //bufferinfo.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-    //bufferinfo.memory = V4L2_MEMORY_MMAP;
-    bufferinfo->index = bufferindex;
+    bufferinfo->type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+    bufferinfo->memory = V4L2_MEMORY_MMAP;
+    //bufferinfo->index = bufferindex;
 
     if(ioctl(fd, VIDIOC_DQBUF, bufferinfo) < 0){
         fprintf(stderr,"VIDIOC_DQBUF: %s\n",strerror(errno));

@@ -84,7 +84,7 @@ public:
 
     void queueBuffer(int bufferindex, v4l2_buffer *bufferinfo);
 
-    void dequeueBuffer(int bufferindex, v4l2_buffer *bufferinfo);
+    void dequeueBuffer(v4l2_buffer *bufferinfo);
 
     void streamON();
     void streamOFF();

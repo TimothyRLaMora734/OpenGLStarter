@@ -88,19 +88,19 @@ int main(int argc, char* argv[]) {
     //main loop
     device.streamON();
 
-    int count = 0;
     int fd_stdout = fileno(stdout);
-    while (!exit_requested){
-        device.dequeueBuffer(count, &bufferInfo[count]);
+    v4l2_buffer bufferQueue;
 
-        //fprintf(stderr,"index: %i\n",bufferInfo[count].index);
+    while (!exit_requested){
+        device.dequeueBuffer(&bufferQueue);
+
+        //fprintf(stderr,"index: %i\n",bufferQueue.index);
 
         //output to stdout
-        if (bufferInfo[count].bytesused > 0)
-            write(fd_stdout,bufferPtr[count],bufferInfo[count].bytesused);
+        if (bufferQueue.bytesused > 0)
+            write(fd_stdout,bufferPtr[bufferQueue.index],bufferQueue.bytesused);
 
-        device.queueBuffer(count, &bufferInfo[count]);
-        count = (count+1) % BUFFER_COUNT;
+        device.queueBuffer(bufferQueue.index, &bufferQueue);
     }
 
     device.streamOFF();
