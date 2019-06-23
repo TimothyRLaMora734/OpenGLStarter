@@ -395,7 +395,7 @@ add_subdirectory( projects/raytracer )
 #add_subdirectory( projects/puc-estudo-dirigido )
 
 if (ARIBEIRO_RPI)
-	add_subdirectory( projects/rpi-openmax )
+	add_subdirectory( projects/rpi-video )
 endif()
 
 #
