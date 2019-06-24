@@ -81,7 +81,7 @@ public:
 
     std::vector<v4l2_queryctrl> controls;
 
-    bool queryControlByName(const std::string name, v4l2_queryctrl *result);
+    bool queryControlByName(const std::string &name, v4l2_queryctrl *result);
 
     //V4L2_PIX_FMT_H264
     bool queryPixelFormat(__u32 pixelFormat, v4l2_fmtdesc *output);

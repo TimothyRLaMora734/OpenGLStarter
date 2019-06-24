@@ -79,6 +79,11 @@ int main(int argc, char* argv[]) {
 
     device.open();
 
+    //v4l2_queryctrl ctrl;
+    //if ( device.queryControlByName("Brightness", &ctrl ) ){
+        //device.setCtrlValue(ctrl, 128);
+    //}
+
 
     device.printControls();
 	//fgetc(stdin);

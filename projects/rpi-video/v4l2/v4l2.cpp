@@ -79,53 +79,6 @@ static bool compareDeviceName(const std::string &s1, const std::string &s2)
     return n1 < n2;
 }
 
-static int query_ext_ctrl_ioctl(int fd, v4l2_query_ext_ctrl *qctrl, bool have_query_ext_ctrl)
-{
-	v4l2_queryctrl qc;
-	int rc;
-
-	if (have_query_ext_ctrl) {
-		rc = ioctl(fd, VIDIOC_QUERY_EXT_CTRL, qctrl);
-		if (errno != ENOTTY)
-			return rc;
-	}
-
-	qc.id = qctrl->id;
-	rc = ioctl(fd, VIDIOC_QUERYCTRL, &qc);
-	if (rc == 0) {
-		qctrl->type = qc.type;
-		memcpy(qctrl->name, qc.name, sizeof(qctrl->name));
-		qctrl->minimum = qc.minimum;
-		if (qc.type == V4L2_CTRL_TYPE_BITMASK) {
-			qctrl->maximum = (__u32)qc.maximum;
-			qctrl->default_value = (__u32)qc.default_value;
-		} else {
-			qctrl->maximum = qc.maximum;
-			qctrl->default_value = qc.default_value;
-		}
-		qctrl->step = qc.step;
-		qctrl->flags = qc.flags;
-		qctrl->elems = 1;
-		qctrl->nr_of_dims = 0;
-		memset(qctrl->dims, 0, sizeof(qctrl->dims));
-		switch (qctrl->type) {
-		case V4L2_CTRL_TYPE_INTEGER64:
-			qctrl->elem_size = sizeof(__s64);
-			break;
-		case V4L2_CTRL_TYPE_STRING:
-			qctrl->elem_size = qc.maximum + 1;
-			break;
-		default:
-			qctrl->elem_size = sizeof(__s32);
-			break;
-		}
-		memset(qctrl->reserved, 0, sizeof(qctrl->reserved));
-	}
-	qctrl->id = qc.id;
-	return rc;
-}
-
-
 std::vector<std::string> v4l2::listDevicesNames(){
     std::vector<std::string> result;
     DIR *dp = opendir("/dev");
@@ -368,7 +321,11 @@ std::vector<v4l2_queryctrl> v4l2::getControls(const std::string &device) {
 }
 
 
-bool Device::queryControlByName(const std::string name, v4l2_queryctrl *result){
+bool Device::queryControlByName(const std::string &nameparam, v4l2_queryctrl *result){
+
+    std::string name = nameparam;
+    //convert to lower case
+    transform(name.begin(), name.end(), name.begin(), ::tolower);
 
     for (int i=0;i< controls.size();i++){
         std::string controlname = std::string( (char*)controls[i].name );
@@ -472,6 +429,12 @@ Device::~Device(){
 }
 
 void Device::printControls(){
+    if (fd < 0)
+    {
+        fprintf(stderr, "Device filedescriptor closed (%s).\n", path.c_str());
+        exit(-1);
+    }
+
     fprintf(stderr,"Controls\n");
 
     for (int i=0;i<controls.size();i++){
@@ -494,6 +457,12 @@ void Device::printControls(){
 }
 
 int Device::getCtrlValue(const v4l2_queryctrl &qctrl) {
+    if (fd < 0)
+    {
+        fprintf(stderr, "Device filedescriptor closed (%s).\n", path.c_str());
+        exit(-1);
+    }
+
     if (!canReadValue(qctrl)){
         fprintf(stderr,"cannot read control %s\n", qctrl.name);
         exit(-1);
@@ -510,12 +479,18 @@ int Device::getCtrlValue(const v4l2_queryctrl &qctrl) {
 }
 
 void Device::setCtrlValue(const v4l2_queryctrl &qctrl, int v) {
+    if (fd < 0)
+    {
+        fprintf(stderr, "Device filedescriptor closed (%s).\n", path.c_str());
+        exit(-1);
+    }
+
     v4l2_control ctrl;
     memset(&ctrl, 0, sizeof(ctrl));
     ctrl.id = qctrl.id;
     ctrl.value = v;
     if (ioctl(fd, VIDIOC_S_CTRL, &ctrl)) {
-        fprintf(stderr,"error %s getting ctrl %s\n",
+        fprintf(stderr,"error %s setting ctrl %s\n",
                 strerror(errno), qctrl.name);
         exit(-1);
     }
@@ -538,6 +513,13 @@ void Device::close(){
 
 
 void Device::setFormat(const v4l2_fmtdesc &fmt, const v4l2_frmsizeenum &res, const v4l2_frmivalenum &interval ){
+
+    if (fd < 0)
+    {
+        fprintf(stderr, "Device filedescriptor closed (%s).\n", path.c_str());
+        exit(-1);
+    }
+
     v4l2_format imageFormat;
 
     imageFormat.type = fmt.type;//V4L2_BUF_TYPE_VIDEO_CAPTURE;
@@ -583,6 +565,12 @@ void Device::setFormat(const v4l2_fmtdesc &fmt, const v4l2_frmsizeenum &res, con
 
 
 void Device::setNumberOfInputBuffers(int count){
+    if (fd < 0)
+    {
+        fprintf(stderr, "Device filedescriptor closed (%s).\n", path.c_str());
+        exit(-1);
+    }
+
     v4l2_requestbuffers bufrequest;
     memset(&bufrequest, 0, sizeof(bufrequest));
 
@@ -597,6 +585,12 @@ void Device::setNumberOfInputBuffers(int count){
 }
 
 v4l2_buffer Device::getBufferInformationFromDevice(int bufferIndex) {
+    if (fd < 0)
+    {
+        fprintf(stderr, "Device filedescriptor closed (%s).\n", path.c_str());
+        exit(-1);
+    }
+
     v4l2_buffer bufferinfo;
     memset(&bufferinfo, 0, sizeof(bufferinfo));
 
@@ -613,6 +607,12 @@ v4l2_buffer Device::getBufferInformationFromDevice(int bufferIndex) {
 }
 
 void* Device::getBufferPointer(const v4l2_buffer &bufferinfo) {
+    if (fd < 0)
+    {
+        fprintf(stderr, "Device filedescriptor closed (%s).\n", path.c_str());
+        exit(-1);
+    }
+
     void* buffer_ptr = mmap(
         NULL,
         bufferinfo.length,
@@ -631,6 +631,12 @@ void* Device::getBufferPointer(const v4l2_buffer &bufferinfo) {
 }
 
 void Device::queueBuffer(int bufferindex, v4l2_buffer *bufferinfo) {
+    if (fd < 0)
+    {
+        fprintf(stderr, "Device filedescriptor closed (%s).\n", path.c_str());
+        exit(-1);
+    }
+
     //v4l2_buffer bufferinfo;
     //memset(bufferinfo, 0, sizeof(v4l2_buffer));
 
@@ -645,6 +651,12 @@ void Device::queueBuffer(int bufferindex, v4l2_buffer *bufferinfo) {
 }
 
 void Device::dequeueBuffer(v4l2_buffer *bufferinfo){
+    if (fd < 0)
+    {
+        fprintf(stderr, "Device filedescriptor closed (%s).\n", path.c_str());
+        exit(-1);
+    }
+
     //v4l2_buffer bufferinfo;
     memset(bufferinfo, 0, sizeof(v4l2_buffer));
 
@@ -661,6 +673,12 @@ void Device::dequeueBuffer(v4l2_buffer *bufferinfo){
 }
 
 void Device::streamON(){
+    if (fd < 0)
+    {
+        fprintf(stderr, "Device filedescriptor closed (%s).\n", path.c_str());
+        exit(-1);
+    }
+
     int type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
     if(ioctl(fd, VIDIOC_STREAMON, &type) < 0){
         fprintf(stderr,"VIDIOC_STREAMON: %s\n",strerror(errno));
@@ -670,6 +688,12 @@ void Device::streamON(){
 }
 
 void Device::streamOFF(){
+    if (fd < 0)
+    {
+        fprintf(stderr, "Device filedescriptor closed (%s).\n", path.c_str());
+        exit(-1);
+    }
+
     int type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
     if(ioctl(fd, VIDIOC_STREAMOFF, &type) < 0){
         fprintf(stderr,"VIDIOC_STREAMOFF: %s\n",strerror(errno));
