@@ -21,6 +21,7 @@ static int xioctl(int fh, int request, void *arg)
 #include <vector>
 #include <map>
 #include <string>
+#include <locale> // tolower
 
 
 static std::string fcc2s(unsigned int val)
@@ -53,12 +54,34 @@ static std::string fract2fps(const struct v4l2_fract &f)
 }
 
 
+static std::string controlType2s(__u32 t){
+    switch(t){
+        case V4L2_CTRL_TYPE_INTEGER:      return "int";
+        case V4L2_CTRL_TYPE_INTEGER64:    return "int64";
+        case V4L2_CTRL_TYPE_STRING:       return "str";
+        case V4L2_CTRL_TYPE_BOOLEAN:      return "bool";
+        case V4L2_CTRL_TYPE_MENU:         return "menu";
+        case V4L2_CTRL_TYPE_INTEGER_MENU: return "intmenu";
+        case V4L2_CTRL_TYPE_BUTTON:       return "button";
+        case V4L2_CTRL_TYPE_BITMASK:      return "bitmask";
+        case V4L2_CTRL_TYPE_U8:           return "u8";
+        case V4L2_CTRL_TYPE_U16:          return "u16";
+        case V4L2_CTRL_TYPE_U32:          return "u32";
+        default:                          return "unknown";
+    }
+}
+
+
 class Device{
     bool streaming;
 public:
     std::string path;
     v4l2_capability capability;
     std::vector<v4l2_fmtdesc> supportedFormats;
+
+    std::vector<v4l2_queryctrl> controls;
+
+    bool queryControlByName(const std::string name, v4l2_queryctrl *result);
 
     //V4L2_PIX_FMT_H264
     bool queryPixelFormat(__u32 pixelFormat, v4l2_fmtdesc *output);
@@ -75,19 +98,23 @@ public:
     // online device handling
     //
     bool open();
-
     void close();
+
     void setFormat(const v4l2_fmtdesc &fmt, const v4l2_frmsizeenum &res, const v4l2_frmivalenum &interval );
     void setNumberOfInputBuffers(int count);
     v4l2_buffer getBufferInformationFromDevice(int bufferIndex);
     void* getBufferPointer(const v4l2_buffer &bufferinfo);
 
     void queueBuffer(int bufferindex, v4l2_buffer *bufferinfo);
-
     void dequeueBuffer(v4l2_buffer *bufferinfo);
 
     void streamON();
     void streamOFF();
+
+    void printControls();
+
+    int getCtrlValue(const v4l2_queryctrl &qctrl);
+    void setCtrlValue(const v4l2_queryctrl &qctrl, int v);
 
 };
 
@@ -105,6 +132,8 @@ public:
     static std::vector<v4l2_fmtdesc> getDeviceFormats(const std::string &device);
     static std::vector<v4l2_frmsizeenum> getFramesizes(const std::string &device, const v4l2_fmtdesc &fmt);
     static std::vector<v4l2_frmivalenum> getFrameIntervals(const std::string &device, const v4l2_frmsizeenum &framesize);
+
+    static std::vector<v4l2_queryctrl> getControls(const std::string &device);
 
 
 };

@@ -79,7 +79,51 @@ static bool compareDeviceName(const std::string &s1, const std::string &s2)
     return n1 < n2;
 }
 
+static int query_ext_ctrl_ioctl(int fd, v4l2_query_ext_ctrl *qctrl, bool have_query_ext_ctrl)
+{
+	v4l2_queryctrl qc;
+	int rc;
 
+	if (have_query_ext_ctrl) {
+		rc = ioctl(fd, VIDIOC_QUERY_EXT_CTRL, qctrl);
+		if (errno != ENOTTY)
+			return rc;
+	}
+
+	qc.id = qctrl->id;
+	rc = ioctl(fd, VIDIOC_QUERYCTRL, &qc);
+	if (rc == 0) {
+		qctrl->type = qc.type;
+		memcpy(qctrl->name, qc.name, sizeof(qctrl->name));
+		qctrl->minimum = qc.minimum;
+		if (qc.type == V4L2_CTRL_TYPE_BITMASK) {
+			qctrl->maximum = (__u32)qc.maximum;
+			qctrl->default_value = (__u32)qc.default_value;
+		} else {
+			qctrl->maximum = qc.maximum;
+			qctrl->default_value = qc.default_value;
+		}
+		qctrl->step = qc.step;
+		qctrl->flags = qc.flags;
+		qctrl->elems = 1;
+		qctrl->nr_of_dims = 0;
+		memset(qctrl->dims, 0, sizeof(qctrl->dims));
+		switch (qctrl->type) {
+		case V4L2_CTRL_TYPE_INTEGER64:
+			qctrl->elem_size = sizeof(__s64);
+			break;
+		case V4L2_CTRL_TYPE_STRING:
+			qctrl->elem_size = qc.maximum + 1;
+			break;
+		default:
+			qctrl->elem_size = sizeof(__s32);
+			break;
+		}
+		memset(qctrl->reserved, 0, sizeof(qctrl->reserved));
+	}
+	qctrl->id = qc.id;
+	return rc;
+}
 
 
 std::vector<std::string> v4l2::listDevicesNames(){
@@ -151,6 +195,7 @@ bool v4l2::loadDeviceInfo(const std::string &path, Device *deviceParam) {
     device.path = path;
     if ( v4l2::getDeviceCapability (device.path, &device.capability  ) ) {
         device.supportedFormats = v4l2::getDeviceFormats(device.path);
+        device.controls = v4l2::getControls(device.path);
         return true;
     }
     return false;
@@ -241,6 +286,107 @@ std::vector<v4l2_frmivalenum> v4l2::getFrameIntervals(const std::string &device,
 }
 
 
+static bool isCtrlValid(const v4l2_queryctrl &qctrl){
+    if (qctrl.flags & V4L2_CTRL_FLAG_DISABLED) {
+		return false;
+    }
+	if (qctrl.type == V4L2_CTRL_TYPE_CTRL_CLASS) {
+		return false;
+	}
+    return true;
+}
+
+static bool canReadValue(const v4l2_queryctrl &qctrl){
+	if ((qctrl.flags & V4L2_CTRL_FLAG_WRITE_ONLY) ||
+	    qctrl.type == V4L2_CTRL_TYPE_BUTTON) {
+	    return false;
+	}
+	if (qctrl.type >= V4L2_CTRL_COMPOUND_TYPES) {
+		return false;
+	}
+    return true;
+}
+
+// this control listing is used just for the non-ext ctrl using just the VIDIOC_QUERYCTRL
+//
+// To check if you have more controls available, use the command:
+//
+// v4l2-ctl --device=/dev/video0 --all
+//
+
+std::vector<v4l2_queryctrl> v4l2::getControls(const std::string &device) {
+    std::vector<v4l2_queryctrl> result;
+
+    int fd = open(device.c_str(), O_RDWR);
+    if (fd < 0)
+        return result;
+
+    bool have_query_ext_ctrl;
+    {
+        v4l2_queryctrl qc;
+        memset(&qc,0,sizeof(v4l2_queryctrl));
+        int rc = ioctl(fd, VIDIOC_QUERY_EXT_CTRL, &qc);
+        have_query_ext_ctrl = (rc == 0);
+    }
+
+    fprintf(stderr,"  Has Ext Ctrl: %i\n", have_query_ext_ctrl);
+    if (have_query_ext_ctrl)
+        fprintf(stderr,"    NOTICE: Ext Ctrl Not Implemented.");
+
+    if (!have_query_ext_ctrl) {
+        const unsigned next_fl = V4L2_CTRL_FLAG_NEXT_CTRL | V4L2_CTRL_FLAG_NEXT_COMPOUND;
+
+        v4l2_queryctrl qc;
+        memset(&qc,0,sizeof(v4l2_queryctrl));
+        qc.id = next_fl;
+
+        while (!ioctl(fd, VIDIOC_QUERYCTRL, &qc)){
+            if (isCtrlValid(qc))
+                result.push_back(qc);
+            //fprintf(stderr,"    '%s' (%s) ", qc.name, controlType2s(qc.type).c_str());
+            //fprintf(stderr," min: %i max: %i step: %i default: %i\n", qc.minimum, qc.maximum, qc.step, qc.default_value );
+            qc.id |= next_fl;
+        }
+
+        if (qc.id == next_fl)
+        {
+            for (qc.id = V4L2_CID_USER_BASE; qc.id < V4L2_CID_LASTP1; qc.id++) {
+                if (ioctl(fd, VIDIOC_QUERYCTRL, &qc) == 0)
+                    if (isCtrlValid(qc))
+                        result.push_back(qc);
+            }
+            for (qc.id = V4L2_CID_PRIVATE_BASE; ioctl(fd, VIDIOC_QUERYCTRL, &qc) == 0; qc.id++) {
+                if (isCtrlValid(qc))
+                    result.push_back(qc);
+            }
+        }
+    }
+
+    close(fd);
+
+    return result;
+}
+
+
+bool Device::queryControlByName(const std::string name, v4l2_queryctrl *result){
+
+    for (int i=0;i< controls.size();i++){
+        std::string controlname = std::string( (char*)controls[i].name );
+        //convert to lower case
+        transform(controlname.begin(), controlname.end(), controlname.begin(), ::tolower);
+        //starts with
+        if (controlname.find(name) == 0){
+            *result = controls[i];
+            return true;
+        }
+    }
+
+    return false;
+}
+
+
+
+
 
 bool Device::queryPixelFormat(__u32 pixelFormat, v4l2_fmtdesc *output){
     for(int i=0;i<supportedFormats.size();i++){
@@ -325,6 +471,55 @@ Device::~Device(){
     close();
 }
 
+void Device::printControls(){
+    fprintf(stderr,"Controls\n");
+
+    for (int i=0;i<controls.size();i++){
+        v4l2_queryctrl &qctrl = controls[i];
+
+        fprintf(stderr,"%31s | (%s) min: %i max: %i step: %i",
+            qctrl.name,
+            controlType2s(qctrl.type).c_str(),
+            qctrl.minimum,
+            qctrl.maximum,
+            qctrl.step
+        );
+
+        if (canReadValue(qctrl)){
+            fprintf(stderr," value: %i\n", getCtrlValue(qctrl));
+        } else {
+            fprintf(stderr," value: (cannot read)\n");
+        }
+    }
+}
+
+int Device::getCtrlValue(const v4l2_queryctrl &qctrl) {
+    if (!canReadValue(qctrl)){
+        fprintf(stderr,"cannot read control %s\n", qctrl.name);
+        exit(-1);
+    }
+    v4l2_control ctrl;
+    memset(&ctrl, 0, sizeof(ctrl));
+    ctrl.id = qctrl.id;
+    if (ioctl(fd, VIDIOC_G_CTRL, &ctrl)) {
+        fprintf(stderr,"error %s getting ctrl %s\n",
+                strerror(errno), qctrl.name);
+        exit(-1);
+    }
+    return ctrl.value;
+}
+
+void Device::setCtrlValue(const v4l2_queryctrl &qctrl, int v) {
+    v4l2_control ctrl;
+    memset(&ctrl, 0, sizeof(ctrl));
+    ctrl.id = qctrl.id;
+    ctrl.value = v;
+    if (ioctl(fd, VIDIOC_S_CTRL, &ctrl)) {
+        fprintf(stderr,"error %s getting ctrl %s\n",
+                strerror(errno), qctrl.name);
+        exit(-1);
+    }
+}
 
 //
 // online device handling
@@ -367,6 +562,7 @@ void Device::setFormat(const v4l2_fmtdesc &fmt, const v4l2_frmsizeenum &res, con
 
     if(ioctl(fd, VIDIOC_S_FMT, &imageFormat) < 0) {
         fprintf(stderr,"Device could not set format: %s\n",strerror(errno));
+        exit(-1);
     }
 
     //
@@ -380,6 +576,7 @@ void Device::setFormat(const v4l2_fmtdesc &fmt, const v4l2_frmsizeenum &res, con
 
     if (ioctl(fd, VIDIOC_S_PARM, &streamparm) < 0) {
         fprintf(stderr,"Failed to set camera FPS: %s\n",strerror(errno));
+        exit(-1);
     }
 
 }

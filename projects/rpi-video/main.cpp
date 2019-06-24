@@ -15,6 +15,10 @@ void signal_handler(int signal) {
     exit_requested = true;
 }
 //
+// Show info v4l2-ctl
+//
+// v4l2-ctl --device=/dev/video0 --all
+//
 // Command line:
 //
 // ./rpi-video | cvlc - --demux h264
@@ -26,7 +30,7 @@ void signal_handler(int signal) {
 // cvlc v4l2:///dev/video0:chroma=h264:width=320:height=240 --demux h264
 //
 // mkfifo h264.fifo
-// ./rpi-video > h264.fifo & omxplayer --adev hdmi h264.fifo --video_queue 1 --threshold 1
+// ./rpi-video > h264.fifo & omxplayer --adev hdmi h264.fifo --video_queue 1 --threshold 1 --win 0,0,640,360
 //
 int main(int argc, char* argv[]) {
 	PlatformPath::setWorkingPath(PlatformPath::getExecutablePath(argv[0]));
@@ -74,6 +78,12 @@ int main(int argc, char* argv[]) {
 
 
     device.open();
+
+
+    device.printControls();
+	//fgetc(stdin);
+
+
     device.setFormat(formatDescription, res, interval);
 
     // buffer allocation and information retrieve
