@@ -3,6 +3,7 @@
 
 OMX::OMX(){
     initialized = false;
+    appExitRequested = false;
 }
 
 OMX* OMX::Instance(){
@@ -205,10 +206,11 @@ void OMX::setVideoBitrate(OMX_HANDLETYPE handle, OMX_U32 portIndex, OMX_VIDEO_CO
     }
 }
 
-void OMX::setVideoPortFormat(OMX_HANDLETYPE handle, OMX_U32 portIndex, OMX_VIDEO_CODINGTYPE codingType) {
+void OMX::setVideoPortFormat(OMX_HANDLETYPE handle, OMX_U32 portIndex, OMX_VIDEO_CODINGTYPE codingType, OMX_COLOR_FORMATTYPE colorType) {
     OMX_VIDEO_PARAM_PORTFORMATTYPE format;
     OMX_INIT_STRUCTURE(format);
     format.nPortIndex = portIndex;
+    format.eColorFormat = colorType;
     format.eCompressionFormat = codingType;//OMX_VIDEO_CodingAVC;
     OMX_ERRORTYPE error;
     if((error = OMX_SetParameter(handle, OMX_IndexParamVideoPortFormat, &format)) != OMX_ErrorNone) {

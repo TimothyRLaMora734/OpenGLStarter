@@ -43,6 +43,9 @@ class OMX {
     OMX();
     bool initialized;
 public:
+
+    volatile bool appExitRequested;
+
     static OMX* Instance();
     void init();
     ~OMX();
@@ -108,7 +111,7 @@ public:
     // Video Calls
     //
     static void setVideoBitrate(OMX_HANDLETYPE handle, OMX_U32 portIndex, OMX_VIDEO_CONTROLRATETYPE controlrate, OMX_U32 bitrate);
-    static void setVideoPortFormat(OMX_HANDLETYPE handle, OMX_U32 portIndex, OMX_VIDEO_CODINGTYPE codingType);
+    static void setVideoPortFormat(OMX_HANDLETYPE handle, OMX_U32 portIndex, OMX_VIDEO_CODINGTYPE codingType, OMX_COLOR_FORMATTYPE colorType = OMX_COLOR_FormatUnused);
 
     //
     // Allocating/Releasing buffers

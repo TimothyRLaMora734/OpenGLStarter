@@ -124,6 +124,23 @@ public:
 
     }
 
+    virtual ~BroadcomVideoEncode() {
+
+        OMX::portFlush(this, encoder, 200);
+        OMX::portFlush(this, encoder, 201);
+
+        OMX::setEnablePort(encoder, 200, OMX_FALSE);
+        OMX::setEnablePort(encoder, 201, OMX_FALSE);
+
+        OMX::freeBuffer(encoder, 200, inputBuffer);
+        OMX::freeBuffer(encoder, 201, outputBuffer);
+
+        OMX::setState(encoder, OMX_StateIdle);
+        OMX::setState(encoder, OMX_StateLoaded);
+
+        OMX::freeHandle(encoder);
+    }
+
 
     void postYUV(int8_t *yuv, int length) {
         if (!canFillInputBuffer)
@@ -176,22 +193,7 @@ public:
     }
 
 
-    virtual ~BroadcomVideoEncode() {
 
-        OMX::portFlush(this, encoder, 200);
-        OMX::portFlush(this, encoder, 201);
-
-        OMX::setEnablePort(encoder, 200, OMX_FALSE);
-        OMX::setEnablePort(encoder, 201, OMX_FALSE);
-
-        OMX::freeBuffer(encoder, 200, inputBuffer);
-        OMX::freeBuffer(encoder, 201, outputBuffer);
-
-        OMX::setState(encoder, OMX_StateIdle);
-        OMX::setState(encoder, OMX_StateLoaded);
-
-        OMX::freeHandle(encoder);
-    }
 
     // OMX callbacks
     OMX_ERRORTYPE emptyBufferDone(OMX_HANDLETYPE hComponent,OMX_PTR pAppData,OMX_BUFFERHEADERTYPE* pBuffer){

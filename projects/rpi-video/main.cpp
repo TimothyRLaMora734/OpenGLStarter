@@ -10,9 +10,13 @@ using namespace aRibeiro;
 
 #include <signal.h>
 
-bool exit_requested = false;
+volatile bool exit_requested = false;
 void signal_handler(int signal) {
     exit_requested = true;
+    //
+    // Force internal loops to exit nicely
+    //
+    OMX::Instance()->appExitRequested = true;
 }
 //
 // Show info v4l2-ctl
@@ -34,7 +38,8 @@ void signal_handler(int signal) {
 //
 int main(int argc, char* argv[]) {
 	PlatformPath::setWorkingPath(PlatformPath::getExecutablePath(argv[0]));
-//*
+
+/*
     signal(SIGINT,  signal_handler);
     signal(SIGTERM, signal_handler);
     signal(SIGQUIT, signal_handler);
@@ -92,7 +97,7 @@ int main(int argc, char* argv[]) {
     device.setFormat(formatDescription, res, interval);
 
     // buffer allocation and information retrieve
-    const int BUFFER_COUNT = 16; // max 32
+    const int BUFFER_COUNT = 3; // max 32
 
     device.setNumberOfInputBuffers(BUFFER_COUNT);
     v4l2_buffer bufferInfo[BUFFER_COUNT];
@@ -116,8 +121,15 @@ int main(int argc, char* argv[]) {
         //fprintf(stderr,"index: %i\n",bufferQueue.index);
 
         //output to stdout
-        if (bufferQueue.bytesused > 0)
-            write(fd_stdout,bufferPtr[bufferQueue.index],bufferQueue.bytesused);
+        write(fd_stdout,bufferPtr[bufferQueue.index],bufferQueue.bytesused);
+
+        //unsigned char* buffer = (unsigned char*)bufferPtr[bufferQueue.index];
+        //static NALu nalu[20];
+        //unsigned int nSize = FindAllNALu(buffer, bufferQueue.bytesused, nalu);
+        //for (unsigned int i = 0; i < nSize; i++) {
+        //    void * pStart = &buffer[nalu[i].pos];
+        //    write(fd_stdout,pStart,nalu[i].size);
+        //};
 
         device.queueBuffer(bufferQueue.index, &bufferQueue);
     }
@@ -131,7 +143,7 @@ int main(int argc, char* argv[]) {
     signal(SIGTERM, SIG_DFL);
     signal(SIGQUIT, SIG_DFL);
 
-/*/
+/* /
     signal(SIGINT,  signal_handler);
     signal(SIGTERM, signal_handler);
     signal(SIGQUIT, signal_handler);
@@ -155,5 +167,31 @@ int main(int argc, char* argv[]) {
     signal(SIGQUIT, SIG_DFL);
 
 //*/
+
+
+    int fd_stdin = fileno(stdin);
+
+    signal(SIGINT,  signal_handler);
+    signal(SIGTERM, signal_handler);
+    signal(SIGQUIT, signal_handler);
+
+    BroadcomVideoDecode decoder;
+
+    unsigned char buffer[65536];
+
+    while (!exit_requested) {
+
+        int readedSize = read(fd_stdin,buffer,65536);
+        decoder.writeH264Buffer(buffer,readedSize);
+
+    }
+
+    signal(SIGINT,  SIG_DFL);
+    signal(SIGTERM, SIG_DFL);
+    signal(SIGQUIT, SIG_DFL);
+
+
+//*/
+
 	return 0;
 }
