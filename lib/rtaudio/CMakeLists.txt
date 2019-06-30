@@ -43,8 +43,10 @@ option(RTAUDIO_BUILD_PYTHON "Build PyRtAudio python bindings" OFF)
 set(RTAUDIO_TARGETNAME_UNINSTALL "uninstall" CACHE STRING "Name of 'uninstall' build target")
 
 # API Options
-option(RTAUDIO_API_DS "Build DirectSound API" OFF)
-option(RTAUDIO_API_ASIO "Build ASIO API" OFF)
+#option(RTAUDIO_API_DS "Build DirectSound API" OFF)
+option(RTAUDIO_API_DS "Build DirectSound API" ${WIN32}) # [alessandro] force build DS when in windows
+#option(RTAUDIO_API_ASIO "Build ASIO API" OFF)
+option(RTAUDIO_API_ASIO "Build ASIO API" ${WIN32}) # [alessandro] force build ASIO when in windows
 option(RTAUDIO_API_WASAPI "Build WASAPI API" ${WIN32})
 option(RTAUDIO_API_OSS "Build OSS4 API" ${xBSD})
 option(RTAUDIO_API_ALSA "Build ALSA API" ${LINUX})
