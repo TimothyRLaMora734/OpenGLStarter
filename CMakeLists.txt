@@ -235,8 +235,8 @@ elseif(CMAKE_COMPILER_IS_GNUCXX)
 elseif(MSVC)
 endif()
 # Unicode Font issues
-add_definitions(-DUNICODE)
-add_definitions(-D_UNICODE)
+#add_definitions(-DUNICODE)
+#add_definitions(-D_UNICODE)
 add_definitions(-DSFML_STATIC)
 add_definitions(-DGLEW_STATIC)
 

@@ -28,7 +28,9 @@
 
 	//#define NTDDI_VERSION NTDDI_LONGHORN
 	#define SHGetFolderPath  SHGetFolderPathW
-	#define PathAppend              PathAppendW
+	#ifndef PathAppend
+		#define PathAppend              PathAppendW
+	#endif
 	#ifndef CSIDL_PERSONAL
         #define CSIDL_PERSONAL                  0x0005        // My Documents
 	#endif
@@ -147,23 +149,25 @@
 	 */
 	void getSaveGameDir(char* dest, size_t size, const wchar_t* baseDirName, const wchar_t* gameDirName)
 	{
-		TCHAR szPath[MAX_PATH];
+		WCHAR szPath[MAX_PATH];
 		if (useKnownFolders()) { // Vista+ has a "Saved Games" known folder
 			PWSTR wdest;
 			SHGetKnownFolderPath(FOLDERID_SavedGames, 0, NULL, &wdest);
 			//copy to szpath
-			wsprintf(szPath, TEXT("%s"), wdest);
+			//wsprintfW(szPath, TEXT("%s"), wdest);
+			wsprintfW(szPath, L"%s", wdest);
 			CoTaskMemFree(wdest);
 		}
 		else { // use My Documents\My Games\<baseDirName>
 			SHGetFolderPath(NULL, CSIDL_PERSONAL, NULL, 0, szPath);
-			PathAppend(szPath, TEXT("My Games"));
-			CreateDirectory(szPath, NULL);
+			//PathAppendW(szPath, TEXT("My Games"));
+			PathAppendW(szPath, L"My Games");
+			CreateDirectoryW(szPath, NULL);
 		}
-		PathAppend(szPath, baseDirName);
-		CreateDirectory(szPath, NULL);
-		PathAppend(szPath, gameDirName);
-		CreateDirectory(szPath, NULL);
+		PathAppendW(szPath, baseDirName);
+		CreateDirectoryW(szPath, NULL);
+		PathAppendW(szPath, gameDirName);
+		CreateDirectoryW(szPath, NULL);
 
 		memset(dest, 0, size);
 
