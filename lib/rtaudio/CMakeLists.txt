@@ -1,5 +1,5 @@
 # Set minimum CMake required version for this project.
-cmake_minimum_required(VERSION 3.10 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.7.2 FATAL_ERROR)
 
 # Define a C++ project.
 project(rtaudio LANGUAGES CXX)
