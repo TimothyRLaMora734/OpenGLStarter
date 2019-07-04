@@ -336,11 +336,9 @@ public:
             for(int i=0;i<size;i++)
                 lastSPS.push_back(ibuffer[i]);
         }
+        //0x68
         //else if (nal_bit == (NAL_IDC_PICTURE | NAL_TYPE_PPS) ) {
         else if ( nal_type == (NAL_TYPE_PPS) ) {
-            
-            if (nal_bit != 0x68)
-                return;
 
             fprintf(stdout, " processing: 0x%x (PPS)\n",nal_bit);
 
