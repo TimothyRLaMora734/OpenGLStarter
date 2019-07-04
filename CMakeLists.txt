@@ -399,6 +399,8 @@ if (ARIBEIRO_RPI)
 	add_subdirectory( projects/rpi-video )
 endif()
 
+add_subdirectory( projects/flv )
+
 #
 # Tools
 #
