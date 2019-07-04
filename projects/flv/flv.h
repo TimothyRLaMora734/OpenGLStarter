@@ -46,7 +46,7 @@ class ParserH264 {
 
     void putByte(uint8_t byte) {
         if (byte == 0x00 && nalState == None)
-            nalState = NAL1;
+            nalState = NAL0;
         else if (byte == 0x00 && (nalState == NAL0 || nalState == NAL1) )
             nalState = NAL1;
         else if (byte == 0x01 && nalState == NAL1){
