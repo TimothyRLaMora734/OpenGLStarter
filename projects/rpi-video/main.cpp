@@ -21,7 +21,11 @@ void signal_handler(int signal) {
 //
 // Show info v4l2-ctl
 //
+// list parameters
 // v4l2-ctl --device=/dev/video0 --all
+//
+// list resolutions and framerates
+// v4l2-ctl --device=/dev/video0 --list-formats-ext
 //
 // Command line:
 //
@@ -39,7 +43,7 @@ void signal_handler(int signal) {
 int main(int argc, char* argv[]) {
 	PlatformPath::setWorkingPath(PlatformPath::getExecutablePath(argv[0]));
 
-/*
+
     signal(SIGINT,  signal_handler);
     signal(SIGTERM, signal_handler);
     signal(SIGQUIT, signal_handler);
@@ -66,12 +70,13 @@ int main(int argc, char* argv[]) {
 
     v4l2_frmsizeenum res;
     if (!device.queryNearResolutionForFormat(formatDescription, 1280, 720, &res)){
+    //if (!device.queryNearResolutionForFormat(formatDescription, 176, 144, &res)){
         fprintf(stderr,"could not query resolution.\n");
         exit(-1);
     }
 
     v4l2_frmivalenum interval;
-    if (!device.queryNearInterval(res, 24.0f, &interval)){
+    if (!device.queryNearInterval(res, 30.0f, &interval)){
         fprintf(stderr,"could not query interval of 24 fps.\n");
         exit(-1);
     }
@@ -166,7 +171,7 @@ int main(int argc, char* argv[]) {
     signal(SIGTERM, SIG_DFL);
     signal(SIGQUIT, SIG_DFL);
 
-//*/
+//* /
 
 
     int fd_stdin = fileno(stdin);

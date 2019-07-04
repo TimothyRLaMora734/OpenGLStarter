@@ -29,6 +29,7 @@ target_link_libraries( ${PROJECT_NAME}
 
 #PostBuildConfig( ${PROJECT_NAME} )
 #PostBuildCopy( ${PROJECT_NAME} tests )
+PostBuildCopyFile(${PROJECT_NAME} test.h264)
 
 find_package(OpenMP)
 
