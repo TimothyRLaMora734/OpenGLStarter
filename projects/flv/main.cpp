@@ -1,8 +1,10 @@
 
 
-#include <aribeiro/aribeiro.h>
-using namespace aRibeiro;
+//#include <aribeiro/aribeiro.h>
+//using namespace aRibeiro;
 
+#include <unistd.h>//write read
+#include <vector>
 #include <signal.h>
 
 volatile bool exit_requested = false;
@@ -22,7 +24,7 @@ void signal_handler(int signal) {
 // ffmpeg -i file.h264 -c copy -bsf:v trace_headers -f null -
 //
 int main(int argc, char* argv[]) {
-	PlatformPath::setWorkingPath(PlatformPath::getExecutablePath(argv[0]));
+	//PlatformPath::setWorkingPath(PlatformPath::getExecutablePath(argv[0]));
 
     int fd_stdin = fileno(stdin);
 
