@@ -8,28 +8,28 @@
 
 // https://yumichan.net/video-processing/video-compression/introduction-to-h264-nal-unit/
 
-#define NAL_IDC_FIELD (1 << 5)
-#define NAL_IDC_FRAME (2 << 5)
-#define NAL_IDC_PICTURE (3 << 5)
+#define NAL_IDC_FIELD (1 << 5) // 0x20
+#define NAL_IDC_FRAME (2 << 5) // 0x40
+#define NAL_IDC_PICTURE (3 << 5) // 0x60
 
-#define NAL_TYPE_CSNIDRP 1 // Coded slice of a non-IDR picture
-#define NAL_TYPE_CSDPA 2 // Coded slice data partition A
-#define NAL_TYPE_CSDPB 3 //   Coded slice data partition B
-#define NAL_TYPE_CSDPC 4 //   Coded slice data partition C
-#define NAL_TYPE_CSIDRP 5 //   Coded slice of an IDR picture
-#define NAL_TYPE_SEI 6 //   Supplemental enhancement information (SEI)
-#define NAL_TYPE_SPS 7 //   Sequence parameter set
-#define NAL_TYPE_PPS 8 //   Picture parameter set
-#define NAL_TYPE_AUD 9 //   Access unit delimiter
-#define NAL_TYPE_EOSEQ 10 //   End of sequence
-#define NAL_TYPE_EOSTREAM 11 //   End of stream
-#define NAL_TYPE_FD 12 //   Filler data
-#define NAL_TYPE_SPSE 13 //   Sequence parameter set extension
-#define NAL_TYPE_PNALU 14 //   Prefix NAL unit
-#define NAL_TYPE_SSPS 15 //   Subset sequence parameter set
-#define NAL_TYPE_CSOAACPWP 19 //   Coded slice of an auxiliary coded picture without partitioning
-#define NAL_TYPE_CSE 20 //   Coded slice extension
-#define NAL_TYPE_CSEFDVC 21 //   Coded slice extension for depth view components
+#define NAL_TYPE_CSNIDRP 0x01 // Coded slice of a non-IDR picture
+#define NAL_TYPE_CSDPA 0x02 // Coded slice data partition A
+#define NAL_TYPE_CSDPB 0x03 //   Coded slice data partition B
+#define NAL_TYPE_CSDPC 0x04 //   Coded slice data partition C
+#define NAL_TYPE_CSIDRP 0x05 //   Coded slice of an IDR picture
+#define NAL_TYPE_SEI 0x06 //   Supplemental enhancement information (SEI)
+#define NAL_TYPE_SPS 0x07 //   Sequence parameter set
+#define NAL_TYPE_PPS 0x08 //   Picture parameter set
+#define NAL_TYPE_AUD 0x09 //   Access unit delimiter
+#define NAL_TYPE_EOSEQ 0x0a // 10 //   End of sequence
+#define NAL_TYPE_EOSTREAM 0x0b // 11 //   End of stream
+#define NAL_TYPE_FillerData 0x0c // 12 //   Filler data
+#define NAL_TYPE_SPSE 0x0d // 13 //   Sequence parameter set extension
+#define NAL_TYPE_PrefixNALU 0x0e // 14 //   Prefix NAL unit
+#define NAL_TYPE_SSPS 0x0f //15 //   Subset sequence parameter set
+#define NAL_TYPE_CSOAACPWP 0x13 //19 //   Coded slice of an auxiliary coded picture without partitioning
+#define NAL_TYPE_CSE 0x14 // 20 //   Coded slice extension
+#define NAL_TYPE_CSEFDVC 0x15 // 21 //   Coded slice extension for depth view components
 
 class ParserH264 {
 
@@ -39,34 +39,34 @@ class ParserH264 {
         None,
         Data,
         NAL0,
-        NAL1,
-        NAL2
+        NAL1
     };
     State nalState; // nal = network abstraction layer
     State writingState;
 
     void putByte(uint8_t byte) {
         if (byte == 0x00 && nalState == None)
-            nalState = NAL0;
-        else if (byte == 0x00 && nalState == NAL0)
             nalState = NAL1;
-        else if (byte == 0x00 && (nalState == NAL1 || nalState == NAL2) )
-            nalState = NAL2;
-        else if (byte == 0x01 && nalState == NAL2){
+        else if (byte == 0x00 && (nalState == NAL0 || nalState == NAL1) )
+            nalState = NAL1;
+        else if (byte == 0x01 && nalState == NAL1){
             nalState = None;
             //detected a NAL info
             if (writingState == None){
                 writingState = Data;
-                buffer.push_back(0x00);
-                buffer.push_back(0x00);
-                buffer.push_back(0x00);
+                return;
             } else if (writingState == Data){
+                
                 buffer.pop_back();// 0x00
                 buffer.pop_back();// 0x00
-                buffer.pop_back();// 0x00
-
+                
+                //in the case using the format 00 00 00 01, remove the last element detected
+                if (buffer[buffer.size()-1] == 0x00)
+                    buffer.pop_back();
+                
                 chunkDetectedH264(&buffer[0],buffer.size());
-                buffer.resize(3);
+                buffer.clear();
+                return;
             }
         } else
             nalState = None;
@@ -86,6 +86,7 @@ public:
     }
 
     virtual void chunkDetectedH264(const uint8_t* ibuffer, int size){
+        
     }
 
     void endOfStreamH264() {
@@ -315,28 +316,36 @@ public:
 
     void chunkDetectedH264(const uint8_t* ibuffer, int size) {
         printf("[debug] Detected NAL chunk size: %i\n",size);
-        if (size < 4){
+        
+        if (size <= 0){
             fprintf(stdout, "  error On h264 chunk detection\n");
             return;
         }
 
-        uint8_t nal_bit = ibuffer[4];
+        uint8_t nal_bit = ibuffer[0];
+        uint8_t nal_type = (nal_bit & 0x1f);
+        
         //0x67
-        if (nal_bit == (NAL_IDC_PICTURE | NAL_TYPE_SPS) ) {
+        //if (nal_bit == (NAL_IDC_PICTURE | NAL_TYPE_SPS) ) {
+        if ( nal_type == (NAL_TYPE_SPS) ) {
 
             fprintf(stdout, " processing: 0x%x (SPS)\n",nal_bit);
 
             //store information to use when arrise PPS nal_bit, probably the next NAL detection
             lastSPS.clear();
-            for(int i=4;i<size;i++)
+            for(int i=0;i<size;i++)
                 lastSPS.push_back(ibuffer[i]);
         }
-        else if (nal_bit == (NAL_IDC_PICTURE | NAL_TYPE_PPS) ) {
+        //else if (nal_bit == (NAL_IDC_PICTURE | NAL_TYPE_PPS) ) {
+        else if ( nal_type == (NAL_TYPE_PPS) ) {
+            
+            if (nal_bit != 0x68)
+                return;
 
             fprintf(stdout, " processing: 0x%x (PPS)\n",nal_bit);
 
             //must be called just after the SPS detection
-            int32_t bodyLength = lastSPS.size() + (size-4) + 16;
+            int32_t bodyLength = lastSPS.size() + size + 16;
 
             //
             // flv tag header = 11 bytes
@@ -375,9 +384,9 @@ public:
                 exit(-1);
             }
 
-            mFLVWritter.writeUInt16(size-4); //picture parameter set length
+            mFLVWritter.writeUInt16(size); //picture parameter set length
             //H264 picture parameter set raw data
-            for(int i=4;i<size;i++)
+            for(int i=0;i<size;i++)
                 mFLVWritter.writeUInt8(ibuffer[i]);
 
             //
@@ -395,11 +404,13 @@ public:
             videoTimestamp_ms += 1000/30;
         }
         //0x65
-        else if (nal_bit == (NAL_IDC_PICTURE | NAL_TYPE_CSIDRP) ) {
+        //else if (nal_bit == (NAL_IDC_PICTURE | NAL_TYPE_CSIDRP) ) {
+        else if ( nal_type == (NAL_TYPE_CSIDRP) ) {
+        
 
             fprintf(stdout, " processing: 0x%x (0x65)\n",nal_bit);
 
-            uint32_t bodyLength = (size-4) + 5 + 4;//flv VideoTagHeader +  NALU length
+            uint32_t bodyLength = size + 5 + 4;//flv VideoTagHeader +  NALU length
 
             //
             // flv tag header = 11 bytes
@@ -416,10 +427,10 @@ public:
             mFLVWritter.writeUInt8(0x17);//key frame, AVC 1:keyframe 2:inner frame 7:H264
             mFLVWritter.writeUInt8(0x01);//avc NALU unit
             mFLVWritter.writeUInt24(0x00);//composit time ??????????
-            mFLVWritter.writeUInt32(size-4);//nal length
+            mFLVWritter.writeUInt32(size);//nal length
 
             //nal raw data
-            for(int i=4;i<size;i++)
+            for(int i=0;i<size;i++)
                 mFLVWritter.writeUInt8(ibuffer[i]);
 
             //
@@ -436,11 +447,12 @@ public:
             videoTimestamp_ms += 1000/30;
         }
         //0x61
-        else if (nal_bit == (NAL_IDC_FRAME | NAL_TYPE_CSNIDRP) ) {
+        //else if (nal_bit == (NAL_IDC_FRAME | NAL_TYPE_CSNIDRP) ) {
+        else if ( nal_type == (NAL_TYPE_CSNIDRP) ) {
 
             fprintf(stdout, " processing: 0x%x (0x61)\n",nal_bit);
 
-            uint32_t bodyLength = (size-4) + 5 + 4;//flv VideoTagHeader +  NALU length
+            uint32_t bodyLength = size + 5 + 4;//flv VideoTagHeader +  NALU length
 
             //
             // flv tag header = 11 bytes
@@ -457,10 +469,10 @@ public:
             mFLVWritter.writeUInt8(0x27);//key frame, AVC 1:keyframe 2:inner frame 7:H264
             mFLVWritter.writeUInt8(0x01);//avc NALU unit
             mFLVWritter.writeUInt24(0x00);//composit time ??????????
-            mFLVWritter.writeUInt32(size-4);//nal length
+            mFLVWritter.writeUInt32(size);//nal length
 
             // raw nal data
-            for(int i=4;i<size;i++)
+            for(int i=0;i<size;i++)
                 mFLVWritter.writeUInt8(ibuffer[i]);
 
             //
@@ -476,9 +488,117 @@ public:
 
             videoTimestamp_ms += 1000/30;
 
+        }
+        
+        else if (nal_type == 0x16) {
+            fprintf(stdout, " ignoring 0x16 bit: 0x%x type: 0x%x\n",nal_bit, nal_type);
+        }
+        
+        else if (nal_type == 0x12) {
+            fprintf(stdout, " ignoring 0x12 bit: 0x%x type: 0x%x\n",nal_bit, nal_type);
+        }
+        
+        else if (nal_type == NAL_TYPE_FillerData) {
+            fprintf(stdout, " ignoring NAL_TYPE_FillerData bit: 0x%x type: 0x%x\n",nal_bit, nal_type);
+        }
+        
+        else if (nal_type == 0x1b) {
+            fprintf(stdout, " ignoring 0x1b bit: 0x%x type: 0x%x\n",nal_bit, nal_type);
+        }
+        
+        else if (nal_type == 0x1c) {
+            fprintf(stdout, " ignoring 0x1c bit: 0x%x type: 0x%x\n",nal_bit, nal_type);
+        }
+        
+        else if (nal_type == 0x17) {
+            fprintf(stdout, " ignoring 0x17 bit: 0x%x type: 0x%x\n",nal_bit, nal_type);
+        }
+        
+        else if (nal_type == 0x1f) {
+            fprintf(stdout, " ignoring 0x1f bit: 0x%x type: 0x%x\n",nal_bit, nal_type);
+        }
+        
+        else if (nal_type == NAL_TYPE_CSDPB) {
+            fprintf(stdout, " ignoring NAL_TYPE_CSDPB bit: 0x%x type: 0x%x\n",nal_bit, nal_type);
+        }
+        
+        else if (nal_type == NAL_TYPE_CSE) {
+            fprintf(stdout, " ignoring NAL_TYPE_CSE bit: 0x%x type: 0x%x\n",nal_bit, nal_type);
+        }
+        
+        else if (nal_type == 0x19) {
+            fprintf(stdout, " ignoring 0x19 bit: 0x%x type: 0x%x\n",nal_bit, nal_type);
+        }
+        
+        else if (nal_type == 0x1e) {
+            fprintf(stdout, " ignoring 0x1e bit: 0x%x type: 0x%x\n",nal_bit, nal_type);
+        }
+        
+        else if (nal_type == NAL_TYPE_CSDPA) {
+            fprintf(stdout, " ignoring NAL_TYPE_CSDPA bit: 0x%x type: 0x%x\n",nal_bit, nal_type);
+        }
+
+        else if (nal_type == NAL_TYPE_EOSTREAM) {
+            fprintf(stdout, " ignoring NAL_TYPE_EOSTREAM bit: 0x%x type: 0x%x\n",nal_bit, nal_type);
+        }
+
+        else if (nal_type == 0x11) {
+            fprintf(stdout, " ignoring 0x11 bit: 0x%x type: 0x%x\n",nal_bit, nal_type);
+        }
+        
+        else if (nal_type == NAL_TYPE_SSPS) {
+            fprintf(stdout, " ignoring NAL_TYPE_SSPS bit: 0x%x type: 0x%x\n",nal_bit, nal_type);
+        }
+        
+        else if (nal_type == NAL_TYPE_EOSEQ) {
+            fprintf(stdout, " ignoring NAL_TYPE_EOSEQ bit: 0x%x type: 0x%x\n",nal_bit, nal_type);
+        }
+        
+        else if (nal_type == 0x00) {
+            fprintf(stdout, " ignoring 0x00 bit: 0x%x type: 0x%x\n",nal_bit, nal_type);
+        }
+        
+        else if (nal_type == NAL_TYPE_CSEFDVC) {
+            fprintf(stdout, " ignoring NAL_TYPE_CSEFDVC bit: 0x%x type: 0x%x\n",nal_bit, nal_type);
+        }
+        
+        else if (nal_type == 0x1d) {
+            fprintf(stdout, " ignoring 0x1d bit: 0x%x type: 0x%x\n",nal_bit, nal_type);
+        }
+        
+        else if (nal_type == 0x10) {
+            fprintf(stdout, " ignoring 0x10 bit: 0x%x type: 0x%x\n",nal_bit, nal_type);
+        }
+        
+        else if (nal_type == NAL_TYPE_CSOAACPWP) {
+            fprintf(stdout, " ignoring NAL_TYPE_AUD bit: 0x%x type: 0x%x\n",nal_bit, nal_type);
+        }
+        
+        else if (nal_type == NAL_TYPE_AUD) {
+            fprintf(stdout, " ignoring NAL_TYPE_AUD bit: 0x%x type: 0x%x\n",nal_bit, nal_type);
+        }
+        
+        else if (nal_type == NAL_TYPE_SPSE) {
+            fprintf(stdout, " ignoring NAL_TYPE_SPSE bit: 0x%x type: 0x%x\n",nal_bit, nal_type);
+        }
+        
+        else if (nal_type == 0x18) {
+            fprintf(stdout, " ignoring Unknown 0x18 bit: 0x%x type: 0x%x\n",nal_bit, nal_type);
+        }
+        
+        else if (nal_type == (NAL_TYPE_CSDPC)) {
+            fprintf(stdout, " ignoring NAL_TYPE_CSDPC bit: 0x%x type: 0x%x\n",nal_bit, nal_type);
+        }
+        
+        else if (nal_type == (NAL_TYPE_PrefixNALU)) {
+            fprintf(stdout, " ignoring prefixNALU bit: 0x%x type: 0x%x\n",nal_bit, nal_type);
+        }
+        else if (nal_type == (NAL_TYPE_SEI)) {
+            fprintf(stdout, " ignoring SEI bit: 0x%x type: 0x%x\n",nal_bit, nal_type);
+            
         } else {
             // nal_bit type not implemented...
-            fprintf(stdout, "Error: unknown NAL bit: 0x%x\n",nal_bit);
+            fprintf(stdout, "Error: unknown NAL bit: 0x%x type: 0x%x\n",nal_bit, nal_type);
             exit(-1);
         }
     }
