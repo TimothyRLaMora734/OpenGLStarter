@@ -32,9 +32,9 @@
 #define NAL_TYPE_CSEFDVC 21 //   Coded slice extension for depth view components
 
 class ParserH264 {
-    
+
     std::vector<uint8_t> buffer;
-    
+
     enum State{
         None,
         Data,
@@ -44,7 +44,7 @@ class ParserH264 {
     };
     State nalState; // nal = network abstraction layer
     State writingState;
-    
+
     void putByte(uint8_t byte) {
         if (byte == 0x00 && nalState == None)
             nalState = NAL0;
@@ -64,40 +64,40 @@ class ParserH264 {
                 buffer.pop_back();// 0x00
                 buffer.pop_back();// 0x00
                 buffer.pop_back();// 0x00
-                
+
                 chunkDetectedH264(&buffer[0],buffer.size());
                 buffer.resize(3);
             }
         } else
             nalState = None;
-        
+
         if (writingState == Data)
             buffer.push_back(byte);
     }
-    
+
 public:
-    
+
     ParserH264() {
         nalState = None;
         writingState = None;
     }
-    
+
     virtual ~ParserH264(){
     }
-    
+
     virtual void chunkDetectedH264(const uint8_t* ibuffer, int size){
     }
-    
+
     void endOfStreamH264() {
         if (buffer.size() <= 0)
             return;
-        
+
         chunkDetectedH264(&buffer[0],buffer.size());
         buffer.clear();
         writingState = None;
         nalState = None;
     }
-    
+
     void parseH264(const uint8_t* ibuffer, int size) {
         for(int i=0;i<size;i++){
             putByte(ibuffer[i]);
@@ -143,7 +143,7 @@ uint8_t aac2FlvObjTAndFreq(uint8_t aacAudioObjectType,
 
 class ParserAAC {
     std::vector<uint8_t> buffer;
-    
+
     enum State{
         None,
         Data,
@@ -151,21 +151,21 @@ class ParserAAC {
         ADTS_HEADER_SIZE,
         ADTS_LENGTH_SIZE
     };
-    
+
     State adtsState;
     uint32_t frameLength;
-    
+
     void putByte(uint8_t byte) {
-        
+
         if ( byte == 0xff ) { // && adtsState == None ) {
             adtsState = ADTS_SECOND_BYTE;
         } else if ( (byte & 0xf0) == 0xf0 && adtsState == ADTS_SECOND_BYTE) {
             adtsState = ADTS_HEADER_SIZE;
-            
+
             buffer.clear();
             buffer.push_back(0xff);
             buffer.push_back(byte);
-            
+
         } else if (adtsState == ADTS_HEADER_SIZE) {
             buffer.push_back(byte);
             if (buffer.size() == ADTS_HEADER_SIZE) {
@@ -182,19 +182,19 @@ class ParserAAC {
             adtsState = None;
         }
     }
-    
+
 public:
-    
+
     ParserAAC() {
         adtsState = None;
     }
-    
+
     virtual ~ParserAAC(){
     }
-    
+
     virtual void chunkDetectedAAC(const uint8_t* ibuffer, int size){
     }
-    
+
     void parseAAC(const uint8_t* ibuffer, int size) {
         for(int i=0;i<size;i++){
             putByte(ibuffer[i]);
@@ -206,25 +206,25 @@ public:
 class FLVWritter{
 public:
     std::vector<uint8_t> buffer;
-    
+
     void flushToFD(int fd) {
         if (buffer.size() <= 0)
             return;
         ::write(fd,&buffer[0],buffer.size());
         buffer.clear();
     }
-    
+
     void reset(){
         buffer.clear();
     }
-    
+
     void writeFLVFileHeader(bool haveAudio, bool haveVideo){
         uint8_t flv_header[13] = {
             0x46, 0x4c, 0x56, 0x01, 0x05,
             0x00, 0x00, 0x00, 0x09, 0x00,
             0x00, 0x00, 0x00
         };
-        
+
         if (haveAudio && haveVideo) {
             flv_header[4] = 0x05;
         } else if (haveAudio && !haveVideo) {
@@ -234,40 +234,40 @@ public:
         } else {
             flv_header[4] = 0x00;
         }
-        
+
         for(int i=0;i<13;i++)
             buffer.push_back(flv_header[i]);
     }
-    
+
     void writeUInt8(uint8_t v) {
         buffer.push_back(v);
     }
-    
+
     void writeUInt16(uint32_t v){
         buffer.push_back((uint8_t)(v >> 8));
         buffer.push_back((uint8_t)(v));
     }
-    
+
     void writeUInt24(uint32_t v){
         buffer.push_back((uint8_t)(v >> 16));
         buffer.push_back((uint8_t)(v >> 8));
         buffer.push_back((uint8_t)(v));
     }
-    
+
     void writeUInt32(uint32_t v){
         buffer.push_back((uint8_t)(v >> 24));
         buffer.push_back((uint8_t)(v >> 16));
         buffer.push_back((uint8_t)(v >> 8));
         buffer.push_back((uint8_t)(v));
     }
-    
+
     void writeUInt32Timestamp(uint32_t v){
         buffer.push_back((uint8_t)(v >> 16));
         buffer.push_back((uint8_t)(v >> 8));
         buffer.push_back((uint8_t)(v));
         buffer.push_back((uint8_t)(v >> 24));
     }
-    
+
 };
 
 
@@ -280,40 +280,41 @@ enum FLV_TAG_TYPE {
 
 
 class FLVFileWriter: public ParserAAC, public ParserH264 {
-    
+
     std::vector<uint8_t> lastSPS;
-    
+
 public:
     FLVWritter mFLVWritter;
     int fd;
     bool firstAudioWrite;
     uint32_t audioTimestamp_ms;
     uint32_t videoTimestamp_ms;
-    
+
     FLVFileWriter ( const char* file ) {
         fd = open(file, O_WRONLY | O_CREAT | O_TRUNC , 0644 );
         if (fd < 0){
             fprintf(stderr,"error to create flv file\n");
             exit(-1);
         }
-        
+
         //have audio, have video
         mFLVWritter.writeFLVFileHeader(false, true);
         mFLVWritter.flushToFD(fd);
-        
+
         firstAudioWrite = true;
         audioTimestamp_ms = 0;
         videoTimestamp_ms = 0;
     }
-    
+
     virtual ~FLVFileWriter(){
         if (fd >= 0){
             mFLVWritter.flushToFD(fd);
             close(fd);
         }
     }
-    
+
     void chunkDetectedH264(const uint8_t* ibuffer, int size) {
+        printf("[debug] Detected NAL chunk size: %i\n",size);
         if (size < 4){
             fprintf(stdout, "  error On h264 chunk detection\n");
             return;
@@ -322,21 +323,21 @@ public:
         uint8_t nal_bit = ibuffer[4];
         //0x67
         if (nal_bit == (NAL_IDC_PICTURE | NAL_TYPE_SPS) ) {
-            
+
             fprintf(stdout, " processing: 0x%x (SPS)\n",nal_bit);
-            
+
             //store information to use when arrise PPS nal_bit, probably the next NAL detection
             lastSPS.clear();
             for(int i=4;i<size;i++)
                 lastSPS.push_back(ibuffer[i]);
         }
         else if (nal_bit == (NAL_IDC_PICTURE | NAL_TYPE_PPS) ) {
-            
+
             fprintf(stdout, " processing: 0x%x (PPS)\n",nal_bit);
-            
+
             //must be called just after the SPS detection
             int32_t bodyLength = lastSPS.size() + (size-4) + 16;
-            
+
             //
             // flv tag header = 11 bytes
             //
@@ -344,7 +345,7 @@ public:
             mFLVWritter.writeUInt24( bodyLength );//data len
             mFLVWritter.writeUInt32Timestamp( videoTimestamp_ms );//timestamp
             mFLVWritter.writeUInt24( 0 );//stream id 0
-            
+
             //
             // Message Body = 16 bytes + SPS bytes + PPS bytes
             //
@@ -352,7 +353,7 @@ public:
             mFLVWritter.writeUInt8(0x17);//key frame, AVC 1:keyframe 7:h264
             mFLVWritter.writeUInt8(0x00);//avc sequence header
             mFLVWritter.writeUInt24( 0x00 );//composit time ??????????
-            
+
             //flv VideoTagBody --AVCDecoderCOnfigurationRecord
             mFLVWritter.writeUInt8(0x01);//configurationversion
             mFLVWritter.writeUInt8(lastSPS[1]);//avcprofileindication
@@ -360,19 +361,25 @@ public:
             mFLVWritter.writeUInt8(lastSPS[3]);//avclevelindication
             mFLVWritter.writeUInt8(0xff); //reserved + lengthsizeminusone
             mFLVWritter.writeUInt8(0xe0 | 0x01); // first reserved, second number of SPS
-            
+
             mFLVWritter.writeUInt16( lastSPS.size() ); //sequence parameter set length
             //H264 sequence parameter set raw data
             for(int i=0;i<lastSPS.size();i++)
                 mFLVWritter.writeUInt8(lastSPS[i]);
-            
+
             mFLVWritter.writeUInt8(0x01); // number of PPS
-            
+
+            //sanity check with the packet size...
+            if ( size-4 > 0xffff ){
+                fprintf(stderr, "PPS Greater than 64k. This muxer does not support it.\n");
+                exit(-1);
+            }
+
             mFLVWritter.writeUInt16(size-4); //picture parameter set length
             //H264 picture parameter set raw data
             for(int i=4;i<size;i++)
                 mFLVWritter.writeUInt8(ibuffer[i]);
-            
+
             //
             // previous tag size
             //
@@ -383,19 +390,17 @@ public:
             }
             mFLVWritter.writeUInt32(currentSize);//data len
             mFLVWritter.flushToFD(fd);
-            
-            
-            //videoTimestamp_ms += 66;
+
+
+            videoTimestamp_ms += 1000/30;
         }
         //0x65
-        else if (nal_bit == (NAL_IDC_FRAME | NAL_TYPE_CSIDRP) ) {
-            
+        else if (nal_bit == (NAL_IDC_PICTURE | NAL_TYPE_CSIDRP) ) {
+
             fprintf(stdout, " processing: 0x%x (0x65)\n",nal_bit);
-            
-            videoTimestamp_ms += 66;
-            
+
             uint32_t bodyLength = (size-4) + 5 + 4;//flv VideoTagHeader +  NALU length
-            
+
             //
             // flv tag header = 11 bytes
             //
@@ -403,7 +408,7 @@ public:
             mFLVWritter.writeUInt24( bodyLength );//data len
             mFLVWritter.writeUInt32Timestamp( videoTimestamp_ms );//timestamp
             mFLVWritter.writeUInt24( 0 );//stream id 0
-            
+
             //
             // Message Body = VideoTagHeader(5) + NALLength(4) + NAL raw data
             //
@@ -412,11 +417,11 @@ public:
             mFLVWritter.writeUInt8(0x01);//avc NALU unit
             mFLVWritter.writeUInt24(0x00);//composit time ??????????
             mFLVWritter.writeUInt32(size-4);//nal length
-            
+
             //nal raw data
             for(int i=4;i<size;i++)
                 mFLVWritter.writeUInt8(ibuffer[i]);
-            
+
             //
             // previous tag size
             //
@@ -427,16 +432,16 @@ public:
             }
             mFLVWritter.writeUInt32(currentSize);//data len
             mFLVWritter.flushToFD(fd);
+
+            videoTimestamp_ms += 1000/30;
         }
         //0x61
         else if (nal_bit == (NAL_IDC_FRAME | NAL_TYPE_CSNIDRP) ) {
-            
+
             fprintf(stdout, " processing: 0x%x (0x61)\n",nal_bit);
-            
-            videoTimestamp_ms += 66;
-            
+
             uint32_t bodyLength = (size-4) + 5 + 4;//flv VideoTagHeader +  NALU length
-            
+
             //
             // flv tag header = 11 bytes
             //
@@ -444,7 +449,7 @@ public:
             mFLVWritter.writeUInt24( bodyLength );//data len
             mFLVWritter.writeUInt32Timestamp( videoTimestamp_ms );//timestamp
             mFLVWritter.writeUInt24( 0 );//stream id 0
-            
+
             //
             // Message Body = VideoTagHeader(5) + NALLength(4) + NAL raw data
             //
@@ -453,11 +458,11 @@ public:
             mFLVWritter.writeUInt8(0x01);//avc NALU unit
             mFLVWritter.writeUInt24(0x00);//composit time ??????????
             mFLVWritter.writeUInt32(size-4);//nal length
-            
+
             // raw nal data
             for(int i=4;i<size;i++)
                 mFLVWritter.writeUInt8(ibuffer[i]);
-            
+
             //
             // previous tag size
             //
@@ -468,13 +473,16 @@ public:
             }
             mFLVWritter.writeUInt32(currentSize);//data len
             mFLVWritter.flushToFD(fd);
-            
+
+            videoTimestamp_ms += 1000/30;
+
         } else {
             // nal_bit type not implemented...
-            fprintf(stdout, "unknown NAL bit: 0x%x\n",nal_bit);
+            fprintf(stdout, "Error: unknown NAL bit: 0x%x\n",nal_bit);
+            exit(-1);
         }
     }
-    
+
     void chunkDetectedAAC(const uint8_t* ibuffer, int size){
         //
         // Extract AAC audio configuration from AAC header
@@ -482,15 +490,15 @@ public:
         uint8_t aacAudioObjectType = (ibuffer[2] & 0xc0) >> 6;
         uint8_t aacSampleFrequencyIndex =  (ibuffer[2] & 0x3c) >> 2;
         uint8_t aacChannelConfiguration = (ibuffer[3] & 0xc0) >> 6;
-        
+
         //
         // write audio config
         //
         if (firstAudioWrite){
             firstAudioWrite = false;
-            
+
             uint32_t bodyLength = 2 + 2; //AudioTagHeader + AudioSpecificConfig
-            
+
             //
             // flv tag header = 11 bytes
             //
@@ -512,7 +520,7 @@ public:
                                                        aacChannelConfiguration ) );
             mFLVWritter.writeUInt8(((aacSampleFrequencyIndex & 0x01) << 7) |
                                    (aacChannelConfiguration << 3));
-            
+
             //
             // previous tag size
             //
@@ -524,12 +532,12 @@ public:
             mFLVWritter.writeUInt32(currentSize);//data len
             mFLVWritter.flushToFD(fd);
         }
-        
+
         //
         // write audio data
         //
         uint32_t bodyLength = 2 + size - AAC_ADTS_HEADER_SIZE; // AudioTagHeader + raw AAC w/o header
-        
+
         //
         // flv tag header = 11 bytes
         //
