@@ -31,27 +31,44 @@
 #define NAL_TYPE_CSE 0x14 // 20 //   Coded slice extension
 #define NAL_TYPE_CSEFDVC 0x15 // 21 //   Coded slice extension for depth view components
 
-class ParserH264 {
+struct sps_info{
+    uint8_t profile_idc;
+    uint8_t constraints;
+    uint8_t level_idc;
+    uint8_t log2_max_frame_num;
+    
+    bool set;
+};
 
+class ParserH264 {
     std::vector<uint8_t> buffer;
 
     enum State{
         None,
         Data,
         NAL0,
-        NAL1
+        NAL1,
+        
+        EMULATION0,
+        EMULATION1,
+        EMULATION_FORCE_SKIP
     };
     State nalState; // nal = network abstraction layer
     State writingState;
-
+    
     void putByte(uint8_t byte) {
+        //
+        // Detect start code 00 00 01 and 00 00 00 01
+        //
+        // It returns the buffer right after the start code
+        //
         if (byte == 0x00 && nalState == None)
             nalState = NAL0;
         else if (byte == 0x00 && (nalState == NAL0 || nalState == NAL1) )
             nalState = NAL1;
         else if (byte == 0x01 && nalState == NAL1){
             nalState = None;
-            //detected a NAL info
+            
             if (writingState == None){
                 writingState = Data;
                 return;
@@ -61,18 +78,26 @@ class ParserH264 {
                 buffer.pop_back();// 0x00
                 
                 //in the case using the format 00 00 00 01, remove the last element detected
-                if (buffer[buffer.size()-1] == 0x00)
+                if (buffer.size()-2 >=0 &&
+                    buffer[buffer.size()-1] == 0x00 &&
+                    buffer[buffer.size()-2] != 0x03 )//keep value, if emulation prevention is present
                     buffer.pop_back();
                 
-                chunkDetectedH264(&buffer[0],buffer.size());
+                chunkDetectedH264(buffer);
+                
                 buffer.clear();
+                
                 return;
             }
         } else
             nalState = None;
 
-        if (writingState == Data)
+        if (writingState == Data){
+            //
+            // increase raw buffer size
+            //
             buffer.push_back(byte);
+        }
     }
 
 public:
@@ -85,7 +110,9 @@ public:
     virtual ~ParserH264(){
     }
 
-    virtual void chunkDetectedH264(const uint8_t* ibuffer, int size){
+    // rawBuffer might has emulation bytes
+    // Raw Byte Sequence Payload (RBSP)
+    virtual void chunkDetectedH264(const std::vector<uint8_t> &nal){
         
     }
 
@@ -93,7 +120,8 @@ public:
         if (buffer.size() <= 0)
             return;
 
-        chunkDetectedH264(&buffer[0],buffer.size());
+        chunkDetectedH264(buffer);
+        
         buffer.clear();
         writingState = None;
         nalState = None;
@@ -104,6 +132,144 @@ public:
             putByte(ibuffer[i]);
         }
     }
+    
+    
+    static inline uint32_t readbit(int bitPos,  const uint8_t* data, int size){
+        int dataPosition = bitPos / 8;
+        int bitPosition = 7 - bitPos % 8;
+        if (dataPosition >= size){
+            fprintf(stderr,"error to access bit...\n");
+            exit(-1);
+        }
+        return (data[dataPosition] >> bitPosition) & 0x01;
+    }
+    
+    // leading 0`s count equals the number of next bits after bit 1
+    //
+    //  Example: 01x  001xx 0001xxx 00001xxxx
+    //
+    //  The max number of bits is equal 32 in this sintax
+    //
+    static inline int bitsToSkip_ue( int start,  const uint8_t* data, int size){
+        int bitPos = start;
+        int dataPosition = start / 8;
+        int bitPosition;
+        while (dataPosition < size){
+            dataPosition = bitPos / 8;
+            bitPosition = 7 - bitPos % 8;
+            int bit = (data[dataPosition] >> bitPosition) & 0x01;
+            if (bit == 1)
+                break;
+            bitPos++;
+        }
+        int leadingZeros = bitPos - start;
+        int totalBits = leadingZeros + 1 + leadingZeros;
+        if (totalBits > 32){
+            fprintf(stderr,"bitsToSkip_ue length greated than 32\n");
+            exit(-1);
+        }
+        return totalBits;
+    }
+    
+    static inline uint32_t read_golomb_ue(int start,  const uint8_t* data, int size){
+        int bitPos = start;
+        int dataPosition = start / 8;
+        int bitPosition;
+        while (dataPosition < size){
+            dataPosition = bitPos / 8;
+            bitPosition = 7 - bitPos % 8;
+            int bit = (data[dataPosition] >> bitPosition) & 0x01;
+            if (bit == 1)
+                break;
+            bitPos++;
+        }
+        uint32_t leadingZeros = (uint32_t)(bitPos - start);
+        uint32_t num = readbits(bitPos+1, leadingZeros, data, size);
+        num += (1 << leadingZeros) - 1;
+        
+        return num;
+    }
+    
+    static inline uint32_t readbits(int bitPos, int length, const uint8_t* data, int size){
+        if (length > 32){
+            fprintf(stderr,"readbits length greated than 32\n");
+            exit(-1);
+        }
+        uint32_t result = 0;
+        for(int i=0;i<length;i++){
+            result <<= 1;
+            result = result | readbit(bitPos+i, data, size);
+        }
+        return result;
+    }
+    
+    static inline sps_info parseSPS(const std::vector<uint8_t> sps_rbsp) {
+        const uint8_t *data = &sps_rbsp[0];
+        uint32_t size = sps_rbsp.size();
+        
+        sps_info result;
+        
+        result.profile_idc = sps_rbsp[1];
+        result.constraints = sps_rbsp[2];
+        result.level_idc = sps_rbsp[3];
+        
+        uint32_t startIndex = 8+24;//NAL bit + profile_idc (8bits) + constraints (8bits) + level_idc (8bits)
+        startIndex += bitsToSkip_ue(startIndex, data, size);//seq_parameter_set_id (ue)
+        
+        uint32_t log2_max_frame_num_minus4 = read_golomb_ue(startIndex, data, size);
+        
+        if (log2_max_frame_num_minus4 < 0 ||
+            log2_max_frame_num_minus4 > 12){
+            fprintf(stderr,"parseSPS_log2_max_frame_num_minus4 value not in range [0-12] \n");
+            exit(-1);
+        }
+        
+        result.log2_max_frame_num = log2_max_frame_num_minus4 + 4;
+        result.set = true;
+        return result;
+    }
+    
+    // Raw Byte Sequence Payload (RBSP) -- without the emulation prevention bytes
+    // maxSize is used to parse just the beggining of the nal structure...
+    // avoid process all buffer size on NAL new frame check
+    static inline void nal2RBSP(const std::vector<uint8_t> &buffer,
+                                std::vector<uint8_t> *rbsp,
+                                int maxSize = -1){
+        if (maxSize <= 0)
+            maxSize = buffer.size();
+        rbsp->resize(maxSize);
+        
+        State emulationState = None;
+        int count = 0;
+        
+        for(int i=0; i < maxSize ;i++){
+            uint8_t byte = buffer[i];
+            
+            if (byte == 0x00 && emulationState == None)
+                emulationState = EMULATION0;
+            else if (byte == 0x00 && (emulationState == EMULATION0 || emulationState == EMULATION1) )
+                emulationState = EMULATION1;
+            else if (byte == 0x03 && emulationState == EMULATION1)
+            {
+                emulationState = EMULATION_FORCE_SKIP;
+                continue;
+            }
+            else if (emulationState == EMULATION_FORCE_SKIP) { //skip 00 01 02 or 03
+                if ( byte != 0x00 && byte != 0x01 && byte != 0x02 && byte != 0x03 ){
+                    fprintf(stdout, "H264 NAL emulation prevention pattern detected error (%u)\n", byte);
+                    exit(-1);
+                }
+                emulationState = None;
+            } else
+                emulationState = None;
+            
+            (*rbsp)[count] = byte;
+            count++;
+        }
+        if (count != rbsp->size())
+            rbsp->resize(count);
+    }
+    
 };
 
 
@@ -245,33 +411,132 @@ public:
     }
 
     void writeUInt16(uint32_t v){
-        buffer.push_back((uint8_t)(v >> 8));
-        buffer.push_back((uint8_t)(v));
+        buffer.push_back((v >> 8) & 0xff);
+        buffer.push_back((v) & 0xff);
     }
 
     void writeUInt24(uint32_t v){
-        buffer.push_back((uint8_t)(v >> 16));
-        buffer.push_back((uint8_t)(v >> 8));
-        buffer.push_back((uint8_t)(v));
+        buffer.push_back((v >> 16) & 0xff);
+        buffer.push_back((v >> 8) & 0xff);
+        buffer.push_back((v) & 0xff);
     }
 
     void writeUInt32(uint32_t v){
-        buffer.push_back((uint8_t)(v >> 24));
-        buffer.push_back((uint8_t)(v >> 16));
-        buffer.push_back((uint8_t)(v >> 8));
-        buffer.push_back((uint8_t)(v));
+        buffer.push_back((v >> 24) & 0xff);
+        buffer.push_back((v >> 16) & 0xff);
+        buffer.push_back((v >> 8) & 0xff);
+        buffer.push_back((v) & 0xff);
+    }
+    
+    void writeUInt32(uint32_t v, std::vector<uint8_t> *data){
+        data->push_back((v >> 24) & 0xff);
+        data->push_back((v >> 16) & 0xff);
+        data->push_back((v >> 8) & 0xff);
+        data->push_back((v) & 0xff);
     }
 
     void writeUInt32Timestamp(uint32_t v){
-        buffer.push_back((uint8_t)(v >> 16));
-        buffer.push_back((uint8_t)(v >> 8));
-        buffer.push_back((uint8_t)(v));
-        buffer.push_back((uint8_t)(v >> 24));
+        buffer.push_back((v >> 16) & 0xff);
+        buffer.push_back((v >> 8) & 0xff);
+        buffer.push_back((v) & 0xff);
+        buffer.push_back((v >> 24) & 0xff);
+    }
+    
+    void writeVideoSequenceHeader(const std::vector<uint8_t> &sps, const std::vector<uint8_t> &pps, const sps_info &spsinfo) {
+        
+        //
+        // flv tag header = 11 bytes
+        //
+        writeUInt8(0x09);//tagtype video
+        writeUInt24( sps.size() + pps.size() + 16 );//data len
+        writeUInt32Timestamp( 0 );//timestamp
+        writeUInt24( 0 );//stream id 0
+        
+        //
+        // Message Body = 16 bytes + SPS bytes + PPS bytes
+        //
+        //flv VideoTagHeader
+        writeUInt8(0x17);//key frame, AVC 1:keyframe 7:h264
+        writeUInt8(0x00);//avc sequence header
+        writeUInt24( 0x00 );//composition time
+        
+        //flv VideoTagBody --AVCDecoderCOnfigurationRecord
+        writeUInt8(0x01);//configurationversion
+        writeUInt8(spsinfo.profile_idc);//avcprofileindication
+        writeUInt8(spsinfo.constraints);//profilecompatibilty
+        writeUInt8(spsinfo.level_idc);//avclevelindication
+        writeUInt8(0xFC | 0x03); //reserved (6 bits), NULA length size - 1 (2 bits)
+        writeUInt8(0xe0 | 0x01); // first reserved, second number of SPS
+        
+        writeUInt16( sps.size() ); //sequence parameter set length
+        //H264 sequence parameter set raw data
+        for(int i=0;i<sps.size();i++)
+            writeUInt8(sps[i]);
+        
+        writeUInt8(0x01); // number of PPS
+        
+        writeUInt16(pps.size()); //picture parameter set length
+        //H264 picture parameter set raw data
+        for(int i=0;i<pps.size();i++)
+            writeUInt8(pps[i]);
+        
+        if (buffer.size() != sps.size() + pps.size() + 16 + 11 ){
+            fprintf(stderr, "error writeVideoSequenceHeader\n");
+            exit(-1);
+        }
+        
+        // previous tag size
+        writeUInt32(buffer.size());
+    }
+    
+    void writeVideoFrame(const std::vector<uint8_t> &data, bool keyframe, uint32_t timestamp_ms, int streamID){
+        
+        writeUInt8(0x09);//tagtype video
+        writeUInt24( data.size() + 5 );//data len
+        writeUInt32Timestamp( timestamp_ms );//timestamp
+        writeUInt24( streamID );//stream id 0)
+        
+        if (keyframe)
+            writeUInt8(0x17);//key frame, AVC 1:keyframe 2:inner frame 7:H264
+        else
+            writeUInt8(0x27);//key frame, AVC 1:keyframe 2:inner frame 7:H264
+        
+        writeUInt8(0x01);//avc NALU unit
+        writeUInt24(0x00);//composit time ??????????
+        
+        for(int i=0;i<data.size();i++)
+            writeUInt8(data[i]);
+        
+        if (buffer.size() != data.size() + 5 + 11 ){
+            fprintf(stderr, "error writeVideoFrame\n");
+            exit(-1);
+        }
+        
+        // previous size
+        writeUInt32(buffer.size());
+        
+    }
+    
+    void writeVideoEndOfStream(uint32_t timestamp_ms, int streamID){
+        writeUInt8(0x09);//tagtype video
+        writeUInt24( 5 );//data len
+        writeUInt32Timestamp( timestamp_ms );//timestamp
+        writeUInt24( streamID );//stream id 0)
+        
+        writeUInt8(0x17);//key frame, AVC 1:keyframe 2:inner frame 7:H264
+        writeUInt8(0x02);//avc EOS
+        writeUInt24(0x00);//composit time ??????????
+        
+        if (buffer.size() != 5 + 11 ){
+            fprintf(stderr, "error writeVideoEOS\n");
+            exit(-1);
+        }
+        
+        // previous size
+        writeUInt32(buffer.size());
     }
 
 };
-
-
 
 enum FLV_TAG_TYPE {
     FLV_TAG_TYPE_AUDIO = 0x08,
@@ -279,10 +544,106 @@ enum FLV_TAG_TYPE {
     FLV_TAG_TYPE_META = 0x12
 };
 
+//  Detection of the first VCL NAL unit of a primary coded picture
+// https://stackoverflow.com/questions/19642736/count-frames-in-h-264-bitstream?rq=1
+class H264NewFrameDetection {
+    std::vector<uint8_t> aux;
+    
+    bool newFrameOnNextIDR;
+    uint32_t old_frame_num;
+    bool spsinfo_set;
+    
+    bool firstFrame;
+public:
+    uint32_t currentFrame;
+    bool newFrameFound;
+    
+    H264NewFrameDetection() {
+        currentFrame = 0;
+        newFrameOnNextIDR = false;
+        old_frame_num = 0;
+        spsinfo_set = false;
+        firstFrame = true;
+    }
+    
+    void analyseBufferForNewFrame(const std::vector<uint8_t> &nal, const sps_info &spsinfo){
+        
+        uint8_t nal_bit = nal[0];
+        uint8_t nal_type = (nal_bit & 0x1f);
+        
+        if ( nal_type == (NAL_TYPE_SPS) ||
+            nal_type == (NAL_TYPE_PPS) ||
+            nal_type == (NAL_TYPE_AUD) ||
+            nal_type == (NAL_TYPE_SEI) ||
+            (nal_type >= 14 && nal_type <= 18)
+            ) {
+            newFrameOnNextIDR = true;
+        }
+        
+        if ((nal_type == NAL_TYPE_CSIDRP ||
+             nal_type == NAL_TYPE_CSNIDRP)
+            && spsinfo.set ){
+            
+            aux.clear();
+            //(8 + 3*(32*2+1) + 16) = max header per NALU slice bits = 27.375 bytes
+            // 32 bytes + 8 (Possibility of Emulation in 32 bytes)
+            int RBSPMaxBytes = 32 + 8;
+            if (nal.size() < (32 + 8))
+                RBSPMaxBytes = nal.size();
+            ParserH264::nal2RBSP(nal, &aux, RBSPMaxBytes );
+            uint8_t * rbspBuffer = &aux[0];
+            uint32_t rbspBufferSize = aux.size();
+            
+            uint32_t frame_num_index = 8;//start counting after the nal_bit
+            //first_mb_in_slice (ue)
+            frame_num_index += ParserH264::bitsToSkip_ue(frame_num_index, rbspBuffer, rbspBufferSize);
+            //slice_type (ue)
+            frame_num_index += ParserH264::bitsToSkip_ue(frame_num_index, rbspBuffer, rbspBufferSize);
+            //pic_parameter_set_id (ue)
+            frame_num_index += ParserH264::bitsToSkip_ue(frame_num_index, rbspBuffer, rbspBufferSize);
+            //now can read frame_num
+            uint32_t frame_num = ParserH264::readbits(frame_num_index,
+                                                      spsinfo.log2_max_frame_num,
+                                                      rbspBuffer, rbspBufferSize);
+
+            if (!spsinfo_set){
+                old_frame_num = frame_num;
+                spsinfo_set = true;//spsinfo.set
+            }
+            
+            if (old_frame_num != frame_num){
+                newFrameOnNextIDR = true;
+                old_frame_num = frame_num;
+            }
+        }
+        
+        
+        if (newFrameOnNextIDR &&(nal_type == NAL_TYPE_CSIDRP ||
+                                 nal_type == NAL_TYPE_CSNIDRP)) {
+            newFrameOnNextIDR = false;
+            if (firstFrame){//skip the first frame
+                firstFrame = false;
+            } else {
+                newFrameFound = true;
+                currentFrame++;
+            }
+        }
+    }
+    
+    void reset(){
+        newFrameFound = false;
+    }
+    
+};
 
 class FLVFileWriter: public ParserAAC, public ParserH264 {
 
-    std::vector<uint8_t> lastSPS;
+    std::vector<uint8_t> sps;
+    std::vector<uint8_t> pps;
+    
+    sps_info spsInfo;
+    
+    H264NewFrameDetection mH264NewFrameDetection;
 
 public:
     FLVWritter mFLVWritter;
@@ -290,6 +651,9 @@ public:
     bool firstAudioWrite;
     uint32_t audioTimestamp_ms;
     uint32_t videoTimestamp_ms;
+
+    //contains the several NALs until complete a frame... after that can write to FLV
+    std::vector<uint8_t> nalBuffer;
 
     FLVFileWriter ( const char* file ) {
         fd = open(file, O_WRONLY | O_CREAT | O_TRUNC , 0644 );
@@ -305,196 +669,111 @@ public:
         firstAudioWrite = true;
         audioTimestamp_ms = 0;
         videoTimestamp_ms = 0;
+        
+        spsInfo.set = false;
     }
 
     virtual ~FLVFileWriter(){
         if (fd >= 0){
-            mFLVWritter.flushToFD(fd);
+            
+            //force write the last frame
+            if (nalBuffer.size() > 0){
+                uint8_t firstNALtype = nalBuffer[4] & 0x1f;
+                
+                bool iskeyframe = (firstNALtype == NAL_TYPE_CSIDRP);
+                mFLVWritter.writeVideoFrame(nalBuffer, iskeyframe, videoTimestamp_ms, 0);
+                mFLVWritter.flushToFD(fd);
+                
+                nalBuffer.clear();
+                
+                mFLVWritter.writeVideoEndOfStream(videoTimestamp_ms,0);
+                mFLVWritter.flushToFD(fd);
+            } else {
+                if (mH264NewFrameDetection.currentFrame > 0)
+                    videoTimestamp_ms = ((mH264NewFrameDetection.currentFrame-1) * 1000)/30;
+                mFLVWritter.writeVideoEndOfStream(videoTimestamp_ms,0);
+                mFLVWritter.flushToFD(fd);
+            }
             close(fd);
         }
     }
-
-    void chunkDetectedH264(const uint8_t* ibuffer, int size) {
-        printf("[debug] Detected NAL chunk size: %i\n",size);
+    
+    
+    //decoding time stamp (DTS) and presentation time stamp (PTS)
+    void chunkDetectedH264(const std::vector<uint8_t> &data) {
         
-        if (size <= 0){
+        //printf("[debug] Detected NAL chunk size: %i\n",rbspBufferSize);
+        
+        if (data.size() <= 0){
             fprintf(stdout, "  error On h264 chunk detection\n");
             return;
         }
-
-        uint8_t nal_bit = ibuffer[0];
+        
+        uint8_t nal_bit = data[0];
         uint8_t nal_type = (nal_bit & 0x1f);
+        
+        mH264NewFrameDetection.analyseBufferForNewFrame(data, spsInfo);
+        
+        if (mH264NewFrameDetection.newFrameFound){
+            mH264NewFrameDetection.reset();
+            
+            uint8_t firstNALtype = nalBuffer[4] & 0x1f;
+            
+            bool iskeyframe = (firstNALtype == NAL_TYPE_CSIDRP);
+            mFLVWritter.writeVideoFrame(nalBuffer, iskeyframe, videoTimestamp_ms, 0);
+            mFLVWritter.flushToFD(fd);
+            
+            nalBuffer.clear();
+            
+            videoTimestamp_ms = (mH264NewFrameDetection.currentFrame * 1000)/30;
+        }
         
         //0x67
         //if (nal_bit == (NAL_IDC_PICTURE | NAL_TYPE_SPS) ) {
         if ( nal_type == (NAL_TYPE_SPS) ) {
-
             fprintf(stdout, " processing: 0x%x (SPS)\n",nal_bit);
 
-            //store information to use when arrise PPS nal_bit, probably the next NAL detection
-            lastSPS.clear();
-            for(int i=0;i<size;i++)
-                lastSPS.push_back(ibuffer[i]);
+            sps.clear();
+            //max 26 bytes on sps header (read until log2_max_frame_num_minus4)
+            nal2RBSP(data, &sps, 26 );
+            spsInfo = parseSPS(sps);
+            
+            sps.clear();
+            //mFLVWritter.writeUInt32(data.size(), &sps);
+            for(int i=0;i<data.size();i++)
+                sps.push_back(data[i]);
+            
         }
         //0x68
         //else if (nal_bit == (NAL_IDC_PICTURE | NAL_TYPE_PPS) ) {
         else if ( nal_type == (NAL_TYPE_PPS) ) {
-
             fprintf(stdout, " processing: 0x%x (PPS)\n",nal_bit);
-
-            //must be called just after the SPS detection
-            int32_t bodyLength = lastSPS.size() + size + 16;
-
-            //
-            // flv tag header = 11 bytes
-            //
-            mFLVWritter.writeUInt8(0x09);//tagtype video
-            mFLVWritter.writeUInt24( bodyLength );//data len
-            mFLVWritter.writeUInt32Timestamp( videoTimestamp_ms );//timestamp
-            mFLVWritter.writeUInt24( 0 );//stream id 0
-
-            //
-            // Message Body = 16 bytes + SPS bytes + PPS bytes
-            //
-            //flv VideoTagHeader
-            mFLVWritter.writeUInt8(0x17);//key frame, AVC 1:keyframe 7:h264
-            mFLVWritter.writeUInt8(0x00);//avc sequence header
-            mFLVWritter.writeUInt24( 0x00 );//composit time ??????????
-
-            //flv VideoTagBody --AVCDecoderCOnfigurationRecord
-            mFLVWritter.writeUInt8(0x01);//configurationversion
-            mFLVWritter.writeUInt8(lastSPS[1]);//avcprofileindication
-            mFLVWritter.writeUInt8(lastSPS[2]);//profilecompatibilty
-            mFLVWritter.writeUInt8(lastSPS[3]);//avclevelindication
-            mFLVWritter.writeUInt8(0xff); //reserved + lengthsizeminusone
-            mFLVWritter.writeUInt8(0xe0 | 0x01); // first reserved, second number of SPS
-
-            mFLVWritter.writeUInt16( lastSPS.size() ); //sequence parameter set length
-            //H264 sequence parameter set raw data
-            for(int i=0;i<lastSPS.size();i++)
-                mFLVWritter.writeUInt8(lastSPS[i]);
-
-            mFLVWritter.writeUInt8(0x01); // number of PPS
-
-            //sanity check with the packet size...
-            if ( size-4 > 0xffff ){
-                fprintf(stderr, "PPS Greater than 64k. This muxer does not support it.\n");
-                exit(-1);
-            }
-
-            mFLVWritter.writeUInt16(size); //picture parameter set length
-            //H264 picture parameter set raw data
-            for(int i=0;i<size;i++)
-                mFLVWritter.writeUInt8(ibuffer[i]);
-
-            //
-            // previous tag size
-            //
-            uint32_t currentSize = mFLVWritter.buffer.size();
-            if (currentSize != bodyLength + 11 ){
-                fprintf(stderr, "error to write flv video tag NAL_TYPE_PPS\n");
-                exit(-1);
-            }
-            mFLVWritter.writeUInt32(currentSize);//data len
-            mFLVWritter.flushToFD(fd);
-
-
-            videoTimestamp_ms += 1000/30;
-        }
-        //0x65
-        //else if (nal_bit == (NAL_IDC_PICTURE | NAL_TYPE_CSIDRP) ) {
-        else if ( nal_type == (NAL_TYPE_CSIDRP) ) {
-        
-
-            fprintf(stdout, " processing: 0x%x (0x65)\n",nal_bit);
-
-            uint32_t bodyLength = size + 5 + 4;//flv VideoTagHeader +  NALU length
-
-            //
-            // flv tag header = 11 bytes
-            //
-            mFLVWritter.writeUInt8(0x09);//tagtype video
-            mFLVWritter.writeUInt24( bodyLength );//data len
-            mFLVWritter.writeUInt32Timestamp( videoTimestamp_ms );//timestamp
-            mFLVWritter.writeUInt24( 0 );//stream id 0
-
-            //
-            // Message Body = VideoTagHeader(5) + NALLength(4) + NAL raw data
-            //
-            //flv VideoTagHeader
-            mFLVWritter.writeUInt8(0x17);//key frame, AVC 1:keyframe 2:inner frame 7:H264
-            mFLVWritter.writeUInt8(0x01);//avc NALU unit
-            mFLVWritter.writeUInt24(0x00);//composit time ??????????
-            mFLVWritter.writeUInt32(size);//nal length
-
-            //nal raw data
-            for(int i=0;i<size;i++)
-                mFLVWritter.writeUInt8(ibuffer[i]);
-
-            //
-            // previous tag size
-            //
-            uint32_t currentSize = mFLVWritter.buffer.size();
-            if (currentSize != bodyLength + 11 ){
-                fprintf(stderr, "error to write flv video tag NAL_TYPE_CSIDRP\n");
-                exit(-1);
-            }
-            mFLVWritter.writeUInt32(currentSize);//data len
-            mFLVWritter.flushToFD(fd);
-
-            videoTimestamp_ms += 1000/30;
-        }
-        //0x61
-        //else if (nal_bit == (NAL_IDC_FRAME | NAL_TYPE_CSNIDRP) ) {
-        else if ( nal_type == (NAL_TYPE_CSNIDRP) ) {
-
-            fprintf(stdout, " processing: 0x%x (0x61)\n",nal_bit);
-
-            uint32_t bodyLength = size + 5 + 4;//flv VideoTagHeader +  NALU length
-
-            //
-            // flv tag header = 11 bytes
-            //
-            mFLVWritter.writeUInt8(0x09);//tagtype video
-            mFLVWritter.writeUInt24( bodyLength );//data len
-            mFLVWritter.writeUInt32Timestamp( videoTimestamp_ms );//timestamp
-            mFLVWritter.writeUInt24( 0 );//stream id 0
-
-            //
-            // Message Body = VideoTagHeader(5) + NALLength(4) + NAL raw data
-            //
-            //flv VideoTagHeader
-            mFLVWritter.writeUInt8(0x27);//key frame, AVC 1:keyframe 2:inner frame 7:H264
-            mFLVWritter.writeUInt8(0x01);//avc NALU unit
-            mFLVWritter.writeUInt24(0x00);//composit time ??????????
-            mFLVWritter.writeUInt32(size);//nal length
-
-            // raw nal data
-            for(int i=0;i<size;i++)
-                mFLVWritter.writeUInt8(ibuffer[i]);
-
-            //
-            // previous tag size
-            //
-            uint32_t currentSize = mFLVWritter.buffer.size();
-            if (currentSize != bodyLength + 11 ){
-                fprintf(stderr, "error to write flv video tag NAL_TYPE_CSNIDRP\n");
-                exit(-1);
-            }
-            mFLVWritter.writeUInt32(currentSize);//data len
-            mFLVWritter.flushToFD(fd);
-
-            videoTimestamp_ms += 1000/30;
-
-        }
-        else if (nal_type == (NAL_TYPE_SEI)) {
-            fprintf(stdout, " ignoring SEI bit: 0x%x type: 0x%x\n",nal_bit, nal_type);
             
+            pps.clear();
+            //mFLVWritter.writeUInt32(data.size(), &pps);
+            for(int i=0;i<data.size();i++)
+                pps.push_back(data[i]);
+            
+            mFLVWritter.writeVideoSequenceHeader(sps, pps, spsInfo);
+            mFLVWritter.flushToFD(fd);
+
+        }
+        //0x65, 0x61, 0x41
+        else if ( nal_type == NAL_TYPE_CSIDRP ||
+                  nal_type == NAL_TYPE_CSNIDRP ) {
+            
+            mFLVWritter.writeUInt32( data.size(), &nalBuffer );
+            for(int i=0;i<data.size();i++)
+                nalBuffer.push_back(data[i]);
+            
+        } else if (nal_type == (NAL_TYPE_SEI)) {
+            fprintf(stdout, " ignoring SEI bit: 0x%x type: 0x%x\n",nal_bit, nal_type);
         } else {
             // nal_bit type not implemented...
             fprintf(stdout, "Error: unknown NAL bit: 0x%x type: 0x%x\n",nal_bit, nal_type);
             exit(-1);
         }
+        
     }
 
     void chunkDetectedAAC(const uint8_t* ibuffer, int size){

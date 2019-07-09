@@ -26,7 +26,8 @@ void signal_handler(int signal) {
 int main(int argc, char* argv[]) {
 	//PlatformPath::setWorkingPath(PlatformPath::getExecutablePath(argv[0]));
 
-    int fd_stdin = fileno(stdin);
+    //int fd_stdin = fileno(stdin);
+    int fd_stdin = open("test.h264",O_RDONLY);
 
     signal(SIGINT,  signal_handler);
     signal(SIGTERM, signal_handler);
@@ -51,6 +52,10 @@ int main(int argc, char* argv[]) {
     signal(SIGINT,  SIG_DFL);
     signal(SIGTERM, SIG_DFL);
     signal(SIGQUIT, SIG_DFL);
+    
+    close(fd_stdin);
+    
+    system("open out.flv");
 
 	return 0;
 }
