@@ -6,7 +6,7 @@ using namespace aRibeiro;
 #define ROUND_UP_2(num) (((num)+1)&~1)
 #define ROUND_UP_4(num) (((num)+3)&~3)
 
-class BroadcomVideoEncode : public OMXComponentBase {
+class BroadcomH264Encode : public OMXComponentBase {
 
     OMX_U32 width;
     OMX_U32 height;
@@ -36,7 +36,7 @@ public:
 
     int stdout_fd;
 
-    BroadcomVideoEncode(OMX_U32 width, OMX_U32 height, OMX_U32 framerate, OMX_U32 bitrate):OMXComponentBase() {
+    BroadcomH264Encode(OMX_U32 width, OMX_U32 height, OMX_U32 framerate, OMX_U32 bitrate):OMXComponentBase() {
 
         stdout_fd = fileno(stdout);
 
@@ -48,7 +48,7 @@ public:
 
         encoder = OMX::createHandle("OMX.broadcom.video_encode",this);
 
-        fprintf(stderr,"\nBroadcomVideoEncode\n\n");
+        fprintf(stderr,"\nBroadcomH264Encode\n\n");
 
         //input port
         OMX::printPort(encoder,200);
@@ -124,7 +124,7 @@ public:
 
     }
 
-    virtual ~BroadcomVideoEncode() {
+    virtual ~BroadcomH264Encode() {
 
         OMX::portFlush(this, encoder, 200);
         OMX::portFlush(this, encoder, 201);

@@ -2,8 +2,10 @@
 using namespace aRibeiro;
 
 #include "openmax/BroadcomCamera.h"
-#include "openmax/BroadcomVideoDecode.h"
-#include "openmax/BroadcomVideoEncode.h"
+#include "openmax/BroadcomH264Decode.h"
+#include "openmax/BroadcomH264Encode.h"
+
+#include "openmax/BroadcomAACEncode.h"
 
 #include "v4l2/v4l2.h"
 
@@ -43,6 +45,29 @@ void signal_handler(int signal) {
 int main(int argc, char* argv[]) {
 	PlatformPath::setWorkingPath(PlatformPath::getExecutablePath(argv[0]));
 
+	signal(SIGINT,  signal_handler);
+    signal(SIGTERM, signal_handler);
+    signal(SIGQUIT, signal_handler);
+
+    BroadcomAACEncode encoder(44100, 128);
+
+
+    while (!exit_requested) {
+
+        encoder.postPCM16bitSignedInterleaved(NULL,0);
+
+        encoder.makeOutBufferAvailable();
+
+        PlatformSleep::sleepMillis(40);
+
+    }
+
+
+    signal(SIGINT,  SIG_DFL);
+    signal(SIGTERM, SIG_DFL);
+    signal(SIGQUIT, SIG_DFL);
+
+	/*
 
     signal(SIGINT,  signal_handler);
     signal(SIGTERM, signal_handler);
@@ -125,6 +150,9 @@ int main(int argc, char* argv[]) {
 
         //fprintf(stderr,"index: %i\n",bufferQueue.index);
 
+        char h264_aud[] = {0x00,0x00,0x00,0x01,0x09};
+        write(fd_stdout,h264_aud,sizeof(h264_aud));
+
         //output to stdout
         write(fd_stdout,bufferPtr[bufferQueue.index],bufferQueue.bytesused);
 
@@ -153,7 +181,7 @@ int main(int argc, char* argv[]) {
     signal(SIGTERM, signal_handler);
     signal(SIGQUIT, signal_handler);
 
-    BroadcomVideoEncode encoder(1280, 720, 25, 2700);
+    BroadcomH264Encode encoder(1280, 720, 25, 2700);
 
 
     while (!exit_requested) {
@@ -180,7 +208,7 @@ int main(int argc, char* argv[]) {
     signal(SIGTERM, signal_handler);
     signal(SIGQUIT, signal_handler);
 
-    BroadcomVideoDecode decoder;
+    BroadcomH264Decode decoder;
 
     unsigned char buffer[65536];
 

@@ -114,6 +114,12 @@ public:
     static void setVideoPortFormat(OMX_HANDLETYPE handle, OMX_U32 portIndex, OMX_VIDEO_CODINGTYPE codingType, OMX_COLOR_FORMATTYPE colorType = OMX_COLOR_FormatUnused);
 
     //
+    // Audio Calls
+    //
+    static void setAudioPCMParam(OMX_HANDLETYPE handle, OMX_U32 portIndex, OMX_U32 inputSamplingRate);
+    static void setAudioAACParam(OMX_HANDLETYPE handle, OMX_U32 portIndex, OMX_U32 bitrate, OMX_U32 samplerate);
+
+    //
     // Allocating/Releasing buffers
     //
     static OMX_BUFFERHEADERTYPE *allocateBuffer(OMX_HANDLETYPE handle, OMX_U32 portIndex);

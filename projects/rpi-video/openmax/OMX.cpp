@@ -219,6 +219,64 @@ void OMX::setVideoPortFormat(OMX_HANDLETYPE handle, OMX_U32 portIndex, OMX_VIDEO
     }
 }
 
+
+void OMX::setAudioPCMParam(OMX_HANDLETYPE handle, OMX_U32 portIndex, OMX_U32 inputSamplingRate) {
+    OMX_AUDIO_PARAM_PCMMODETYPE param;
+    OMX_INIT_STRUCTURE(param);
+
+    param.nPortIndex = portIndex;
+
+    // nChannels must be 1, 2, 4, or 8
+    param.nChannels = 2;
+    // nBitPerSample must be 16 or 32
+    param.nBitPerSample = 16;
+    // eNumData must be OMX_NumericalDataSigned
+    param.eNumData = OMX_NumericalDataSigned;
+    // eEndian must be OMX_EndianLittle
+    param.eEndian = OMX_EndianLittle;
+    // bInterleaved must be OMX_TRUE
+    param.bInterleaved = OMX_TRUE;
+    // ePCMMode must be OMX_AUDIO_PCMModeLinear
+    param.ePCMMode = OMX_AUDIO_PCMModeLinear;
+
+    param.nSamplingRate = inputSamplingRate;
+
+    param.eChannelMapping[0] = OMX_AUDIO_ChannelLF;
+    param.eChannelMapping[1] = OMX_AUDIO_ChannelRF;
+
+
+    OMX_ERRORTYPE error;
+    if((error = OMX_SetParameter(handle, OMX_IndexParamAudioPcm, &param)) != OMX_ErrorNone) {
+        fprintf(stderr,"Failed to set audio format on port %u: %s", portIndex, OMX::getError(error) );
+        exit(-1);
+    }
+
+
+}
+
+void OMX::setAudioAACParam(OMX_HANDLETYPE handle, OMX_U32 portIndex, OMX_U32 bitrate, OMX_U32 samplerate) {
+    OMX_AUDIO_PARAM_AACPROFILETYPE param;
+    OMX_INIT_STRUCTURE(param);
+
+    param.nPortIndex = portIndex;
+
+    param.nBitRate = bitrate;
+    //MP2ADTS or RAW
+    param.eAACStreamFormat = OMX_AUDIO_AACStreamFormatMP2ADTS;
+    param.nSampleRate = samplerate;
+
+    //nChannels (must be 1 or 2)
+    param.nChannels = 2;
+
+    OMX_ERRORTYPE error;
+    if((error = OMX_SetParameter(handle, OMX_IndexParamAudioAac, &param)) != OMX_ErrorNone) {
+        fprintf(stderr,"Failed to set audio format on port %u: %s", portIndex, OMX::getError(error) );
+        exit(-1);
+    }
+}
+
+
+
 OMX_BUFFERHEADERTYPE* OMX::allocateBuffer(OMX_HANDLETYPE handle, OMX_U32 portIndex) {
     OMX_PARAM_PORTDEFINITIONTYPE portdef = OMX::getPortDefinition(handle,portIndex);
     OMX_BUFFERHEADERTYPE *result;
@@ -408,6 +466,7 @@ void OMX::printPort(OMX_HANDLETYPE handle, OMX_U32 portIndex) {
 //string codes
 const char* OMX::getError(OMX_ERRORTYPE error){
     switch(error) {
+        /*
         case OMX_ErrorNone:                     return "OMX_ErrorNone";
         case OMX_ErrorBadParameter:             return "OMX_ErrorBadParameter";
         case OMX_ErrorIncorrectStateOperation:  return "OMX_ErrorIncorrectStateOperation (invalid state while trying to perform command)";
@@ -415,8 +474,56 @@ const char* OMX::getError(OMX_ERRORTYPE error){
         case OMX_ErrorInsufficientResources:    return "OMX_ErrorInsufficientResources";
         case OMX_ErrorBadPortIndex:             return "OMX_ErrorBadPortIndex (incorrect port)";
         case OMX_ErrorHardware:                 return "OMX_ErrorHardware";
+        */
+
+
+
+        case OMX_ErrorInsufficientResources:              return "OMX_ErrorInsufficientResources";
+        case OMX_ErrorUndefined:                          return "OMX_ErrorUndefined";
+        case OMX_ErrorInvalidComponentName:               return "OMX_ErrorInvalidComponentName";
+        case OMX_ErrorComponentNotFound:                  return "OMX_ErrorComponentNotFound";
+        case OMX_ErrorInvalidComponent:                   return "OMX_ErrorInvalidComponent";
+        case OMX_ErrorBadParameter:                       return "OMX_ErrorBadParameter";
+        case OMX_ErrorNotImplemented:                     return "OMX_ErrorNotImplemented";
+        case OMX_ErrorUnderflow:                          return "OMX_ErrorUnderflow";
+        case OMX_ErrorOverflow:                           return "OMX_ErrorOverflow";
+        case OMX_ErrorHardware:                           return "OMX_ErrorHardware";
+        case OMX_ErrorInvalidState:                       return "OMX_ErrorInvalidState";
+        case OMX_ErrorStreamCorrupt:                      return "OMX_ErrorStreamCorrupt";
+        case OMX_ErrorPortsNotCompatible:                 return "OMX_ErrorPortsNotCompatible";
+        case OMX_ErrorResourcesLost:                      return "OMX_ErrorResourcesLost";
+        case OMX_ErrorNoMore:                             return "OMX_ErrorNoMore";
+        case OMX_ErrorVersionMismatch:                    return "OMX_ErrorVersionMismatch";
+        case OMX_ErrorNotReady:                           return "OMX_ErrorNotReady";
+        case OMX_ErrorTimeout:                            return "OMX_ErrorTimeout";
+        case OMX_ErrorSameState:                          return "OMX_ErrorSameState";
+        case OMX_ErrorResourcesPreempted:                 return "OMX_ErrorResourcesPreempted";
+        case OMX_ErrorPortUnresponsiveDuringAllocation:   return "OMX_ErrorPortUnresponsiveDuringAllocation";
+        case OMX_ErrorPortUnresponsiveDuringDeallocation: return "OMX_ErrorPortUnresponsiveDuringDeallocation";
+        case OMX_ErrorPortUnresponsiveDuringStop:         return "OMX_ErrorPortUnresponsiveDuringStop";
+        case OMX_ErrorIncorrectStateTransition:           return "OMX_ErrorIncorrectStateTransition";
+        case OMX_ErrorIncorrectStateOperation:            return "OMX_ErrorIncorrectStateOperation";
+        case OMX_ErrorUnsupportedSetting:                 return "OMX_ErrorUnsupportedSetting";
+        case OMX_ErrorUnsupportedIndex:                   return "OMX_ErrorUnsupportedIndex";
+        case OMX_ErrorBadPortIndex:                       return "OMX_ErrorBadPortIndex";
+        case OMX_ErrorPortUnpopulated:                    return "OMX_ErrorPortUnpopulated";
+        case OMX_ErrorComponentSuspended:                 return "OMX_ErrorComponentSuspended";
+        case OMX_ErrorDynamicResourcesUnavailable:        return "OMX_ErrorDynamicResourcesUnavailable";
+        case OMX_ErrorMbErrorsInFrame:                    return "OMX_ErrorMbErrorsInFrame";
+        case OMX_ErrorFormatNotDetected:                  return "OMX_ErrorFormatNotDetected";
+        case OMX_ErrorContentPipeOpenFailed:              return "OMX_ErrorContentPipeOpenFailed";
+        case OMX_ErrorContentPipeCreationFailed:          return "OMX_ErrorContentPipeCreationFailed";
+        case OMX_ErrorSeperateTablesUsed:                 return "OMX_ErrorSeperateTablesUsed";
+        case OMX_ErrorTunnelingUnsupported:               return "OMX_ErrorTunnelingUnsupported";
+        case OMX_ErrorKhronosExtensions:                  return "OMX_ErrorKhronosExtensions";
+        case OMX_ErrorVendorStartUnused:                  return "OMX_ErrorVendorStartUnused";
+        case OMX_ErrorDiskFull:                           return "OMX_ErrorDiskFull";
+        case OMX_ErrorMaxFileSize:                        return "OMX_ErrorMaxFileSize";
+        case OMX_ErrorDrmUnauthorised:                    return "OMX_ErrorDrmUnauthorised";
+        case OMX_ErrorDrmExpired:                         return "OMX_ErrorDrmExpired";
+        case OMX_ErrorDrmGeneral:                         return "OMX_ErrorDrmGeneral";
         /* That's all I've encountered during hacking so let's not bother with the rest... */
-        default:                                return "(unknown error)";
+        default:                                          return "(unknown error)";
     }
 }
 

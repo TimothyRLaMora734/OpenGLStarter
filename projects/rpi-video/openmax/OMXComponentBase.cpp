@@ -37,7 +37,7 @@ OMX_ERRORTYPE OMXComponentBase::eventHandler(OMX_HANDLETYPE hComponent,OMX_PTR p
             }
             break;
         case OMX_EventError:
-            fprintf(stderr, "OMX_EventError: %i\n", nData1 );
+            fprintf(stderr, "OMX_EventError: 0x%08x -> %s\n", nData1, OMX::getError((OMX_ERRORTYPE)nData1) );
             exit(-1);
             break;
         default:

@@ -27,7 +27,7 @@ static unsigned int FindAllNALu(unsigned char * source, unsigned int size, NALu 
   return num;
 }
 
-class BroadcomVideoDecode : public OMXComponentBase {
+class BroadcomH264Decode : public OMXComponentBase {
 
     PlatformMutex mutex;
 
@@ -68,13 +68,13 @@ public:
     volatile bool outputPortChanged;
     volatile bool CanReadOutputBuffer;
 
-    BroadcomVideoDecode():OMXComponentBase() {
+    BroadcomH264Decode():OMXComponentBase() {
 
         outputBuffer = NULL;
 
         decoder = OMX::createHandle("OMX.broadcom.video_decode",this);
 
-        fprintf(stderr,"\nBroadcomVideoDecode\n\n");
+        fprintf(stderr,"\nBroadcomH264Decode\n\n");
 
 
         OMX::setVideoPortFormat(decoder, 130, OMX_VIDEO_CodingAVC);
@@ -114,7 +114,7 @@ public:
     }
 
 
-    virtual ~BroadcomVideoDecode() {
+    virtual ~BroadcomH264Decode() {
 
         OMX::portFlush(this, decoder, 130);
         OMX::portFlush(this, decoder, 131);
