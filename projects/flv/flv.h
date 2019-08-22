@@ -590,6 +590,7 @@ public:
         old_frame_num = 0;
         spsinfo_set = false;
         firstFrame = true;
+		newFrameFound = false;
     }
 
     void analyseBufferForNewFrame(const std::vector<uint8_t> &nal, const sps_info &spsinfo){
@@ -682,7 +683,7 @@ public:
     std::vector<uint8_t> nalBuffer;
 
     FLVFileWriter ( const char* file ) {
-        fd = open(file, O_WRONLY | O_CREAT | O_TRUNC , 0644 );
+        fd = open(file, O_WRONLY | O_CREAT | O_TRUNC | O_BINARY , 0644 );
         if (fd < 0){
             fprintf(stderr,"error to create flv file\n");
             exit(-1);
@@ -743,6 +744,7 @@ public:
         if (mH264NewFrameDetection.newFrameFound){
             mH264NewFrameDetection.reset();
 
+			//write the previous nalBuffer set related to previous frame.
             uint8_t firstNALtype = nalBuffer[4] & 0x1f;
 
             bool iskeyframe = (firstNALtype == NAL_TYPE_CSIDRP);
@@ -769,7 +771,8 @@ public:
             for(int i=0;i<data.size();i++)
                 sps.push_back(data[i]);
 
-        }
+
+		}
         //0x68
         //else if (nal_bit == (NAL_IDC_PICTURE | NAL_TYPE_PPS) ) {
         else if ( nal_type == (NAL_TYPE_PPS) ) {
