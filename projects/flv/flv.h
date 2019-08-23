@@ -6,6 +6,10 @@
 #include <stdint.h>
 #include <fcntl.h>
 
+#ifndef O_BINARY
+    #define O_BINARY 0
+#endif
+
 // https://yumichan.net/video-processing/video-compression/introduction-to-h264-nal-unit/
 
 #define NAL_IDC_FIELD (1 << 5) // 0x20

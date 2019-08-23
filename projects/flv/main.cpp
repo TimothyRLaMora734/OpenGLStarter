@@ -11,6 +11,10 @@ using namespace aRibeiro;
 #include <vector>
 #include <signal.h>
 
+#ifndef O_BINARY
+    #define O_BINARY 0
+#endif
+
 volatile bool exit_requested = false;
 void signal_handler(int signal) {
     exit_requested = true;
@@ -62,8 +66,12 @@ int main(int argc, char* argv[]) {
 #endif
     
     close(fd_stdin);
-    
+
+#ifdef WIN32
+    system("start out.flv");
+#else
     system("open out.flv");
+#endif
 
 	return 0;
 }
