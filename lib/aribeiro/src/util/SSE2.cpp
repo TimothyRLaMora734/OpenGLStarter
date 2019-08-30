@@ -101,7 +101,7 @@ CheckSSE2::CheckSSE2() {
         fprintf(stderr,"SSE2 not available in this CPU/OS.\n");
         exit(-1);
     } else {
-        printf("SSE2 available !\n");
+        //printf("SSE2 available !\n");
     }
 }
 
