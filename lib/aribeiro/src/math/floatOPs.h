@@ -70,7 +70,8 @@ namespace aRibeiro {
     ARIBEIRO_INLINE float32x4_t vshuffle_0333(const float32x4_t &a)
     {
         float32x4_t r = vshuffle_3333(a);
-        static const float32x4_t _zero = vset1(0);
+        //static const float32x4_t _zero = vset1(0);
+        float32x4_t _zero = vshuffle_0000(a);
         return vextq_f32( r, _zero , 1);
     }
 
