@@ -30,6 +30,9 @@ void OnDataFromAudioCard(void *fltBuffer, uint32_t frames) {
 
 int main(int argc, char* argv[]){
 
+	//RTAudioHelper::printDevices(RtAudio::WINDOWS_DS);
+	//return 0;
+
     PlatformPath::setWorkingPath(PlatformPath::getExecutablePath(argv[0]));
 
     outputAAC = fopen("output.aac","wb");
@@ -47,7 +50,12 @@ int main(int argc, char* argv[]){
     adtsMuxer.OnData.add(&OnDataFromMuxer);
     adtsMuxer.init(audioEncoder.getCtx());
 
-    RTAudioInput inputAudio;
+#if defined(OS_TARGET_win)
+    RTAudioInput inputAudio(RtAudio::WINDOWS_DS);
+#else
+	RTAudioInput inputAudio();
+#endif
+
     inputAudio.OnData.add(&OnDataFromAudioCard);
     #if defined(OS_TARGET_mac)
     inputAudio.initInputFromDeviceName("Apple Inc.: Built-in Input");

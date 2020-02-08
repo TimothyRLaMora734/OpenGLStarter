@@ -29,7 +29,9 @@ public:
     
     OnAudioDelegate OnData;
     
-    RTAudioInput() {
+    RTAudioInput(RtAudio::Api api = RtAudio::UNSPECIFIED):
+		devices(api)
+	{
         initialized = false;
         endStream_called = false;
     }
@@ -119,9 +121,9 @@ public:
 class RTAudioHelper {
 public:
 
-    static void printDevices() {
+    static void printDevices(RtAudio::Api api = RtAudio::UNSPECIFIED) {
         
-        RtAudio devices;
+        RtAudio devices(api);
         int count = devices.getDeviceCount();
         RtAudio::DeviceInfo info;
         
