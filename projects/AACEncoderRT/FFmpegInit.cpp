@@ -1,0 +1,19 @@
+
+extern "C" {
+    #include <libavcodec/avcodec.h>
+    #include <libavutil/log.h>
+    #include <libavformat/avformat.h>
+    #include <libavutil/timestamp.h>
+    #include <libswresample/swresample.h>
+}
+
+void globalInitFFMPEG(){
+    //#if defined(OS_TARGET_linux)
+    static bool initialized = false;
+    if (!initialized){
+        initialized = true;
+        av_register_all();
+        avcodec_register_all();
+    }
+    //#endif
+}
