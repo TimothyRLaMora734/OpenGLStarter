@@ -1,4 +1,6 @@
 
+#include "FFmpegInit.h"
+
 extern "C" {
     #include <libavcodec/avcodec.h>
     #include <libavutil/log.h>

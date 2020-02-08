@@ -54,6 +54,7 @@ int main(int argc, char* argv[]){
     #elif defined(OS_TARGET_linux)
     inputAudio.initInputFromDeviceName("default");
     #elif defined(OS_TARGET_win)
+	inputAudio.initInputFromDeviceName("Microfone (HD Pro Webcam C920)");
     #endif
 
     fgetc(stdin);

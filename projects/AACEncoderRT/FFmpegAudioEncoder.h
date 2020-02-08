@@ -249,7 +249,8 @@ public:
         //ctx->channel_layout = AV_CH_LAYOUT_STEREO;
         //ctx->channels = av_get_channel_layout_nb_channels(ctx->channel_layout);
         ctx->profile = FF_PROFILE_AAC_LOW;//FF_PROFILE_AAC_MAIN;
-        ctx->time_base = (AVRational){1, sampleRate};
+		ctx->time_base.num = 1;
+		ctx->time_base.den = sampleRate;
         ctx->codec_type = AVMEDIA_TYPE_AUDIO;
         // AAC default frame size
         ctx->frame_size = 1024;

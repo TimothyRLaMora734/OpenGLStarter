@@ -15,7 +15,7 @@ extern "C" {
 #include <libswresample/swresample.h>
 }
 
-#if defined(OS_TARGET_linux)
+#if defined(OS_TARGET_linux) || defined(OS_TARGET_win)
 
 #undef av_err2str
 //#define av_err2str(errnum) av_make_error_string((char*)__builtin_alloca(AV_ERROR_MAX_STRING_SIZE), AV_ERROR_MAX_STRING_SIZE, errnum)
