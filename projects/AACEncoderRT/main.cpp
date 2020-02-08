@@ -51,9 +51,9 @@ int main(int argc, char* argv[]){
     adtsMuxer.init(audioEncoder.getCtx());
 
 #if defined(OS_TARGET_win)
-    RTAudioInput inputAudio(RtAudio::WINDOWS_DS);
+	RTAudioInput inputAudio;// (RtAudio::WINDOWS_DS);
 #else
-	RTAudioInput inputAudio();
+	RTAudioInput inputAudio;
 #endif
 
     inputAudio.OnData.add(&OnDataFromAudioCard);
