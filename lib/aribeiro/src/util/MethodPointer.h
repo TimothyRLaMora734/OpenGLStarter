@@ -40,6 +40,8 @@ if (methodPtr != NULL)
 
 */
 
+namespace aRibeiro {
+
 #define DefineMethodPointer(className,returnType,...) \
 	typedef returnType (DelegateFriendObject::*className##Method) (__VA_ARGS__); \
 	typedef returnType (*className##Function) (__VA_ARGS__); \
@@ -92,5 +94,7 @@ if (methodPtr != NULL)
 				(functionPtr)(__VA_ARGS__); \
 		} \
 	};
+
+}
 
 #endif
