@@ -401,6 +401,8 @@ endif()
 
 add_subdirectory( projects/flv )
 
+add_subdirectory( projects/AACEncoderRT )
+
 #
 # Tools
 #

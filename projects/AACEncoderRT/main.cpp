@@ -29,37 +29,51 @@ void OnDataFromAudioCard(void *fltBuffer, uint32_t frames) {
 }
 
 int main(int argc, char* argv[]){
-    
+
+	//RTAudioHelper::printDevices(RtAudio::WINDOWS_DS);
+	//return 0;
+
     PlatformPath::setWorkingPath(PlatformPath::getExecutablePath(argv[0]));
-    
+
     outputAAC = fopen("output.aac","wb");
     if (!outputAAC)
         exit(-1);
     outputRAW = fopen("output.raw","wb");
     if (!outputRAW)
         exit(-1);
-    
+
     //tunnel the data from encoder to the muxer
     audioEncoder.OnData.add(&adtsMuxer,&FFmpegADTSMuxer::OnDataFromEncoder);
     audioEncoder.initAAC();
-    
+
     //initialize the muxer with the encoder parameter
     adtsMuxer.OnData.add(&OnDataFromMuxer);
     adtsMuxer.init(audioEncoder.getCtx());
-    
-    RTAudioInput inputAudio;
+
+#if defined(OS_TARGET_win)
+	RTAudioInput inputAudio;// (RtAudio::WINDOWS_DS);
+#else
+	RTAudioInput inputAudio;
+#endif
+
     inputAudio.OnData.add(&OnDataFromAudioCard);
+    #if defined(OS_TARGET_mac)
     inputAudio.initInputFromDeviceName("Apple Inc.: Built-in Input");
-    
+    #elif defined(OS_TARGET_linux)
+    inputAudio.initInputFromDeviceName("default");
+    #elif defined(OS_TARGET_win)
+	inputAudio.initInputFromDeviceName("Microfone (HD Pro Webcam C920)");
+    #endif
+
     fgetc(stdin);
-    
+
     inputAudio.endStream();
-    
+
     audioEncoder.flushQueuedFrames();
     adtsMuxer.endStream();
-    
+
     fclose(outputAAC);
     fclose(outputRAW);
-    
+
     return 0;
 }

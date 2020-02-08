@@ -61,6 +61,7 @@
 #include <aribeiro/PlatformGL.h>
 #include <aribeiro/Property.h>
 #include <aribeiro/Delegate.h>
+#include <aribeiro/MethodPointer.h>
 #include <aribeiro/GetFirstMacAddress.h>
 #include <aribeiro/SetNullAndDelete.h>
 #include <aribeiro/NetworkConstants.h>
