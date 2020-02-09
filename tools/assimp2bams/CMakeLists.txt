@@ -13,8 +13,9 @@ set_target_properties(${PROJECT_NAME} PROPERTIES FOLDER "TOOLS")
 
 # Linking libraries
 target_link_libraries(${PROJECT_NAME}
-	${ARIBEIRO_LIBRARIES} 
-	assimp	
+	assimp # assimp needs zlib to be included after this lib
+	       # This is why this configuration needs ARIBEIRO_LIBRARIES to be included below
+	${ARIBEIRO_LIBRARIES}
 )
 
 copy_3rdparty_dll(${PROJECT_NAME})
