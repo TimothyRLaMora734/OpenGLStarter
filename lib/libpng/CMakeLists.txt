@@ -52,9 +52,10 @@ IF(NOT PNG_BUILD_ZLIB)
   #find_package(ZLIB REQUIRED)
   #include_directories(${ZLIB_INCLUDE_DIR})
 
+  #[alessandro]
   set(ZLIB_LIBRARY )
   #set(ZLIB_LIBRARY zlib )
-  set(ZLIB_INCLUDE_DIR ${GLOBAL_INCLUDE_DIR}/zlib)
+  set(ZLIB_INCLUDE_DIR ${CMAKE_HOME_DIRECTORY}/include/zlib)
 
   #include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../zlib/)
 

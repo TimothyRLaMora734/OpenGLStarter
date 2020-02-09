@@ -361,10 +361,11 @@ IF( NOT ZLIB_FOUND )
   #SET(ZLIB_LIBRARIES zlibstatic)
   #SET(ZLIB_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/contrib/zlib ${CMAKE_CURRENT_BINARY_DIR}/contrib/zlib)
   
+  #[alessandro]
   SET(ZLIB_FOUND 1)
   set(ZLIB_LIBRARY )
   #set(ZLIB_LIBRARY zlib )
-  set(ZLIB_INCLUDE_DIR ${GLOBAL_INCLUDE_DIR}/zlib )
+  set(ZLIB_INCLUDE_DIR ${CMAKE_HOME_DIRECTORY}/include/zlib )
   
   
   # need to ensure we don't link with system zlib or minizip as well.
