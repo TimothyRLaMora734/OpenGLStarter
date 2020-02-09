@@ -11,34 +11,34 @@ App::App(sf::RenderWindow *window, int w, int h):
     AppBase(w,h)
 {
     this->window = window;
-    
-    
+
+
     int limitz = 20;
     int limitx = limitz;
     vec3 sceneMin = vec3(-limitx,0.3f,-limitz);
     vec3 sceneMax = vec3(limitx,3.0f,limitz);
-    
+
     groundModel = new GroundModel(this,
                 sceneMin,sceneMax,
                 limitx,limitz,0.3f);
-    
+
     flock = new Flock(this,
                       100,
                       sceneMin,sceneMax);
-    
+
     camera = new Camera();
-    
+
     renderState = GLRenderState::getInstance();
-    
+
     shaderVertexColor = new GLShaderVertexColor();
-    
+
     //initialize all matrix
     projection = mat4::IdentityMatrix;
     //camera = mat4::IdentityMatrix;
-    
+
     //initialize auxiliary variables
     //cameraPosition = vec3(0.0f,5.0f,10.0f);
-    
+
     //listen the resize window event
     WindowSize.OnChange.add(this, &App::OnWindowResize);
     OnWindowResize(&WindowSize);
@@ -47,7 +47,7 @@ App::App(sf::RenderWindow *window, int w, int h):
     renderState->ClearColor = vec4(1.0f,1.0f,250.0f/255.0f,1.0f);
     renderState->Wireframe = WireframeBack;
     renderState->CullFace = CullFaceNone;
-    
+
     time.update();
 }
 
@@ -72,13 +72,13 @@ void App::draw() {
         printf("fps: %f\n", 1.0f/time.deltaTime);
     }
     processInput();
-    
+
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-    
+
     //compute the camera projection matrix
     //camera = inv(translate(cameraPosition)*xRotate(DEG2RAD(-30.0f)));
     mat4 viewProjection = (mat4)projection * camera->computeViewMatrix(&flock->boidMaster);
-    
+
     groundModel->draw(viewProjection);
     flock->draw(time,viewProjection);
 }
@@ -88,7 +88,7 @@ void App::processInput() {
     right.setState( sf::Keyboard::isKeyPressed(sf::Keyboard::Right) );
     up.setState( sf::Keyboard::isKeyPressed(sf::Keyboard::Up) );
     down.setState( sf::Keyboard::isKeyPressed(sf::Keyboard::Down) );
-    
+
     /*
     const float speed = 3.0f;
     if (up.pressed)
@@ -105,9 +105,9 @@ void App::processInput() {
 }
 
 void App::drawPrimitive( GLuint oglPrimitive, const mat4 &modelViewProjection, const vec3 vertexBuffer[], const vec4 colorBuffer[], int count ){
-    
+
     renderState->CurrentShader = shaderVertexColor;
-    
+
     shaderVertexColor->setMatrix(modelViewProjection);
     OPENGL_CMD(glEnableVertexAttribArray(GLShaderVertexColor::vPosition));
     OPENGL_CMD(glVertexAttribPointer(GLShaderVertexColor::vPosition, 3, GL_FLOAT, false, sizeof(vec3), &vertexBuffer[0]));
@@ -120,7 +120,7 @@ void App::drawPrimitive( GLuint oglPrimitive, const mat4 &modelViewProjection, c
 
 void App::drawPrimitive6(GLuint oglPrimitive, const mat4 &modelViewProjection, const vec3 *vertexBuffer, const vec4 *colorBuffer, const uint16_t *indices, int count) {
     renderState->CurrentShader = shaderVertexColor;
-    
+
     shaderVertexColor->setMatrix(modelViewProjection);
     OPENGL_CMD(glEnableVertexAttribArray(GLShaderVertexColor::vPosition));
     OPENGL_CMD(glVertexAttribPointer(GLShaderVertexColor::vPosition, 3, GL_FLOAT, false, sizeof(vec3), &vertexBuffer[0]));
