@@ -1,7 +1,5 @@
 project (aribeiro-test-easing-eq)
 
-#file(GLOB_RECURSE  gamelogic_src GameLogic/*.cpp GameLogic/*.h )
-
 set( HEADERS
 	LineRenderer.h
 	EasingEqDrawer.h
@@ -18,10 +16,9 @@ add_executable(${PROJECT_NAME} ${SRC} ${HEADERS})
 set_target_properties(${PROJECT_NAME} PROPERTIES FOLDER "TESTS")
 
 target_link_libraries( ${PROJECT_NAME}
-	#aribeiro
 	#sfml-network sfml-graphics sfml-window sfml-system sfml-audio
 	sfml-window sfml-graphics
 	${ARIBEIRO_LIBRARIES} )
 
-PostBuildConfig( ${PROJECT_NAME} )
-PostBuildCopy( ${PROJECT_NAME} resources )
+copy_3rdparty_dll(${PROJECT_NAME})
+copy_directory_after_build( ${PROJECT_NAME} resources )

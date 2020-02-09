@@ -1,3 +1,15 @@
+
+#####################################################
+# ARibeiro Lib Setup
+#####################################################
+# global definitions
+add_definitions_global(-DSFML_STATIC)
+if(OS_TARGET STREQUAL win)
+    register_dll(extlibs/bin/${ARCH_TARGET}/openal32.dll)
+endif()
+#####################################################
+
+
 cmake_minimum_required(VERSION 2.8.3)
 
 
@@ -406,7 +418,5 @@ elseif(SFML_OS_ANDROID)
 
 endif()
 
-
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/include/SFML/
-	DESTINATION ${CMAKE_HOME_DIRECTORY}/include/${PROJECT_NAME}/)
+copy_headers_to_include_directory(${PROJECT_NAME} ${CMAKE_CURRENT_SOURCE_DIR}/include/SFML/)
 

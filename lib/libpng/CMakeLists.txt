@@ -478,11 +478,7 @@ set(libpng_public_hdrs
   "${CMAKE_CURRENT_SOURCE_DIR}/pnglibconf.h"
 )
 
-#message(STATUS ${CMAKE_CURRENT_SOURCE_DIR}/pnglibconf.h)
-
-file(COPY ${libpng_public_hdrs}
-	DESTINATION ${CMAKE_HOME_DIRECTORY}/include/${PROJECT_NAME}/)
-
+copy_headers_to_include_directory(${PROJECT_NAME} ${libpng_public_hdrs})
 
 set(libpng_private_hdrs
   pngpriv.h

@@ -215,8 +215,9 @@ set(LIB_TARGETS)
 set( RTAUDIO_BUILD_SHARED_LIBS OFF CACHE BOOL "Build shared of static libs." )
 set( RTAUDIO_BUILD_TESTING OFF CACHE BOOL "Build rtAudio testing." )
 set(PUBLIC_HEADERS RtAudio.h)
-file(COPY ${PUBLIC_HEADERS}
-     DESTINATION ${CMAKE_HOME_DIRECTORY}/include/${PROJECT_NAME}/)
+
+copy_headers_to_include_directory(${PROJECT_NAME} ${PUBLIC_HEADERS})
+
 
 # Use RTAUDIO_BUILD_SHARED_LIBS / RTAUDIO_BUILD_STATIC_LIBS if they
 # are defined, otherwise default to standard BUILD_SHARED_LIBS.

@@ -1,91 +1,43 @@
 project (aribeiro)
 
-#include_directories( ${GLOBAL_INCLUDE_DIR} )
-
-set( ARIBEIRO_INCLUDE_DIR ${GLOBAL_INCLUDE_DIR})
-
-if(ARIBEIRO_RPI)
-
-    #find_package(EGL REQUIRED)
-    #find_package(GLES REQUIRED)
-    #include_directories(${EGL_INCLUDE_DIR} ${GLES_INCLUDE_DIR})
-
-        # Workaround: we need to use gles2 on the rpi version
-        #get_filename_component(GLES2PATH ${GLES_LIBRARY} PATH)
-        #find_library(GLES2_LIBRARY brcmGLESv2 ${GLES2PATH})
-        # fallback to old vendor library name
-        #if(${GLES2_LIBRARY} STREQUAL "GLES2_LIBRARY-NOTFOUND")
-            #find_library(GLES2_LIBRARY GLESv2 ${GLES2PATH})
-        #endif()
-
-    #set( ARIBEIRO_LIBRARIES ${EGL_INCLUDE_DIR} ${GLES_INCLUDE_DIR} ${GLES2_LIBRARY})
-
-
-else()
-    set( ARIBEIRO_LIBRARIES ${OPENGL_LIBRARIES})
-endif()
-
-if(WIN32)
-	#for path operations
-	set(ARIBEIRO_LIBRARIES ${ARIBEIRO_LIBRARIES} shlwapi iphlpapi)
-	#for multimedia calls
-	set(ARIBEIRO_LIBRARIES ${ARIBEIRO_LIBRARIES} winmm)
-endif()
-
 #
-# inside framework dependencies
+# General Configuration
 #
-set(ARIBEIRO_LIBRARIES ${ARIBEIRO_LIBRARIES} glew convertutf png_static zlib )
 
+set(ARIBEIRO_LIBRARIES glew convertutf png_static zlib )
+
+# include RPI libs
 if (ARIBEIRO_RPI)
-	#set(ARIBEIRO_INCLUDE_DIR ${ARIBEIRO_INCLUDE_DIR} /opt/vc/lib/)
-	set(ARIBEIRO_LIBRARIES ${ARIBEIRO_LIBRARIES} bcm_host openmaxil vcos vchiq_arm) #pthread
-	message (STATUS "All Link Libs: ${ARIBEIRO_LIBRARIES}")
-endif()
-
-if (${OS_TARGET} STREQUAL "linux")
-
-set(ARIBEIRO_LIBRARIES ${ARIBEIRO_LIBRARIES} pthread )
-
-endif()
-
-
-# By default, symbols provided by the sublibs that are not used by mainlib (which is all of them in this case)
-# are not used. This changes that.
-if (MSVC)
-set(ARIBEIRO_LIBRARIES
-        -WHOLEARCHIVE:aribeiro
-		aribeiro
-        ${ARIBEIRO_LIBRARIES})
-elseif (APPLE)
-set(ARIBEIRO_LIBRARIES
-        -Wl,-all_load
-		aribeiro
-        ${ARIBEIRO_LIBRARIES})
-elseif (WIN32)
-#MingW...
-set(ARIBEIRO_LIBRARIES
-		aribeiro
-        ${ARIBEIRO_LIBRARIES})
-elseif (ARIBEIRO_RPI)
-# raspberry
-set(ARIBEIRO_LIBRARIES
-        -Wl,--whole-archive
-		aribeiro
-		-Wl,--no-whole-archive
-		${GLES_LIBRARY}
-        ${ARIBEIRO_LIBRARIES})
+	set(ARIBEIRO_LIBRARIES ${GLES_LIBRARY} ${RPI_LIBRARIES} ${ARIBEIRO_LIBRARIES})
 else()
-#linux
-set(ARIBEIRO_LIBRARIES
-        -Wl,--whole-archive
-		aribeiro
-        -Wl,--no-whole-archive
-        ${ARIBEIRO_LIBRARIES})
+	set(ARIBEIRO_LIBRARIES ${OPENGL_LIBRARIES} ${ARIBEIRO_LIBRARIES})
+endif()
+
+#
+# The default behaviour of the linker is to
+# load symbols just when they are needed.
+#
+# The code below forces the load of all defined symbols
+#
+if(OS_TARGET STREQUAL win)
+	list(APPEND ARIBEIRO_LIBRARIES
+				shlwapi iphlpapi #path operations
+				winmm ) #multimedia calls
+	if (MSVC)
+		#Visual Studio
+		set(ARIBEIRO_LIBRARIES -WHOLEARCHIVE:aribeiro aribeiro ${ARIBEIRO_LIBRARIES})
+	elseif ()
+		#MingW...
+		set(ARIBEIRO_LIBRARIES aribeiro ${ARIBEIRO_LIBRARIES})
+	endif()
+elseif(OS_TARGET STREQUAL mac)
+	set(ARIBEIRO_LIBRARIES -Wl,-all_load aribeiro ${ARIBEIRO_LIBRARIES})
+elseif(OS_TARGET STREQUAL linux)
+	list(APPEND ARIBEIRO_LIBRARIES pthread )
+	set(ARIBEIRO_LIBRARIES -Wl,--whole-archive aribeiro -Wl,--no-whole-archive ${ARIBEIRO_LIBRARIES})
 endif ()
 
 # export global variables
-set(ARIBEIRO_INCLUDE_DIR ${ARIBEIRO_INCLUDE_DIR} PARENT_SCOPE)
 set(ARIBEIRO_LIBRARIES ${ARIBEIRO_LIBRARIES} PARENT_SCOPE)
 
 FILE( GLOB math_collision_src src/math/collision/*.cpp)
@@ -266,35 +218,6 @@ set( SRC
 	)
 
 
-#endif()
-
-
-# By default, symbols provided by the sublibs that are not used by mainlib (which is all of them in this case)
-# are not used. This changes that.
-#if (WIN32)
-#    set_target_properties(${PROJECT_NAME} PROPERTIES
-#        LINK_FLAGS "/WHOLEARCHIVE"
-#    )
-#elseif (APPLE)
-#    set_target_properties(${PROJECT_NAME} PROPERTIES
-#        LINK_FLAGS "-Wl,-all_load"
-#    )
-#else ()
-#    set_target_properties(${PROJECT_NAME} PROPERTIES
-#        LINK_FLAGS "-Wl,--whole-archive"
-#    )
-#endif ()
-
-
 add_library( ${PROJECT_NAME} STATIC ${PUBLIC_HEADERS} ${PRIVATE_HEADERS} ${SRC} )
 
-#message(STATUS ${GLOBAL_INCLUDE_DIR}/${PROJECT_NAME}/)
-
-file(COPY ${PUBLIC_HEADERS}
-	DESTINATION ${GLOBAL_INCLUDE_DIR}/${PROJECT_NAME}/)
-
-macro(LinkARibeiro)
-	target_link_libraries( ${PROJECT_NAME}
-		aribeiro
-		${ARIBEIRO_LIBRARIES} )
-endmacro()
+copy_headers_to_include_directory( ${PROJECT_NAME} ${PUBLIC_HEADERS} )

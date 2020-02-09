@@ -95,8 +95,7 @@ set(ZLIB_PUBLIC_HDRS
     zlib.h
 )
 
-file(COPY ${ZLIB_PUBLIC_HDRS}
-	DESTINATION ${CMAKE_HOME_DIRECTORY}/include/${PROJECT_NAME}/)
+copy_headers_to_include_directory(${PROJECT_NAME} ${ZLIB_PUBLIC_HDRS})
 
 set(ZLIB_PRIVATE_HDRS
     crc32.h

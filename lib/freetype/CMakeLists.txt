@@ -460,9 +460,9 @@ endif ()
 
 # eof
 
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/include/freetype/
-	DESTINATION ${CMAKE_HOME_DIRECTORY}/include/${PROJECT_NAME}/)
+copy_headers_to_include_directory(${PROJECT_NAME} ${CMAKE_CURRENT_SOURCE_DIR}/include/freetype/)
 
+#needs this file in a different location
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/include/ft2build.h
 	DESTINATION ${CMAKE_HOME_DIRECTORY}/include/)
 	

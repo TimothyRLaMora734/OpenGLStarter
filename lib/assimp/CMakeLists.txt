@@ -587,9 +587,7 @@ if(WIN32)
 ENDIF (WIN32)
 
 
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/include/assimp/
-	DESTINATION ${CMAKE_HOME_DIRECTORY}/include/${PROJECT_NAME}/)
-
 # set the target's folder (for IDEs that support it, e.g. Visual Studio)
 set_target_properties(${PROJECT_NAME} PROPERTIES FOLDER "LIBS/assimp")
 
+copy_headers_to_include_directory(${PROJECT_NAME} ${CMAKE_CURRENT_SOURCE_DIR}/include/assimp/)

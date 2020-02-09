@@ -12,10 +12,10 @@ add_executable(${PROJECT_NAME} ${SRC})
 #set_target_properties(${PROJECT_NAME} PROPERTIES FOLDER "EXE")
 
 target_link_libraries( ${PROJECT_NAME}
-	#aribeiro
 	#sfml-network sfml-graphics sfml-window sfml-system sfml-audio
 	sfml-window sfml-graphics
 	${ARIBEIRO_LIBRARIES} )
 
-PostBuildConfig( ${PROJECT_NAME} )
-PostBuildCopy( ${PROJECT_NAME} resources )
+
+copy_3rdparty_dll(${PROJECT_NAME})
+copy_directory_after_build( ${PROJECT_NAME} resources )

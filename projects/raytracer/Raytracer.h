@@ -87,29 +87,118 @@ class Raytracer {
 	//
 	// deve retornar uma cor a partir de um raio
 	//
-	vec3 recursiveRaytracing(const collision::Ray &ray, int max_depth) {
-		vec3 normal;
-		float t;
-		
-		Object *object;
-
+    vec3 recursiveRaytracing(const collision::Ray &ray, int max_depth) {
+        float t;
+        vec3 normal;
+        Object *object;
+        
         if ( max_depth <= 0 )
             return vec3(0.0f);
         
-		if (calculateCollision(ray, &t, &normal, &object)) {
-			//
-			// Make the illumination calculation
-			//
-			vec3 collisionPos = ray.origin + ray.dir*t;
+        if (calculateCollision(ray, &t, &normal, &object)) {
+            //
+            // Make the illumination calculation
+            //
+            vec3 collisionPos = ray.origin + ray.dir*t;
+            
+            vec3 ambient = lights[0].rgb * object->finishing->ambientReflection;
+            vec3 diffuse;
+            vec3 specular;
+            
+            vec3 V = -ray.dir;
+            
+            for (int i=1;i<lights.size();i++){
+                vec3 L = lights[i].pos - collisionPos;
+                float Llength = length(L);
+                L /= Llength;//normalize
+                
+                //shadow check
+                float NdotL = dot(normal, L);
+                if (NdotL < 0){
+                    //light is behind the object... not able to see it either (diffuse or reflected)
+                    continue;
+                }
+                
+                float tshadow;
+                vec3 normalshadow;
+                Object *objectshadow;
+                if (calculateCollision(collision::Ray(collisionPos + normal*EPSILON*10.0f,L),
+                                       &tshadow, &normalshadow, &objectshadow)
+                    && tshadow < Llength)
+                {
+                    continue;
+                }
+                
+                float lightAttenuation = 1.0f/(lights[i].constantAttenuation+
+                                               lights[i].linearAttenuation*Llength+
+                                               lights[i].QuadraticAttenuation*Llength*Llength);
+                
+                float Idiff = clamp( NdotL, 0.0f, 1.0f );
+                Idiff *= object->finishing->diffuseReflection * lightAttenuation;
+                diffuse += lights[i].rgb * Idiff;
+                
+                vec3 R = reflect(-L, normal);
+                float RdotV = dot( R, V );
+                if (RdotV < 0)
+                    continue;
+                float Ispec = clamp (RdotV , 0.0f, 1.0f );
+                
+                //vec3 H = normalize( L + V );
+                //float NdotH = dot( normal, H );
+                //if (NdotH < 0)
+                //    continue;
+                //float Ispec = clamp ( NdotH , 0.0f, 1.0f );
+                Ispec = pow(Ispec, object->finishing->specularShininess);
+                Ispec *= object->finishing->specularReflection * lightAttenuation;
+                specular += lights[i].rgb * Ispec;
+            }
+            
+            vec3 reflectedColor;
+            
+            if (object->finishing->reflectionPercentage > EPSILON){
+                collision::Ray rray(collisionPos, reflect(ray.dir, normal));
+                //issues on precision
+                rray.origin += rray.dir * EPSILON * 20.0f;
+                reflectedColor = recursiveRaytracing(rray, max_depth-1);
+                reflectedColor *= object->finishing->reflectionPercentage;
+            }
+            
+            vec3 refractedColor;
+            
+            if (object->finishing->transmissionPercentage > EPSILON){
+                float ni = 1.0f;//ar
+                float nr = object->finishing->refractiveIndex;
+                vec3 refractedRay;
+                if (refract(ray.dir, normal,ni,nr,&refractedRay)){
+                    //consider that an object cannot be inside another...
+                    float tAux;
+                    vec3 normalAux;
+                    collision::Ray rray(collisionPos, refractedRay);
+                    //issues on precision
+                    rray.origin += rray.dir * EPSILON * 20.0f;
+                    if (object->raycast(rray, &tAux, &normalAux)) {
+                        if (tAux > 0) {
+                            vec3 outputPos = rray.origin + rray.dir * tAux;
+                            if (refract(rray.dir,normalAux,nr,ni,&refractedRay)){
+                                collision::Ray r2ray(outputPos, refractedRay);
+                                //issues on precision
+                                r2ray.origin += r2ray.dir * EPSILON * 20.0f;
+                                refractedColor = recursiveRaytracing(r2ray, max_depth-1);
+                                refractedColor *= object->finishing->transmissionPercentage;
+                            }
+                        }
+                    }
+                }
+            }
             
             vec3 pigmentColor = object->pigment->getColor(collisionPos);
             
-			return pigmentColor;
-		}
-		else
-			return backgroundColor;
-		
-	}
+            return pigmentColor * ( ambient + diffuse ) + specular + reflectedColor + refractedColor;
+        }
+        else
+            return backgroundColor;
+        
+    }
 
 public:
 	
