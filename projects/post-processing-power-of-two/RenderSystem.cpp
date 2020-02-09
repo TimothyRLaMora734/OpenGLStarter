@@ -327,7 +327,7 @@ void RenderSystem::drawSphere(GLTexture *texture, int sectorCount, int stackCoun
     //std::vector<vec3> lines;
     //std::vector<vec4> colors;
 
-	std::vector<VertexAttrib, ssealign<vec3, 16> > vertices;
+	std::vector<VertexAttrib, ssealign<VertexAttrib, 16> > vertices;
 	std::vector<unsigned short> indices;
 
 	float x, y, z, xy;                              // vertex position
