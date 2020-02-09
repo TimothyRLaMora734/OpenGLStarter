@@ -26,7 +26,7 @@ if(OS_TARGET STREQUAL win)
 	if (MSVC)
 		#Visual Studio
 		set(ARIBEIRO_LIBRARIES -WHOLEARCHIVE:aribeiro aribeiro ${ARIBEIRO_LIBRARIES})
-	elseif ()
+	else()
 		#MingW...
 		set(ARIBEIRO_LIBRARIES aribeiro ${ARIBEIRO_LIBRARIES})
 	endif()
@@ -35,6 +35,8 @@ elseif(OS_TARGET STREQUAL mac)
 elseif(OS_TARGET STREQUAL linux)
 	list(APPEND ARIBEIRO_LIBRARIES pthread )
 	set(ARIBEIRO_LIBRARIES -Wl,--whole-archive aribeiro -Wl,--no-whole-archive ${ARIBEIRO_LIBRARIES})
+else()
+	message(FATAL_ERROR "Platform not tested with aribeiro lib")
 endif ()
 
 # export global variables
