@@ -438,7 +438,7 @@ void SMDImporter::AddBoneChildren(aiNode* pcNode, uint32_t iParent) {
             pc->mTransformation = bone.sAnim.asKeys[0].matrix;
         }
 
-        if (bone.iParent == static_cast<uint32_t>(-1)) { 
+        if (bone.iParent == static_cast<uint32_t>(-1)) {
             bone.mOffsetMatrix = pc->mTransformation;
         } else {
             bone.mOffsetMatrix = asBones[bone.iParent].mOffsetMatrix * pc->mTransformation;
@@ -547,6 +547,47 @@ void SMDImporter::CreateOutputAnimation(int index, const std::string &name) {
         // there are no scaling keys ...
     }
 }
+
+//[alessandro]
+#if defined(__MINGW32__)
+#include <string.h>
+
+char *
+__strtok_r (char *s, const char *delim, char **save_ptr)
+{
+  char *end;
+  if (s == NULL)
+    s = *save_ptr;
+  if (*s == '\0')
+    {
+      *save_ptr = s;
+      return NULL;
+    }
+  /* Scan leading delimiters.  */
+  s += strspn (s, delim);
+  if (*s == '\0')
+    {
+      *save_ptr = s;
+      return NULL;
+    }
+  /* Find the end of the token.  */
+  end = s + strcspn (s, delim);
+  if (*end == '\0')
+    {
+      *save_ptr = end;
+      return s;
+    }
+  /* Terminate the token and make *SAVE_PTR point past it.  */
+  *end = '\0';
+  *save_ptr = end + 1;
+  return s;
+}
+
+static inline char* strtok_s(char* s, const char* delim, char** context)
+{
+        return __strtok_r(s, delim, context);
+}
+#endif
 
 void SMDImporter::GetAnimationFileList(const std::string &pFile, IOSystem* pIOHandler, std::vector<std::tuple<std::string, std::string>>& outList) {
     auto base = DefaultIOSystem::absolutePath(pFile);

@@ -69,6 +69,13 @@ using namespace Assimp;
 #   define PATHLIMIT 4096
 #endif
 
+
+//[alessandro]
+#if !defined(WindowsStore) && defined(__MINGW32__)
+    #define __stat64 _stat
+    #define _wstat64 _wstat
+#endif
+
 // ------------------------------------------------------------------------------------------------
 // Tests for the existence of a file at the given path.
 bool DefaultIOSystem::Exists( const char* pFile) const
@@ -77,6 +84,7 @@ bool DefaultIOSystem::Exists( const char* pFile) const
     wchar_t fileName16[PATHLIMIT];
 
 #ifndef WindowsStore
+
     bool isUnicode = IsTextUnicode(pFile, static_cast<int>(strlen(pFile)), NULL) != 0;
     if (isUnicode) {
 

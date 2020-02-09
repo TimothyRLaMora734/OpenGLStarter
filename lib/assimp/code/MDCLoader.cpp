@@ -296,7 +296,7 @@ void MDCImporter::InternReadFile(
             pcMesh->mMaterialIndex = (unsigned int)aszShaders.size();
 
             // create a new shader
-            aszShaders.push_back(std::string( pcShader->ucName, 
+            aszShaders.push_back(std::string( pcShader->ucName,
                 ::strnlen(pcShader->ucName, sizeof(pcShader->ucName)) ));
         }
         // need to create a default material
