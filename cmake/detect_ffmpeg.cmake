@@ -76,15 +76,15 @@ elseif (OS_TARGET STREQUAL win)
         message(FATAL_ERROR "windows FFmpeg build arch not supported...")
     endif()
 
-    set( AVCODEC_LIBRARY ${FFMPEG_LIB_DIR}/avcodec.lib )
-    set( AVFORMAT_LIBRARY ${FFMPEG_LIB_DIR}/avformat.lib )
-    set( AVUTIL_LIBRARY ${FFMPEG_LIB_DIR}/avutil.lib )
-    set( AVDEVICE_LIBRARY ${FFMPEG_LIB_DIR}/avdevice.lib )
+    set( AVCODEC_LIBRARY ${CMAKE_SOURCE_DIR}/${FFMPEG_LIB_DIR}/avcodec.lib )
+    set( AVFORMAT_LIBRARY ${CMAKE_SOURCE_DIR}/${FFMPEG_LIB_DIR}/avformat.lib )
+    set( AVUTIL_LIBRARY ${CMAKE_SOURCE_DIR}/${FFMPEG_LIB_DIR}/avutil.lib )
+    set( AVDEVICE_LIBRARY ${CMAKE_SOURCE_DIR}/${FFMPEG_LIB_DIR}/avdevice.lib )
 
-    set( AVFILTER_LIBRARY ${FFMPEG_LIB_DIR}/avfilter.lib )
-    set( POSTPROC_LIBRARY ${FFMPEG_LIB_DIR}/postproc.lib )
-    set( SWRESAMPLE_LIBRARY ${FFMPEG_LIB_DIR}/swresample.lib )
-    set( SWSCALE_LIBRARY ${FFMPEG_LIB_DIR}/swscale.lib )
+    set( AVFILTER_LIBRARY ${CMAKE_SOURCE_DIR}/${FFMPEG_LIB_DIR}/avfilter.lib )
+    set( POSTPROC_LIBRARY ${CMAKE_SOURCE_DIR}/${FFMPEG_LIB_DIR}/postproc.lib )
+    set( SWRESAMPLE_LIBRARY ${CMAKE_SOURCE_DIR}/${FFMPEG_LIB_DIR}/swresample.lib )
+    set( SWSCALE_LIBRARY ${CMAKE_SOURCE_DIR}/${FFMPEG_LIB_DIR}/swscale.lib )
 
     # dlls to copy to projects
     register_dll( ${FFMPEG_LIB_DIR}/avcodec-58.dll
