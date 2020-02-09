@@ -497,6 +497,7 @@ ADD_ASSIMP_IMPORTER( IFC
   Importer/IFC/IFCOpenings.cpp
 )
 
+#[alessandro]
 #if (ASSIMP_BUILD_IFC_IMPORTER)
   if (MSVC)
     set_source_files_properties(Importer/IFC/IFCReaderGen1_2x3.cpp Importer/IFC/IFCReaderGen2_2x3.cpp PROPERTIES COMPILE_FLAGS "/bigobj")
@@ -738,6 +739,13 @@ ADD_ASSIMP_IMPORTER( STEP
     StepExporter.h
     StepExporter.cpp
 )
+
+#[alessandro]
+if (MSVC)
+	set_source_files_properties(Importer/StepFile/StepFileGen1.cpp Importer/StepFile/StepFileGen1.cpp PROPERTIES COMPILE_FLAGS "/bigobj")
+elseif(CMAKE_COMPILER_IS_MINGW)
+	set_source_files_properties(Importer/StepFile/StepFileGen1.cpp Importer/StepFile/StepFileGen1.cpp PROPERTIES COMPILE_FLAGS "-O2 -Wa,-mbig-obj")
+endif()
 
 SET( Exporter_SRCS
   Exporter.cpp
