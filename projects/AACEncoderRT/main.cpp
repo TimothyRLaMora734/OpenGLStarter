@@ -30,7 +30,8 @@ void OnDataFromAudioCard(void *fltBuffer, uint32_t frames) {
 
 int main(int argc, char* argv[]){
 
-	//RTAudioHelper::printDevices(RtAudio::WINDOWS_DS);
+    //RTAudioHelper::printDevices(RtAudio::WINDOWS_DS);
+	//RTAudioHelper::printDevices();
 	//return 0;
 
     PlatformPath::setWorkingPath(PlatformPath::getExecutablePath(argv[0]));
@@ -60,7 +61,7 @@ int main(int argc, char* argv[]){
     #if defined(OS_TARGET_mac)
     inputAudio.initInputFromDeviceName("Apple Inc.: Built-in Input");
     #elif defined(OS_TARGET_linux)
-    inputAudio.initInputFromDeviceName("default");
+    inputAudio.initInputFromDeviceName("hw:HD Pro Webcam C920,0");
     #elif defined(OS_TARGET_win)
 	inputAudio.initInputFromDeviceName("Microfone (HD Pro Webcam C920)");
     #endif
