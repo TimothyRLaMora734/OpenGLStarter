@@ -47,6 +47,8 @@ public:
         
         return inv(transformMatrix);
     }
+
+	SSE2_CLASS_NEW_OPERATOR
     
 };
 

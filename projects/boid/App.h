@@ -63,6 +63,8 @@ public:
     void drawPrimitive(GLuint oglPrimitive, const mat4 &modelViewProjection, const vec3 vertexBuffer[], const vec4 colorBuffer[], int count);
     
     void drawPrimitive6(GLuint oglPrimitive, const mat4 &modelViewProjection, const vec3 *vertexBuffer, const vec4 *colorBuffer, const uint16_t *indice, int count);
+
+	SSE2_CLASS_NEW_OPERATOR
 };
 
 #endif

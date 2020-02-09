@@ -297,6 +297,8 @@ public:
         else if (boidMaster.pos.z > sceneMax.z)
             boidMaster.pos.z -= sceneDelta.z;
     }
+
+	SSE2_CLASS_NEW_OPERATOR
     
 };
 
