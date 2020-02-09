@@ -1,9 +1,18 @@
 
 
-//#include <aribeiro/aribeiro.h>
-//using namespace aRibeiro;
+#include <aribeiro/aribeiro.h>
+using namespace aRibeiro;
 
-#include <unistd.h>//write read
+#if defined(WIN32)
+	#include <io.h>
+#else
+	#include <unistd.h>//write read
+#endif
+
+#ifndef O_BINARY
+	#define O_BINARY 0
+#endif
+
 #include <vector>
 #include <signal.h>
 #include <stdio.h>
@@ -125,14 +134,17 @@ public:
 // ffmpeg -i file.h264 -c copy -bsf:v trace_headers -f null -
 //
 int main(int argc, char* argv[]) {
-	//PlatformPath::setWorkingPath(PlatformPath::getExecutablePath(argv[0]));
+	PlatformPath::setWorkingPath(PlatformPath::getExecutablePath(argv[0]));
 
     //int fd_stdin = fileno(stdin);
-    int fd_stdin = open("out.flv",O_RDONLY);
+    int fd_stdin = open("out.flv",O_RDONLY | O_BINARY);
     
     signal(SIGINT,  signal_handler);
     signal(SIGTERM, signal_handler);
-    signal(SIGQUIT, signal_handler);
+#ifndef WIN32
+	signal(SIGQUIT, signal_handler);
+#endif
+    
 
 
     unsigned char buffer[65536];
@@ -152,7 +164,11 @@ int main(int argc, char* argv[]) {
     
     signal(SIGINT,  SIG_DFL);
     signal(SIGTERM, SIG_DFL);
-    signal(SIGQUIT, SIG_DFL);
+
+#ifndef WIN32
+	signal(SIGQUIT, SIG_DFL);
+#endif
+    
     
     close(fd_stdin);
     
