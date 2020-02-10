@@ -26,12 +26,12 @@ protected:
 	int addLabel(GLFont *f,
 		const char*text,
 		const vec2 &pos,
-		const bool centerV, const bool centerH, 
+		const bool centerV, const bool centerH,
 		float size);
 	int addLabelBtn(GLFont *f,
 		const char*text,
 		const vec2 &pos, const vec2 &dim,
-		const bool centerV, const bool centerH, 
+		const bool centerV, const bool centerH,
 		float size);
 	InterfaceGuiGroup* getInterface(const int i)const;
 public:
@@ -42,6 +42,9 @@ public:
 	virtual bool keyUp(const int k);
 	virtual bool mouseDown(const int btn, const vec2 &pos);
 	virtual bool mouseUp(const int btn, const vec2 &pos);
+
+	SSE2_CLASS_NEW_OPERATOR
+
 };
 
 

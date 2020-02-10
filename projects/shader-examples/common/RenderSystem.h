@@ -87,6 +87,8 @@ public:
 
 	void drawTexture(GLTexture *texture, const vec4 &color, GLuint oglPrimitive, const vec3 *vertexBuffer, const vec2 *uvBuffer, int count);
 
+    SSE2_CLASS_NEW_OPERATOR
+
 };
 
 

@@ -35,6 +35,7 @@ public:
 	virtual void setAlign(const bool Vcentered, const bool Hcentered);
 
 	SSE2_CLASS_NEW_OPERATOR
+
 };
 
 

@@ -16,7 +16,7 @@ _SSE2_ALIGN_PRE struct VertexAttrib {
 	vec3 normal;
 	vec3 tangent;
 	vec3 binormal;
-};
+}_SSE2_ALIGN_POS;
 
 class RenderSystem;
 

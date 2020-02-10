@@ -28,6 +28,8 @@ public:
 	bool mouseDown(const int ID, const int btn, const vec2 &pos);
 
 	vec2 getQuadDimension();
+
+    SSE2_CLASS_NEW_OPERATOR
 };
 
 #endif

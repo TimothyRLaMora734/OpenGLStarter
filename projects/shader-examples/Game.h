@@ -475,6 +475,7 @@ public:
 		return true;
 	}
 
+    SSE2_CLASS_NEW_OPERATOR
 };
 
 
@@ -599,6 +600,8 @@ public:
 		return true;
 	}
 
+	SSE2_CLASS_NEW_OPERATOR
+
 };
 
 class Game {
@@ -611,8 +614,8 @@ class Game {
 
 public:
 	Game(int w, int h) {
-
 		cursor = GLTexture::loadFromPNG("resources/images/cursor.png");
+
 		//load font
 		{
 			Font* font_raw = Font::LoadFromBasof("resources/font/BenjaminGothic.basof");
@@ -625,8 +628,8 @@ public:
 		this->w = w;
 		this->h = h;
 
-		RenderSystem::getSingleton();
 
+		RenderSystem::getSingleton();
 
 		//glPixelZoom(0.4,0.4);
 		activeInterface = new MainMenu(cursor, font);//new ShaderMenu(&cursor, &hover, &font);

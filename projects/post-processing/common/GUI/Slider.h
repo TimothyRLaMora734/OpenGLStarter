@@ -44,6 +44,8 @@ public:
 	void setLerp(const float l);
 	float getLerp()const;
 
+	SSE2_CLASS_NEW_OPERATOR
+
 };
 
 

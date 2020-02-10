@@ -65,6 +65,8 @@ public:
 	void setSelected(const int s);
 	int getSelected()const;
 	int count()const;
+
+	SSE2_CLASS_NEW_OPERATOR
 };
 
 
