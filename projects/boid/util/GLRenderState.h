@@ -34,6 +34,7 @@ enum BlendModeType {
 	BlendModeAddAlpha
 };
 
+#ifndef ARIBEIRO_RPI
 enum AlphaTestType {
 	AlphaTestDisabled,
 	AlphaTestEqual,
@@ -42,6 +43,7 @@ enum AlphaTestType {
 	AlphaTestGreater,
 	AlphaTestGreaterEqual,
 };
+#endif
 
 enum HintType {
 	HintDisabled,
@@ -49,12 +51,14 @@ enum HintType {
 	HintNicest
 };
 
+#ifndef ARIBEIRO_RPI
 enum WireframeType {
 	WireframeDisabled,
 	WireframeBoth,
 	WireframeFront,
 	WireframeBack
 };
+#endif
 
 enum ColorWriteType{
     ColorWriteNone = 0,
@@ -85,12 +89,14 @@ class GLRenderState {
 	void OnClearDepthChange(Property<float> *prop);
 	void OnDepthWriteChange(Property<bool> *prop);
 	void OnBlendModeChange(Property<BlendModeType> *prop);
+	#ifndef ARIBEIRO_RPI
 	void OnAlphaTestChange(Property<AlphaTestType> *prop);
 	void OnAlphaRefChange(Property<float> *prop);
 	void OnLineSmoothHintChange(Property<HintType> *prop);
-	void OnLineWidthChange(Property<float> *prop);
 	void OnPointSizeChange(Property<float> *prop);
 	void OnWireframeChange(Property<WireframeType> *prop);
+	#endif
+	void OnLineWidthChange(Property<float> *prop);
 	void OnCurrentShaderChange(Property<GLShader*> *prop);
 	void OnViewportChange(Property<iRect> *prop);
 	void OnCurrentFramebufferObjectChange(Property<GLFramebufferObject*> *prop);
@@ -107,12 +113,15 @@ public:
 	Property<float> ClearDepth;
 	Property<bool> DepthWrite;
 	Property<BlendModeType> BlendMode;
+	#ifndef ARIBEIRO_RPI
 	Property<AlphaTestType> AlphaTest;
+	Property<WireframeType> Wireframe;
 	Property<float> AlphaRef;
 	Property<HintType> LineSmoothHint;
-	Property<float> LineWidth;
 	Property<float> PointSize;
-	Property<WireframeType> Wireframe;
+	#endif
+
+	Property<float> LineWidth;
 	Property<GLShader*> CurrentShader;
 	Property<iRect> Viewport;
 	Property<GLFramebufferObject*> CurrentFramebufferObject;

@@ -45,7 +45,9 @@ App::App(sf::RenderWindow *window, int w, int h):
 
     //setup renderstate
     renderState->ClearColor = vec4(1.0f,1.0f,250.0f/255.0f,1.0f);
+    #ifndef ARIBEIRO_RPI
     renderState->Wireframe = WireframeBack;
+    #endif
     renderState->CullFace = CullFaceNone;
 
     time.update();

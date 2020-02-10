@@ -85,6 +85,8 @@ void GLRenderState::OnBlendModeChange(Property<BlendModeType> *prop) {
 	}
 
 }
+
+#ifndef ARIBEIRO_RPI
 void GLRenderState::OnAlphaTestChange(Property<AlphaTestType> *prop) {
 	switch (prop->value) {
 	case AlphaTestDisabled:
@@ -112,10 +114,16 @@ void GLRenderState::OnAlphaTestChange(Property<AlphaTestType> *prop) {
 		break;
 	}
 }
+#endif
+
+#ifndef ARIBEIRO_RPI
 void GLRenderState::OnAlphaRefChange(Property<float> *prop) {
 	//forward the alpha ref change to another processor
 	OnAlphaTestChange(&AlphaTest);
 }
+#endif
+
+#ifndef ARIBEIRO_RPI
 void GLRenderState::OnLineSmoothHintChange(Property<HintType> *prop) {
 	switch (prop->value) {
 	case HintDisabled:
@@ -131,12 +139,18 @@ void GLRenderState::OnLineSmoothHintChange(Property<HintType> *prop) {
 		break;
 	}
 }
+#endif
+
 void GLRenderState::OnLineWidthChange(Property<float> *prop) {
 	glLineWidth(prop->value);
 }
+#ifndef ARIBEIRO_RPI
 void GLRenderState::OnPointSizeChange(Property<float> *prop) {
 	glPointSize(prop->value);
 }
+#endif
+
+#ifndef ARIBEIRO_RPI
 void GLRenderState::OnWireframeChange(Property<WireframeType> *prop) {
 	switch (prop->value) {
 	case WireframeDisabled:
@@ -153,6 +167,8 @@ void GLRenderState::OnWireframeChange(Property<WireframeType> *prop) {
 		break;
 	}
 }
+#endif
+
 void GLRenderState::OnCurrentShaderChange(Property<GLShader*> *prop) {
 	if (prop->value == NULL)
 		GLShader::disable();
@@ -194,12 +210,14 @@ void GLRenderState::initialize(int w, int h) {
 	ClearDepth = 1.0f;
 	DepthWrite = true;
 	BlendMode = BlendModeAlpha;
+	#ifndef ARIBEIRO_RPI
 	AlphaTest = AlphaTestDisabled;
 	AlphaRef = 1.0f / 255.0f;
-	LineSmoothHint = HintDisabled;
-	LineWidth = 1.0f;
-	PointSize = 1.0f;
 	Wireframe = WireframeDisabled;
+	LineSmoothHint = HintDisabled;
+	PointSize = 1.0f;
+	#endif
+	LineWidth = 1.0f;
 	CurrentShader = NULL;
 	Viewport = iRect(w, h);
 	CurrentFramebufferObject = NULL;
@@ -215,12 +233,14 @@ void GLRenderState::initialize(int w, int h) {
 	ClearDepth.OnChange.add(this, &GLRenderState::OnClearDepthChange);
 	DepthWrite.OnChange.add(this, &GLRenderState::OnDepthWriteChange);
 	BlendMode.OnChange.add(this, &GLRenderState::OnBlendModeChange);
+	#ifndef ARIBEIRO_RPI
 	AlphaTest.OnChange.add(this, &GLRenderState::OnAlphaTestChange);
 	AlphaRef.OnChange.add(this, &GLRenderState::OnAlphaRefChange);
 	LineSmoothHint.OnChange.add(this, &GLRenderState::OnLineSmoothHintChange);
-	LineWidth.OnChange.add(this, &GLRenderState::OnLineWidthChange);
 	PointSize.OnChange.add(this, &GLRenderState::OnPointSizeChange);
 	Wireframe.OnChange.add(this, &GLRenderState::OnWireframeChange);
+	#endif
+	LineWidth.OnChange.add(this, &GLRenderState::OnLineWidthChange);
 	CurrentShader.OnChange.add(this, &GLRenderState::OnCurrentShaderChange);
 	Viewport.OnChange.add(this, &GLRenderState::OnViewportChange);
 	CurrentFramebufferObject.OnChange.add(this, &GLRenderState::OnCurrentFramebufferObjectChange);
@@ -236,12 +256,14 @@ void GLRenderState::initialize(int w, int h) {
 	ClearDepth.OnChange(&ClearDepth);
 	DepthWrite.OnChange(&DepthWrite);
 	BlendMode.OnChange(&BlendMode);
+	#ifndef ARIBEIRO_RPI
 	AlphaTest.OnChange(&AlphaTest);
 	AlphaRef.OnChange(&AlphaRef);
 	LineSmoothHint.OnChange(&LineSmoothHint);
-	LineWidth.OnChange(&LineWidth);
 	PointSize.OnChange(&PointSize);
 	Wireframe.OnChange(&Wireframe);
+	#endif
+	LineWidth.OnChange(&LineWidth);
 	CurrentShader.OnChange(&CurrentShader);
 	Viewport.OnChange(&Viewport);
 	CurrentFramebufferObject.OnChange(&CurrentFramebufferObject);
@@ -250,7 +272,9 @@ void GLRenderState::initialize(int w, int h) {
 	//
 	// Not using fixed pipeline lighting
 	//
+	#ifndef ARIBEIRO_RPI
 	glDisable(GL_LIGHTING);
+	#endif
 
 }
 

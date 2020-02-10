@@ -182,7 +182,7 @@ public:
                 vec3 targetDir = normalize(targetVel);
 
                 float targetVelF = dot(targetVel,btarget.dir);
-                if (abs(targetVelF)<2.0f)
+                if (absv(targetVelF)<2.0f)
                     targetVelF = sign(targetVelF)*2.0f;
 
                 btarget.dir = moveSlerp(bsource.dir, targetDir, DEG2RAD(time.deltaTime*100.0f));

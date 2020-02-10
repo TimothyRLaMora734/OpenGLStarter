@@ -45,6 +45,8 @@ void signal_handler(int signal) {
 int main(int argc, char* argv[]) {
 	PlatformPath::setWorkingPath(PlatformPath::getExecutablePath(argv[0]));
 
+	/* AAC HW Encoder from RPI does not work...
+
 	signal(SIGINT,  signal_handler);
     signal(SIGTERM, signal_handler);
     signal(SIGQUIT, signal_handler);
@@ -67,8 +69,9 @@ int main(int argc, char* argv[]) {
     signal(SIGTERM, SIG_DFL);
     signal(SIGQUIT, SIG_DFL);
 
-	/*
+	/*/
 
+	// VIdeo input from RPI...
     signal(SIGINT,  signal_handler);
     signal(SIGTERM, signal_handler);
     signal(SIGQUIT, signal_handler);
@@ -150,8 +153,12 @@ int main(int argc, char* argv[]) {
 
         //fprintf(stderr,"index: %i\n",bufferQueue.index);
 
-        char h264_aud[] = {0x00,0x00,0x00,0x01,0x09};
-        write(fd_stdout,h264_aud,sizeof(h264_aud));
+        // cannot use AUD on this kind of stream....
+        // internally it can deliver different kinds of pkt sequences...
+        // -- it is safer to detect new frame using the DetectionClass
+        //
+        //char h264_aud[] = {0x00,0x00,0x00,0x01,0x09};
+        //write(fd_stdout,h264_aud,sizeof(h264_aud));
 
         //output to stdout
         write(fd_stdout,bufferPtr[bufferQueue.index],bufferQueue.bytesused);
