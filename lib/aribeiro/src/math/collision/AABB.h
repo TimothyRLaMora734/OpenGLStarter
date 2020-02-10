@@ -10,9 +10,9 @@
 namespace aRibeiro {
 
 //class vec2;
-    
+
 namespace collision {
-        
+
 class Sphere;
 class LineSegment;
 class Plane;
@@ -87,8 +87,8 @@ _SSE2_ALIGN_PRE class ARIBEIRO_API AABB{
     //--------------------------------------------------------------------------
     // Static methods
     //--------------------------------------------------------------------------
-    
-	
+
+
 	/// \brief OpenGL calls to draw the GL_LINES of the AABB in 3D <br/>
     /// If the application doesn't use the gl headers, this method won draw anything
     /// \author Alessandro Ribeiro
@@ -116,7 +116,7 @@ _SSE2_ALIGN_PRE class ARIBEIRO_API AABB{
     /// \return true if the point is inside the AABB, otherwise false
     ///
     static bool pointInsideAABB(const vec3& ptn,const AABB& b);
-    
+
 	/// \brief Test if there is some overlaped area between two AABBs
     /// \author Alessandro Ribeiro
     /// \param a The first AABB to test
@@ -161,10 +161,11 @@ _SSE2_ALIGN_PRE class ARIBEIRO_API AABB{
 	//
 	static bool frustumOverlapsAABB(const Frustum &f, const AABB &aabb);
 
-};
+	SSE2_CLASS_NEW_OPERATOR
+} _SSE2_ALIGN_POS;
 
 }
-    
+
 }
 
 #endif

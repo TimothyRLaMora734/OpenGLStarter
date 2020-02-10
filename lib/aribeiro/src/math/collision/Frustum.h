@@ -15,15 +15,15 @@ namespace collision {
 
 	_SSE2_ALIGN_PRE class Frustum {
 		void computePlanes(const mat4& clipMatrix);
-        
+
         float minProjections[6];
         float maxProjections[6];
-        
+
 	public:
-        
+
 		Plane rightPlane, leftPlane, bottomPlane, topPlane, nearPlane, farPlane;
         vec3 vertices[8];
-        
+
         Plane& operator[](int idx);
         const Plane& operator[](int idx)const;
 
@@ -34,8 +34,9 @@ namespace collision {
 		static bool sphereOverlapsFrustum(const Sphere &s, const Frustum &f);
 		static bool aabbOverlapsFrustum(const AABB &aabb, const Frustum &f);
 
+		SSE2_CLASS_NEW_OPERATOR
 
-	};
+	} _SSE2_ALIGN_POS;
 }
 }
 

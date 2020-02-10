@@ -6,14 +6,14 @@
 
 /*
  property declaration:
- 
- 
+
+
  Property<vec2> Size;
- 
+
  Size = vec2(1.0f);
- 
+
  // you can listen to property changes
- 
+
  void MyListeningFunction(Property<vec2> *prop) {
     vec2 vOld = prop->oldValue;
     vec2 vNew = prop->value;
@@ -21,10 +21,10 @@
     //  The next listeners will receive the old value as new to set...
     prop->rollback();
  }
- 
+
  Size.OnChange.add(MyListeningFunction);
- 
- 
+
+
  */
 
 namespace aRibeiro {
@@ -37,7 +37,7 @@ namespace aRibeiro {
         void operator=(const Property&) {}
 
     public:
-        
+
         BEGIN_DECLARE_DELEGATE(PropertyBaseEvent, Property<T> *prop) CALL_PATTERN(prop) END_DECLARE_DELEGATE;
 
         T oldValue;
@@ -55,7 +55,7 @@ namespace aRibeiro {
             oldValue = T();
             value = T();
         }
-        
+
         void rollback() {
             value = oldValue;
         }
@@ -74,8 +74,10 @@ namespace aRibeiro {
         operator T() const {
             return value;
         }
+
+        SSE2_CLASS_NEW_OPERATOR
     };
-    
+
 }
 
 #endif

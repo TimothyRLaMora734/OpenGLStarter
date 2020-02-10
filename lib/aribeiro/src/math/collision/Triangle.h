@@ -46,7 +46,7 @@ namespace collision {
 			float &u, float &v, float &w);
 
 		// given a sphere p,radius -- returns the penetration vector of this sphere if it collides with the triangle
-		//  If you are using a movable sphere, you can check the max step it can do based in its radius... 
+		//  If you are using a movable sphere, you can check the max step it can do based in its radius...
 		//     and consider the max step to look the minor triangle in the collision scene
 		static bool sphereIntersectsTriangle(const Sphere& sphere, const vec3& a, const vec3& b, const vec3& c, vec3 *penetration);
 		static bool sphereIntersectsTriangle(const Sphere& sphere, const Triangle& t, vec3 *penetration);
@@ -57,9 +57,9 @@ namespace collision {
 		static bool aabbIntersectsTriangle(const AABB &box, const vec3 &v0, const vec3 &v1, const vec3 &v2);
 		static bool aabbIntersectsTriangle(const AABB &box, const Triangle &triangle);
 
+        SSE2_CLASS_NEW_OPERATOR
 
-
-	};
+	}_SSE2_ALIGN_POS;
 
 }
 }

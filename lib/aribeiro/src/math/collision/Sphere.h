@@ -5,9 +5,9 @@
 #include <aribeiro/vec3.h>
 
 namespace aRibeiro {
-	
+
 namespace collision {
-        
+
 	class Ray;
 	class LineSegment;
 	class AABB;
@@ -22,7 +22,7 @@ namespace collision {
 
 		Sphere();
 		Sphere(const vec3 &center, float radius);
-        
+
         static bool sphereOverlapsSphere(const Sphere& a,const Sphere& b);
 
 		static Sphere joinSpheres(const Sphere &s0, const Sphere &s1);
@@ -42,10 +42,10 @@ namespace collision {
 		static bool triangleIntersectsSphere(const vec3& a, const vec3& b, const vec3& c, const Sphere& sphere, vec3 *penetration);
 		static bool triangleIntersectsSphere(const Triangle& t, const Sphere& sphere, vec3 *penetration);
 
-
-	};
+        SSE2_CLASS_NEW_OPERATOR
+	}_SSE2_ALIGN_POS;
 }
-    
+
 }
 
 #endif

@@ -41,14 +41,16 @@ namespace aRibeiro {
 			//else
 				//printf("error to pop element...\n");
 		}
-        
+
         void operator=(const T &v) {
             top = v;
         }
-        
+
         operator T() const {
             return top;
         }
+
+        SSE2_CLASS_NEW_OPERATOR
 
 	};
 

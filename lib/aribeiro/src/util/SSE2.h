@@ -203,7 +203,25 @@
     #define _SSE2_ALIGN_POS __attribute__ (( __aligned__ (16)))
     #define ARIBEIRO_INLINE inline __attribute__((always_inline))
 
-    #define SSE2_CLASS_NEW_OPERATOR
+    #define SSE2_CLASS_NEW_OPERATOR \
+	ARIBEIRO_INLINE void* operator new(size_t size) {\
+        return aligned_alloc(16, size);\
+	}\
+	ARIBEIRO_INLINE void operator delete(void* p) { \
+		free(p);\
+	}\
+	ARIBEIRO_INLINE void* operator new[](size_t size) {\
+        return aligned_alloc(16, size);\
+	}\
+	ARIBEIRO_INLINE void operator delete[](void* p) {\
+		free(p);\
+	}\
+	ARIBEIRO_INLINE void* operator new (std::size_t n, void* ptr)\
+	{\
+        return ptr;\
+	}\
+	ARIBEIRO_INLINE void operator delete(void *objectAllocated, void* ptr) {\
+	}
 
 #else
 

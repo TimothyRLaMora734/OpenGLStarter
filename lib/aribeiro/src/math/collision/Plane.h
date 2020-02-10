@@ -5,7 +5,7 @@
 #include <aribeiro/vec3.h>
 
 namespace aRibeiro {
-	
+
 namespace collision {
 	class Ray;
 	class Triangle;
@@ -37,7 +37,7 @@ namespace collision {
 		static float pointDistanceToPlane(const vec3 &q, const Plane &plane);
 
 		static bool raycastPlane(const Ray &r, const Plane &plane, float *outT, vec3 *outNormal);
-		
+
 		static bool segmentIntersectsPlane(const vec3 &a, const vec3 &b, const Plane &plane);
 		static bool segmentIntersectsPlane(const LineSegment &ls, const Plane &plane);
 
@@ -53,7 +53,9 @@ namespace collision {
 		//
 		static bool aabbIntersectsPlane(const AABB &b, const Plane &plane);
 
-	};
+		SSE2_CLASS_NEW_OPERATOR
+
+	}_SSE2_ALIGN_POS;
 }
 }
 

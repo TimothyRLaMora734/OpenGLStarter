@@ -7,7 +7,7 @@
 namespace aRibeiro {
 
 namespace collision {
-        
+
 	class AABB;
 	class Plane;
 	class Sphere;
@@ -60,7 +60,8 @@ namespace collision {
 			float &u, float &v, float &w);
 
 
-	};
+        SSE2_CLASS_NEW_OPERATOR
+	} _SSE2_ALIGN_POS;
 
 }
 }

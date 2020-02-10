@@ -30,7 +30,8 @@ namespace collision {
 		static bool raycastTriangle(const Ray &ray, const vec3 &a, const vec3 &b, const vec3&c, float *outT, vec3 *outNormal);
 		static bool raycastTriangle(const Ray &ray, const Triangle &t, float *outT, vec3 *outNormal);
 
-	};
+		SSE2_CLASS_NEW_OPERATOR
+	}_SSE2_ALIGN_POS;
 
 }
 }
