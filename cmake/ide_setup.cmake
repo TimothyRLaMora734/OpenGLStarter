@@ -33,7 +33,7 @@ elseif(OS_TARGET STREQUAL mac)
 
     #SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -all_load")
     #SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -v")
-    add_linker_flags_global(-ObjC)
+    add_linker_flag_global(-ObjC)
 
 elseif(OS_TARGET STREQUAL linux)
 

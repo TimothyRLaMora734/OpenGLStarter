@@ -99,7 +99,7 @@ elseif (OS_TARGET STREQUAL win)
     if (MSVC AND ARCH_TARGET STREQUAL x86)
         # disable safe exception handler on the compiler... 
         # it is for x86 arch on VS
-        add_linker_flags_global(/SAFESEH:NO)
+        add_linker_flag_global(/SAFESEH:NO)
     endif()
 
     include_directories_global(${FFMPEG_INCLUDE_DIR})

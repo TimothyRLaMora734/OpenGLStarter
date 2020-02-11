@@ -5,7 +5,7 @@
 set(GLOBAL_LINKER_FLAGS "" CACHE STRING "")
 mark_as_internal(GLOBAL_LINKER_FLAGS)
 
-macro(add_linker_flags_global)
+macro(add_linker_flag_global)
     foreach(flag IN ITEMS ${ARGN})
         if (NOT ${flag} IN_LIST GLOBAL_LINKER_FLAGS)
             list(APPEND GLOBAL_LINKER_FLAGS ${flag})
