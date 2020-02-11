@@ -1,12 +1,3 @@
-#
-# Global linker flags
-#
-if (${OS_TARGET} STREQUAL "mac")
-	SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -ObjC")
-	SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -v")
-endif()
-
-
 ############################################################################
 # Global compiler flags
 ############################################################################

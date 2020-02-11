@@ -15,7 +15,8 @@ macro(list_to_string list str)
 endmacro()
 
 macro(create_missing_cmake_build_type)
-    if( NOT DEFINED CMAKE_BUILD_TYPE )
+    #if( NOT DEFINED CMAKE_BUILD_TYPE ) #the variable need to be check with empty content
+    if( NOT CMAKE_BUILD_TYPE )
         set( CMAKE_BUILD_TYPE Release CACHE STRING
                 "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel."
                 FORCE )
