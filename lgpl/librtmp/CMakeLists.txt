@@ -81,7 +81,7 @@ set( SRC src/rtmp.c
          src/parseurl.c )
 
 if(MSVC)
-    set(SRC ${SRC} librtmp.def)
+    set(SRC ${SRC} src/librtmp.def)
 endif()     
 
 add_library( ${PROJECT_NAME} SHARED ${PUBLIC_HEADERS} ${PRIVATE_HEADERS} ${SRC} )
