@@ -49,16 +49,17 @@ include(GNUInstallDirs)
 option(PNG_BUILD_ZLIB "Custom zlib Location, else find_package is used" OFF)
 
 IF(NOT PNG_BUILD_ZLIB)
-  #find_package(ZLIB REQUIRED)
-  #include_directories(${ZLIB_INCLUDE_DIR})
-
-  #[alessandro]
-  set(ZLIB_LIBRARY )
-  #set(ZLIB_LIBRARY zlib )
-  set(ZLIB_INCLUDE_DIR ${CMAKE_HOME_DIRECTORY}/include/zlib)
-
-  #include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../zlib/)
-
+  
+  if (OpenGLStarter_Integration)
+	  #[alessandro]
+	  set(ZLIB_LIBRARY )
+	  #set(ZLIB_LIBRARY zlib )
+	  set(ZLIB_INCLUDE_DIR ${CMAKE_HOME_DIRECTORY}/include/zlib)
+  else()
+	find_package(ZLIB REQUIRED)
+	include_directories(${ZLIB_INCLUDE_DIR})
+  endif()
+  
 ENDIF(NOT PNG_BUILD_ZLIB)
 
 if(NOT WIN32)
@@ -479,7 +480,9 @@ set(libpng_public_hdrs
   "${CMAKE_CURRENT_SOURCE_DIR}/pnglibconf.h"
 )
 
-copy_headers_to_include_directory(${PROJECT_NAME} ${libpng_public_hdrs})
+if (OpenGLStarter_Integration)
+	copy_headers_to_include_directory(${PROJECT_NAME} ${libpng_public_hdrs})
+endif()
 
 set(libpng_private_hdrs
   pngpriv.h

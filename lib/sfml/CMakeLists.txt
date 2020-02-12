@@ -1,14 +1,15 @@
 
-#####################################################
-# ARibeiro Lib Setup
-#####################################################
-# global definitions
-add_definitions_global(-DSFML_STATIC)
-if(OS_TARGET STREQUAL win)
-    register_dll(extlibs/bin/${ARCH_TARGET}/openal32.dll)
+if (OpenGLStarter_Integration)
+	#####################################################
+	# ARibeiro Lib Setup
+	#####################################################
+	# global definitions
+	add_definitions_global(-DSFML_STATIC)
+	if(OS_TARGET STREQUAL win)
+		register_dll(extlibs/bin/${ARCH_TARGET}/openal32.dll)
+	endif()
+	#####################################################
 endif()
-#####################################################
-
 
 cmake_minimum_required(VERSION 2.8.3)
 
@@ -418,5 +419,7 @@ elseif(SFML_OS_ANDROID)
 
 endif()
 
-copy_headers_to_include_directory(${PROJECT_NAME} ${CMAKE_CURRENT_SOURCE_DIR}/include/SFML/)
+if (OpenGLStarter_Integration)
+	copy_headers_to_include_directory(${PROJECT_NAME} ${CMAKE_CURRENT_SOURCE_DIR}/include/SFML/)
+endif()
 

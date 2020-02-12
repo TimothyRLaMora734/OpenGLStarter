@@ -1383,8 +1383,9 @@ RTMP_ClientPacket(RTMP *r, RTMPPacket *packet)
 }
 
 #ifdef _DEBUG
-extern FILE *netstackdump;
-extern FILE *netstackdump_read;
+//[alessandro]
+//extern FILE *netstackdump;
+//extern FILE *netstackdump_read;
 #endif
 
 static int
@@ -1471,7 +1472,8 @@ ReadN(RTMP *r, char *buffer, int n)
 	}
       /*RTMP_Log(RTMP_LOGDEBUG, "%s: %d bytes\n", __FUNCTION__, nBytes); */
 #ifdef _DEBUG
-      fwrite(ptr, 1, nBytes, netstackdump_read);
+	  //[alessandro]
+      //fwrite(ptr, 1, nBytes, netstackdump_read);
 #endif
 
       if (nBytes == 0)
@@ -4300,7 +4302,8 @@ RTMPSockBuf_Send(RTMPSockBuf *sb, const char *buf, int len)
   int rc;
 
 #ifdef _DEBUG
-  fwrite(buf, 1, len, netstackdump);
+  //[alessandro]
+  //fwrite(buf, 1, len, netstackdump);
 #endif
 
 #if defined(CRYPTO) && !defined(NO_SSL)
@@ -4963,7 +4966,8 @@ Read_1_Packet(RTMP *r, char *buf, unsigned int buflen)
 
   if (recopy)
     {
-      len = ret > buflen ? buflen : ret;
+	  //[alessandro]
+      len = ret > (int)buflen ? (int)buflen : ret;
       memcpy(buf, r->m_read.buf, len);
       r->m_read.bufpos = r->m_read.buf + len;
       r->m_read.buflen = ret - len;

@@ -28,16 +28,23 @@
 #include <ws2tcpip.h>
 
 #ifdef _MSC_VER	/* MSVC */
-#define snprintf _snprintf
+//[alessandro]
+//#define snprintf _snprintf
+//#define vsnprintf _vsnprintf
 #define strcasecmp stricmp
 #define strncasecmp strnicmp
-#define vsnprintf _vsnprintf
+	//[alessandro]
+	#include <sys/types.h>
 #endif
 
 #define GetSockError()	WSAGetLastError()
 #define SetSockError(e)	WSASetLastError(e)
 #define setsockopt(a,b,c,d,e)	(setsockopt)(a,b,c,(const char *)d,(int)e)
-#define EWOULDBLOCK	WSAETIMEDOUT	/* we don't use nonblocking, but we do use timeouts */
+//[alessandro]
+#if !defined(EWOULDBLOCK)
+	#define EWOULDBLOCK	WSAETIMEDOUT	/* we don't use nonblocking, but we do use timeouts */
+#endif
+
 #define sleep(n)	Sleep(n*1000)
 #define msleep(n)	Sleep(n)
 #define SET_RCVTIMEO(tv,s)	int tv = s*1000

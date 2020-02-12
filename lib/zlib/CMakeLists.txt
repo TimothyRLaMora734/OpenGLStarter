@@ -95,8 +95,10 @@ set(ZLIB_PUBLIC_HDRS
     zlib.h
 )
 
-copy_headers_to_include_directory(${PROJECT_NAME} ${ZLIB_PUBLIC_HDRS})
-#include_directories_global( ${CMAKE_HOME_DIRECTORY}/include/${PROJECT_NAME} )
+if (OpenGLStarter_Integration)
+	copy_headers_to_include_directory(${PROJECT_NAME} ${ZLIB_PUBLIC_HDRS})
+	#include_directories_global( ${CMAKE_HOME_DIRECTORY}/include/${PROJECT_NAME} )
+endif()
 
 set(ZLIB_PRIVATE_HDRS
     crc32.h

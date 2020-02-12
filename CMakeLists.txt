@@ -16,6 +16,10 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
+# make all libs that are included,
+# to use the framework comands
+set( OpenGLStarter_Integration ON )
+
 include(cmake/tools.cmake)
 include(cmake/DetectOSAndArchitecture.cmake)
 include(cmake/add_definitions_global.cmake)

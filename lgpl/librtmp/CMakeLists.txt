@@ -4,12 +4,50 @@ set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake-modules)
 
 project (rtmp C)
 
+#
+# copy_dlls_to_build_dir
+#
+# Command used in Windows to copy 3rdparty dlls to final binary folder
+#
+macro(copy_dlls_to_build_dir PROJECT_NAME)
+    foreach(FILENAME IN ITEMS ${ARGN})
+        if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${FILENAME}")
+			get_filename_component(FILENAME_WITHOUT_PATH "${CMAKE_CURRENT_SOURCE_DIR}/${FILENAME}" NAME)
+            add_custom_command(
+                TARGET ${PROJECT_NAME} POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E copy
+                        ${CMAKE_CURRENT_SOURCE_DIR}/${FILENAME}
+                        $<TARGET_FILE_DIR:${PROJECT_NAME}>/${FILENAME_WITHOUT_PATH} )
+        else()
+            message(FATAL_ERROR "File Does Not Exists: ${FILENAME}")
+        endif()
+    endforeach()
+endmacro()
+
 set( LIBRTMP_STANDALONE OFF )
 
 #
 # OpenSSL package
 #
-find_package(OpenSSL)
+if (WIN32)
+
+	if( CMAKE_SIZEOF_VOID_P EQUAL 8 )
+		#64bit
+		set(OPENSSL_LIB_DIR lib_win64)
+	else()
+		#32bit
+		set(OPENSSL_LIB_DIR lib_win32)
+	endif()
+
+	set(OPENSSL_FOUND ON)
+	set(OPENSSL_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/openssl/include )
+	set(OPENSSL_LIBRARIES ${CMAKE_CURRENT_SOURCE_DIR}/openssl/${OPENSSL_LIB_DIR}/libssl.lib
+						  ${CMAKE_CURRENT_SOURCE_DIR}/openssl/${OPENSSL_LIB_DIR}/libcrypto.lib )
+	
+else()
+	find_package(OpenSSL)
+endif()
+
 if(OPENSSL_FOUND)
     #add_definitions(-DNO_CRYPTO) # crypto is from openssl
     set(LIBRTMP_USE_OPENSSL ON CACHE BOOL "Compile with OpenSSL (do not turn on with GnuTLS at same time)")
@@ -47,7 +85,24 @@ elseif (NOT LIBRTMP_USE_GNUTLS AND NOT LIBRTMP_USE_OPENSSL)
     add_definitions(-DNO_SSL)
 else()
     #normal build, need zlib
-    find_package(ZLIB REQUIRED)
+
+	if (WIN32)
+		#
+		# zlib source include
+		#
+		if(NOT TARGET zlib)
+			set( ZLIB_OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR}/zlib )
+			message(STATUS "[librtmp] will compile zlib at: ${ZLIB_OUTPUT_DIR}" )
+			add_subdirectory( ../../lib/zlib ${ZLIB_OUTPUT_DIR} )
+		endif()
+		
+		set(ZLIB_FOUND ON)
+		set(ZLIB_INCLUDE_DIRS ../../lib/zlib ${ZLIB_OUTPUT_DIR})
+		set(ZLIB_LIBRARIES zlib)
+		
+	else()
+		find_package(ZLIB REQUIRED)
+	endif()
     if(ZLIB_FOUND)
         include_directories(${ZLIB_INCLUDE_DIRS})
     endif()
@@ -100,6 +155,10 @@ endif()
 
 if(WIN32)
     target_link_libraries(${PROJECT_NAME} PRIVATE ws2_32 winmm gdi32)
+	set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME librtmp)
+	copy_dlls_to_build_dir(${PROJECT_NAME} openssl/${OPENSSL_LIB_DIR}/libssl-3.dll
+										   openssl/${OPENSSL_LIB_DIR}/libcrypto-3.dll )
+	
 endif()
 
 if (LIBRTMP_USE_OPENSSL)
@@ -133,4 +192,7 @@ target_compile_definitions( ${PROJECT_NAME} PUBLIC -DEXPORT )
 # set the target's folder (for IDEs that support it, e.g. Visual Studio)
 set_target_properties(${PROJECT_NAME} PROPERTIES FOLDER "LIBS/librtmp")
 
-#copy_headers_to_include_directory(${PROJECT_NAME} ${PUBLIC_HEADERS})
+# OpenGLStarter Integration
+if (OpenGLStarter_Integration)
+	copy_headers_to_include_directory(${PROJECT_NAME} ${PUBLIC_HEADERS})
+endif()

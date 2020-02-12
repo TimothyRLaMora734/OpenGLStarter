@@ -216,7 +216,9 @@ set( RTAUDIO_BUILD_SHARED_LIBS OFF CACHE BOOL "Build shared of static libs." )
 set( RTAUDIO_BUILD_TESTING OFF CACHE BOOL "Build rtAudio testing." )
 set(PUBLIC_HEADERS RtAudio.h)
 
-copy_headers_to_include_directory(${PROJECT_NAME} ${PUBLIC_HEADERS})
+if (OpenGLStarter_Integration)
+	copy_headers_to_include_directory(${PROJECT_NAME} ${PUBLIC_HEADERS})
+endif()
 
 
 # Use RTAUDIO_BUILD_SHARED_LIBS / RTAUDIO_BUILD_STATIC_LIBS if they

@@ -28,11 +28,12 @@ endmacro()
 macro(copy_file_after_build PROJECT_NAME)
     foreach(FILENAME IN ITEMS ${ARGN})
         if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${FILENAME}")
+			get_filename_component(FILENAME_WITHOUT_PATH "${CMAKE_CURRENT_SOURCE_DIR}/${FILENAME}" NAME)
             add_custom_command(
                 TARGET ${PROJECT_NAME} POST_BUILD
                 COMMAND ${CMAKE_COMMAND} -E copy
                         ${CMAKE_CURRENT_SOURCE_DIR}/${FILENAME}
-                        $<TARGET_FILE_DIR:${PROJECT_NAME}>/${FILENAME} )
+                        $<TARGET_FILE_DIR:${PROJECT_NAME}>/${FILENAME_WITHOUT_PATH} )
         else()
             message(FATAL_ERROR "File Does Not Exists: ${FILENAME}")
         endif()
