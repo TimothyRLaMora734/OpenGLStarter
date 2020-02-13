@@ -27,7 +27,7 @@ class Flock {
 
     BoidModel *boidModel;
 
-    void computeNeighbor(const Boid *boid, const std::vector<Boid,ssealign<Boid,16>> &list,
+    void computeNeighbor(const Boid *boid, const std::vector< Boid, ssealign<Boid,16> > &list,
 
                          int &neighborCounter,
                          vec3 &neighborAlignment,
