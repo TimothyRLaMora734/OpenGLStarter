@@ -332,6 +332,7 @@ namespace aRibeiro {
     ///
     ARIBEIRO_INLINE quat conjugate(const quat& a){
 #if defined(ARIBEIRO_SSE2)
+        static const __m128 _quat_conjugate_mask = _mm_load_(-0.f,-0.f,-0.f,0.f);
         return _mm_xor_ps(_quat_conjugate_mask,a.array_sse);
 #elif defined(ARIBEIRO_NEON)
         static const float32x4_t _const_n = (float32x4_t){-1,-1,-1,1};
@@ -2208,6 +2209,7 @@ namespace aRibeiro {
     ///
     ARIBEIRO_INLINE vec2 absv(const vec2 &a){
 #if defined(ARIBEIRO_SSE2)
+        static const __m128 _vec4_sign_mask = _mm_set1_ps(-0.f); // -0.f = 1 << 31
         return _mm_andnot_ps(_vec4_sign_mask, a.array_sse);
 #elif defined(ARIBEIRO_NEON)
         return vabsq_f32(a.array_neon);
@@ -2225,6 +2227,7 @@ namespace aRibeiro {
     ///
     ARIBEIRO_INLINE vec3 absv(const vec3 &a){
 #if defined(ARIBEIRO_SSE2)
+        static const __m128 _vec4_sign_mask = _mm_set1_ps(-0.f); // -0.f = 1 << 31
         return _mm_andnot_ps(_vec4_sign_mask, a.array_sse);
 #elif defined(ARIBEIRO_NEON)
         return vabsq_f32(a.array_neon);
@@ -2242,6 +2245,7 @@ namespace aRibeiro {
     ///
     ARIBEIRO_INLINE vec4 absv(const vec4 &a){
 #if defined(ARIBEIRO_SSE2)
+        static const __m128 _vec4_sign_mask = _mm_set1_ps(-0.f); // -0.f = 1 << 31
         return _mm_andnot_ps(_vec4_sign_mask, a.array_sse);
 #elif defined(ARIBEIRO_NEON)
         return vabsq_f32(a.array_neon);
@@ -2484,8 +2488,8 @@ namespace aRibeiro {
         );
 */
         //much faster
-        static const __m128 _one = _mm_load_( 0,0,0,1 );
-        mat4 r(m.array_sse[0],m.array_sse[1],m.array_sse[2],_one);
+        //static const __m128 _one = _mm_load_( 0,0,0,1 );
+        mat4 r(m.array_sse[0],m.array_sse[1],m.array_sse[2],mat4::IdentityMatrix.array_sse[3]);//_one
 		_mm_f32_(r.array_sse[0],3) = 0;
 		_mm_f32_(r.array_sse[1],3) = 0;
 		_mm_f32_(r.array_sse[2],3) = 0;
@@ -3230,10 +3234,10 @@ namespace aRibeiro {
     ///
     ARIBEIRO_INLINE mat4 translate(const float &_x_,const float &_y_,const float &_z_){
 #if defined(ARIBEIRO_SSE2)
-        return mat4(_mm_load_(1,0,0,0),
-					_mm_load_(0,1,0,0),
-					_mm_load_(0,0,1,0),
-					_mm_load_(_x_,_y_,_z_,1));
+        return mat4(mat4::IdentityMatrix.array_sse[0],
+                    mat4::IdentityMatrix.array_sse[1],
+                    mat4::IdentityMatrix.array_sse[2],
+                    _mm_load_(_x_,_y_,_z_,1));
 #elif defined(ARIBEIRO_NEON)
         return mat4((float32x4_t){1,0,0,0},
 					(float32x4_t){0,1,0,0},
@@ -3255,11 +3259,10 @@ namespace aRibeiro {
     ///
     ARIBEIRO_INLINE mat4 translate(const vec3 &_v_){
 #if defined(ARIBEIRO_SSE2)
-        mat4 result = mat4(
-			_mm_load_(1,0,0,0),
-			_mm_load_(0,1,0,0),
-			_mm_load_(0,0,1,0),
-                    _v_.array_sse);
+        mat4 result = mat4(mat4::IdentityMatrix.array_sse[0],
+                           mat4::IdentityMatrix.array_sse[1],
+                           mat4::IdentityMatrix.array_sse[2],
+                           _v_.array_sse);
         _mm_f32_(result.array_sse[3],3) = 1.0f;
         return result;
 #elif defined(ARIBEIRO_NEON)
@@ -3286,10 +3289,9 @@ namespace aRibeiro {
     ARIBEIRO_INLINE mat4 translate(const vec4 &_v_){
 #if defined(ARIBEIRO_SSE2)
         
-        mat4 result = mat4(
-                           _mm_load_(1,0,0,0),
-                           _mm_load_(0,1,0,0),
-                           _mm_load_(0,0,1,0),
+        mat4 result = mat4(mat4::IdentityMatrix.array_sse[0],
+                           mat4::IdentityMatrix.array_sse[1],
+                           mat4::IdentityMatrix.array_sse[2],
                            _v_.array_sse);
         _mm_f32_(result.array_sse[3],3) = 1.0f; // much faster than make a lot of multiplications
 
@@ -3344,7 +3346,7 @@ namespace aRibeiro {
 			_mm_load_(_x_,0,0,0),
 			_mm_load_(0,_y_,0,0),
 			_mm_load_(0,0,_z_,0),
-			_mm_load_(0,0,0,1));
+			mat4::IdentityMatrix.array_sse[3]);
 #elif defined(ARIBEIRO_NEON)
         return mat4((float32x4_t){_x_,0,0,0},
 					(float32x4_t){0,_y_,0,0},
@@ -3370,7 +3372,7 @@ namespace aRibeiro {
 			_mm_load_(_v_.x,0,0,0),
 			_mm_load_(0,_v_.y,0,0),
 			_mm_load_(0,0,_v_.z,0),
-			_mm_load_(0,0,0,1)
+			mat4::IdentityMatrix.array_sse[3]
 		);
 #elif defined(ARIBEIRO_NEON)
         return mat4((float32x4_t){_v_.x,0,0,0},
@@ -3397,7 +3399,7 @@ namespace aRibeiro {
 			_mm_load_(_v_.x,0,0,0),
 			_mm_load_(0,_v_.y,0,0),
 			_mm_load_(0,0,_v_.z,0),
-			_mm_load_(0,0,0,1)
+			mat4::IdentityMatrix.array_sse[3]
 		);
 #elif defined(ARIBEIRO_NEON)
         return mat4((float32x4_t){_v_.x,0,0,0},
@@ -3746,11 +3748,11 @@ namespace aRibeiro {
 #if defined(ARIBEIRO_SSE2)
         
         //much faster
-        static const __m128 _w = _mm_load_(0,0,0,1);
+        //static const __m128 _w = _mm_load_(0,0,0,1);
         mat4 m(x.array_sse,
                y.array_sse,
                z.array_sse,
-               _w );
+               mat4::IdentityMatrix.array_sse[3] ); //_w
         _mm_f32_(m.array_sse[0],3) = 0;
         _mm_f32_(m.array_sse[1],3) = 0;
         _mm_f32_(m.array_sse[2],3) = 0;
@@ -3789,11 +3791,11 @@ namespace aRibeiro {
         y = normalize(cross(z, x));
 #if defined(ARIBEIRO_SSE2)
         //much faster
-        static const __m128 _w = _mm_load_(0,0,0,1);
+        //static const __m128 _w = _mm_load_(0,0,0,1);
         mat4 m(x.array_sse,
                y.array_sse,
                z.array_sse,
-               _w );
+               mat4::IdentityMatrix.array_sse[3] ); // _w
         _mm_f32_(m.array_sse[0],3) = 0;
         _mm_f32_(m.array_sse[1],3) = 0;
         _mm_f32_(m.array_sse[2],3) = 0;
@@ -4217,9 +4219,9 @@ namespace aRibeiro {
 
 		_mm_f32_(m2, 2) = 1.0f - _mm_f32_(m2, 2);
 
-        static const __m128 m3 = _mm_load_(0,0,0,1.0f);
+        //static const __m128 m3 = _mm_load_(0,0,0,1.0f);
 
-        return mat4(m0,m1,m2,m3);
+        return mat4(m0,m1,m2,mat4::IdentityMatrix.array_sse[3]);//m3
 
 
         /*

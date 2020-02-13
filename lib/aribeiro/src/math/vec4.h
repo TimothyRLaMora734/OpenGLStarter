@@ -12,11 +12,7 @@ namespace aRibeiro{
 class vec3;
 
 #if defined(ARIBEIRO_SSE2)
-
-    extern const __m128 _vec4_zero_sse;
-    extern const __m128 _vec4_sign_mask; // -0.f = 1 << 31
-
-#pragma pack(push, 16)
+    #pragma pack(push, 16)
 #endif
 
 
@@ -62,6 +58,7 @@ _SSE2_ALIGN_PRE class ARIBEIRO_API vec4{
     ///
     ARIBEIRO_INLINE vec4(){
 #if defined(ARIBEIRO_SSE2)
+        static const __m128 _vec4_zero_sse = _mm_set1_ps(0.0f);
         array_sse = _vec4_zero_sse;
 #elif defined(ARIBEIRO_NEON)
         array_neon = (float32x4_t){0,0,0,0};
@@ -212,6 +209,7 @@ _SSE2_ALIGN_PRE class ARIBEIRO_API vec4{
 
         __m128 diff_abs = _mm_sub_ps(array_sse, v.array_sse);
         //abs
+        static const __m128 _vec4_sign_mask = _mm_set1_ps(-0.f); // -0.f = 1 << 31
         diff_abs = _mm_andnot_ps(_vec4_sign_mask, diff_abs);
 
         //static const __m128 epsilon = _mm_set1_ps(1e-4f); // -0.f = 1 << 31
@@ -306,6 +304,7 @@ _SSE2_ALIGN_PRE class ARIBEIRO_API vec4{
     ///
     ARIBEIRO_INLINE vec4 operator-() const{
 #if defined(ARIBEIRO_SSE2)
+        static const __m128 _vec4_sign_mask = _mm_set1_ps(-0.f); // -0.f = 1 << 31
         return _mm_xor_ps(_vec4_sign_mask, array_sse);
 #elif defined(ARIBEIRO_NEON)
         static const float32x4_t minus_one = (float32x4_t){-1.0f,-1.0f,-1.0f,-1.0f};
@@ -464,7 +463,7 @@ _SSE2_ALIGN_PRE class ARIBEIRO_API vec4{
 INLINE_OPERATION_IMPLEMENTATION(vec4)
 
 #if defined(ARIBEIRO_SSE2)
-#pragma pack(pop)
+    #pragma pack(pop)
 #endif
 
 }

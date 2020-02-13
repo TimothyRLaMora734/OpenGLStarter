@@ -20,7 +20,6 @@
 #include <aribeiro/geometricOperations.h>
 #include <aribeiro/mat4.h>
 #include <aribeiro/quat.h>
-#include <aribeiro/tensor4.h>
 #include <aribeiro/vec2.h>
 #include <aribeiro/vec3.h>
 #include <aribeiro/vec4.h>

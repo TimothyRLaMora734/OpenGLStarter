@@ -8,16 +8,8 @@
 
 namespace aRibeiro {
 
-
-//class tensor4;
-//class vec4;
-
 #if defined(ARIBEIRO_SSE2)
-
-    //const __m128 _vec3_zero_sse = _mm_set1_ps(0.0f);
-    //const __m128 _vec3_sign_mask = _mm_set1_ps(-0.f); // -0.f = 1 << 31
-
-#pragma pack(push, 16)
+    #pragma pack(push, 16)
 #endif
 
 /// \brief Matrix with 4x4 components
@@ -58,6 +50,8 @@ _SSE2_ALIGN_PRE class ARIBEIRO_API mat4{
 
 
     }_SSE2_ALIGN_POS;
+    
+    static const mat4 IdentityMatrix;///<An static Identity matrix
 
 #if defined(ARIBEIRO_SSE2)
     //special SSE2 constructor
@@ -85,6 +79,7 @@ _SSE2_ALIGN_PRE class ARIBEIRO_API mat4{
     /// \author Alessandro Ribeiro
     ///
     ARIBEIRO_INLINE mat4(){
+        /*
 #if defined(ARIBEIRO_SSE2)
         array_sse[0] = _vec4_zero_sse;
         array_sse[1] = _vec4_zero_sse;
@@ -99,6 +94,8 @@ _SSE2_ALIGN_PRE class ARIBEIRO_API mat4{
         _11=_12=_13=_14=_21=_22=_23=_24=
         _31=_32=_33=_34=_41=_42=_43=_44= 0;
 #endif
+        */
+        *this = mat4::IdentityMatrix;
 
     }
     //---------------------------------------------------------------------------
@@ -429,6 +426,8 @@ _SSE2_ALIGN_PRE class ARIBEIRO_API mat4{
 
 #if defined(ARIBEIRO_SSE2)
 
+        static const __m128 _vec4_sign_mask = _mm_set1_ps(-0.f); // -0.f = 1 << 31
+        
         __m128 diff_abs[4];
         diff_abs[0] = _mm_sub_ps(array_sse[0], v.array_sse[0]);
         diff_abs[0] = _mm_andnot_ps(_vec4_sign_mask, diff_abs[0]); //abs
@@ -545,6 +544,8 @@ _SSE2_ALIGN_PRE class ARIBEIRO_API mat4{
 #if defined(ARIBEIRO_SSE2)
         mat4 result;
 
+        static const __m128 _vec4_sign_mask = _mm_set1_ps(-0.f); // -0.f = 1 << 31
+        
         result.array_sse[0] = _mm_xor_ps(_vec4_sign_mask, array_sse[0]);
         result.array_sse[1] = _mm_xor_ps(_vec4_sign_mask, array_sse[1]);
         result.array_sse[2] = _mm_xor_ps(_vec4_sign_mask, array_sse[2]);
@@ -698,13 +699,12 @@ _SSE2_ALIGN_PRE class ARIBEIRO_API mat4{
 
 	SSE2_CLASS_NEW_OPERATOR
 
-    static const mat4 IdentityMatrix;///<An static Identity matrix
 };
 
 INLINE_OPERATION_IMPLEMENTATION(mat4)
 
 #if defined(ARIBEIRO_SSE2)
-#pragma pack(pop)
+    #pragma pack(pop)
 #endif
 
 }

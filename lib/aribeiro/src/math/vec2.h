@@ -8,11 +8,7 @@
 namespace aRibeiro{
 
 #if defined(ARIBEIRO_SSE2)
-
-    extern const __m128 _vec2_zero_sse;
-    extern const __m128 _vec2_sign_mask; // -0.f = 1 << 31
-
-#pragma pack(push, 16)
+    #pragma pack(push, 16)
 #endif
 
 /// \brief Vector 2D (vec2)
@@ -270,7 +266,7 @@ _SSE2_ALIGN_PRE class ARIBEIRO_API vec2{
 INLINE_OPERATION_IMPLEMENTATION(vec2)
 
 #if defined(ARIBEIRO_SSE2)
-#pragma pack(pop)
+    #pragma pack(pop)
 #endif
 
 }
