@@ -27,7 +27,8 @@ public:
 
         vertexBuffer = new vec3[xDiv*zDiv];
         colorBuffer = new vec4[xDiv*zDiv];
-        indicesBuffer = new uint16_t[(xDiv-1)*(zDiv-1)*6];
+        //indicesBuffer = new uint16_t[(xDiv-1)*(zDiv-1)*6];
+        indicesBuffer = ogl_indexbuffer_malloc<uint16_t>((xDiv-1)*(zDiv-1)*6);
 
         vec3 delta = max - min;
         delta.x /= (xDiv-1);
@@ -63,7 +64,8 @@ public:
     ~GroundModel() {
         setNullAndDeleteArray(vertexBuffer);
         setNullAndDeleteArray(colorBuffer);
-        setNullAndDeleteArray(indicesBuffer);
+        //setNullAndDeleteArray(indicesBuffer);
+        ogl_indexbuffer_free(indicesBuffer);
     }
 
 

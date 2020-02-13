@@ -105,4 +105,31 @@
 #endif
 
 
+// In RPI:
+//         the buffers sent to the GL API,
+//         access aligned data,
+//         and need the buffer size to be
+//         16 bytes aligned also.
+// Use this definition
+//
+template <typename C>
+static C* ogl_indexbuffer_malloc(int s) {
+#ifdef ARIBEIRO_RPI
+    int alloc_s = s*sizeof(C);
+    return (C*)aligned_alloc(16,  alloc_s + alloc_s % 16 );
+#else
+    return (C*)malloc(s*sizeof(C));
+#endif
+}
+
+template <typename C>
+static void ogl_indexbuffer_free(C *&ptr) {
+    if (ptr != NULL) {
+        C * aux = ptr;
+        ptr = NULL;
+        free(aux);
+    }
+}
+
+
 #endif
