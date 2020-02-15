@@ -816,10 +816,11 @@ public:
             videoTimestamp_ms = videoTimestampIncrementer.increment();
             //videoTimestamp_ms = (mH264NewFrameDetection.currentFrame * 1000)/30;
             
+            /*
             if (videoTimestamp_ms != (mH264NewFrameDetection.currentFrame * 1000)/30){
                 printf("error...\n");
                 exit(-1);
-            }
+            }*/
             
         }
 
