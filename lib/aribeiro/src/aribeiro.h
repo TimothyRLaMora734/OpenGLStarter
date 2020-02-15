@@ -113,10 +113,11 @@
 // Use this definition
 //
 template <typename C>
-static C* ogl_indexbuffer_malloc(int s) {
+static C* ogl_indexbuffer_malloc(size_t s) {
 #ifdef ARIBEIRO_RPI
-    int alloc_s = s*sizeof(C);
-    return (C*)aligned_alloc(16,  alloc_s + alloc_s % 16 );
+    size_t alloc_s = s*sizeof(C);
+    size_t complete_16bytes = ( 16 - alloc_s % 16 ) % 16;
+    return (C*)aligned_alloc(16,  alloc_s + complete_16bytes );
 #else
     return (C*)malloc(s*sizeof(C));
 #endif

@@ -14,17 +14,17 @@
 
 
 	#ifdef _MSC_VER //_WIN32
-	//  Windows
-	//#ifdef _MSC_VER
-	#include <intrin.h>
-	//#else
-	//#define cpuid(info, x)    __cpuidex(info, x, 0)
-	//#endif
+		//  Windows
+		//#ifdef _MSC_VER
+		#include <intrin.h>
+		//#else
+		//#define cpuid(info, x)    __cpuidex(info, x, 0)
+		//#endif
 	#else
-	//  GCC Intrinsics
-	#include <cpuid.h>
-	void cpuid(int info[4], int InfoType);
-	unsigned long long _xgetbv(unsigned int index);
+		//  GCC Intrinsics
+		#include <cpuid.h>
+		void cpuid(int info[4], int InfoType);
+		unsigned long long _xgetbv(unsigned int index);
 	#endif
 
 	class CPUInfo {
@@ -101,30 +101,30 @@
 
 	#if _MSC_VER
 
-	//windows compatible
-	#define _SSE2_ALIGN_PRE _MM_ALIGN16
+		//windows compatible
+		#define _SSE2_ALIGN_PRE _MM_ALIGN16
 
-	//other platforms compatible
-	#define _SSE2_ALIGN_POS
-	#define ARIBEIRO_INLINE __forceinline
+		//other platforms compatible
+		#define _SSE2_ALIGN_POS
+		#define ARIBEIRO_INLINE __forceinline
 
 
-	#define _mm_f32_(v,i) v.m128_f32[i]
-	#define _mm_load_(x,y,z,w) _mm_set_ps(w,z,y,x)
+		#define _mm_f32_(v,i) v.m128_f32[i]
+		#define _mm_load_(x,y,z,w) _mm_set_ps(w,z,y,x)
 
 	#else
 
-	#define _SSE2_ALIGN_PRE
+		#define _SSE2_ALIGN_PRE
 
-	#ifndef _MM_ALIGN16
-        #define _MM_ALIGN16 __attribute__ (( __aligned__ (16)))
-	#endif
+		#ifndef _MM_ALIGN16
+			#define _MM_ALIGN16 __attribute__ (( __aligned__ (16)))
+		#endif
 
-	#define _SSE2_ALIGN_POS _MM_ALIGN16
-	#define ARIBEIRO_INLINE inline __attribute__((always_inline))
+		#define _SSE2_ALIGN_POS _MM_ALIGN16
+		#define ARIBEIRO_INLINE inline __attribute__((always_inline))
 
-	#define _mm_f32_(v,i) v[i]
-	#define _mm_load_(x,y,z,w) _mm_set_ps(w,z,y,x)
+		#define _mm_f32_(v,i) v[i]
+		#define _mm_load_(x,y,z,w) _mm_set_ps(w,z,y,x)
 
 	#endif
 
@@ -167,13 +167,15 @@
 	//
 	#define SSE2_CLASS_NEW_OPERATOR \
 	ARIBEIRO_INLINE void* operator new(size_t size) {\
-		return _mm_malloc(size, 16);\
+		size_t complete_16bytes = ( 16 - size % 16 ) % 16;\
+		return _mm_malloc(size + complete_16bytes, 16);\
 	}\
 	ARIBEIRO_INLINE void operator delete(void* p) { \
 		_mm_free(p);\
 	}\
 	ARIBEIRO_INLINE void* operator new[](size_t size) {\
-		return _mm_malloc(size, 16);\
+		size_t complete_16bytes = ( 16 - size % 16 ) % 16;\
+		return _mm_malloc(size + complete_16bytes, 16);\
 	}\
 	ARIBEIRO_INLINE void operator delete[](void* p) {\
 		_mm_free(p);\
@@ -205,13 +207,15 @@
 
     #define SSE2_CLASS_NEW_OPERATOR \
 	ARIBEIRO_INLINE void* operator new(size_t size) {\
-        return aligned_alloc(16, size);\
+		size_t complete_16bytes = ( 16 - size % 16 ) % 16;\
+        return aligned_alloc(16, size+complete_16bytes);\
 	}\
 	ARIBEIRO_INLINE void operator delete(void* p) { \
 		free(p);\
 	}\
 	ARIBEIRO_INLINE void* operator new[](size_t size) {\
-        return aligned_alloc(16, size);\
+		size_t complete_16bytes = ( 16 - size % 16 ) % 16;\
+        return aligned_alloc(16, size+complete_16bytes);\
 	}\
 	ARIBEIRO_INLINE void operator delete[](void* p) {\
 		free(p);\
@@ -296,12 +300,14 @@
 
 		inline pointer allocate(size_type n) {
 			//return (pointer)_aligned_malloc(n * sizeof(value_type), N);
+			size_t size = n * sizeof(value_type);
+			size_t complete_16bytes = ( 16 - size % 16 ) % 16;
 #if defined(ARIBEIRO_SSE2)
-			return (pointer)_mm_malloc(n * sizeof(value_type),N);
+			return (pointer)_mm_malloc(size+complete_16bytes,N);
 #elif defined(ARIBEIRO_RPI)
-            return (pointer)aligned_alloc(N, n * sizeof(value_type));
+            return (pointer)aligned_alloc(N, size+complete_16bytes);
 #else
-			return (pointer)malloc(n * sizeof(value_type));
+			return (pointer)malloc(size+complete_16bytes);
 #endif
 		}
 
