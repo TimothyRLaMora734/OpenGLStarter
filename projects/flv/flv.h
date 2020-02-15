@@ -667,6 +667,58 @@ public:
 
 };
 
+// use only int increment to advance video coding,
+//  based on video framerate...
+//
+//  the original way was to do: timestamp_ms = (mH264NewFrameDetection.currentFrame * 1000)/30;
+// with this class could be: timestamp_ms = increment()
+class FractionalIntIncrementer {
+    
+    static uint32_t gcd( uint32_t a, uint32_t b )
+    {
+        const uint32_t zero = 0;
+        while ( true )
+        {
+            if ( a == zero )
+                return b;
+            b %= a;
+            
+            if ( b == zero )
+                return a;
+            a %= b;
+        }
+    }
+
+    uint32_t incr_int;
+    uint32_t incr_1_max_count;
+    uint32_t count;
+public:
+    uint32_t timestamp_ms;
+    
+    FractionalIntIncrementer() {
+        
+    }
+    
+    FractionalIntIncrementer(uint32_t num, uint32_t den) {
+        uint32_t gcd = FractionalIntIncrementer::gcd(num, den);
+        this->incr_int = num/den;
+        this->incr_1_max_count = den/gcd;
+        timestamp_ms = 0;
+        count = 0;
+    }
+    
+    uint32_t increment(){
+        timestamp_ms += incr_int;
+        count++;
+        if (incr_1_max_count > 1 && count >= incr_1_max_count){
+            count = 0;
+            timestamp_ms ++;
+        }
+        return timestamp_ms;
+    }
+    
+};
+
 class FLVFileWriter: public ParserAAC, public ParserH264 {
 
     std::vector<uint8_t> sps;
@@ -675,6 +727,7 @@ class FLVFileWriter: public ParserAAC, public ParserH264 {
     sps_info spsInfo;
 
     H264NewFrameDetection mH264NewFrameDetection;
+    FractionalIntIncrementer videoTimestampIncrementer;
 
 public:
     FLVWritter mFLVWritter;
@@ -702,6 +755,9 @@ public:
         videoTimestamp_ms = 0;
 
         spsInfo.set = false;
+        
+        //1000 ms to 30 frames time incrementer
+        videoTimestampIncrementer = FractionalIntIncrementer(1000,30);
     }
 
     virtual ~FLVFileWriter(){
@@ -720,8 +776,8 @@ public:
                 mFLVWritter.writeVideoEndOfStream(videoTimestamp_ms,0);
                 mFLVWritter.flushToFD(fd);
             } else {
-                if (mH264NewFrameDetection.currentFrame > 0)
-                    videoTimestamp_ms = ((mH264NewFrameDetection.currentFrame-1) * 1000)/30;
+                //if (mH264NewFrameDetection.currentFrame > 0)
+                    //videoTimestamp_ms = ((mH264NewFrameDetection.currentFrame-1) * 1000)/30;
                 mFLVWritter.writeVideoEndOfStream(videoTimestamp_ms,0);
                 mFLVWritter.flushToFD(fd);
             }
@@ -757,7 +813,14 @@ public:
 
             nalBuffer.clear();
 
-            videoTimestamp_ms = (mH264NewFrameDetection.currentFrame * 1000)/30;
+            videoTimestamp_ms = videoTimestampIncrementer.increment();
+            //videoTimestamp_ms = (mH264NewFrameDetection.currentFrame * 1000)/30;
+            
+            if (videoTimestamp_ms != (mH264NewFrameDetection.currentFrame * 1000)/30){
+                printf("error...\n");
+                exit(-1);
+            }
+            
         }
 
         //0x67
