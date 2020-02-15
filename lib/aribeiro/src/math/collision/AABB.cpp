@@ -6,6 +6,10 @@ namespace aRibeiro {
 namespace collision {
 	//--------------------------------------------------------------------------
 	AABB::AABB(const vec3 &a, const vec3 &b) {
+#if defined(ARIBEIRO_SSE2) || defined(ARIBEIRO_NEON)
+        min_box = minimum(a, b);
+        max_box = maximum(a, b);
+#else
 		if (a.x < b.x) {
 			min_box.x = a.x;
 			max_box.x = b.x;
@@ -30,9 +34,17 @@ namespace collision {
 			max_box.z = a.z;
 			min_box.z = b.z;
 		}
+#endif
 	}
 	//--------------------------------------------------------------------------
 	AABB::AABB(const vec2 &a, const vec2 &b) {
+#if defined(ARIBEIRO_SSE2)
+        min_box.array_sse = _mm_min_ps(a.array_sse, b.array_sse);
+        max_box.array_sse = _mm_max_ps(a.array_sse, b.array_sse);
+#elif defined(ARIBEIRO_NEON)
+        min_box.array_neon = vminq_f32(a.array_neon, b.array_neon);
+        max_box.array_neon = vmaxq_f32(a.array_neon, b.array_neon);
+#else
 		if (a.x < b.x) {
 			min_box.x = a.x;
 			max_box.x = b.x;
@@ -48,13 +60,15 @@ namespace collision {
 		else {
 			max_box.y = a.y;
 			min_box.y = b.y;
-		}
+        }
+#endif
 		min_box.z = -1;
 		max_box.z = 1;
 	}
 	//--------------------------------------------------------------------------
 	AABB::AABB() {
-		min_box = max_box = vec3(0);
+        static const vec3 __zero = vec3(0);
+		min_box = max_box = __zero;
 	}
 	//--------------------------------------------------------------------------
 	/*
@@ -113,6 +127,14 @@ namespace collision {
 			ptn.z<b.max_box.z && ptn.z>b.min_box.z);
 	}
 	bool AABB::aabbOverlapsAABB(const AABB& a, const AABB& b) {
+        
+        if ( a.max_box.x < b.min_box.x || a.min_box.x > b.max_box.x ) return false;
+        if ( a.max_box.y < b.min_box.y || a.min_box.y > b.max_box.y ) return false;
+        if ( a.max_box.z < b.min_box.z || a.min_box.z > b.max_box.z ) return false;
+        
+        return true;
+        
+        /*
 		return (
 			(((a.max_box.x >= b.min_box.x) && (a.max_box.x <= b.max_box.x)) ||
 			((b.min_box.x >= a.min_box.x) && (b.min_box.x <= a.max_box.x))) ||
@@ -129,6 +151,7 @@ namespace collision {
 					(((b.max_box.z >= a.min_box.z) && (b.max_box.z <= a.max_box.z)) ||
 					((a.min_box.z >= b.min_box.z) && (a.min_box.z <= b.max_box.z)))
 					);
+        */
 	}
 	AABB AABB::joinAABB(const AABB& a, const AABB& b) {
 		return AABB(minimum(a.min_box, b.min_box), maximum(a.max_box, b.max_box));
@@ -376,6 +399,27 @@ namespace collision {
 		if (boxMax < triangleOffset - EPSILON || boxMin > triangleOffset + EPSILON)
 			return false; // No intersection possible.
 
+        //
+        // TODO: test the nine edge cross-products or single edge case
+        //
+        // Test the single edge
+        vec3 triangleEdges[] = {
+            v0 - v1,
+            v1 - v2,
+            v2 - v0
+        };
+        
+        for (int i = 0; i < 3; i++)
+        {
+            // The box normals are the same as it's edge tangents
+            vec3 axis = normalize( cross(triangleEdges[i], triangle_Normal) );
+            projectOnAxis(box_Vertices, 8, axis, &boxMin, &boxMax);
+            projectOnAxis(triangle_Vertices, 3, axis, &triangleMin, &triangleMax);
+            if (boxMax < triangleMin - EPSILON || boxMin > triangleMax + EPSILON)
+                return false; // No intersection possible
+        }
+        
+        /*
 		// Test the nine edge cross-products
 		vec3 triangleEdges[] = {
 			v0 - v1,
@@ -393,7 +437,8 @@ namespace collision {
 				if (boxMax < triangleMin - EPSILON || boxMin > triangleMax + EPSILON)
 					return false; // No intersection possible
 			}
-
+        */
+        
 		// No separating axis found.
 		return true;
 	}
