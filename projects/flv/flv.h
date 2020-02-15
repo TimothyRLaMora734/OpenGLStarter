@@ -40,6 +40,7 @@ struct sps_info{
     uint8_t constraints;
     uint8_t level_idc;
     uint32_t log2_max_frame_num;
+    uint32_t frame_num_mask;
 
     bool set;
 };
@@ -229,6 +230,9 @@ public:
         }
 
         result.log2_max_frame_num = log2_max_frame_num_minus4 + 4;
+        
+        result.frame_num_mask = (( 1 << result.log2_max_frame_num ) - 1);
+        
         result.set = true;
         return result;
     }
@@ -581,6 +585,7 @@ class H264NewFrameDetection {
 
     bool newFrameOnNextIDR;
     uint32_t old_frame_num;
+    uint32_t last_frame_delta;
     bool spsinfo_set;
 
     bool firstFrame;
@@ -595,6 +600,7 @@ public:
         spsinfo_set = false;
         firstFrame = true;
 		newFrameFound = false;
+        last_frame_delta = 1;
     }
 
     void analyseBufferForNewFrame(const std::vector<uint8_t> &nal, const sps_info &spsinfo){
@@ -644,6 +650,10 @@ public:
 
             if (old_frame_num != frame_num){
                 newFrameOnNextIDR = true;
+                
+                //frame_num will be in the range [0, ( 1 << spsinfo.log2_max_frame_num )[
+                last_frame_delta = ( frame_num - old_frame_num ) & spsinfo.frame_num_mask;
+                
                 old_frame_num = frame_num;
             }
         }
@@ -656,7 +666,8 @@ public:
                 firstFrame = false;
             } else {
                 newFrameFound = true;
-                currentFrame++;
+                //currentFrame++;
+                currentFrame += last_frame_delta;
             }
         }
     }
@@ -728,6 +739,7 @@ class FLVFileWriter: public ParserAAC, public ParserH264 {
 
     H264NewFrameDetection mH264NewFrameDetection;
     FractionalIntIncrementer videoTimestampIncrementer;
+    uint32_t lastCurrentFrame;
 
 public:
     FLVWritter mFLVWritter;
@@ -758,6 +770,7 @@ public:
         
         //1000 ms to 30 frames time incrementer
         videoTimestampIncrementer = FractionalIntIncrementer(1000,30);
+        lastCurrentFrame = 0;
     }
 
     virtual ~FLVFileWriter(){
@@ -813,7 +826,11 @@ public:
 
             nalBuffer.clear();
 
-            videoTimestamp_ms = videoTimestampIncrementer.increment();
+            uint32_t delta = mH264NewFrameDetection.currentFrame - lastCurrentFrame;
+            lastCurrentFrame = mH264NewFrameDetection.currentFrame;
+            for(uint32_t i=0;i<delta;i++)
+                videoTimestamp_ms = videoTimestampIncrementer.increment();
+            
             //videoTimestamp_ms = (mH264NewFrameDetection.currentFrame * 1000)/30;
             
             /*
