@@ -56,6 +56,11 @@ add_subdirectory( lib/rtaudio )
 add_subdirectory( lib/aribeiro )
 
 #
+# Project Libs
+#
+add_subdirectory( projects-lib/libflv )
+
+#
 # Projects
 #
 add_subdirectory( projects/template )

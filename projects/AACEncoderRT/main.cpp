@@ -4,6 +4,7 @@
 #include "RTAudioManager.h"
 
 #include <stdio.h>
+#include <libflv/FLVMuxer.h>
 
 //play raw :
 // ffplay -f f32le -ar 48000 -ac 2 output.raw
@@ -15,12 +16,25 @@
 
 FILE* outputRAW;
 FILE* outputAAC;
+FILE* outputFLV;
+
+void flvWrite(const void* data, size_t size){
+    fwrite(data, sizeof(uint8_t), (size_t)size, outputFLV);
+}
 
 FFmpegADTSMuxer adtsMuxer;
 FFmpegAudioEncoder audioEncoder;
+FLVMuxer flvMuxer(false, //_writeVideo,
+                  true, // _writeAudio,
+                  30, //_videoFPS
+                  44100,//_audioSamplerate
+                  OnDataMethodPtrT(&flvWrite));
+
+
 
 void OnDataFromMuxer(uint8_t *data, int size){
     fwrite(data, sizeof(uint8_t), (size_t)size, outputAAC);
+    //flvMuxer.writeADTS(data, size);
 }
 
 void OnDataFromAudioCard(void *fltBuffer, uint32_t frames) {
@@ -35,13 +49,18 @@ int main(int argc, char* argv[]){
 	//return 0;
 
     PlatformPath::setWorkingPath(PlatformPath::getExecutablePath(argv[0]));
-
+    
     outputAAC = fopen("output.aac","wb");
     if (!outputAAC)
         exit(-1);
     outputRAW = fopen("output.raw","wb");
     if (!outputRAW)
         exit(-1);
+    outputFLV = fopen("output.flv","wb");
+    if (!outputFLV)
+        exit(-1);
+    
+    flvMuxer.writeHeader();
 
     //tunnel the data from encoder to the muxer
     audioEncoder.OnData.add(&adtsMuxer,&FFmpegADTSMuxer::OnDataFromEncoder);
@@ -72,9 +91,11 @@ int main(int argc, char* argv[]){
 
     audioEncoder.flushQueuedFrames();
     adtsMuxer.endStream();
+    flvMuxer.endOfStream();
 
     fclose(outputAAC);
     fclose(outputRAW);
+    fclose(outputFLV);
 
     return 0;
 }

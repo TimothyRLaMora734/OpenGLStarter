@@ -23,4 +23,6 @@ target_link_libraries(  ${PROJECT_NAME}
                         #${POSTPROC_LIBRARY}
                         ${SWRESAMPLE_LIBRARY}
                         #${SWSCALE_LIBRARY}
+
+                        libflv
 )

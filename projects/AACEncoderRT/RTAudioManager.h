@@ -270,7 +270,7 @@ public:
     void initInputFromDeviceName(const std::string &devicename,
                                  uint32_t _bufferFrames = 1024,
                                  RtAudioFormat format = RTAUDIO_FLOAT32 ,
-                                 uint32_t samplerate=48000,
+                                 uint32_t samplerate=44100,
                                  int channels = 2,
                                  int offset = 0) {
         if (initialized)

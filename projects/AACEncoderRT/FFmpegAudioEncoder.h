@@ -101,7 +101,7 @@ public:
 
     void init(AVCodecContext *audio_encoder_ctx,
               AVSampleFormat input_sample_fmt = AV_SAMPLE_FMT_FLT,
-              int input_sample_rate = 48000
+              int input_sample_rate = 44100
               //AVSampleFormat targetFmt = AV_SAMPLE_FMT_FLTP
               ) {
         if (initialized)
@@ -221,7 +221,7 @@ public:
      AAC 256 - 10
      AAC 320 - 10
      */
-    void initAAC(int sampleRate = 48000 , int channels = 2, int audioBitrate = 256000 ) {
+    void initAAC(int sampleRate = 44100 , int channels = 2, int audioBitrate = 192000 ) {
         if (initialized)
             return;
         initialized = true;
