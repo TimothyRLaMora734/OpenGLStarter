@@ -51,6 +51,12 @@ FLVMuxer::FLVMuxer(
 }
 
 void FLVMuxer::onADTSChunk(const void* buffer, size_t size){
+    
+    static const uint32_t adts_sample_rates[16] = {
+        96000, 88200, 64000, 48000, 44100, 32000,
+        24000, 22050, 16000, 12000, 11025, 8000, 7350
+    };
+    
     //
     // Extract AAC audio configuration from AAC header
     //
@@ -73,6 +79,12 @@ void FLVMuxer::onADTSChunk(const void* buffer, size_t size){
             aacChannelConfiguration,
             ADTSTimestamp.value_ms,0);
         mFLVWritter.flush(OnWriteData);
+        
+        //check samplerate from freqindex
+        if (ADTSTimestamp.samplerate != adts_sample_rates[aacSampleFrequencyIndex]){
+            fprintf(stderr,"Changing samplerate to detected samplerate: %u\n", adts_sample_rates[aacSampleFrequencyIndex]);
+            ADTSTimestamp.changeSampleRate(1000*1024, adts_sample_rates[aacSampleFrequencyIndex]);
+        }
     }
 
     mFLVWritter.writeAudioFrame(ibuffer, size, 

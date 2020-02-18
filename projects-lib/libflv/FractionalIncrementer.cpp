@@ -37,8 +37,22 @@ FractionalIncrementer::FractionalIncrementer(uint32_t num, uint32_t den) {
     this->incr_1_max_count = den/gcd;
     value_ms = 0;
     count = 0;
+    samplerate = den;
 }
-    
+
+void FractionalIncrementer::changeSampleRate(uint32_t num, uint32_t den) {
+    if(num <= den){
+        fprintf(stderr,"[FractionalIncrementer] the num must be greater than den...\n");
+        exit(-1);
+    }
+    uint32_t gcd = FractionalIncrementer::gcd(num, den);
+    this->incr_int = num/den;
+    this->incr_1_max_count = den/gcd;
+    //value_ms = 0;
+    count = 0;
+    samplerate = den;
+}
+
 uint32_t FractionalIncrementer::increment(){
     value_ms += incr_int;
     count++;

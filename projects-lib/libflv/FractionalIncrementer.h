@@ -18,6 +18,7 @@ class FractionalIncrementer {
     uint32_t incr_1_max_count;
     uint32_t count;
 public:
+    uint32_t samplerate;
     //the current timestamp in ms
     uint32_t value_ms;
     
@@ -34,6 +35,9 @@ public:
     FractionalIncrementer(uint32_t num, uint32_t den);
     
     uint32_t increment();
+    
+    //will not affect the current value_ms
+    void changeSampleRate(uint32_t num, uint32_t den);
     
 };
 
