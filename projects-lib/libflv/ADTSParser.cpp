@@ -149,7 +149,8 @@ void ADTSParser::putByte(uint8_t byte) {
             
             frameLength = ((buffer[3] & 0x03) << 11) | (buffer[4] << 3) | ((buffer[5] & 0xe0) >> 5);
             
-            uint8_t ProtectionAbsent = readbit(15, (uint8_t*)&buffer[0], buffer.size());
+            // [00000000][00000001]
+            uint8_t ProtectionAbsent = buffer[1] * 0x01;//readbit(15, (uint8_t*)&buffer[0], buffer.size());
             
             if (ProtectionAbsent == 0){
                 fprintf(stderr, "Error: CRC skip not implemented...\n");

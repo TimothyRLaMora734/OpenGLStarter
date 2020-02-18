@@ -186,6 +186,29 @@ public:
     
 };
 
+static inline uint32_t readbit(int bitPos,  const uint8_t* data, int size){
+    int dataPosition = bitPos / 8;
+    int bitPosition = 7 - bitPos % 8;
+    if (dataPosition >= size){
+        fprintf(stderr,"error to access bit...\n");
+        exit(-1);
+    }
+    return (data[dataPosition] >> bitPosition) & 0x01;
+}
+
+static inline uint32_t readbits(int bitPos, int length, const uint8_t* data, int size){
+    if (length > 32){
+        fprintf(stderr,"readbits length greated than 32\n");
+        exit(-1);
+    }
+    uint32_t result = 0;
+    for(int i=0;i<length;i++){
+        result <<= 1;
+        result = result | readbit(bitPos+i, data, size);
+    }
+    return result;
+}
+
 class FFmpegADTSMuxer {
 
     AVOutputFormat *adts_container;
@@ -208,7 +231,19 @@ class FFmpegADTSMuxer {
     static int writeData(void *userData, uint8_t *data, int size){
         FFmpegADTSMuxer *muxer = (FFmpegADTSMuxer*)userData;
         
+        if (size<=7){
+            printf("[FFmpegADTSMuxer] pkt size too small: %i\n",size);
+            exit(-1);
+        }
+        //bits 54 - 55
+        uint32_t num_frames = (data[6] & 0x03) + 1;//readbits(54,2,data,size)+1;
+        if (num_frames != 1){
+            printf("[FFmpegADTSMuxer] NumFrames > 1 not implemented: %u\n",num_frames);
+            exit(-1);
+        }
+        
 #if USE_BITSTREAM_FILTER
+        
         BitstreamFilterADTStoASC &filter = muxer->filter;
         filter.sendBuffer(data, size);
         while (filter.getPKT()){
@@ -263,7 +298,7 @@ class FFmpegADTSMuxer {
             FakeADTSHeader[4] = (framelength >> 3) & 0xff;
             FakeADTSHeader[5] = (framelength << 5) & 0xff;
             
-            //printf(" [FFmpegADTSMuxer] framelength size calculated: %u (%u)\n", framelength, framelength-7);
+            //printf(" [FFmpegADTSMuxer] framelength size calculated: %u (%i)\n", framelength-7, size - (framelength-7) );
             
             muxer->OnData(FakeADTSHeader, 7);
             muxer->OnData(filter.mpkt.data, filter.mpkt.size);

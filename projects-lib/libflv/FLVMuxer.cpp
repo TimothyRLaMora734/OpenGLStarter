@@ -54,7 +54,8 @@ void FLVMuxer::onADTSChunk(const void* buffer, size_t size){
     
     static const uint32_t adts_sample_rates[16] = {
         96000, 88200, 64000, 48000, 44100, 32000,
-        24000, 22050, 16000, 12000, 11025, 8000, 7350
+        24000, 22050, 16000, 12000, 11025, 8000, 7350,
+        0,0,0
     };
     
     //
@@ -64,6 +65,8 @@ void FLVMuxer::onADTSChunk(const void* buffer, size_t size){
     uint8_t aacAudioObjectType = (ibuffer[2] & 0xc0) >> 6;
     uint8_t aacSampleFrequencyIndex =  (ibuffer[2] & 0x3c) >> 2;
     uint8_t aacChannelConfiguration = (ibuffer[3] & 0xc0) >> 6;
+    
+    uint32_t accNumFrames = (ibuffer[6] & 0x03) + 1;
     
     /*
     printf(" FLVMuxer \n");
@@ -93,7 +96,8 @@ void FLVMuxer::onADTSChunk(const void* buffer, size_t size){
         ADTSTimestamp.value_ms,0);
     mFLVWritter.flush(OnWriteData);
 
-    ADTSTimestamp.increment();
+    for(int i=0;i<accNumFrames;i++)
+        ADTSTimestamp.increment();
 }
 
 void FLVMuxer::onH264Chunk(const void* buffer, size_t size){
