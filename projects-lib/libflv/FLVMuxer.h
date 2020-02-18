@@ -13,7 +13,7 @@ using namespace aRibeiro;
 #include "FLVWritter.h"
 
 class FLVMuxer{
-    OnDataMethodPtrT OnWriteData;
+    FLV_OnDataMethodPtrT OnWriteData;
 
     bool writeVideo;
     bool writeAudio;
@@ -45,7 +45,7 @@ public:
              bool _writeAudio,
              uint32_t _videoFPS = 30,
              uint32_t _audioSamplerate = 44100,
-             const OnDataMethodPtrT &_OnWriteData = NULL);
+             const FLV_OnDataMethodPtrT &_OnWriteData = NULL);
 
     void writeHeader();
     void writeADTS(const void* buffer, size_t size);

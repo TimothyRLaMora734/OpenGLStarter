@@ -16,7 +16,7 @@ class ADTSParser {
         ADTS_LENGTH_SIZE
     };
 
-    OnDataMethodPtrT OnWriteData;
+    FLV_OnDataMethodPtrT OnWriteData;
     std::vector<uint8_t> buffer;
     State adtsState;
     uint32_t frameLength;
@@ -25,7 +25,7 @@ class ADTSParser {
 
 public:
 
-    ADTSParser(const OnDataMethodPtrT &_OnWriteData);
+    ADTSParser(const FLV_OnDataMethodPtrT &_OnWriteData);
     virtual ~ADTSParser();
     void parse(const uint8_t* ibuffer, int size);
 

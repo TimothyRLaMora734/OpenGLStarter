@@ -31,7 +31,7 @@ FLVMuxer flvMuxer(false, //_writeVideo,
                   true, // _writeAudio,
                   30, //_videoFPS
                   44100,//_audioSamplerate
-                  OnDataMethodPtrT(&flvWrite));
+                  FLV_OnDataMethodPtrT(&flvWrite));
 
 
 

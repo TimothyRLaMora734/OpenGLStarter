@@ -46,7 +46,7 @@ int main(int argc, char* argv[]) {
                    false, // _writeAudio,
                    30, //_videoFPS
                    44100,//_audioSamplerate
-                   OnDataMethodPtrT(&flvWrite));
+                   FLV_OnDataMethodPtrT(&flvWrite));
 
     //int fd_stdin = fileno(stdin);
     int fd_stdin = open("test.h264",O_RDONLY | O_BINARY);

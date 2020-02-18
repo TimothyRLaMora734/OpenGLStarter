@@ -28,7 +28,7 @@ class H264Parser {
         EMULATION_FORCE_SKIP
     };
 
-    OnDataMethodPtrT OnWriteData;
+    FLV_OnDataMethodPtrT OnWriteData;
     std::vector<uint8_t> buffer;
     State nalState; // nal = network abstraction layer
     State writingState;
@@ -37,7 +37,7 @@ class H264Parser {
 
 public:
 
-    H264Parser(const OnDataMethodPtrT &_OnWriteData);
+    H264Parser(const FLV_OnDataMethodPtrT &_OnWriteData);
     virtual ~H264Parser();
 
     void endOfStream();

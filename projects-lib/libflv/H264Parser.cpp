@@ -69,7 +69,7 @@ void H264Parser::putByte(uint8_t byte) {
     }
 }
 
-H264Parser::H264Parser(const OnDataMethodPtrT &_OnWriteData) {
+H264Parser::H264Parser(const FLV_OnDataMethodPtrT &_OnWriteData) {
     OnWriteData = _OnWriteData;
     nalState = None;
     writingState = None;

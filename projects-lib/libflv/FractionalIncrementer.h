@@ -30,8 +30,8 @@ public:
     // Video with 30 FPS with 1 frame input sample per time:
     //   FractionalIncrementer(1000,30)
     //
-    // Audio with 48khz with 1024 input samples per time:
-    //   FractionalIncrementer(1000*1024,48000) 
+    // Audio with 44.1khz with 1024 input samples per time:
+    //   FractionalIncrementer(1000*1024,44100)
     FractionalIncrementer(uint32_t num, uint32_t den);
     
     uint32_t increment();

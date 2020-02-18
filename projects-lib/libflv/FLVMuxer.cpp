@@ -31,10 +31,10 @@ FLVMuxer::FLVMuxer(
     bool _writeAudio,
     uint32_t _videoFPS,
     uint32_t _audioSamplerate,
-    const OnDataMethodPtrT &_OnWriteData):
+    const FLV_OnDataMethodPtrT &_OnWriteData):
         mFLVWritter(),
-        mADTSParser(OnDataMethodPtrT(this,&FLVMuxer::onADTSChunk)),
-        mH264Parser(OnDataMethodPtrT(this,&FLVMuxer::onH264Chunk)){
+        mADTSParser(FLV_OnDataMethodPtrT(this,&FLVMuxer::onADTSChunk)),
+        mH264Parser(FLV_OnDataMethodPtrT(this,&FLVMuxer::onH264Chunk)){
     
     OnWriteData = _OnWriteData;
 

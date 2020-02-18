@@ -4,7 +4,7 @@
 #include <aribeiro/aribeiro.h>
 using namespace aRibeiro;
 
-DefineMethodPointer(OnDataMethodPtrT, void, const void* data, size_t s) VoidMethodCall(data,s)
+DefineMethodPointer(FLV_OnDataMethodPtrT, void, const void* data, size_t s) VoidMethodCall(data,s)
 
 
 #endif

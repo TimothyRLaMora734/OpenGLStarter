@@ -1,7 +1,7 @@
 #include "FLVWritter.h"
 #include "FLVMuxer.h"//OnDataMethodPtrT
 
-void FLVWritter::flush(OnDataMethodPtrT &OnData){
+void FLVWritter::flush(FLV_OnDataMethodPtrT &OnData){
     if (buffer.size() <= 0)
         return;
     if (OnData != NULL)

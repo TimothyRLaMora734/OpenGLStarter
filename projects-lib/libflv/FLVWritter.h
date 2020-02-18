@@ -21,7 +21,7 @@ class FLVWritter{
 public:
     std::vector<uint8_t> buffer;
 
-    void flush(OnDataMethodPtrT &OnData);
+    void flush(FLV_OnDataMethodPtrT &OnData);
 
     void reset();
     void writeFLVFileHeader(bool haveAudio, bool haveVideo);

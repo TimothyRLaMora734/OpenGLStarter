@@ -173,7 +173,7 @@ void ADTSParser::putByte(uint8_t byte) {
     }
 }
 
-ADTSParser::ADTSParser(const OnDataMethodPtrT &_OnWriteData) {
+ADTSParser::ADTSParser(const FLV_OnDataMethodPtrT &_OnWriteData) {
     adtsState = None;
     OnWriteData = _OnWriteData;
 }
