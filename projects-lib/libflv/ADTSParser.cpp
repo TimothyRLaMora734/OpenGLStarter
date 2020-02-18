@@ -109,23 +109,24 @@ aac_info fillAACStructure(const uint8_t* ibuffer, int size){
     return result;
 }
 
+
 void printInfo(const aac_info &info){
     printf("info \n");
-    printf("     syncword: %x (0xFFF)\n", info.syncword);
-    printf("     MPEGVersion: %x (0 for MPEG-4, 1 for MPEG-2)\n", info.MPEGVersion);
-    printf("     Layer: %x (0x00)\n", info.Layer);
-    printf("     ProtectionAbsent: %x (1 protection absent - No CRC)\n", info.ProtectionAbsent);
-    printf("     MPEG4AudioObjectType_minus_1: %x (MP4 profile)\n", info.MPEG4AudioObjectType_minus_1);
-    printf("     MPEG4SamplingFrequencyIndex: %x (!= 0x%x)\n", info.MPEG4SamplingFrequencyIndex, 15);
-    printf("     private_bit: %x (0x00)\n", info.private_bit);
-    printf("     MPEG4ChannelConfiguration: %x (!=0x00)\n", info.MPEG4ChannelConfiguration);
-    printf("     originality: %x (0x01)\n", info.originality);
-    printf("     home: %x (0x00)\n", info.home);
-    printf("     copyrighted_id_bit: %x (0x00)\n", info.copyrighted_id_bit);
-    printf("     copyright_id_start: %x (0x00)\n", info.copyright_id_start);
-    printf("     frame_length: %x\n", info.frame_length);
-    printf("     Buffer_fullness: %x\n", info.Buffer_fullness);
-    printf("     Number_of_AACframes: %x\n", info.Number_of_AACframes);
+    printf("     syncword: 0x%x (0xFFF)\n", info.syncword);
+    printf("     MPEGVersion: 0x%x (0 for MPEG-4, 1 for MPEG-2)\n", info.MPEGVersion);
+    printf("     Layer: 0x%x (0x00)\n", info.Layer);
+    printf("     ProtectionAbsent: 0x%x (1 protection absent - No CRC)\n", info.ProtectionAbsent);
+    printf("     MPEG4AudioObjectType_minus_1: 0x%x (MP4 profile)\n", info.MPEG4AudioObjectType_minus_1);
+    printf("     MPEG4SamplingFrequencyIndex: 0x%x (!= 0x%x)\n", info.MPEG4SamplingFrequencyIndex, 15);
+    printf("     private_bit: 0x%x (0x00)\n", info.private_bit);
+    printf("     MPEG4ChannelConfiguration: 0x%x (!=0x00)\n", info.MPEG4ChannelConfiguration);
+    printf("     originality: 0x%x (0x01)\n", info.originality);
+    printf("     home: 0x%x (0x00)\n", info.home);
+    printf("     copyrighted_id_bit: 0x%x (0x00)\n", info.copyrighted_id_bit);
+    printf("     copyright_id_start: 0x%x (0x00)\n", info.copyright_id_start);
+    printf("     frame_length: 0x%x (%u)\n", info.frame_length, info.frame_length);
+    printf("     Buffer_fullness: 0x%x\n", info.Buffer_fullness);
+    printf("     Number_of_AACframes: 0x%x\n", info.Number_of_AACframes);
 }
 
 
@@ -133,7 +134,7 @@ void ADTSParser::putByte(uint8_t byte) {
 
     const uint32_t AAC_ADTS_HEADER_SIZE = 7;
 
-    if ( byte == 0xff ) { // && adtsState == None ) {
+    if ( byte == 0xff && (adtsState == None) ) { // && adtsState == None ) {
         adtsState = ADTS_SECOND_BYTE;
     } else if ( (byte & 0xf0) == 0xf0 && adtsState == ADTS_SECOND_BYTE) {
         adtsState = ADTS_HEADER_SIZE;
@@ -148,12 +149,16 @@ void ADTSParser::putByte(uint8_t byte) {
             
             frameLength = ((buffer[3] & 0x03) << 11) | (buffer[4] << 3) | ((buffer[5] & 0xe0) >> 5);
             
-            aac_info info = fillAACStructure((uint8_t*)&buffer[0], buffer.size());
-            printInfo(info);
+            uint8_t ProtectionAbsent = readbit(15, (uint8_t*)&buffer[0], buffer.size());
             
-            //info.frame_length;
-            //readbits(30, 13, (const uint8_t*)&buffer[0], buffer.size());
-            //((buffer[3] & 0x03) << 11) | (buffer[4] << 3) | ((buffer[5] & 0xe0) >> 5);
+            if (ProtectionAbsent == 0){
+                fprintf(stderr, "Error: CRC skip not implemented...\n");
+                exit(-1);
+            }
+            
+            //aac_info info = fillAACStructure((uint8_t*)&buffer[0], buffer.size());
+            //printInfo(info);
+            
             adtsState = ADTS_LENGTH_SIZE;
         }
     } else if (adtsState == ADTS_LENGTH_SIZE) {
@@ -177,16 +182,17 @@ ADTSParser::~ADTSParser(){
 
 void ADTSParser::parse(const uint8_t* ibuffer, int size) {
     
-    const uint32_t AAC_ADTS_HEADER_SIZE = 7;
+    //const uint32_t AAC_ADTS_HEADER_SIZE = 7;
     
     for(int i=0;i<size;i++){
         putByte(ibuffer[i]);
         
+        /*
         if (adtsState == ADTS_LENGTH_SIZE && buffer.size() == AAC_ADTS_HEADER_SIZE){
             if (frameLength != size) {
                 uint32_t  MPEG4SamplingFrequencyIndex = readbits(18, 4, (const uint8_t*)&buffer[0], buffer.size());
                 
-                printf("error on parsing ADTS frameSize: %u (%u, %u) size: %u (%x) sampleIndex: %u\n",
+                printf("error on parsing ADTS frameSize: %u (%u, %u) size: %u (0x%x) sampleIndex: %u\n",
                        frameLength,
                        ((buffer[3] & 0x03) << 11) | (buffer[4] << 3) | ((buffer[5] & 0xe0) >> 5),
                        readbits(30, 13, (const uint8_t*)&buffer[0], buffer.size()),
@@ -196,5 +202,6 @@ void ADTSParser::parse(const uint8_t* ibuffer, int size) {
                 exit(-1);
             }
         }
+        */
     }
 }

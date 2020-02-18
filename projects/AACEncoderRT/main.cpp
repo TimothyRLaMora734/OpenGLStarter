@@ -13,6 +13,9 @@
 // convert the raw PCM to AAC
 // ffmpeg -f f32le -ar 48000 -ac 2 -i output.raw -f adts -ar 48000 -ac 2 -ab 198000 output.aac
 //
+// fix tha aac generated to put in flv container using a bitstream filter:
+// ffmpeg -f aac -i output2.aac -bsf:a aac_adtstoasc -f flv -acodec copy output.flv
+//
 
 FILE* outputRAW;
 FILE* outputAAC;
@@ -33,8 +36,9 @@ FLVMuxer flvMuxer(false, //_writeVideo,
 
 
 void OnDataFromMuxer(uint8_t *data, int size){
+    //printf("  OnDataFromMuxer size: %u\n", size);
     fwrite(data, sizeof(uint8_t), (size_t)size, outputAAC);
-    //flvMuxer.writeADTS(data, size);
+    flvMuxer.writeADTS(data, size);
 }
 
 void OnDataFromAudioCard(void *fltBuffer, uint32_t frames) {

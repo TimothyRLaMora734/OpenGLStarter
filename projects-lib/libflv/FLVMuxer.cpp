@@ -58,6 +58,13 @@ void FLVMuxer::onADTSChunk(const void* buffer, size_t size){
     uint8_t aacAudioObjectType = (ibuffer[2] & 0xc0) >> 6;
     uint8_t aacSampleFrequencyIndex =  (ibuffer[2] & 0x3c) >> 2;
     uint8_t aacChannelConfiguration = (ibuffer[3] & 0xc0) >> 6;
+    
+    /*
+    printf(" FLVMuxer \n");
+    printf("    aacAudioObjectType 0x%x\n", aacAudioObjectType);
+    printf("    aacSampleFrequencyIndex 0x%x\n", aacSampleFrequencyIndex);
+    printf("    aacChannelConfiguration 0x%x\n", aacChannelConfiguration);
+    */
 
     if (ADTSTimestamp.value_ms == 0){
         //write header
