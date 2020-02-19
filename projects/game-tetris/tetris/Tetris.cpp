@@ -170,12 +170,9 @@ void Tetris::addExplosionEffect(const std::vector<vec3> &positions, const std::v
 	}
 }
 
-
 int Tetris::selectRandomUnit() {
-	return (int)((double)rand() / (double)RAND_MAX * 5.9f);
+    return Random::getRange(0,5);
 }
-
-
 
 Tetris::Tetris(AlMultiSource *whoosh,
 	AlMultiSource *plink,

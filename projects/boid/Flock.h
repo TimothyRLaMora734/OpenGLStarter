@@ -8,15 +8,6 @@ using namespace aRibeiro;
 #include "App.h"
 #include "BoidModel.h"
 
-vec3 randomDirection(){
-    vec3 aux;
-    do{
-        aux = normalize(Random::getVec3() - 0.5f);
-    }while (sqrLength(aux) < 0.0002f*0.0002f);
-    aux = normalize(aux);
-    return aux;
-}
-
 class Flock {
     App *app;
     vec3 sceneMin,sceneMax, sceneDelta;
@@ -57,7 +48,7 @@ class Flock {
                     aux = boid->pos - list[i].pos;
                     dist = length(aux);
                     if (dist <= 0.0002f) {
-                        aux = randomDirection();
+                        aux = Random::getVec3Direction();
                         aux *= 9999.0f;
                     } else {
                         aux /= dist;
@@ -112,7 +103,7 @@ public:
     }
 
     void createBoid() {
-        vec3 dir = randomDirection();
+        vec3 dir = Random::getVec3Direction();
         dir *= vec3(1.0f,0.2f,1.0f);
         dir = normalize(dir);
 

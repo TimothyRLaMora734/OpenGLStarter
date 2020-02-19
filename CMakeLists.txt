@@ -49,6 +49,7 @@ add_subdirectory( lib/libpng )
 add_subdirectory( lib/sfml )
 add_subdirectory( lib/zlib )
 add_subdirectory( lib/rtaudio )
+add_subdirectory( lib/randomlib )
 
 #
 # MainLibrary

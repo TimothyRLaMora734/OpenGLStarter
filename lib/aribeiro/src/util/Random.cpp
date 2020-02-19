@@ -1,8 +1,10 @@
 
 #include "Random.h"
-#include "win32/drand48.h"
+#include <randomlib/Random.hpp>
 
 #include <aribeiro/PlatformTime.h>
+
+RandomLib::Random _aribeiro_random;
 
 namespace aRibeiro {
 
@@ -10,58 +12,74 @@ namespace aRibeiro {
     bool Random::initialized = false;
     
 	void Random::setSeed(long int v) {
-		srand48(v);
+        _aribeiro_random.Reseed(v);
         initialized = true;
 	}
 
 	double Random::getDouble() {
         if (!initialized)
             Random::setSeed(time(NULL));
-		return drand48();
+		return _aribeiro_random.FloatN();
 	}
 	float Random::getFloat() {
         if (!initialized)
             Random::setSeed(time(NULL));
-		return (float)drand48();
+		return (float)_aribeiro_random.FloatN();
 	}
 	vec2 Random::getVec2() {
-        if (!initialized)
-            Random::setSeed(time(NULL));
-		return vec2((float)drand48(), (float)drand48());
+        return vec2(Random::getFloat(), Random::getFloat());
 	}
 	vec3 Random::getVec3() {
-        if (!initialized)
-            Random::setSeed(time(NULL));
-		return vec3((float)drand48(), (float)drand48(), (float)drand48());
+		return vec3(Random::getFloat(), Random::getFloat(), Random::getFloat());
 	}
 	vec4 Random::getVec4() {
-        if (!initialized)
-            Random::setSeed(time(NULL));
-		return vec4((float)drand48(), (float)drand48(), (float)drand48(), (float)drand48());
+		return vec4(Random::getFloat(), Random::getFloat(), Random::getFloat(), Random::getFloat());
 	}
 	
 	mat4 Random::getMat4() {
-        if (!initialized)
-            Random::setSeed(time(NULL));
-		return mat4((float)drand48(), (float)drand48(), (float)drand48(), (float)drand48(),
-			(float)drand48(), (float)drand48(), (float)drand48(), (float)drand48(),
-			(float)drand48(), (float)drand48(), (float)drand48(), (float)drand48(),
-			(float)drand48(), (float)drand48(), (float)drand48(), (float)drand48());
+		return mat4(Random::getFloat(), Random::getFloat(), Random::getFloat(), Random::getFloat(),
+			Random::getFloat(), Random::getFloat(), Random::getFloat(), Random::getFloat(),
+			Random::getFloat(), Random::getFloat(), Random::getFloat(), Random::getFloat(),
+			Random::getFloat(), Random::getFloat(), Random::getFloat(), Random::getFloat());
 	}
-    /*
-	tensor4 Random::getTensor4() {
-		return tensor4((float)drand48(), (float)drand48(), (float)drand48(), (float)drand48(),
-			(float)drand48(), (float)drand48(), (float)drand48(), (float)drand48(),
-			(float)drand48(), (float)drand48(), (float)drand48(), (float)drand48(),
-			(float)drand48(), (float)drand48(), (float)drand48(), (float)drand48());
-	}
-     */
-
 	quat Random::getQuat(){
         if (!initialized)
             Random::setSeed(time(NULL));
-		return quatFromEuler( DEG2RAD( (float)drand48() * 360.0f ) , DEG2RAD((float)drand48() * 360.0f), DEG2RAD((float)drand48() * 360.0f));
+		return quatFromEuler( DEG2RAD( Random::getFloat() * 360.0f ) , DEG2RAD(Random::getFloat() * 360.0f), DEG2RAD(Random::getFloat() * 360.0f));
 	}
-
+    
+    vec2 Random::getVec2Direction(){
+        vec2 result = Random::getVec2() * 2.0f - vec2(1.0f);
+        while (sqrLength(result) < 0.001f){
+            result = Random::getVec2() * 2.0f - vec2(1.0f);
+        }
+        result = normalize(result);
+        return result;
+    }
+    vec3 Random::getVec3Direction(){
+        vec3 result = Random::getVec3() * 2.0f - vec3(1.0f);
+        while (sqrLength(result) < 0.001f){
+            result = Random::getVec3() * 2.0f - vec3(1.0f);
+        }
+        result = normalize(result);
+        return result;
+    }
+    vec4 Random::getVec4Ptn(){
+        return vec4(Random::getVec3(), 1.0f);
+    }
+    vec4 Random::getVec4Vec(){
+        return vec4(Random::getVec3(), 0.0f);
+    }
+    vec4 Random::getVec4VecDirection(){
+        return vec4(Random::getVec3Direction(), 0.0f);
+    }
+    int Random::getRange(int min, int max) {
+        int delta = max - min + 1;
+        float rand_f = Random::getFloat() * (float)delta;
+        int rand_i = (int)rand_f;
+        if (rand_i == delta)
+            rand_i--;
+        return min + rand_i;
+    }
 }
 

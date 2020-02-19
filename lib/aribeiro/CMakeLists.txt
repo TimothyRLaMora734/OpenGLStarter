@@ -4,7 +4,7 @@ project (aribeiro)
 # General Configuration
 #
 
-set(ARIBEIRO_LIBRARIES glew convertutf png_static zlib )
+set(ARIBEIRO_LIBRARIES glew convertutf png_static zlib randomlib )
 
 # include RPI libs
 if (ARIBEIRO_RPI)
@@ -72,8 +72,6 @@ set( PUBLIC_HEADERS
 		src/platform/PlatformGL.h
 
         ${util_h}
-        src/util/win32/drand48.h
-
 
         ${opengl_h}
 
@@ -110,7 +108,6 @@ set( SRC
 		src/platform/PlatformGL.cpp
 
 		${util_src}
-        src/util/win32/drand48.cpp
 
         ${opengl_src}
 
@@ -127,10 +124,6 @@ set( SRC
 		src/opengl/font/GLStripText.cpp
 
 		)
-
-
-#Visual Studio filters
-#if (MSVC)
 
 	source_group("" FILES
 		src/aribeiro.h
@@ -169,11 +162,6 @@ set( SRC
 	source_group("util" FILES
 		${util_h}
         ${util_src}
-	)
-
-	source_group("util\\win32" FILES
-		src/util/win32/drand48.h
-		src/util/win32/drand48.cpp
 	)
 
 	source_group("opengl" FILES
