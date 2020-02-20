@@ -60,6 +60,7 @@ add_subdirectory( lib/aribeiro )
 # Project Libs
 #
 add_subdirectory( projects-lib/libflv )
+add_subdirectory( projects-lib/ffmpeg-wrapper )
 
 #
 # Projects

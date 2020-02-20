@@ -1,6 +1,7 @@
 
-#include "FFmpegADTSMuxer.h"
-#include "FFmpegAudioEncoder.h"
+#include <ffmpeg-wrapper/FFmpegADTSMuxer.h>
+#include <ffmpeg-wrapper/FFmpegAudioEncoder.h>
+
 #include "RTAudioManager.h"
 
 #include <stdio.h>
@@ -21,7 +22,7 @@ FILE* outputRAW;
 FILE* outputAAC;
 FILE* outputFLV;
 
-void flvWrite(const void* data, size_t size){
+void OnDataFromFLV(const void* data, size_t size){
     fwrite(data, sizeof(uint8_t), (size_t)size, outputFLV);
 }
 
@@ -31,11 +32,10 @@ FLVMuxer flvMuxer(false, //_writeVideo,
                   true, // _writeAudio,
                   30, //_videoFPS
                   44100,//_audioSamplerate
-                  FLV_OnDataMethodPtrT(&flvWrite));
+                  FLV_OnDataMethodPtrT(&OnDataFromFLV));
 
 
-
-void OnDataFromMuxer(uint8_t *data, int size){
+void OnDataFromMuxer(const uint8_t *data, size_t size){
     //printf("  OnDataFromMuxer size: %u\n", size);
     fwrite(data, sizeof(uint8_t), (size_t)size, outputAAC);
     flvMuxer.writeADTS(data, size);
@@ -67,12 +67,14 @@ int main(int argc, char* argv[]){
     flvMuxer.writeHeader();
 
     //tunnel the data from encoder to the muxer
-    audioEncoder.OnData.add(&adtsMuxer,&FFmpegADTSMuxer::OnDataFromEncoder);
-    audioEncoder.initAAC();
+    audioEncoder.initAAC(44100,//sample rate
+                         2 ,//channels
+                         192000 ,//bitrate
+                         FFmpeg_OnAVFrameAVPacketMethodPtrT(&adtsMuxer,&FFmpegADTSMuxer::writeData));
 
     //initialize the muxer with the encoder parameter
-    adtsMuxer.OnData.add(&OnDataFromMuxer);
-    adtsMuxer.init(audioEncoder.getCtx());
+    adtsMuxer.init(audioEncoder.getCtx(),
+                   FFmpeg_OnDataMethodPtrT(&OnDataFromMuxer));
 
 #if defined(OS_TARGET_win)
 	RTAudioInput inputAudio;// (RtAudio::WINDOWS_DS);

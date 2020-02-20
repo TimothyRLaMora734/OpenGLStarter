@@ -15,14 +15,6 @@ target_link_libraries(  ${PROJECT_NAME}
                         PUBLIC
                         ${ARIBEIRO_LIBRARIES}
                         rtaudio
-                        ${AVCODEC_LIBRARY}
-                        ${AVFORMAT_LIBRARY}
-                        ${AVUTIL_LIBRARY}
-                        #${AVDEVICE_LIBRARY}
-                        #${AVFILTER_LIBRARY}
-                        #${POSTPROC_LIBRARY}
-                        ${SWRESAMPLE_LIBRARY}
-                        #${SWSCALE_LIBRARY}
-
+                        ffmpeg-wrapper
                         libflv
 )
