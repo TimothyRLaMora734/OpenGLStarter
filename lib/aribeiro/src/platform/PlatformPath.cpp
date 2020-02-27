@@ -391,8 +391,12 @@ namespace aRibeiro {
 	}
 
 
-    void PlatformPath::splitPathString(std::string input, std::string *outFolder, std::string *outFilename, std::string *outFileWOExt, std::string *outFileExt) {
-        //
+    void PlatformPath::splitPathString(const std::string &_input, std::string *outFolder, std::string *outFilename, std::string *outFileWOExt, std::string *outFileExt) {
+		
+		//copy the parameter to use replace afterwards
+		std::string input = _input;
+
+		//
         // normalize path separator
         //
         std::replace(input.begin(), input.end(), '\\', PlatformPath::SEPARATOR[0]);

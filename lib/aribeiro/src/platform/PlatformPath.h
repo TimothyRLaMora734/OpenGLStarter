@@ -105,7 +105,7 @@ namespace aRibeiro {
         /// \param returns filename with extension
         /// \param returns filename without extension
         /// \param returns extension from filename
-        static void splitPathString(std::string input, std::string *outFolder, std::string *outFilename, std::string *outFileWOExt, std::string *outFileExt);
+        static void splitPathString(const std::string &input, std::string *outFolder, std::string *outFilename, std::string *outFileWOExt, std::string *outFileExt);
 
 
 		//static bool createDir(const std::string &path);
