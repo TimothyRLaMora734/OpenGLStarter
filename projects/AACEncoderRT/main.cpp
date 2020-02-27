@@ -1,11 +1,11 @@
 
 #include <ffmpeg-wrapper/FFmpegADTSMuxer.h>
 #include <ffmpeg-wrapper/FFmpegAudioEncoder.h>
-
-#include "RTAudioManager.h"
+#include <rtaudio-wrapper/RTAudioInput.h>
+#include <libflv/FLVMuxer.h>
 
 #include <stdio.h>
-#include <libflv/FLVMuxer.h>
+
 
 //play raw :
 // ffplay -f f32le -ar 48000 -ac 2 output.raw
@@ -41,7 +41,7 @@ void OnDataFromMuxer(const uint8_t *data, size_t size){
     flvMuxer.writeADTS(data, size);
 }
 
-void OnDataFromAudioCard(void *fltBuffer, uint32_t frames) {
+void OnDataFromAudioCard(const void *fltBuffer, uint32_t frames) {
     fwrite(fltBuffer, sizeof(float), frames*2, outputRAW);
     audioEncoder.writeBufferFloat((float*)fltBuffer, frames);
 }
@@ -74,22 +74,42 @@ int main(int argc, char* argv[]){
 
     //initialize the muxer with the encoder parameter
     adtsMuxer.init(audioEncoder.getCtx(),
-                   FFmpeg_OnDataMethodPtrT(&OnDataFromMuxer));
+                   &OnDataFromMuxer);
 
 #if defined(OS_TARGET_win)
-	RTAudioInput inputAudio;// (RtAudio::WINDOWS_DS);
+	RTAudioInput<float> inputAudio(RtAudio::WINDOWS_DS);
 #else
-	RTAudioInput inputAudio;
+	RTAudioInput<float> inputAudio;
 #endif
 
-    inputAudio.OnData.add(&OnDataFromAudioCard);
-    #if defined(OS_TARGET_mac)
-    inputAudio.initInputFromDeviceName("Apple Inc.: Built-in Input");
-    #elif defined(OS_TARGET_linux)
-    inputAudio.initInputFromDeviceName("hw:HD Pro Webcam C920,0");
-    #elif defined(OS_TARGET_win)
-	inputAudio.initInputFromDeviceName("Microfone (HD Pro Webcam C920)");
-    #endif
+#if defined(OS_TARGET_mac)
+    inputAudio.initInputFromDeviceName("Apple Inc.: Built-in Input"
+		1024,//_bufferFrames
+		RTAUDIO_FLOAT32,//format
+		44100,//samplerate
+		2,//channels
+		0,//offset
+		&OnDataFromAudioCard //OnData
+	);
+#elif defined(OS_TARGET_linux)
+    inputAudio.initInputFromDeviceName("hw:HD Pro Webcam C920,0"
+		1024,//_bufferFrames
+		RTAUDIO_FLOAT32,//format
+		44100,//samplerate
+		2,//channels
+		0,//offset
+		&OnDataFromAudioCard //OnData
+	);
+#elif defined(OS_TARGET_win)
+	inputAudio.initInputFromDeviceName("Microfone (HD Pro Webcam C920)",
+		1024,//_bufferFrames
+		RTAUDIO_FLOAT32,//format
+		44100,//samplerate
+		2,//channels
+		0,//offset
+		&OnDataFromAudioCard //OnData
+	);
+#endif
 
     fgetc(stdin);
 

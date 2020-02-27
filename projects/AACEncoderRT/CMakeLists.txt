@@ -14,7 +14,7 @@ copy_3rdparty_dll(${PROJECT_NAME})
 target_link_libraries(  ${PROJECT_NAME}
                         PUBLIC
                         ${ARIBEIRO_LIBRARIES}
-                        rtaudio
+                        rtaudio-wrapper
                         ffmpeg-wrapper
                         libflv
 )

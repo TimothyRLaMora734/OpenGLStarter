@@ -61,6 +61,7 @@ add_subdirectory( lib/aribeiro )
 #
 add_subdirectory( projects-lib/libflv )
 add_subdirectory( projects-lib/ffmpeg-wrapper )
+add_subdirectory( projects-lib/rtaudio-wrapper )
 
 #
 # Projects
