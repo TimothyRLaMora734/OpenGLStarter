@@ -9,45 +9,37 @@
 #include <stdint.h>
 
 static inline
-int32_t int_lerp32(const int32_t&a_32i, const int32_t&b_32i, float lerp) {
-	int32_t delta_32i = b_32i - a_32i;
-	int32_t result_32i;
-	if (delta_32i < 0) {
-		delta_32i = -delta_32i;
-		float delta_32f = (float)delta_32i;
-		result_32i = a_32i - (int32_t)(delta_32f * lerp + 0.5f);
-	}
-	else {
-		float delta_32f = (float)delta_32i;
-		result_32i = a_32i + (int32_t)(delta_32f * lerp + 0.5f);
-	}
-	return result_32i;
+int32_t int_lerp32_single(const int32_t&a, const int32_t&b, float lerp) {
+	float result = (float)a * (1.0f - lerp) + (float)b * lerp;
+	if (result < 0)
+		result -= 0.5f;
+	else
+		result += 0.5f;
+	return (int32_t)result;
 }
+
 
 static inline
-int64_t int_lerp64(const int64_t&a_64i, const int64_t&b_64i, float lerp) {
-	int64_t delta_64i = b_64i - a_64i;
-	int64_t result_64i;
-	if (delta_64i < 0) {
-		delta_64i = -delta_64i;
-		double delta_64f = (double)delta_64i;
-		result_64i = a_64i - (int64_t)(delta_64f * lerp + 0.5);
-	}
-	else {
-		double delta_64f = (double)delta_64i;
-		result_64i = a_64i + (int64_t)(delta_64f * lerp + 0.5);
-	}
-	return result_64i;
+int32_t int_lerp32_double(const int32_t&a, const int32_t&b, double lerp) {
+	double result = (double)a * (1.0 - lerp) + (double)b * lerp;
+	if (result < 0)
+		result -= 0.5f;
+	else
+		result += 0.5f;
+	if (result <= -_UINT32_MAX)
+		return -_UINT32_MAX;
+	else if (result >= _UINT32_MAX)
+		return _UINT32_MAX;
+	return (int32_t)result;
 }
-
 
 template<typename C>
 static inline
 C int_lerp(const C&a, const C&b, float lerp) {
 	if (sizeof(C) >= 4)
-		return (int32_t)int_lerp64(a, b, lerp);
+		return int_lerp32_double(a, b, lerp);
 	else
-		return int_lerp32(a, b, lerp);
+		return int_lerp32_single(a, b, lerp);
 }
 
 

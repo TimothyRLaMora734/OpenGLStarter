@@ -37,12 +37,12 @@ class AudioResampler {
 		else {
 			if (sizeof(C) >= 4) {
 				for (int j = 0; j < channels; j++) {
-					buffer[bufferCount*channels + j] = (int32_t)int_lerp64(sampleA[j], sampleB[j], lerp);
+					buffer[bufferCount*channels + j] = int_lerp32_double(sampleA[j], sampleB[j], lerp);
 				}
 			}
 			else {
 				for (int j = 0; j < channels; j++) {
-					buffer[bufferCount*channels + j] = int_lerp32(sampleA[j], sampleB[j], lerp);
+					buffer[bufferCount*channels + j] = int_lerp32_single(sampleA[j], sampleB[j], lerp);
 				}
 			}
 		}
@@ -76,12 +76,12 @@ public:
 		fromBuffer = NULL;
 	}
 
-	void init(bool isInt, 
-			  int frames, 
-			  int channels, 
-			  uint32_t fromSamplerate, 
-			  uint32_t toSamplerate,
-			  const RTAUDIO_OnAudioDataMethodPtrT &OnData) {
+	void init(bool isInt,
+		int frames,
+		int channels,
+		uint32_t fromSamplerate,
+		uint32_t toSamplerate,
+		const RTAUDIO_OnAudioDataMethodPtrT &OnData) {
 		if (buffer != NULL)
 			return;
 		isFloat = !isInt;
