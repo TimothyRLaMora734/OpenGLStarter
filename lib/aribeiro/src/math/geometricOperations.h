@@ -2232,8 +2232,11 @@ namespace aRibeiro {
 #elif defined(ARIBEIRO_NEON)
         return vabsq_f32(a.array_neon);
 #else
+		return vec2(absv(a.x), absv(a.y));
+		/*
         return vec2((a.x < 0) ? (-a.x) : (a.x),
                     (a.y < 0) ? (-a.y) : (a.y));
+		*/
 #endif
     }
 
@@ -2250,9 +2253,12 @@ namespace aRibeiro {
 #elif defined(ARIBEIRO_NEON)
         return vabsq_f32(a.array_neon);
 #else
+		return vec3(absv(a.x), absv(a.y), absv(a.z));
+		/*
         return vec3((a.x < 0) ? (-a.x) : (a.x),
                     (a.y < 0) ? (-a.y) : (a.y),
                     (a.z < 0) ? (-a.z) : (a.z));
+		*/
 #endif
     }
     /// \brief Compute the absolute value of a vector
@@ -2268,10 +2274,13 @@ namespace aRibeiro {
 #elif defined(ARIBEIRO_NEON)
         return vabsq_f32(a.array_neon);
 #else
+		return vec4(absv(a.x), absv(a.y), absv(a.z), absv(a.w));
+		/*
         return vec4((a.x < 0) ? (-a.x) : (a.x),
                     (a.y < 0) ? (-a.y) : (a.y),
                     (a.z < 0) ? (-a.z) : (a.z),
                     (a.w < 0) ? (-a.w) : (a.w));
+		*/
 #endif
     }
     //------------------------------------------------------------------------------
@@ -2513,7 +2522,7 @@ namespace aRibeiro {
 		_mm_f32_(r.array_sse[2],3) = 0;
         return r;
 #elif defined(ARIBEIRO_NEON)
-
+		/*
         static const float32x4_t _valuemask = (float32x4_t){ 1,1,1,0 };
         //static const float32x4_t _one = (float32x4_t){ 0,0,0,1 };
 
@@ -2525,6 +2534,20 @@ namespace aRibeiro {
             //_one
             //vaddq_f32(vmulq_f32(m.array_neon[3],_valuemask), _one)
         );
+		*/
+
+		mat4 r(
+			m.array_neon[0],
+			m.array_neon[1],
+			m.array_neon[2],
+			mat4::IdentityMatrix.array_neon[3]
+		);
+
+		r.array_neon[0][3] = 0;
+		r.array_neon[1][3] = 0;
+		r.array_neon[2][3] = 0;
+
+		return r;
 
 #else
         return mat4(m._11, m._12, m._13, 0,
