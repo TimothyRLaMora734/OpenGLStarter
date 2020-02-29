@@ -31,7 +31,7 @@ namespace collision {
 	void Plane::normalize() {
 		float mag2 = dot(normal, normal);
         const float TOLERANCE = 1e-4f;//0.001f;
-		if (fabs(mag2) > TOLERANCE && fabs(mag2 - 1.0f) > TOLERANCE)
+		if (absv(mag2) > TOLERANCE && absv(mag2 - 1.0f) > TOLERANCE)
 		{
             mag2 = sqrt(mag2);
 			mag2 = 1.0f / mag2;

@@ -491,7 +491,7 @@ namespace aRibeiro {
         const float TOLERANCE = 1e-6f;
         // Don't normalize if we don't have to
         float mag2 = dot(vec, vec);
-        if (fabs(mag2) > TOLERANCE && fabs(mag2 - 1.0f) > TOLERANCE)
+        if (absv(mag2) > TOLERANCE && absv(mag2 - 1.0f) > TOLERANCE)
             result = (vec * (1.0f / sqrtf(mag2)));
         return result;
     }
@@ -510,7 +510,7 @@ namespace aRibeiro {
 #if defined(ARIBEIRO_SSE2)
         __m128 mag2 = dot_sse_3(vec.array_sse, vec.array_sse);
         //const float TOLERANCE = 1e-6f;
-        if (fabs(_mm_f32_(mag2,0)) > EPSILON2 && fabs(_mm_f32_(mag2,0) - 1.0f) > EPSILON2)
+        if (absv(_mm_f32_(mag2,0)) > EPSILON2 && absv(_mm_f32_(mag2,0) - 1.0f) > EPSILON2)
         {
             //_mm_rsqrt_ps low precision issues...
             __m128 magInv = _mm_set1_ps(1.0f/sqrtf(_mm_f32_(mag2,0)));//_mm_rsqrt_ps( mag2 );
@@ -520,7 +520,7 @@ namespace aRibeiro {
 #elif defined(ARIBEIRO_NEON)
         float32x4_t mag2 = dot_neon_3(vec.array_neon, vec.array_neon);
         //const float TOLERANCE = 1e-6f;
-        if (fabs(mag2[0]) > EPSILON2 && fabs(mag2[0] - 1.0f) > EPSILON2)
+        if (absv(mag2[0]) > EPSILON2 && absv(mag2[0] - 1.0f) > EPSILON2)
         {
             //_mm_rsqrt_ps low precision issues...
             float32x4_t magInv = vset1(1.0f/sqrtf(mag2[0]));//_mm_rsqrt_ps( mag2 );
@@ -533,7 +533,7 @@ namespace aRibeiro {
         //const float TOLERANCE = 1e-6f;
         // Don't normalize if we don't have to
         float mag2 = dot(vec, vec);
-        if (fabs(mag2) > EPSILON2 && fabs(mag2 - 1.0f) > EPSILON2)
+        if (absv(mag2) > EPSILON2 && absv(mag2 - 1.0f) > EPSILON2)
             result = (vec * (1.0f / sqrtf(mag2)));
         return result;
 #endif
@@ -553,7 +553,7 @@ namespace aRibeiro {
 #if defined(ARIBEIRO_SSE2)
         __m128 mag2 = dot_sse_4(vec.array_sse, vec.array_sse);
         //const float TOLERANCE = 1e-6f;
-        if (fabs(_mm_f32_(mag2,0)) > EPSILON2 && fabs(_mm_f32_(mag2,0) - 1.0f) > EPSILON2){
+        if (absv(_mm_f32_(mag2,0)) > EPSILON2 && absv(_mm_f32_(mag2,0) - 1.0f) > EPSILON2){
             //_mm_rsqrt_ps low precision issues...
             __m128 magInv = _mm_set1_ps(1.0f/sqrtf(_mm_f32_(mag2,0)));//_mm_rsqrt_ps( mag2 );
             return _mm_mul_ps( vec.array_sse, magInv );
@@ -562,7 +562,7 @@ namespace aRibeiro {
 #elif defined(ARIBEIRO_NEON)
         float32x4_t mag2 = dot_neon_4(vec.array_neon, vec.array_neon);
         //const float TOLERANCE = 1e-6f;
-        if (fabs(mag2[0]) > EPSILON2 && fabs(mag2[0] - 1.0f) > EPSILON2)
+        if (absv(mag2[0]) > EPSILON2 && absv(mag2[0] - 1.0f) > EPSILON2)
         {
             //_mm_rsqrt_ps low precision issues...
             float32x4_t magInv = vset1(1.0f/sqrtf(mag2[0]));//_mm_rsqrt_ps( mag2 );
@@ -575,7 +575,7 @@ namespace aRibeiro {
         //const float TOLERANCE = 1e-6f;
         // Don't normalize if we don't have to
         float mag2 = dot(vec, vec);
-        if (fabs(mag2) > EPSILON2 && fabs(mag2 - 1.0f) > EPSILON2)
+        if (absv(mag2) > EPSILON2 && absv(mag2 - 1.0f) > EPSILON2)
             result = (vec * (1.0f / sqrtf(mag2)));
         return result;
 #endif
@@ -592,7 +592,7 @@ namespace aRibeiro {
         // Don't normalize if we don't have to
 
         float mag2 = dot(q,q);//q.w * q.w + q.x * q.x + q.y * q.y + q.z * q.z;
-        if (fabs(mag2) > EPSILON2 && fabs(mag2 - 1.0f) > EPSILON2) {
+        if (absv(mag2) > EPSILON2 && absv(mag2 - 1.0f) > EPSILON2) {
 #if defined(ARIBEIRO_SSE2)
             //__m128 magInv = _mm_rsqrt_ps( _mm_set1_ps(mag2) );
             //_mm_rsqrt_ps low precision issues...

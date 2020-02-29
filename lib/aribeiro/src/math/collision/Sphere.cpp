@@ -77,7 +77,7 @@ namespace collision {
 		float lengthPQ = dot(pq, pq);
 		const float TOLERANCE = 0.001f;
 		// check if can normalize segment
-		if (fabs(lengthPQ) > TOLERANCE && fabs(lengthPQ - 1.0f) > TOLERANCE)
+		if (absv(lengthPQ) > TOLERANCE && absv(lengthPQ - 1.0f) > TOLERANCE)
 			pq *= 1.0f / lengthPQ;
 		else {
 			//test the point inside the sphere
